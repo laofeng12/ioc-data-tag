@@ -1,0 +1,88 @@
+.el-table {
+  margin-top: 20px;
+}
+
+
+// 可编辑的单元格的样式
+.link-column-color {
+  color: #409EFF;
+  cursor: pointer;
+  .el-input__inner {
+    color: #409EFF;
+  }
+}
+.editalble-column {
+  .el-input {
+    z-index: 10;
+    display: none;
+    .el-input__inner {
+      background: transparent;
+      border: none;
+      text-align: center;
+      padding: 0;
+      height: auto;
+      line-height: 1;
+    }
+  }
+  .unable-edit-label {
+    display: inline-block;
+  }
+}
+.editable-active {
+  .el-input {
+    display: block;
+  }
+  .unable-edit-label {
+    display: none;
+  }
+}
+.editable-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #409EFF;
+  z-index: 1;
+}
+.w-form-warning-label {
+  padding-left: 20px;
+}
+
+.editable-key-value-list {
+  .grid-content {
+    min-height: 46px;
+    font-size: 14px;
+    line-height: 46px;
+    &.title {
+      color: #000000;
+      font-weight: bold;
+      &.value-grid {
+        border-left: 1px solid #cccccc;
+      }
+    }
+    &.value-grid {
+      padding-left: 10px;
+    }
+  }
+  
+}
+.el-form-item.is-success{
+  .el-input__inner{
+       border-color: #dcdfe6;
+     }
+  .el-textarea__inner{
+       border-color:#dcdfe6;
+     }
+  .el-input__inner {
+    &:focus {
+      border-color: #dcdfe6;
+    }
+  }
+    .el-textarea__inner {
+      &:focus {
+        border-color: #dcdfe6;
+      }
+    }
+  }

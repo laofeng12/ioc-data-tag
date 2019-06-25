@@ -1,0 +1,99 @@
+@import '../styles/variables';
+
+.chart-setting-box {
+  min-height: calc(100vh - 50px);
+  .filtrate-wrap {
+    position: relative;
+    #filtrate {
+      min-height: 200px;
+    }
+    ul {
+      margin-bottom: 10px;
+    }
+    ul:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .draw-list {
+    margin-bottom: 10px;
+    header {
+      margin-bottom: 5px;
+    }
+  }
+  .aside-right {
+    width: 100% !important;
+    >>>
+    .el-aside {
+      display: flex;
+      flex-direction: column;
+      div.shink-pannel:last-child {
+        display: flex;
+        flex: 1;
+        .el-card {
+          flex: 1;
+          margin-bottom: 0;
+        }
+      }
+    }
+    .el-container {
+      min-height: calc(100vh - 50px);
+    }
+  }
+
+  .no-dataset{
+    color: #cccccc;
+    font-size: 16px;
+    text-align: center;
+    border: 1px dashed #ccc;
+    padding: 5px;
+  }
+  .has-dataset{
+    font-size: 14px;
+    margin-block-start:0;
+    margin-block-end:0;
+    padding-inline-start: 0;
+    .data-list{
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content:space-between;
+      margin-bottom: 5px;
+      i{
+        color: $color;
+        &.close:hover{
+          cursor: pointer;
+          font-weight: bold;
+        }
+      }
+      .filtrate-btn-box {
+        .el-icon-close {
+          color: #fff;
+          &:hover {
+            font-weight: bold;
+          }
+        }
+      }
+    }
+    &.dimen{
+      margin-top: 10px;
+    }
+    .dimen-list{
+      cursor:move;
+    }
+    &.unvisable{
+      li{
+        display: none;
+      }
+    }
+    &.filtrate-list{
+      height: 200px;
+      overflow: hidden;
+      overflow-y: auto;
+
+    }
+  }
+  .unvisable{
+    li{
+      display: none;
+    }
+  }
+}
