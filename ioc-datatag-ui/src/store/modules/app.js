@@ -63,6 +63,16 @@ const app = {
               'parentResId': '0',
               'subResList': [
                 {
+                  'resId': '742732609200195',
+                  'resName': '模型部署管理',
+                  'resURL': '/lableImage',
+                  'resType': null,
+                  'resSort': 0,
+                  'resIcon': 'fa fa-columns',
+                  'parentResId': '742732244680195',
+                  'subResList': null
+                },
+                {
                   'resId': '742782609200195',
                   'resName': '标签仪表盘',
                   'resURL': '/tagPanel',

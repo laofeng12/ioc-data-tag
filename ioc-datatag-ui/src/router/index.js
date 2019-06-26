@@ -34,12 +34,18 @@ export default new Router({
       ]
     },
     {
-      path: '/lableImage',
-      name: 'lableImage',
+      path: '/taggedImage',
+      name: 'taggedImage',
       component: ContainerWrapper,
-      redirect: '/tagPanel',
+      redirect: '/lableImage',
       meta: { title: '数据标签与画像' },
       children: [
+        {
+          path: '/lableImage',
+          name: 'lableImage',
+          meta: { title: '模型部署管理' },
+          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/lableImage.vue')
+        },
         {
           path: '/tagPanel',
           name: 'tagPanel',
