@@ -1,0 +1,173 @@
+.cus-box {
+  .cus-left {
+    padding: 15px 0;
+    .left-search {
+      padding: 0 5px 5px 5px;
+    }
+    .left-tabs {
+      position: relative;
+      .cus-tabs {
+        .no-tree-data {
+          height: calc(100vh - 267px);
+          text-align: center;
+        }
+        .el-tree {
+          height: calc(100vh - 299px);
+          overflow: auto;
+          .el-tree-node__expand-icon.expanded {
+            transform: none;
+          }
+          .el-tree-node__expand-icon.expanded:before {
+            content: "\e784";
+          }
+        }
+        .cus-empty {
+          text-align: center;
+        }
+      }
+      //.cus-plus {
+      //  position: absolute;
+      //  top: 1px;
+      //  right: 2px;
+      //  height: 40px;
+      //  line-height: 40px;
+      //  cursor: pointer;
+      //  .el-icon-plus:hover {
+      //    color: #5cb6ff;
+      //  }
+      //}
+    }
+
+    //树的操作菜单列表
+    .cus-node-content {
+      //display: none;
+      opacity: 0;
+      filter:Alpha(opacity=0);
+      transition: opacity .5s;
+      position: absolute;
+      right: 5px;
+      top: 2px;
+      .el-button {
+        padding: 4px 6px;
+      }
+    }
+    .custom-tree-node {
+      width: 84%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      .cus-node-title {
+        color: #606266;
+        font-size: 14px;
+      }
+    }
+    .el-tree-node__content {
+      position: relative;
+    }
+    .el-tree-node__content:hover {
+      .cus-node-content {
+        display: inline-block;
+        opacity: 1;
+        filter:Alpha(opacity=100);
+        transition: opacity .5s;
+      }
+    }
+  }
+  .cus-right {
+    margin-left: 20px;
+    .right-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      h3 {
+        font-weight: 400;
+        color: #1f2f3d;
+        margin: 0;
+      }
+      .cus-edit-btn {
+        margin: 0 10px;
+      }
+    }
+    .right-bottom {
+      margin-top: 4px;
+      .cus-panel {
+        border-left: 1px solid #f5f5f5;
+        border-right: 1px solid #f5f5f5;
+        .el-collapse-item__header {
+          background-color: #f5f5f5;
+          padding-left: 10px;
+          font-size: 14px;
+        }
+      }
+      .cus-table {
+        .report-scheme {
+          text-align: right;
+          width: 100%;
+          display: inline-block;
+          margin: 15px 0 0 0;
+          color: #888;
+          font-size: 14px;
+          font-family: serif;
+        }
+        .el-divider {
+          margin: 5px 0;
+        }
+        .el-table {
+          margin-top: 10px;
+        }
+      }
+      .cus-field-table {
+        //table {
+        //  width: 100%;
+        //}
+        .vxe-table--header-wrapper {
+          thead {
+            color: #222;
+            font-size: 14px;
+          }
+          thead th {
+            background-color: #f4f9fb;
+          }
+        }
+        .vxe-table--body-wrapper {
+          body th, .el-table__body td {
+            padding: 9px 0;
+            .el-button {
+              padding: 0 15px;
+            }
+          }
+        }
+      }
+    }
+  }
+  .cus-left, .cus-right {
+    background-color: #fff;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  /**滚动条样式**/
+  ::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    border: 5px solid transparent;
+  }
+
+  ::-webkit-scrollbar-track {
+    box-shadow: 1px 1px 5px rgba(0,0,0,.2) inset;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    min-height: 20px;
+    background-clip: content-box;
+    box-shadow: 0 0 0 5px rgba(0,0,0,.2) inset;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
