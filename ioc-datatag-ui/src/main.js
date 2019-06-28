@@ -12,15 +12,10 @@ import './icons'
 import '@/styles/index.scss'
 import api from '@/api'
 import * as filters from '@/filters'
-import echarts from 'echarts'
-Vue.prototype.$echarts = echarts
-require('echarts-wordcloud')
 Vue.use(ElementUI)
 
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
-  console.log('key', key)
-  console.log('filters', filters)
 })
 
 Vue.use(Portal)

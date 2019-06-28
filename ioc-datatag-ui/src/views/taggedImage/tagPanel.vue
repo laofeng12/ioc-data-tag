@@ -1,19 +1,19 @@
 <template>
-    <!--<div class="app-container">标签仪表盘</div>-->
+  <!--<div class="app-container">标签仪表盘</div>-->
   <div class="app-container">
     <div class="content">
       <div class="dataChange">
-          <div class="changeOne">
-            <div class="distance">
-              <div class="title">数据集</div>
-              <div>
-                <span><i class="el-icon-plus iconSize"></i></span>
-                <span class="num">12</span>
-                <span class="percentage">%</span>
-              </div>
-              <div class="name">上个月的统计数据</div>
+        <div class="changeOne">
+          <div class="distance">
+            <div class="title">数据集</div>
+            <div>
+              <span><i class="el-icon-plus iconSize"></i></span>
+              <span class="num">12</span>
+              <span class="percentage">%</span>
             </div>
+            <div class="name">上个月的统计数据</div>
           </div>
+        </div>
         <div class="changeTwo">
           <div class="distance">
             <div class="title">标签/数据集</div>
@@ -50,7 +50,7 @@
           </div>
         </div>
         <div class=" barGraph">
-          <div id="myChart" :style="{width: '100%', height: '300px'}"></div>
+          <chart></chart>
         </div>
       </div>
       <div class="label">
@@ -115,174 +115,114 @@
 </template>
 
 <script>
+  import chart from '@/components/panel/chart'
+
   export default {
+    components: {
+      chart
+    },
     name: 'tagPanel',
-    data () {
-      return {
-
-      }
+    data() {
+      return {}
     },
-    mounted () {
-      this.drawLine()
+    mounted() {
+
     },
-    methods: {
-      drawLine () {
-        let myChart = this.$echarts.init(document.getElementById('myChart'))
-        let option = {
-            color: ['#3398DB'],
-            tooltip : {
-              trigger: 'axis',
-              axisPointer : {
-                type : 'shadow'
-              }
-            },
-            grid: {
-              left: '2%',
-              right: '0%',
-              bottom: '3%',
-              containLabel: true
-            },
-            xAxis : [
-              {
-                type : 'category',
-                data : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun','Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-                axisTick: {
-                  alignWithLabel: true
-                }
-              }
-            ],
-            yAxis : [
-              {
-                type : 'value',
-                "axisLine":{
-                  "show":false
-                },
-                "axisTick":{
-                  "show":false
-                },
-                "splitLine": {
-                  "show": false
-                }
-              },
-
-            ],
-            series : [
-              {
-                name:'直接访问',
-                type:'bar',
-                barWidth: '60%',
-                data:[10, 52, 200, 334, 390, 330, 220,10, 52, 200, 334, 390],
-                markLine: {
-                  symbol: ['none', 'none'], //标示线，虚线
-                  itemStyle: {
-                    normal: {
-                      lineStyle:
-                        {
-                          type: 'dotted',
-                        },
-                      label:
-                        {
-                          show: false,
-                        }
-                    }
-                  },
-                  data: [{
-                    yAxis: 100
-                  }, {
-                    yAxis: 200
-                  }, {
-                    yAxis: 300
-                  },{
-                    yAxis: 400
-                  }]
-                }
-              }
-            ]
-          };
-
-        // 为echarts对象加载数据
-        myChart.setOption(option)
-      }
-    }
+    methods: {}
   }
 </script>
 
 <style scoped>
-  .content{
+  .content {
     width: 100%;
     height: 100%;
     padding-left: 40px;
     padding-right: 40px;
     text-align: center;
   }
-  .dataChange{
+
+  .dataChange {
     display: flex;
-    /*justify-content: space-around;*/
     justify-content: space-between;
   }
-  .changeOne,.changeTwo,.changeThree{
+
+  .changeOne, .changeTwo, .changeThree {
     display: flex;
     align-items: center;
     width: 300px;
     height: 160px;
   }
-  .changeOne{
+
+  .changeOne {
     background-color: rgba(255, 204, 51, 1);
   }
-  .changeTwo{
+
+  .changeTwo {
     background-color: rgba(102, 153, 255, 1);
   }
-  .changeThree{
+
+  .changeThree {
     background-color: rgba(43, 192, 72, 1);
   }
-  .title{
+
+  .title {
     font-size: 16px;
     color: #ffffff;
   }
-  .iconSize,.name{
+
+  .iconSize, .name {
     font-size: 16px;
     color: #ffffff;
   }
-  .num,.percentage{
+
+  .num, .percentage {
     font-size: 26px;
     color: #ffffff;
   }
-  .distance{
+
+  .distance {
     line-height: 40px;
     width: 300px;
   }
 
-  .histogram,.label{
+  .histogram, .label {
     width: 100%;
     display: flex;
     margin-top: 50px;
   }
-.tag{
-  width: 15%;
-  text-align: left;
-  font-size: 14px;
-  color: #a7a7a7;
-}
-.barGraph{
-  width: 85%;
-  display: flex;
-}
-  .labelchangeTitle{
+
+  .tag {
+    width: 15%;
+    text-align: left;
+    font-size: 14px;
+    color: #a7a7a7;
+  }
+
+  .barGraph {
+    width: 85%;
+    display: flex;
+  }
+
+  .labelchangeTitle {
     font-size: 16px;
     color: #333333;
   }
-  .labelchangeTitle,.labelchangeOne,.labelchangeTwo,.labelchangeThree{
+
+  .labelchangeTitle, .labelchangeOne, .labelchangeTwo, .labelchangeThree {
     margin-top: 8px;
   }
-  .barGraphOne{
+
+  .barGraphOne {
     width: 20%;
   }
-  .titleName{
+
+  .titleName {
     font-size: 14px;
     color: #a7a7a7;
     margin-top: 5px;
   }
-  .titleContent{
+
+  .titleContent {
     text-align: center;
     font-size: 12px;
     background-color: rgba(0, 204, 204, 1);
@@ -290,10 +230,12 @@
     padding: 4px 6px;
     border-radius: 4px;
   }
-  .contentSpacing{
+
+  .contentSpacing {
     margin-top: 8px;
   }
-  .contentBtn{
+
+  .contentBtn {
     padding-bottom: 10px;
   }
 </style>
