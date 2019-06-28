@@ -1,0 +1,61 @@
+package com.openjava.datatag.tagmanage.service;
+
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
+import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * DT_TAG_GROUP业务层
+ * @author lch
+ *
+ */
+@Service
+@Transactional
+public class DtTagGroupServiceImpl implements DtTagGroupService {
+	
+	@Resource
+	private DtTagGroupRepository dtTagGroupRepository;
+
+	@Resource
+	private  DtTagService dtTagService;
+	
+	public Page<DtTagGroup> query(DtTagGroupDBParam params, Pageable pageable){
+		Page<DtTagGroup> pageresult = dtTagGroupRepository.query(params, pageable);
+		return pageresult;
+	}
+	
+	public List<DtTagGroup> queryDataOnly(DtTagGroupDBParam params, Pageable pageable){
+		return dtTagGroupRepository.queryDataOnly(params, pageable);
+	}
+	
+	public DtTagGroup get(Long id) {
+		Optional<DtTagGroup> o = dtTagGroupRepository.findById(id);
+		if(o.isPresent()) {
+			DtTagGroup m = o.get();
+			return m;
+		}
+		System.out.println("找不到记录DtTagGroup："+id);
+		return null;
+	}
+	
+	public DtTagGroup doSave(DtTagGroup m) {
+		return dtTagGroupRepository.save(m);
+	}
+
+	@Transactional
+	public DtTagGroup doSoftDelete(DtTagGroup m){
+		m.setIsDeleted(1L);
+		//批量修改标签表的删除标识
+		dtTagService.doSoftDeleteByTagsID(m.getId());
+		//修改标签组表的删除标识
+		return doSave(m);
+	}
+}
