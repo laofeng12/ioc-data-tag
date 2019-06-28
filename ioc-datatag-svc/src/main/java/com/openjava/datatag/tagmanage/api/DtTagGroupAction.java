@@ -6,9 +6,11 @@ import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
 import io.swagger.annotations.*;
 import org.ljdp.common.bean.MyBeanUtils;
+import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.ApiResponse;
 import org.ljdp.component.result.BasicApiResponse;
 import org.ljdp.component.result.DataApiResponse;
+import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.sequence.SequenceService;
 import org.ljdp.component.user.BaseUserInfo;
@@ -40,6 +42,8 @@ public class DtTagGroupAction {
 	@Resource
 	private DtTagService dtTagService;
 	
+
+
 	/**
 	 * 用主键获取数据
 	 * @param id
@@ -47,52 +51,47 @@ public class DtTagGroupAction {
 	 */
 	@ApiOperation(value = "根据ID获取", notes = "单个对象查询", nickname="id")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "id", value = "主标识编码", required = true, dataType = "string", paramType = "path"),
+			@ApiImplicitParam(name = "id", value = "主标识编码", required = true, dataType = "string", paramType = "path"),
 	})
 	@ApiResponses({
-		@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
-		@io.swagger.annotations.ApiResponse(code=10001, message="无权限查看")
+			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
+			@io.swagger.annotations.ApiResponse(code=10001, message="无权限查看")
 	})
 	@Security(session=true)
-	@RequestMapping(value="/{id}",method= RequestMethod.GET)
-	public DataApiResponse<DtTagGroup> get(@PathVariable("id")Long id) {
+	@RequestMapping(value="/{id}",method=RequestMethod.GET)
+	public DtTagGroup get(@PathVariable("id")Long id) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTagGroup m = dtTagGroupService.get(id);
-		DataApiResponse<DtTagGroup> apiResp = new DataApiResponse<>();
 		if(m == null){
-			apiResp.setData(m);
-			return apiResp;
+			return m;
 		}
 		if(userInfo.getUserId().equals(m.getCreateUser().toString())){
-			apiResp.setData(m);
-			return apiResp;
+			return m;
 		}else{
-			apiResp.setCode(10001);
-			apiResp.setMessage("无权限查看");
-			return apiResp;
+			throw new APIException(10001,"无权限查看");
 		}
 	}
-	
-	@ApiOperation(value = "标签组列表分页查询(我的)", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
+
+	@ApiOperation(value = "列表分页查询(我的标签组)", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "like_tagsName", value = "标签组名like", required = false, dataType = "String", paramType = "query"),
-		@ApiImplicitParam(name = "eq_isShare", value = "是否共享=", required = false, dataType = "Long", paramType = "query"),
-		@ApiImplicitParam(name = "like_synopsis", value = "标签组简介like", required = false, dataType = "String", paramType = "query"),
-		//@ApiImplicitParam(name = "eq_user", value = "创建者=", required = false, dataType = "Long", paramType = "query"),
-		//@ApiImplicitParam(name = "eq_modifyUser", value = "修改者名=", required = false, dataType = "String", paramType = "query"),
-		//@ApiImplicitParam(name = "eq_isDeleted", value = "删除标记=", required = false, dataType = "Long", paramType = "query"),
-		@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
-		@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "like_tagsName", value = "标签组名like", required = false, dataType = "String", paramType = "query"),
+			@ApiImplicitParam(name = "eq_isShare", value = "是否共享=", required = false, dataType = "Long", paramType = "query"),
+			@ApiImplicitParam(name = "like_synopsis", value = "标签组简介like", required = false, dataType = "String", paramType = "query"),
+			//@ApiImplicitParam(name = "eq_createUser", value = "创建者=", required = false, dataType = "Long", paramType = "query"),
+			//@ApiImplicitParam(name = "eq_isDeleted", value = "删除标记=", required = false, dataType = "Long", paramType = "query"),
+			@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
 	})
 	@Security(session=true)
-	@RequestMapping(value="/MyTagGroupList",method= RequestMethod.GET)
-	public TablePage<DtTagGroup> getMyTagGroupList(@ApiIgnore() DtTagGroupDBParam params, @ApiIgnore() Pageable pageable){
+	@RequestMapping(value="/search",method=RequestMethod.GET)
+	public TablePage<DtTagGroup> doSearch(@ApiIgnore() DtTagGroupDBParam params, @ApiIgnore() Pageable pageable){
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long id = Long.parseLong(userInfo.getUserId());
 		params.setEq_createUser(id);
 		params.setEq_isDeleted(0L);
 		Page<DtTagGroup> result =  dtTagGroupService.query(params, pageable);
 		return new TablePageImpl<>(result);
+
 	}
 
 	@ApiOperation(value = "标签组列表分页查询(共享)-未完成-需要连接用户表", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
@@ -100,14 +99,13 @@ public class DtTagGroupAction {
 			@ApiImplicitParam(name = "like_tagsName", value = "标签组名like", required = false, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "eq_isShare", value = "是否共享=", required = false, dataType = "Long", paramType = "query"),
 			@ApiImplicitParam(name = "like_synopsis", value = "标签组简介like", required = false, dataType = "String", paramType = "query"),
-			@ApiImplicitParam(name = "eq_createUser", value = "创建者=", required = false, dataType = "Long", paramType = "query"),
-			@ApiImplicitParam(name = "eq_modifyUser", value = "修改者名=", required = false, dataType = "String", paramType = "query"),
-			//@ApiImplicitParam(name = "eq_isDeleted", value = "删除标记=", required = false, dataType = "Long", paramType = "query"),
+			//@ApiImplicitParam(name = "eq_createUser", value = "创建者=", required = false, dataType = "Long", paramType = "query"),
+			@ApiImplicitParam(name = "eq_isDeleted", value = "删除标记=", required = false, dataType = "Long", paramType = "query"),
 			@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
 	})
 	@Security(session=true)
-	@RequestMapping(value="/searchShare",method= RequestMethod.GET)
+	@RequestMapping(value="/searchShare",method=RequestMethod.GET)
 	public TablePage<DtTagGroup> doSearchShare(@ApiIgnore() DtTagGroupDBParam params, @ApiIgnore() Pageable pageable){
 		params.setEq_isDeleted(0L);
 		params.setEq_isShare(1L);
@@ -116,14 +114,12 @@ public class DtTagGroupAction {
 		return new TablePageImpl<>(result);
 	}
 
-	/**
-	 * 软删除标签模型和下属的tag
-	 * @param id
-	 * @return
-	 */
-	@ApiOperation(value = "根据ID删除", notes = "软删除标签组和下属的标签", nickname="delete")
+
+
+	@ApiOperation(value = "删除", nickname="delete")
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "id", value = "主标识编码", required = true, dataType = "string", paramType = "post"),
+			@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
+			//@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
 	})
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
@@ -131,55 +127,34 @@ public class DtTagGroupAction {
 			@io.swagger.annotations.ApiResponse(code=10003, message="无权限删除")
 	})
 	@Security(session=true)
-	@RequestMapping(value="/deleteTagGroup",method= RequestMethod.POST)
-	public ApiResponse doSoftDelete(@RequestParam("id")Long id) {
+	@RequestMapping(method=RequestMethod.DELETE)
+	public SuccessMessage doDelete(
+			@RequestParam(value="id",required=false)Long id,
+			@RequestParam(value="ids",required=false)String ids) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTagGroup tagGroup = dtTagGroupService.get(id);
-		ApiResponse apiResp = new BasicApiResponse();
 		if(tagGroup == null || tagGroup.getIsDeleted().equals(1L)){
-			apiResp.setCode(10002);
-			apiResp.setMessage("无此标签组或已被删除");
-			return apiResp;
+			throw new APIException(10002,"无此标签组或已被删除");
 		}
 		if(userInfo.getUserId().equals(tagGroup.getCreateUser().toString())){
 			dtTagGroupService.doSoftDelete(tagGroup);//级联软删除，子标签也会被删除
-			apiResp.setCode(200);
-			return apiResp;
+			return new SuccessMessage("删除成功");
 		}else{
-			apiResp.setCode(10003);
-			apiResp.setMessage("无权限删除");
-			return apiResp;
+			throw new APIException(10003,"无权限删除");
 		}
 	}
 
-	/**
-	 * 设置共享或取消共享
-	 */
-//	@ApiOperation(value = "设置共享或取消共享", nickname="save", notes = "报文格式：content-type=application/json")
-//	@Security(session=true)
-//	@RequestMapping(method= RequestMethod.POST)
-//	@ApiImplicitParams({
-//			@ApiImplicitParam(name = "id", value = "主标识编码", required = true, dataType = "String", paramType = "post"),
-//			@ApiImplicitParam(name = "shared", value = "是否共享标识", required = true, dataType = "Long", paramType = "post"),
-//	})
-//	public ApiResponse setShare(@RequestParam("id") Long id,@RequestParam("shared") Long shared) {
-//		//DtTagGroup tagGroup =
-//		;
-//	}
-	
+
 	/**
 	 * 保存
 	 */
-	@ApiOperation(value = "保存操作", nickname="save", notes = "报文格式：content-type=application/json")
+	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
-	@RequestMapping(method= RequestMethod.POST)
-	public ApiResponse doSave(@RequestBody DtTagGroup body) {
+	@RequestMapping(method=RequestMethod.POST)
+	public SuccessMessage doSave(@RequestBody DtTagGroup body
 
-		if(body.getIsNew() == null || body.getIsNew()) {
-			//取登录系统session的ID而不是前端传过来的
-			Long SessionUserID = 770403422520146L;
-			body.setCreateUser(SessionUserID);
-
+	) {
+		if (body.getIsNew() == null || body.getIsNew()) {
 			//新增，记录创建时间等
 			//设置主键(请根据实际情况修改)
 			SequenceService ss = ConcurrentSequence.getInstance();
@@ -187,24 +162,12 @@ public class DtTagGroupAction {
 			body.setIsNew(true);//执行insert
 			DtTagGroup dbObj = dtTagGroupService.doSave(body);
 		} else {
-
-			//修改，记录更新时间等--验证是否已经删除
+			//修改，记录更新时间等
 			DtTagGroup db = dtTagGroupService.get(body.getId());
-			if (db.getIsDeleted().equals(0L)){
-				//取登录系统的ID而不是前端传过来的
-				//不可以更新创建者
-				body.setCreateUser(db.getCreateUser());
-				MyBeanUtils.copyPropertiesNotBlank(db, body);
-				db.setIsNew(false);//执行update
-				dtTagGroupService.doSave(db);
-			}else {
-				return  new BasicApiResponse(500,"该标签已被删除");
-
-			}
+			MyBeanUtils.copyPropertiesNotBlank(db, body);
+			db.setIsNew(false);//执行update
+			dtTagGroupService.doSave(db);
 		}
-		BasicApiResponse resp = new BasicApiResponse();
-		return resp;
+		return new SuccessMessage("保存成功");
 	}
-	
-	
 }

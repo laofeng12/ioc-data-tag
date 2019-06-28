@@ -22,5 +22,7 @@ public interface DtTagGroupService {
 	DtTagGroup doSave(DtTagGroup m);
 
 	DtTagGroup doSoftDelete(DtTagGroup m);
+
+
 	
 }

@@ -51,7 +51,7 @@ public class DtTagServiceImpl implements DtTagService {
 		dtTagRepository.softDelete(id);
 	}
 
-	/*
+
 	public void doDelete(Long id) {
 		dtTagRepository.deleteById(id);
 	}
@@ -60,5 +60,5 @@ public class DtTagServiceImpl implements DtTagService {
 		for (int i = 0; i < items.length; i++) {
 			dtTagRepository.deleteById(new Long(items[i]));
 		}
-	}*/
+	}
 }

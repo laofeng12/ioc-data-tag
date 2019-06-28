@@ -22,5 +22,7 @@ public interface DtTagService {
 	DtTag doSave(DtTag m);
 
 	void doSoftDeleteByTagsID(Long id);
-	//void doRemove(String ids);
+
+	void doDelete(Long id);
+	void doRemove(String ids);
 }
