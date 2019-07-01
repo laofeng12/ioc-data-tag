@@ -61,5 +61,10 @@ public class Constants {
     public static final String SERVICE_LOGO = "logo";//服务logo
     public static final String SERVICE_ATTACHMENT = "attachment";//服务附件
 
-
+    //===========标签模型运行状态=========
+    public static final String DT_TGMODEL_STATUS="dt.tgmode.status";//共享数据字典
+    public static final Long TG_MODEL_NO_BEGIN = 0L;//未开始
+    public static final Long TG_MODEL_BEGIN = 1L;//开始运行
+    public static final Long TG_MODEL_ERROR = 3L;//运行出错
+    public static final Long TG_MODEL_END = 4L;//运行结束
 }
