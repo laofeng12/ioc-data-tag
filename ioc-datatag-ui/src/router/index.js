@@ -62,6 +62,24 @@ export default new Router({
           meta: { title: '画像查询' },
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/portraitQuery.vue')
         }]
-    }
+    },
+    {
+      path: '/tagManage',
+      name: 'tagManage',
+      component: ContainerWrapper,
+      redirect: '/tagManage',
+      meta: { title: '标签管理' },
+      children: [{
+          path: '/tree',
+          name: 'tree',
+          meta: { title: '创建标签组' },
+          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
+        },{
+        path: '/shareLabel',
+        name: 'shareLabel',
+        meta: { title: '共享标签组' },
+        component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/shareLabel.vue')
+      }]
+    },
   ]
 })
