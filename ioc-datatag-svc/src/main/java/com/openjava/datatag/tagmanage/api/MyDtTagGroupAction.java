@@ -57,8 +57,8 @@ public class MyDtTagGroupAction {
 	public DtTagGroup get(@PathVariable("id")Long id) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTagGroup m = dtTagGroupService.get(id);
-		if(m == null){
-			return m;
+		if(m == null || m.getIsDeleted().equals(1L)){
+			return null;
 		}
 		if(userInfo.getUserId().equals(m.getCreateUser().toString())){
 			return m;
@@ -99,7 +99,7 @@ public class MyDtTagGroupAction {
 	})
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
-			@io.swagger.annotations.ApiResponse(code=10002, message="无此标签或已被删除"),
+			@io.swagger.annotations.ApiResponse(code=10002, message="无此标签组或已被删除"),
 			@io.swagger.annotations.ApiResponse(code=10003, message="无权限删除")
 	})
 	@Security(session=true)
@@ -125,7 +125,7 @@ public class MyDtTagGroupAction {
 	/**
 	 * 保存
 	 */
-	@ApiOperation(value = "保存标签组(仅标签组)/共享与停止共享", nickname="save", notes = "报文格式：content-type=application/json")
+	@ApiOperation(value = "修改标签组(仅标签组)/共享与停止共享", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.POST)
 	@ApiResponses({
@@ -137,6 +137,8 @@ public class MyDtTagGroupAction {
 	public SuccessMessage doSave(@RequestBody DtTagGroup body) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long userId = Long.parseLong(userInfo.getUserId());
+		//不能通过本接口修改热度
+		body.setPopularity(null);
 		if (body.getIsNew() == null || body.getIsNew()) {
 			dtTagGroupService.doNew(body,userId);
 		} else {
@@ -146,7 +148,7 @@ public class MyDtTagGroupAction {
 				throw new APIException(10002,"无此标签组或已被删除");
 			}
 			if(db.getCreateUser().equals(userId)){
-				if(body.getIsDeleted().equals(1L)){
+				if(body.getIsDeleted()!= null && body.getIsDeleted().equals(1L)){
 					throw new APIException(500,"请不要调用POST方法进行删除操作,请用DELETE方法");
 				}
 				dtTagGroupService.doUpdate(body,db);

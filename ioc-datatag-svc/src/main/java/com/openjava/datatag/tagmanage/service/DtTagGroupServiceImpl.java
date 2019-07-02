@@ -75,6 +75,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		body.setModifyTime(now);
 		body.setIsDeleted(0L);
 		body.setIsShare(0L);
+		body.setPopularity(0L);
 		return doSave(body);
 	}
 

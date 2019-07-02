@@ -52,6 +52,11 @@ public class DtTagServiceImpl implements DtTagService {
 		dtTagRepository.doSoftDeleteByTagsID(id,now);
 	}
 
+	public List<DtTag> findByTagsId(Long tagsId){
+		//查询所有未删除的标签list
+		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId,0L);
+	}
+
 
 	public void doDelete(Long id) {
 		dtTagRepository.deleteById(id);

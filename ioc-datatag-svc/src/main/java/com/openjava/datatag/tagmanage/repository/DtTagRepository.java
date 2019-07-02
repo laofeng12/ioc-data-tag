@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * DT_TAG数据库访问层
@@ -20,4 +21,5 @@ public interface DtTagRepository extends DynamicJpaRepository<DtTag, Long>, DtTa
     @Query("update DtTag set isDeleted = 1, modifyTime = :now  where tagsId = :id")
     void doSoftDeleteByTagsID(@Param("id") Long id, @Param("now") Date now);
 
+    List<DtTag> findByTagsIdAndIsDeleted(Long tagsID,Long isDeleted);
 }

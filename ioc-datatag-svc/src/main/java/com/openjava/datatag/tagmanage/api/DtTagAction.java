@@ -3,6 +3,7 @@ package com.openjava.datatag.tagmanage.api;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.query.DtTagDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagService;
+import com.openjava.datatag.utils.tree.AntdTreeNode;
 import io.swagger.annotations.*;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.result.ApiResponse;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
 
 import javax.annotation.Resource;
 
@@ -45,7 +47,7 @@ public class DtTagAction {
 	 */
 	@ApiOperation(value = "根据ID获取", notes = "单个对象查询", nickname="id")
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "id", value = "主标识编码", required = true, dataType = "string", paramType = "path"),
+			@ApiImplicitParam(name = "id", value = "标签编码", required = true, dataType = "string", paramType = "path"),
 	})
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")

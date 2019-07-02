@@ -19,7 +19,7 @@ public interface DtTagService {
 	List<DtTag> queryDataOnly(DtTagDBParam params, Pageable pageable);
 	
 	DtTag get(Long id);
-	
+	List<DtTag> findByTagsId(Long id);
 	DtTag doSave(DtTag m);
 
 	void doSoftDeleteByTagsID(Long id, Date now);

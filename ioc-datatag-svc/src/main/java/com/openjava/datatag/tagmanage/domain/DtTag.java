@@ -39,12 +39,12 @@ public class DtTag implements Persistable<Long>,Serializable {
 	private Long id;
 
 	@ApiModelProperty("标签组编号")
-	@Max(0L)
+	@Max(9223372036854775806L)
 	@Column(name = "TAGS_ID")
 	private Long tagsId;
 
 	@ApiModelProperty("父标签编号")
-	@Max(0L)
+	@Max(9223372036854775806L)
 	@Column(name = "PREA_TAG_ID")
 	private Long preaTagId;
 
@@ -61,24 +61,22 @@ public class DtTag implements Persistable<Long>,Serializable {
 	@ApiModelProperty("创建时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
-	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATE_TIME")
 	private Date createTime;
 
 	@ApiModelProperty("修改时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
-	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "MODIFY_TIME")
 	private Date modifyTime;
 
 	@ApiModelProperty("删除标记")
-	@Max(9L)
+	@Max(1L)
 	@Column(name = "IS_DELETED")
 	private Long isDeleted;
 
 	@ApiModelProperty("层级")
-	@Max(0L)
+	@Max(1L)
 	@Column(name = "LVL")
 	private Long lvl;
 
