@@ -1,5 +1,5 @@
 <template>
-    <!--<div class="app-container">标签管理</div>-->
+  <!--<div class="app-container">标签管理</div>-->
   <div class="app-container">
     <div class="actionBar">
       <div>
@@ -23,8 +23,7 @@
         </el-select>
       </div>
       <div>
-        <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
-        <el-button size="small" type="primary" @click="shareLabel">共享标签组</el-button>
+        <el-button size="small" type="primary" @click="createLabel">我的标签组</el-button>
       </div>
 
     </div>
@@ -198,9 +197,6 @@
       },
       createLabel(){
         this.$router.push('tree')
-      },
-      shareLabel(){
-        this.$router.push('shareLabel')
       }
     },
     created() {
