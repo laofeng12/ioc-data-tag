@@ -1,5 +1,8 @@
 package com.openjava.datatag.tagmanage.repository;
 
-public interface DtTagGroupRepositoryCustom {
+import com.openjava.datatag.tagmanage.domain.DtShareTagGroup;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DtTagGroupRepositoryCustom  {
 
 }

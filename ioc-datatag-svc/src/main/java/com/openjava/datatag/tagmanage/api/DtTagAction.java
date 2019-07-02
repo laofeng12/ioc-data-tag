@@ -111,7 +111,7 @@ public class DtTagAction {
 	@ApiOperation(value = "删除", nickname="delete")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
-			@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
+			@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用 , 分隔", required = false, paramType = "delete"),
 	})
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.DELETE)

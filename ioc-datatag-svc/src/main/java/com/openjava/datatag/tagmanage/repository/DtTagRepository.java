@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
 /**
  * DT_TAG数据库访问层
  * @author lch
@@ -15,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface DtTagRepository extends DynamicJpaRepository<DtTag, Long>, DtTagRepositoryCustom{
     @Transactional
     @Modifying
-    @Query("update DtTag set isDeleted = 1  where tagsId = :id")
-    void softDelete(@Param("id") Long id);
+    @Query("update DtTag set isDeleted = 1, modifyTime = :now  where tagsId = :id")
+    void doSoftDeleteByTagsID(@Param("id") Long id, @Param("now") Date now);
 
 }

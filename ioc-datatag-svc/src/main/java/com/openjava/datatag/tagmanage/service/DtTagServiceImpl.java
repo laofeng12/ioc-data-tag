@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,8 +48,8 @@ public class DtTagServiceImpl implements DtTagService {
 		return dtTagRepository.save(m);
 	}
 
-	public void doSoftDeleteByTagsID(Long id){
-		dtTagRepository.softDelete(id);
+	public void doSoftDeleteByTagsID(Long id, Date now){
+		dtTagRepository.doSoftDeleteByTagsID(id,now);
 	}
 
 

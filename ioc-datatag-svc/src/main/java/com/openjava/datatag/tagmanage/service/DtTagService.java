@@ -5,6 +5,7 @@ import com.openjava.datatag.tagmanage.query.DtTagDBParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ public interface DtTagService {
 	
 	DtTag doSave(DtTag m);
 
-	void doSoftDeleteByTagsID(Long id);
+	void doSoftDeleteByTagsID(Long id, Date now);
 
 	void doDelete(Long id);
 	void doRemove(String ids);
