@@ -27,7 +27,7 @@ import java.util.List;
 @Api(tags="DT_TAG_TREE")
 @RestController
 @RequestMapping("/datatag/tagmanage/dtTagTree")
-public class DtTagTree {
+public class DtTagTreeAction {
 
     @Resource
     private DtTagService dtTagService;

@@ -125,7 +125,7 @@ public class MyDtTagGroupAction {
 	/**
 	 * 保存
 	 */
-	@ApiOperation(value = "修改标签组(仅标签组)/共享与停止共享", nickname="save", notes = "报文格式：content-type=application/json")
+	@ApiOperation(value = "修改标签组信息(仅标签组)/共享与停止共享", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.POST)
 	@ApiResponses({
