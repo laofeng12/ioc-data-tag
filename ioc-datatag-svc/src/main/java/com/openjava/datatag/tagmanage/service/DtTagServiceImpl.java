@@ -3,6 +3,10 @@ package com.openjava.datatag.tagmanage.service;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.query.DtTagDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagRepository;
+import org.ljdp.common.bean.MyBeanUtils;
+import org.ljdp.component.exception.APIException;
+import org.ljdp.component.sequence.ConcurrentSequence;
+import org.ljdp.component.sequence.SequenceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -57,14 +61,47 @@ public class DtTagServiceImpl implements DtTagService {
 		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId,0L);
 	}
 
+	public void doNew(DtTag tag){
+		//新增，记录创建时间等
+		//设置主键(请根据实际情况修改)
+		SequenceService ss = ConcurrentSequence.getInstance();
+		tag.setId(ss.getSequence());
+		tag.setIsDeleted(0L);
+		tag.setIsNew(true);//执行insert
+		Date now = new Date();
+		tag.setCreateTime(now);
+		tag.setModifyTime(now);
+		doSave(tag);
+	}
 
-	public void doDelete(Long id) {
-		dtTagRepository.deleteById(id);
+	public void doUpdate(DtTag tag,DtTag db){
+		//不允许修改父节点，层级和创建时间
+		tag.setPreaTagId(null);
+		tag.setCreateTime(null);
+		tag.setLvl(null);
+		tag.setModifyTime(new Date());
+		MyBeanUtils.copyPropertiesNotBlank(db, tag);
+		db.setIsNew(false);//执行update
+		doSave(db);
 	}
-	public void doRemove(String ids) {
-		String[] items = ids.split(",");
-		for (int i = 0; i < items.length; i++) {
-			dtTagRepository.deleteById(new Long(items[i]));
-		}
+
+
+	public void doSoftDeleteByRootID(Long id,Date now){
+		//-为了减少数据库io，先查询该节点下的所有节点的父节点集，在逐层伪删除
+		List<Long> pIds = dtTagRepository.findPIdByRootId(id);
+		for (Long pId : pIds){
+		    dtTagRepository.doSoftDeleteByPreaTagId(pId,now);
+        }
 	}
+	public void doSoftDeleteByDtTag(DtTag tag){
+		Date now = new Date();
+		//先删除子节点
+		doSoftDeleteByRootID(tag.getId(),now);
+		//再删除本节点
+		tag.setIsDeleted(1L);
+		tag.setModifyTime(now);
+		doSave(tag);
+	}
+
+
 }
