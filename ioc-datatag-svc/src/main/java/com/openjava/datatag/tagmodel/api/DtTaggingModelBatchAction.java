@@ -32,9 +32,9 @@ import com.openjava.datatag.tagmodel.component.DtTaggingModelBatchBO;
  * @author zmk
  *
  */
-@Api(tags="标签模型批量导入")
-@RestController
-@RequestMapping("/datatag/tagmodel/dtTaggingModel/batch")
+//@Api(tags="标签模型批量导入")
+//@RestController
+//@RequestMapping("/datatag/tagmodel/dtTaggingModel/batch")
 public class DtTaggingModelBatchAction extends AbstractBatchComController {
 	@Resource
 	private LjdpFileuploadConfig fileuploadConfig;
@@ -43,7 +43,7 @@ public class DtTaggingModelBatchAction extends AbstractBatchComController {
 	@Resource
 	private DtTaggingModelBatchBO dtTaggingModelBatchBO;
 	
-	@ApiOperation(value = "开始导入", nickname="process")
+	/*@ApiOperation(value = "开始导入", nickname="process")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "fileId", value = "文件id", required = true, dataType = "string", paramType = "post"),
 	})
@@ -77,24 +77,24 @@ public class DtTaggingModelBatchAction extends AbstractBatchComController {
 		String batchType = "标签模型导入";
 		return super.doBatchProcess(dtTaggingModelBatchBO, fullFilePath,
 				fileName, batchType, 0);
-	}
+	}*/
 
-	@Override
+	/*@Override
 	protected FileBatchTask getBatchTask(FileBusinessObject bo) {
 		FileBatchTask task = super.getBatchTask(bo);
 		//第一行是标题，从第二行开始导入，index从0开始
 		task.setBeginIndex(1);
 		//处理完成后删除原文件
 		task.setDeleteAfterProcess(false);
-		/*
+		*//*
 		 * 一个事务批量提交的数量（当事务回滚，会把当前事务涉及的数据都回滚）
 		 *  场景1：主要是把文件数据insert入库，建议设置为100~1000
 		 *  场景2：进行业务办理，每行数据都是一次独立的业务办理，建议设置为1
 		 *  场景3：整个文件数据是一个单独的业务表单，例如导入一张试卷，建议设置尽量大的值，超出当前预计的表单最大数量，建议>=1000
-		 */
+		 *//*
 		task.setBatchSize(1);
 		//如果是excel文件，填写一共有多少个sheet需要处理
 		task.setSheetNumber(1);
 		return task;
-	}
+	}*/
 }
