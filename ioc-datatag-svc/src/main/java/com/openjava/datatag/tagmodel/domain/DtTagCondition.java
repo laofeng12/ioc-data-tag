@@ -28,7 +28,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("条件设置表")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
+//@Accessors(chain = true)
 @Entity
 @Table(name = "DT_TAG_CONDITION")
 public class DtTagCondition implements Persistable<Long>,Serializable {

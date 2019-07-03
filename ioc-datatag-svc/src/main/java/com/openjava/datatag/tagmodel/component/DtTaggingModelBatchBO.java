@@ -66,9 +66,7 @@ public class DtTaggingModelBatchBO extends BaseFileImportBO {
 			j.setTaggingTable(taggingTable);
 			j.setTaggingModelTable(taggingModelTable);
 			j.setPKey(pKey);
-			j.setCreateUserId(createUser);
 			j.setCreateTime(createTime);
-			j.setModifyUser(modifyUser);
 			j.setModifyTime(modifyTime);
 			j.setStartTime(startTime);
 			j.setCycle(cycle);

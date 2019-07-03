@@ -29,7 +29,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("标签模型")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
+//@Accessors(chain = true)
 @Entity
 @Table(name = "DT_TAGGING_MODEL")
 public class DtTaggingModel implements Persistable<Long>,Serializable {
@@ -65,17 +65,11 @@ public class DtTaggingModel implements Persistable<Long>,Serializable {
 	@Length(min=0, max=32)
 	@Column(name = "P_KEY")
 	private String pKey;
-	
-	@ApiModelProperty("创建用户ID")
-	@Max(9223372036854775806L)
-	@Column(name = "CREATE_USER_ID")
-	private Long createUserId;
 
 	@ApiModelProperty("创建用户")
-	@Length(min=0, max=127)
-	@Column(name = "CREATE_USER_NAME")
-	private String createUserName;
-	
+	@Column(name = "CREATE_USER")
+	private Long createUser;
+
 	@ApiModelProperty("创建时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
@@ -83,10 +77,9 @@ public class DtTaggingModel implements Persistable<Long>,Serializable {
 	@Column(name = "CREATE_TIME")
 	private Date createTime;
 	
-	@ApiModelProperty("修改用户名")
-	@Length(min=0, max=32)
+	@ApiModelProperty("修改用户")
 	@Column(name = "MODIFY_USER")
-	private String modifyUser;
+	private Long modifyUser;
 	
 	@ApiModelProperty("修改时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -141,5 +134,5 @@ public class DtTaggingModel implements Persistable<Long>,Serializable {
     	}
     	return true;
     }
-    
+
 }

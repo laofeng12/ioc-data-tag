@@ -24,4 +24,11 @@ public interface DtSetColRepository extends DynamicJpaRepository<DtSetCol, Long>
      */
     @Query(value="from DtSetCol t where t.isSource=0 and t.isDeleted=0 and t.taggingModelId=:taggingModelId and t.sourceCol=:sourceCol")
     List<DtSetCol> getCloneClo(@Param("taggingModelId")Long taggingModelId,@Param("sourceCol")String sourceCol);
+
+    /**
+     * 感觉标签模型Id获取字段表
+     * @param taggingModelId
+     * @return
+     */
+    List<DtSetCol> getByTaggingModelId(Long taggingModelId);
 }

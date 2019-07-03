@@ -24,4 +24,10 @@ public interface DtTaggingModelService {
 	
 	void doDelete(Long id);
 	void doRemove(String ids);
+
+	/**
+	 * 克隆模型
+	 * @param id
+	 */
+	void clone(Long id)throws Exception;
 }
