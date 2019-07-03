@@ -22,8 +22,15 @@ public interface DtTagService {
 	List<DtTag> findByTagsId(Long id);
 	DtTag doSave(DtTag m);
 
+	void doNew(DtTag tag);
+
+	void doUpdate(DtTag tag,DtTag db);
+
+
+
 	void doSoftDeleteByTagsID(Long id, Date now);
 
-	void doDelete(Long id);
-	void doRemove(String ids);
+	void doSoftDeleteByRootID(Long id,Date now);
+
+	void doSoftDeleteByDtTag(DtTag tag);
 }

@@ -36,7 +36,7 @@ public class MyDtTagGroupAction {
 
 	@Resource
 	private DtTagService dtTagService;
-	
+
 
 
 	/**
@@ -106,7 +106,7 @@ public class MyDtTagGroupAction {
 	@RequestMapping(method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
-			@RequestParam(value="ids",required=false)String ids) throws APIException {
+			@ApiIgnore @RequestParam(value="ids",required=false)String ids) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTagGroup tagGroup = dtTagGroupService.get(id);
 		if(tagGroup == null || tagGroup.getIsDeleted().equals(1L)){

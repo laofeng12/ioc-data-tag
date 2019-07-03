@@ -21,5 +21,19 @@ public interface DtTagRepository extends DynamicJpaRepository<DtTag, Long>, DtTa
     @Query("update DtTag set isDeleted = 1, modifyTime = :now  where tagsId = :id")
     void doSoftDeleteByTagsID(@Param("id") Long id, @Param("now") Date now);
 
+    //根据父节点id伪删除子节点
+    @Transactional
+    @Modifying
+    @Query("update DtTag set isDeleted = 1, modifyTime = :now  where preaTagId = :id")
+    void doSoftDeleteByPreaTagId(@Param("id") Long id, @Param("now") Date now);
+
+
+    @Query(value = "SELECT distinct PREA_TAG_ID\n" +
+            "FROM DT_TAG\n" +
+            "where ID != :rootId \n" +
+            "START WITH ID = :rootId\n" +
+            "CONNECT BY PRIOR ID = PREA_TAG_ID",nativeQuery = true)
+    List<Long> findPIdByRootId(@Param("rootId") Long rootId);
+
     List<DtTag> findByTagsIdAndIsDeleted(Long tagsID,Long isDeleted);
 }

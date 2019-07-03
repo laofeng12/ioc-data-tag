@@ -1,31 +1,21 @@
 package com.openjava.datatag.tagmanage.api;
 
 import com.openjava.datatag.tagmanage.domain.DtTag;
-import com.openjava.datatag.tagmanage.query.DtTagDBParam;
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
+import com.openjava.datatag.utils.tree.TagTreeNode;
 import io.swagger.annotations.*;
-import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
-import org.ljdp.component.result.ApiResponse;
-import org.ljdp.component.result.BasicApiResponse;
-import org.ljdp.component.result.DataApiResponse;
 import org.ljdp.component.result.SuccessMessage;
-import org.ljdp.component.sequence.ConcurrentSequence;
-import org.ljdp.component.sequence.SequenceService;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.annotation.Security;
 import org.ljdp.secure.sso.SsoContext;
-import org.ljdp.ui.bootstrap.TablePage;
-import org.ljdp.ui.bootstrap.TablePageImpl;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 
 import javax.annotation.Resource;
-import javax.xml.crypto.Data;
-import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -41,6 +31,9 @@ public class DtTagAction {
 	@Resource
 	private DtTagService dtTagService;
 
+	@Resource
+	private DtTagGroupService dtTagGroupService;
+
 
 	/**
 	 * 保存
@@ -49,36 +42,27 @@ public class DtTagAction {
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.POST)
 	public SuccessMessage doSave(@RequestBody DtTag body) throws APIException {
-		if(body.getIsNew() == null || body.getIsNew()) {
-			//新增，记录创建时间等
-			//设置主键(请根据实际情况修改)
-			SequenceService ss = ConcurrentSequence.getInstance();
-			body.setId(ss.getSequence());
-			body.setIsDeleted(0L);
-			body.setIsNew(true);//执行insert
-			Date now = new Date();
-			body.setCreateTime(now);
-			body.setModifyTime(now);
-			dtTagService.doSave(body);
-		} else {
-			//修改，记录更新时间等
-			DtTag db = dtTagService.get(body.getId());
-			body.setPreaTagId(null);
-			if (body.getIsDeleted().equals(1L)){
-				throw new APIException(500,"请不要用此方法进行删除操作，请用DELETE方法");
-			}
-			//不允许修改层级和创建时间
-			body.setCreateTime(null);
-			body.setLvl(null);
-
-			body.setModifyTime(new Date());
-			MyBeanUtils.copyPropertiesNotBlank(db, body);
-			db.setIsNew(false);//执行update
-			dtTagService.doSave(db);
+		//修改，记录更新时间等
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		DtTag db = dtTagService.get(body.getId());
+		if(db == null || db.getIsDeleted().equals(1L)){
+			throw new APIException(10002,"无此标签或已被删除");
 		}
-
-		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
-		return new SuccessMessage("保存成功");
+		DtTagGroup tagGroup = dtTagGroupService.get(db.getTagsId());
+		if(userInfo.getUserId().equals(tagGroup.getCreateUser().toString())){
+			if(body.getIsNew() == null || body.getIsNew()) {
+				dtTagService.doNew(body);
+				return new SuccessMessage("新建成功");
+			} else {
+				if (body.getIsDeleted().equals(1L)){
+					throw new APIException(500,"请不要用此方法进行删除操作，请用DELETE方法");
+				}
+				dtTagService.doUpdate(body,db);
+				return new SuccessMessage("修改成功");
+			}
+		}else{
+			throw new APIException(10003,"无权限修改");
+		}
 	}
 
 
@@ -90,16 +74,52 @@ public class DtTagAction {
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
-			@RequestParam(value="id",required=false)Long id,
-			@RequestParam(value="ids",required=false)String ids) {
-		if(id != null) {
-			dtTagService.doDelete(id);
-		} else if(ids != null) {
-			dtTagService.doRemove(ids);
+			@RequestParam(value="id",required=false)Long id) throws APIException {
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		DtTag tag = dtTagService.get(id);
+		if(tag == null || tag.getIsDeleted().equals(1L)){
+			throw new APIException(10002,"无此标签或已被删除");
 		}
-		return new SuccessMessage("删除成功");//没有需要返回的数据，就直接返回一条消息
+		DtTagGroup tagGroup = dtTagGroupService.get(tag.getTagsId());
+		if(userInfo.getUserId().equals(tagGroup.getCreateUser().toString())){
+			dtTagService.doSoftDeleteByDtTag(tag);
+			return new SuccessMessage("删除成功");
+		}else{
+			throw new APIException(10003,"无权限删除");
+		}
 	}
-	
+
+	/**
+	 * 用主键获取数据
+	 * @param id
+	 * @return
+	 */
+	@ApiOperation(value = "根据标签组ID获取", notes = "单个对象查询", nickname="id")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "id", value = "标签组编码", required = true, dataType = "string", paramType = "path"),
+	})
+	@ApiResponses({
+			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
+	})
+	@Security(session=true)
+	@RequestMapping(value="/{id}",method= RequestMethod.GET)
+	public TagTreeNode get(@PathVariable("id")Long id) throws APIException {
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		DtTagGroup m = dtTagGroupService.get(id);
+		if(m == null || m.getIsDeleted().equals(1L)){
+			throw new APIException(10002,"无此标签组或 已被删除");
+		}
+		if(userInfo.getUserId().equals(m.getCreateUser().toString())){
+			List<DtTag> tagList = dtTagService.findByTagsId(id);
+			DtTag root = new DtTag();
+			root.setId(0L);
+			TagTreeNode treeNode = new TagTreeNode(tagList,root);
+			return treeNode;
+		}else{
+			throw new APIException(10001,"无权限查看");
+		}
+
+	}
 
 	
 }

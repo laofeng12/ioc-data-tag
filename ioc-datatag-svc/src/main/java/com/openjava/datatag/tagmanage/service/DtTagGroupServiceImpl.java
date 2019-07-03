@@ -55,15 +55,15 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 	}
 
 	@Transactional
-	public DtTagGroup doSoftDelete(DtTagGroup m){
+	public void doSoftDelete(DtTagGroup m){
 		m.setIsDeleted(1L);
 		//批量修改标签表的删除标识
 		dtTagService.doSoftDeleteByTagsID(m.getId(),m.getModifyTime());
 		//修改标签组表的删除标识
-		return doSave(m);
+		doSave(m);
 	}
 
-	public DtTagGroup doNew(DtTagGroup body,Long userId){
+	public void doNew(DtTagGroup body,Long userId){
 		//新增，记录创建时间等
 		//设置主键(请根据实际情况修改)
 		SequenceService ss = ConcurrentSequence.getInstance();
@@ -76,17 +76,17 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		body.setIsDeleted(0L);
 		body.setIsShare(0L);
 		body.setPopularity(0L);
-		return doSave(body);
+		doSave(body);
 	}
 
-	public DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db){
+	public void doUpdate(DtTagGroup body,DtTagGroup db){
 		//Create* 应该保持不变，Modify更新
 		body.setCreateUser(db.getCreateUser());
 		body.setCreateTime(db.getCreateTime());
 		body.setModifyTime(new Date());
 		MyBeanUtils.copyPropertiesNotBlank(db, body);
 		db.setIsNew(false);
-		return doSave(db);
+		doSave(db);
 	}
 
 

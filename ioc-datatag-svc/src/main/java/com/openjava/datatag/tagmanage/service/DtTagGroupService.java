@@ -21,10 +21,10 @@ public interface DtTagGroupService {
 	
 	DtTagGroup doSave(DtTagGroup m);
 
-	DtTagGroup doSoftDelete(DtTagGroup m);
+	void doSoftDelete(DtTagGroup m);
 
-	DtTagGroup doNew(DtTagGroup body,Long userId);
+	void doNew(DtTagGroup body,Long userId);
 
-	DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db);
+	void doUpdate(DtTagGroup body,DtTagGroup db);
 	
 }
