@@ -23,6 +23,8 @@ public interface DtTagGroupService {
 
 	DtTagGroup doSoftDelete(DtTagGroup m);
 
+	DtTagGroup doNew(DtTagGroup body,Long userId);
 
+	DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db);
 	
 }

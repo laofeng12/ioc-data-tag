@@ -3,12 +3,16 @@ package com.openjava.datatag.tagmanage.service;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
+import org.ljdp.common.bean.MyBeanUtils;
+import org.ljdp.component.sequence.ConcurrentSequence;
+import org.ljdp.component.sequence.SequenceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,8 +58,36 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 	public DtTagGroup doSoftDelete(DtTagGroup m){
 		m.setIsDeleted(1L);
 		//批量修改标签表的删除标识
-		dtTagService.doSoftDeleteByTagsID(m.getId());
+		dtTagService.doSoftDeleteByTagsID(m.getId(),m.getModifyTime());
 		//修改标签组表的删除标识
 		return doSave(m);
 	}
+
+	public DtTagGroup doNew(DtTagGroup body,Long userId){
+		//新增，记录创建时间等
+		//设置主键(请根据实际情况修改)
+		SequenceService ss = ConcurrentSequence.getInstance();
+		body.setId(ss.getSequence());
+		body.setIsNew(true);//执行insert
+		body.setCreateUser(userId);
+		Date now = new Date();
+		body.setCreateTime(now);
+		body.setModifyTime(now);
+		body.setIsDeleted(0L);
+		body.setIsShare(0L);
+		body.setPopularity(0L);
+		return doSave(body);
+	}
+
+	public DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db){
+		//Create* 应该保持不变，Modify更新
+		body.setCreateUser(db.getCreateUser());
+		body.setCreateTime(db.getCreateTime());
+		body.setModifyTime(new Date());
+		MyBeanUtils.copyPropertiesNotBlank(db, body);
+		db.setIsNew(false);
+		return doSave(db);
+	}
+
+
 }
