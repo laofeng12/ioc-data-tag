@@ -45,7 +45,7 @@ public class DtTagAction {
 	/**
 	 * 保存
 	 */
-	@ApiOperation(value = "新增或修改", nickname="save", notes = "报文格式：content-type=application/json")
+	@ApiOperation(value = "修改标签:标签名-简介/新增标签:标签名-简介-上级标签id-标签组id", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.POST)
 	public SuccessMessage doSave(@RequestBody DtTag body) throws APIException {
