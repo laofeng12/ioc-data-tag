@@ -28,7 +28,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("字段表日志")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
+//@Accessors(chain = true)
 @Entity
 @Table(name = "DT_TAGCOL_UPDATE_LOG")
 public class DtTagcolUpdateLog implements Persistable<Long>,Serializable {

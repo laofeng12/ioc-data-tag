@@ -28,7 +28,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("字段表")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
+//@Accessors(chain = true)
 @Entity
 @Table(name = "DT_SET_COL")
 public class DtSetCol implements Persistable<Long>,Serializable {

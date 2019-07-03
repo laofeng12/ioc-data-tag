@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.utils.EntityClassUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
@@ -104,7 +105,7 @@ public class DtTaggingModelAction {
 	 */
 	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
-	@RequestMapping(method=RequestMethod.POST)
+	@RequestMapping(value="save",method=RequestMethod.POST)
 	public DtTaggingModel doSave(@RequestBody DtTaggingModel body
 
 			) {
@@ -113,20 +114,16 @@ public class DtTaggingModelAction {
 		DtTaggingModel dbObj=null;
 		if(body.isNew()) {
 			//新增，记录创建时间等
-			body.setCreateTime(now);
-			body.setCreateUserId(Long.valueOf(userInfo.getUserId()));
-			body.setCreateUserName(userInfo.getUserName());
-			body.setModifyTime(now);
-			body.setModifyUser(userInfo.getUserName());
+			EntityClassUtil.dealCreateInfo(body,userInfo);
 			body.setRunState(Constants.TG_MODEL_NO_BEGIN);//未开始
 			body.setIsNew(true);//执行insert
 			dbObj = dtTaggingModelService.doSave(body);
 		} else {
 			//修改，记录更新时间等
-			body.setModifyTime(now);
-			body.setModifyUser(userInfo.getUserName());
 			DtTaggingModel db = dtTaggingModelService.get(body.getTaggingModelId());
-			MyBeanUtils.copyPropertiesNotBlank(db, body);
+			EntityClassUtil.dealModifyInfo(db,userInfo);
+			db.setModelDesc(body.getModelDesc());
+			db.setModelName(body.getModelName());
 			db.setIsNew(false);//执行update
 			dbObj =dtTaggingModelService.doSave(db);
 		}
@@ -134,7 +131,21 @@ public class DtTaggingModelAction {
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
 		return dbObj;
 	}
-	
+
+	/**
+	 * 克隆
+	 */
+	@ApiOperation(value = "克隆", nickname="clone", notes = "报文格式：content-type=application/json")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
+	})
+	@Security(session=true)
+	@RequestMapping(value="/clone",method=RequestMethod.POST)
+	public SuccessMessage clone(@RequestParam(value="id",required=false)Long id) throws Exception {
+		dtTaggingModelService.clone(id);
+		return new SuccessMessage("克隆成功");
+	}
+
 	@ApiOperation(value = "删除", nickname="delete")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
