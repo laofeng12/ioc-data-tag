@@ -1,22 +1,18 @@
 package com.openjava.datatag.tagmodel.api;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
+import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.dto.SelectColDTO;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.SequenceService;
-import org.ljdp.component.sequence.TimeSequence;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.secure.annotation.Security;
 import org.ljdp.ui.bootstrap.TablePage;
@@ -103,7 +99,7 @@ public class DtSetColAction {
 	 */
 	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
-	@RequestMapping(method=RequestMethod.POST)
+	@RequestMapping(value="/save", method=RequestMethod.POST)
 	public SuccessMessage doSave(@RequestBody DtSetCol body
 
 			) {
@@ -123,6 +119,18 @@ public class DtSetColAction {
 		}
 		
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
+		return new SuccessMessage("保存成功");
+	}
+
+	/**
+	 * 字段设置确认选择接口
+	 */
+	@ApiOperation(value = "字段设置确认选择接口", nickname="save", notes = "新增格式：{\"dataSetId\":1,\"dataSetName\":\"高考数据\",\"colList\":[{\"sourceCol\":\"user_name\",\"sourceDataType\":\"String\",\"isMarking\":1}]}" +
+			"修改的格式：{\"taggingModelId\":1,\"dataSetId\":1,\"dataSetName\":\"高考数据233\",\"colList\":[{\"colId\":1,\"taggingModelId\":1,\"sourceCol\":\"name\",\"sourceDataType\":\"String\",\"isMarking\":1},{\"sourceCol\":\"userId2\",\"sourceDataType\":\"Long\",\"isMarking\":1}]}")
+	@Security(session=true)
+	@RequestMapping(value="/selectCol", method=RequestMethod.POST)
+	public SuccessMessage selectCol(@RequestBody DtTaggingModelDTO body) throws Exception{
+		dtSetColService.selectCol(body);
 		return new SuccessMessage("保存成功");
 	}
 	

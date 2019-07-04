@@ -5,11 +5,13 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.data.domain.Persistable;
-import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -46,21 +48,27 @@ public class DtTaggingModel implements Persistable<Long>,Serializable {
 	@Column(name = "MODEL_NAME")
 	private String modelName;
 
-	@ApiModelProperty("模型名字")
+	@ApiModelProperty("模型简介")
 	@Length(min=1, max=1000)
 	@Column(name = "MODEL_DESC")
 	private String modelDesc;
 
-	@ApiModelProperty("打标目标表")
-	@Length(min=0, max=200)
-	@Column(name = "TAGGING_TABLE")
-	private String taggingTable;
+	@ApiModelProperty("打标目标表id")
+	@Max(18L)
+	@Min(1L)
+	@Column(name = "DATA_SET_ID")
+	private Long dataSetId;
 	
-	@ApiModelProperty("打标临时表/模型表")
+	@ApiModelProperty("打标源表名称")
+	@Length(min=1, max=200)
+	@Column(name = "DATA_SET_NAME")
+	private String dataSetName;
+
+	@ApiModelProperty("打标目的表名")
 	@Length(min=0, max=200)
-	@Column(name = "TAGGING_MODEL_TABLE")
-	private String taggingModelTable;
-	
+	@Column(name = "TAGGING_TABLE_NAME")
+	private String dataTableName;
+
 	@ApiModelProperty("声明的主键")
 	@Length(min=0, max=32)
 	@Column(name = "P_KEY")

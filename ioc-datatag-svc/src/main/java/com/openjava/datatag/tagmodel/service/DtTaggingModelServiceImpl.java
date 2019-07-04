@@ -37,7 +37,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DtTaggingModelRepository dtTaggingModelRepository;
 	@Resource
 	private DtSetColRepository dtSetColRepository;
-	public void clone(Long id)throws Exception{
+	public void copy(Long id)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTaggingModel model = get(id);
 		if (model==null) {
@@ -50,7 +50,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		BeanUtils.copyProperties(clone,tempDTO);
 		clone.setTaggingModelId(null);
 		EntityClassUtil.dealCreateInfo(clone,userInfo);
-		doSave(clone);
+		clone = doSave(clone);
 		//克隆字段
 		List<DtSetCol> cloList =  dtSetColRepository.getByTaggingModelId(model.getTaggingModelId());
 		for (int i = 0; i <cloList.size() ; i++) {
@@ -60,8 +60,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			BeanUtils.copyProperties(colDTO,record);
 			BeanUtils.copyProperties(colClone,colDTO);
 			colClone.setColId(null);
+			colClone.setTaggingModelId(clone.getTaggingModelId());
 			EntityClassUtil.dealCreateInfo(colClone,userInfo);
-			dtSetColRepository.save(colClone);
+			colClone = dtSetColRepository.save(colClone);
 			List<DtTagCondition> conditions = dtTagConditionRepository.findByColId(record.getColId());
 			//克隆字段条件设置
 			for (int j = 0; j <conditions.size() ; j++) {
@@ -71,6 +72,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				BeanUtils.copyProperties(conditionDTO,condition);
 				BeanUtils.copyProperties(conditionClone,conditionDTO);
 				conditionClone.setTagConditionId(null);
+				conditionClone.setColId(colClone.getColId());
 				EntityClassUtil.dealCreateInfo(conditionClone,userInfo);
 				dtTagConditionRepository.save(conditionClone);
 			}

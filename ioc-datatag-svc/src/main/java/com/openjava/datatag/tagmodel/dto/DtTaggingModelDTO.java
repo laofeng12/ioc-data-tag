@@ -1,8 +1,11 @@
 package com.openjava.datatag.tagmodel.dto;
 
+import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class DtTaggingModelDTO {
@@ -12,9 +15,11 @@ public class DtTaggingModelDTO {
 
     private String modelDesc;
 
-    private String taggingTable;
+    private Long dataSetId;
 
-    private String taggingModelTable;
+    private String dataSetName;
+
+    private String dataTableName;
 
     private String pKey;
 
@@ -37,4 +42,5 @@ public class DtTaggingModelDTO {
 
     private Boolean isNew;
 
+    private List<DtSetCol> colList = new ArrayList<>();
 }

@@ -29,5 +29,5 @@ public interface DtTaggingModelService {
 	 * 克隆模型
 	 * @param id
 	 */
-	void clone(Long id)throws Exception;
+	void copy(Long id)throws Exception;
 }

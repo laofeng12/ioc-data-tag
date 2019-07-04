@@ -2,6 +2,7 @@ package com.openjava.datatag.tagmodel.service;
 
 import java.util.List;
 
+import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,4 +25,14 @@ public interface DtSetColService {
 	
 	void doDelete(Long id)throws Exception;
 	void doRemove(String ids)throws Exception;
+	List<DtSetCol> getByTaggingModelId(Long taggingModelId);
+	/**
+	 * 字段设置-确认选择
+	 */
+	DtTaggingModelDTO selectCol(DtTaggingModelDTO body)throws Exception;
+	/**
+	 * 根据源表数据获取字段表
+	 */
+	List<DtSetCol>  getBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId);
+
 }
