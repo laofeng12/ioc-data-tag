@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: platform-webui
+  name: platform-webui
+  namespace: ioc-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: platform-webui
+  template:
+    metadata:
+      labels:
+        app: platform-webui
+    spec:
+      containers:
+      - image: harbor.alltosea.com:88/ioc-paas/platform-webui:latest
+        imagePullPolicy: Always
+        name: platform-webui
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+          - name: PROFILES_ACTIVE
+            value: test
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: platform-webui
+  namespace: ioc-platform
+spec:
+  type: NodePort
+  ports:
+    - name: "platform-webui-http"
+      port: 8080
+      targetPort: 8080
+      nodePort: 30003
+  selector:
+    app: platform-webui
+

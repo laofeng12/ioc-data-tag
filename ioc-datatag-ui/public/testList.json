@@ -1,0 +1,37 @@
+{
+  "requestId": "748599274520096",
+  "code": 200,
+  "resources": [
+    {
+      "resId": "742782244680194",
+      "resName": "数据管理",
+      "resURL": null,
+      "resType": null,
+      "resSort": 0,
+      "resIcon": "user",
+      "parentResId": "0",
+      "subResList": [
+        {
+          "resId": "742782609200194",
+          "resName": "数据源",
+          "resURL": "",
+          "resType": null,
+          "resSort": 0,
+          "resIcon": "fa fa-columns",
+          "parentResId": "742782244680194",
+          "subResList": null
+        },
+        {
+          "resId": "742782982990194",
+          "resName": "数据集",
+          "resURL": "",
+          "resType": null,
+          "resSort": 0,
+          "resIcon": "fa fa-columns",
+          "parentResId": "742782244680194",
+          "subResList": null
+        }
+      ]
+    }
+  ]
+}

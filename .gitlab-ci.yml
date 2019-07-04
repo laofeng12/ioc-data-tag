@@ -1,0 +1,40 @@
+# This file is a template, and might need editing before it works on your project.
+image: ayufan/openshift-cli
+
+stages:
+  - build-web
+  - build-java
+
+variables:
+  OPENSHIFT_SERVER: https://master.alltosea.com:8443
+  # Configure this variable in Secure Variables:
+  # OPENSHIFT_TOKEN: my.openshift.token
+
+build-web:
+  stage: build-web
+  before_script: 
+    - echo "192.168.6.102 master.alltosea.com" > /etc/hosts
+    - oc login "$OPENSHIFT_SERVER" -u "$OPENSHIFT_USER" -p  "$OPENSHIFT_PWD" --insecure-skip-tls-verify
+  script:
+    - "oc start-build $CI_WEB_NAME --from-dir=. --follow"
+  tags:
+    - cicd
+  only:
+    refs:
+        - release
+    changes:
+        - ioc-datatag-ui/**/*
+build-java:
+  stage: build-java
+  before_script: 
+    - echo "192.168.6.102 master.alltosea.com" > /etc/hosts
+    - oc login "$OPENSHIFT_SERVER" -u "$OPENSHIFT_USER" -p  "$OPENSHIFT_PWD" --insecure-skip-tls-verify
+  script:
+    - "oc start-build $CI_SVC_NAME --from-dir=. --follow"
+  tags:
+    - cicd
+  only:
+    refs:
+        - release
+    changes:
+        - ioc-datatag-svc/**/*        

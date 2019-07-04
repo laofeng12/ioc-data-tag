@@ -1,0 +1,56 @@
+@import './variables.scss';
+
+#app {
+  height: 100%;
+}
+.app-container {
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  min-height: calc(100vh - 150px);
+  box-sizing: border-box;
+}
+
+.operation-btn-group-wrapper {
+  margin-top: 20px;
+}
+
+.page-wrapper {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.w-info-title {
+  font-size: 18px;
+  padding-left: 10px;
+  margin-bottom: 20px;
+}
+.w-info-default .el-form-item{
+  border-bottom:1px dotted #ccc;
+}
+
+.text-right {
+  text-align: right;
+}
+.bottom-button {
+  margin-top: 25px;
+}
+
+ul li {
+  list-style: none;
+}
+
+p {
+  margin: 0;
+}
+.p-t-18 {
+  padding-top: 18px;
+}
+
+.w-link-color {
+  color: #409EFF;
+}
