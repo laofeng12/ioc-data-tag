@@ -124,7 +124,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 	 * 字段设置-确认选择
 	 */
 	public DtTaggingModelDTO selectCol(DtTaggingModelDTO body)throws Exception{
-		String reqParams = JSONObject.toJSONString(body);
+		String reqParams = JSONObject.toJSONString(body);//用来保存前端请求参数，保存在日志里，方便排查
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		if (body.getDataSetId() == null) {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"打标目标表id不能为空");
@@ -187,6 +187,29 @@ public class DtSetColServiceImpl implements DtSetColService {
 	}
 	public List<DtSetCol>  getBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId){
 		return dtSetColRepository.getBySourceColAndTaggingModelId( sourceCol, taggingModelId);
+	}
+
+	/**
+	 * 克隆字段
+	 */
+	public void clone(Long colId)throws Exception{
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		DtSetCol col = get(colId);
+		DtSetCol clone = new DtSetCol();
+		if (col==null) {
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此字段，colId无效");
+		}
+		List<DtSetCol> cols = getBySourceColAndTaggingModelId(col.getSourceCol(),col.getTaggingModelId());
+		MyBeanUtils.copyProperties(clone,col);
+		EntityClassUtil.dealCreateInfo(clone,userInfo);
+		clone.setColId(null);
+		clone.setIsNew(true);
+		if (CollectionUtils.isNotEmpty(cols)) {
+			clone.setShowCol("copy"+col.getSourceCol()+(cols.size()+1));
+		}else{
+			clone.setShowCol("copy"+col.getSourceCol()+"1");
+		}
+		doSave(clone);
 	}
 	public static void main(String[] args) {
 		System.out.println(RandomStringUtils.random(27,true,false).toUpperCase());

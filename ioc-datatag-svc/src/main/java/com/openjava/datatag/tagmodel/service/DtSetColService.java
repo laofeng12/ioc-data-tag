@@ -34,5 +34,8 @@ public interface DtSetColService {
 	 * 根据源表数据获取字段表
 	 */
 	List<DtSetCol>  getBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId);
-
+	/**
+	 * 克隆字段
+	 */
+	void clone(Long colId)throws Exception;
 }
