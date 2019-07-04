@@ -49,7 +49,7 @@ public class DtTagServiceImpl implements DtTagService {
 	}
 	
 	public DtTag doSave(DtTag m) {
-		return dtTagRepository.save(m);
+		return dtTagRepository.saveAndFlush(m);
 	}
 
 	public void doSoftDeleteByTagsID(Long id, Date now){

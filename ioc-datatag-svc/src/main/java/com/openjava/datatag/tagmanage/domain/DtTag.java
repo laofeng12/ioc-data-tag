@@ -76,7 +76,7 @@ public class DtTag implements Persistable<Long>,Serializable {
 	private Long isDeleted;
 
 	@ApiModelProperty("层级")
-	@Max(1L)
+	@Max(9L)
 	@Column(name = "LVL")
 	private Long lvl;
 

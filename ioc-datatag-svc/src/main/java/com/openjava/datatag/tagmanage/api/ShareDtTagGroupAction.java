@@ -1,14 +1,18 @@
 package com.openjava.datatag.tagmanage.api;
 
+import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmanage.domain.DtShareTagGroup;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtShareTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
+import com.openjava.datatag.tagmanage.service.DtTagService;
+import com.openjava.datatag.utils.tree.TagTreeNode;
 import io.swagger.annotations.*;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
+import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.annotation.Security;
 import org.ljdp.secure.sso.SsoContext;
@@ -33,7 +37,11 @@ public class ShareDtTagGroupAction {
     @Resource
     private DtShareTagGroupService dtShareTagGroupService;
 
-    @Resource DtTagGroupService dtTagGroupService;
+    @Resource
+    private DtTagGroupService dtTagGroupService;
+
+    @Resource
+    private DtTagService dtTagService;
 
     @ApiOperation(value = "标签组列表分页查询(共享)", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
     @ApiImplicitParams({
@@ -58,18 +66,71 @@ public class ShareDtTagGroupAction {
     })
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
-            @io.swagger.annotations.ApiResponse(code=10002, message="无此标签组或未共享")
+            @io.swagger.annotations.ApiResponse(code= MyErrorConstants.SHARE_TAG_GROUP_NOT_FOUND, message="无此标签组或未共享")
     })
     @Security(session=true)
     @RequestMapping(method=RequestMethod.POST)
-    public List<DtTag> doChooseShareTagGroup(
+    public SuccessMessage doChooseShareTagGroup(
             @RequestParam(value="id",required=false)Long id) throws APIException {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         DtTagGroup db = dtTagGroupService.get(id);
-        if(db == null || db.getIsDeleted().equals(1L) || db.getIsShare().equals(0L)){
-            throw new APIException(10002,"无此标签组或未共享");
+        if(db == null || db.getIsDeleted().equals(1L) || db.getIsShare().equals(0L)) {
+            throw new APIException(MyErrorConstants.SHARE_TAG_GROUP_NOT_FOUND, "无此标签组或未共享");
         }
-        return dtShareTagGroupService.choose(id);
+        DtTagGroup tagGroup= dtShareTagGroupService.chooseNewTagGroup(id,Long.parseLong(userInfo.getUserId()));
+        List<DtTag> tagList = dtTagService.findByTagsId(id);
+        DtTag root = new DtTag();
+        root.setId(0L);
+        TagTreeNode tagTreeNode = new TagTreeNode(tagList,root);//怎么回事！这条语句的存在
+        Long newId = ConcurrentSequence.getInstance().getSequence();
+        DtTag newRoot = new DtTag();
+        newRoot.setId(newId);
+        newRoot.setTagName(tagList.get(1).getTagName());
+        newRoot.setSynopsis(tagList.get(1).getTagName());
+        newRoot.setTagsId(tagGroup.getId());
+        newRoot.setLvl(root.getLvl());
+        newRoot.setCreateTime(new Date());
+        newRoot.setModifyTime(new Date());
+        newRoot.setIsDeleted(0L);
+//            newRoot.setPreaTagId(pId);
+        newRoot.setIsNew(true);
+        //tree.setTag(newRoot);
+        dtTagService.doSave(newRoot);
 
+        return new SuccessMessage("选用成功");
+    }
+
+    private void setNewIdAndSave(List list,Long lvl){
+        ;
+    }
+
+
+
+    private void setNewID(TagTreeNode tree,Long pId,Long tagsId,Date now){
+        DtTag root = tree.getTag();
+        if(root.getId() == null || root.getId().equals(0L)){
+            for (TagTreeNode cTree: tree.getChildrenNode()){
+                setNewID(cTree,null,tagsId,now);
+            }
+        }else {
+            //子树的根节点和叶子节点进行修改
+            Long newId = ConcurrentSequence.getInstance().getSequence();
+            DtTag newRoot = new DtTag();
+            newRoot.setId(newId);
+            newRoot.setTagName(root.getTagName());
+            newRoot.setSynopsis(root.getSynopsis());
+            newRoot.setTagsId(tagsId);
+            newRoot.setLvl(root.getLvl());
+            newRoot.setCreateTime(now);
+            newRoot.setModifyTime(now);
+            newRoot.setIsDeleted(0L);
+//            newRoot.setPreaTagId(pId);
+            newRoot.setIsNew(true);
+            //tree.setTag(newRoot);
+            dtTagService.doSave(newRoot);
+            for (TagTreeNode cTree: tree.getChildrenNode()){
+                setNewID(cTree,newRoot.getId(),tagsId,now);
+            }
+        }
     }
 }
