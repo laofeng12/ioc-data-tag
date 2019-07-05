@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,4 +30,9 @@ public interface DtTagConditionRepository extends DynamicJpaRepository<DtTagCond
     @Query(value = "from DtTagCondition t where t.colId in(:colIds)")
     List<DtTagCondition> findByColIds(@Param("colIds")List<Long> colIds);
 
+
+    @Transactional
+    @Modifying
+    @Query("update DtTagCondition set isDeleted = 1, modifyTime = :now,modifyUser= :user  where colId = :id")
+    void doSoftDeleteByColId(@Param("id") Long id,@Param("now") Date now,@Param("user") Long user);
 }

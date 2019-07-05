@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,4 +37,13 @@ public interface DtSetColRepository extends DynamicJpaRepository<DtSetCol, Long>
      * 根据源表数据获取字段表
      */
     List<DtSetCol>  getBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId);
+
+
+
+
+    //根据父节点id伪删除子节点
+    @Transactional
+    @Modifying
+    @Query("update DtSetCol set isDeleted = 1, modifyTime = :now, modifyUser= :user where taggingModelId = :id")
+    void doSoftDeleteByTaggingModelId(@Param("id") Long id,@Param("now") Date now,@Param("user") Long user);
 }
