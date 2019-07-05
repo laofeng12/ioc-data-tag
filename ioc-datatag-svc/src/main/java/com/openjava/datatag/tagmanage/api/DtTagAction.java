@@ -1,11 +1,13 @@
 package com.openjava.datatag.tagmanage.api;
 
+import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmanage.domain.DtTag;
+import com.openjava.datatag.tagmanage.dto.DtTagDTO;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
-import com.openjava.datatag.utils.tree.TagTreeNode;
+import com.openjava.datatag.utils.tree.TagDTOTreeNode;
 import io.swagger.annotations.*;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
@@ -57,10 +59,10 @@ public class DtTagAction {
 				return new SuccessMessage("新建成功");
 			} else {
 				DtTag db = dtTagService.get(body.getId());
-				if((db == null || db.getIsDeleted().equals(1L)) && body.getIsNew()){
+				if((db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED)) && body.getIsNew()){
 					throw new APIException(MyErrorConstants.TAG_NOT_FOUND,"无此标签或已被删除");
 				}
-				if (body.getIsDeleted().equals(1L)){
+				if (body.getIsDeleted()!= null && body.getIsDeleted().equals(Constants.DT_TG_DELETED)){
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请不要用此方法进行删除操作，请用DELETE方法");
 				}
 				dtTagService.doUpdate(body,db);
@@ -88,7 +90,7 @@ public class DtTagAction {
 			@RequestParam(value="id",required=false)Long id) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTag tag = dtTagService.get(id);
-		if(tag == null || tag.getIsDeleted().equals(1L)){
+		if(tag == null || tag.getIsDeleted().equals(Constants.DT_TG_DELETED)){
 			throw new APIException(MyErrorConstants.TAG_NOT_FOUND,"无此标签或已被删除");
 		}
 		DtTagGroup tagGroup = dtTagGroupService.get(tag.getTagsId());
@@ -116,18 +118,18 @@ public class DtTagAction {
 	})
 	@Security(session=true)
 	@RequestMapping(value="/{id}",method= RequestMethod.GET)
-	public TagTreeNode get(@PathVariable("id")Long id) throws APIException {
+	public TagDTOTreeNode get(@PathVariable("id")Long id) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTagGroup db = dtTagGroupService.get(id);
-		if(db == null || db.getIsDeleted().equals(1L)){
+		if(db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED)){
 			throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND,"无此标签组或已被删除");
 		}
 		//自己的和共享的标签组可以查看
-		if(userInfo.getUserId().equals(db.getCreateUser().toString()) || db.getIsShare().equals(1L)){
+		if(userInfo.getUserId().equals(db.getCreateUser().toString()) || db.getIsShare().equals(Constants.DT_TG_SHARED)){
 			List<DtTag> tagList = dtTagService.findByTagsId(id);
-			DtTag root = new DtTag();
-			root.setId(0L);
-			TagTreeNode treeNode = new TagTreeNode(tagList,root);
+			DtTagDTO root = new DtTagDTO();
+			root.setId(TagDTOTreeNode.ROOT_ID);
+			TagDTOTreeNode treeNode = new TagDTOTreeNode(TagDTOTreeNode.toDtTagDTO(tagList),root);
 			return treeNode;
 		}else{
 			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"无权限查看");

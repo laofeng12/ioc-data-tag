@@ -1,8 +1,11 @@
 package com.openjava.datatag.tagmanage.service;
 
+import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.query.DtTagDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagRepository;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.sequence.ConcurrentSequence;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +62,7 @@ public class DtTagServiceImpl implements DtTagService {
 
 	public List<DtTag> findByTagsId(Long tagsId){
 		//查询所有未删除的标签list
-		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId,0L);
+		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId, Constants.DT_TG_EXIST);
 	}
 
 	public void doNew(DtTag tag){
@@ -66,7 +70,7 @@ public class DtTagServiceImpl implements DtTagService {
 		//设置主键(请根据实际情况修改)
 		SequenceService ss = ConcurrentSequence.getInstance();
 		tag.setId(ss.getSequence());
-		tag.setIsDeleted(0L);
+		tag.setIsDeleted(Constants.DT_TG_EXIST);
 		tag.setIsNew(true);//执行insert
 		Date now = new Date();
 		tag.setCreateTime(now);
@@ -80,10 +84,38 @@ public class DtTagServiceImpl implements DtTagService {
 		tag.setCreateTime(null);
 		tag.setLvl(null);
 		tag.setModifyTime(new Date());
-		MyBeanUtils.copyPropertiesNotBlank(db, tag);
+		copyPropertiesNotBlank(db, tag);
 		db.setIsNew(false);//执行update
 		doSave(db);
 	}
+
+	private static void copyPropertiesNotBlank(Object dest, Object orig) {
+		Field[] fields = orig.getClass().getDeclaredFields();
+
+		for(int i = 0; i < fields.length; ++i) {
+			String key = fields[i].getName();
+			if (!key.equals("serialVersionUID")) {
+				try {
+					Object origVal = PropertyUtils.getSimpleProperty(orig, key);
+					if (origVal != null) {
+						if (origVal instanceof String) {
+							if (StringUtils.isNotBlank(origVal.toString())) {
+								PropertyUtils.setSimpleProperty(dest, key, origVal);
+							}
+						} else {
+							PropertyUtils.setSimpleProperty(dest, key, origVal);
+						}
+					}
+				} catch (NoSuchMethodException var6) {
+					var6.printStackTrace();
+				} catch (Exception var7) {
+					System.out.println("ERROR on COPY:" + key);
+					var7.printStackTrace();
+				}
+			}
+		}
+	}
+
 
 
 	public void doSoftDeleteByRootID(Long id,Date now){
@@ -98,7 +130,7 @@ public class DtTagServiceImpl implements DtTagService {
 		//先删除子节点
 		doSoftDeleteByRootID(tag.getId(),now);
 		//再删除本节点
-		tag.setIsDeleted(1L);
+		tag.setIsDeleted(Constants.DT_TG_DELETED);
 		tag.setModifyTime(now);
 		doSave(tag);
 	}

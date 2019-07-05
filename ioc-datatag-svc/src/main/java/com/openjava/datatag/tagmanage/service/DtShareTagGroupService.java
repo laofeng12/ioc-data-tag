@@ -13,6 +13,5 @@ import java.util.List;
 public interface DtShareTagGroupService {
     Page<DtShareTagGroup> findList(String searchKey, Pageable pageable);
 
-   // void choose(Long id,DtTagGroup tagGroup) throws APIException;
-     DtTagGroup chooseNewTagGroup(Long id, Long userId)throws APIException;
+     void choose(Long id, Long userId)throws APIException;
 }

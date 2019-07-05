@@ -6,6 +6,8 @@ import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.data.domain.Persistable;
 import org.hibernate.validator.constraints.Length;
@@ -27,8 +29,10 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @ApiModel("DT_TAG")
 @Data
+//@AllArgsConstructor
+//@RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
+//@Accessors(chain = true)
 @Entity
 @Table(name = "DT_TAG")
 public class DtTag implements Persistable<Long>,Serializable {

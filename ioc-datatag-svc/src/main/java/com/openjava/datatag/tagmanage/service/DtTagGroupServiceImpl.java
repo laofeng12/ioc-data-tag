@@ -1,5 +1,6 @@
 package com.openjava.datatag.tagmanage.service;
 
+import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
@@ -56,7 +57,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 
 	@Transactional
 	public void doSoftDelete(DtTagGroup m){
-		m.setIsDeleted(1L);
+		m.setIsDeleted(Constants.DT_TG_DELETED);
 		//批量修改标签表的删除标识
 		dtTagService.doSoftDeleteByTagsID(m.getId(),m.getModifyTime());
 		//修改标签组表的删除标识
@@ -73,8 +74,8 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		Date now = new Date();
 		body.setCreateTime(now);
 		body.setModifyTime(now);
-		body.setIsDeleted(0L);
-		body.setIsShare(0L);
+		body.setIsDeleted(Constants.DT_TG_EXIST);
+		body.setIsShare(Constants.DT_TG_PRIVATE);
 		body.setPopularity(0L);
 		doSave(body);
 	}
