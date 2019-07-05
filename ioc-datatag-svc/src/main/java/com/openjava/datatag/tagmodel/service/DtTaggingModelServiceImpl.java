@@ -1,5 +1,6 @@
 package com.openjava.datatag.tagmodel.service;
 
+import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 /**
@@ -37,6 +39,10 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DtTaggingModelRepository dtTaggingModelRepository;
 	@Resource
 	private DtSetColRepository dtSetColRepository;
+
+	@Resource
+	private DtTagConditionRepository dtTagConditionRepository;
+
 	public void copy(Long id)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTaggingModel model = get(id);
@@ -79,8 +85,6 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		}
 	}
 
-	@Resource
-	private DtTagConditionRepository dtTagConditionRepository;
 
 	public Page<DtTaggingModel> query(DtTaggingModelDBParam params, Pageable pageable){
 		Page<DtTaggingModel> pageresult = dtTaggingModelRepository.query(params, pageable);
@@ -104,6 +108,18 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	public DtTaggingModel doSave(DtTaggingModel m) {
 		return dtTaggingModelRepository.save(m);
 	}
+
+	public void doSoftDelete(DtTaggingModel taggingModel){
+		Date now = new Date();
+		List<DtSetCol> list = dtSetColRepository.getByTaggingModelId(taggingModel.getId());
+		for (DtSetCol col: list){
+			dtTagConditionRepository.doSoftDeleteByColId(col.getColId(),now,taggingModel.getCreateUser());
+		}
+		dtSetColRepository.doSoftDeleteByTaggingModelId(taggingModel.getId(),now,taggingModel.getCreateUser());
+		taggingModel.setIsDeleted(Constants.PUBLIC_YES);
+		dtTaggingModelRepository.save(taggingModel);
+	}
+
 	public void doDelete(Long id) {
 		dtTaggingModelRepository.deleteById(id);
 	}

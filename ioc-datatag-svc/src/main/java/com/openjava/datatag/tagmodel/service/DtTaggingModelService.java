@@ -30,4 +30,6 @@ public interface DtTaggingModelService {
 	 * @param id
 	 */
 	void copy(Long id)throws Exception;
+
+	void doSoftDelete(DtTaggingModel taggingModel);
 }

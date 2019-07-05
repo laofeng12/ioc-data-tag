@@ -12,7 +12,8 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class DtTaggingModelDBParam extends RoDBQueryParam {
 	private Long eq_taggingModelId;//标签模型主键 --主键查询
-	
+
+	private Long eq_createUser;//创建者
 	private String like_modelName;//模型名字 like ?
 	private Long eq_runState;//运行状态:未运行/运行中/运行出错/运行结束 = ?
 	private Long eq_isDeleted;//删除标记 = ?
@@ -58,4 +59,11 @@ public class DtTaggingModelDBParam extends RoDBQueryParam {
 	public void setGe_startTime(Date startTime) {
 		this.ge_startTime = startTime;
 	}
+	public Long getEq_createUser() {
+		return eq_createUser;
+	}
+	public void setEq_createUser(Long eq_createUser) {
+		this.eq_createUser = eq_createUser;
+	}
+
 }
