@@ -19,7 +19,7 @@ import java.util.Date;
 @ApiModel("共享标签组")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
+//@Accessors(chain = true)
 @Entity
 public class DtShareTagGroup {
 

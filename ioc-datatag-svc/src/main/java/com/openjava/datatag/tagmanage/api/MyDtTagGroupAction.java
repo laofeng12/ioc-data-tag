@@ -1,5 +1,7 @@
 package com.openjava.datatag.tagmanage.api;
 
+import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
@@ -50,20 +52,20 @@ public class MyDtTagGroupAction {
 	})
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
-			@io.swagger.annotations.ApiResponse(code=10001, message="无权限查看")
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="无权限查看")
 	})
 	@Security(session=true)
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
 	public DtTagGroup get(@PathVariable("id")Long id) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTagGroup m = dtTagGroupService.get(id);
-		if(m == null || m.getIsDeleted().equals(1L)){
+		if(m == null || m.getIsDeleted().equals(Constants.DT_TG_DELETED)){
 			return null;
 		}
 		if(userInfo.getUserId().equals(m.getCreateUser().toString())){
 			return m;
 		}else{
-			throw new APIException(10001,"无权限查看");
+			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"无权限查看");
 		}
 	}
 
@@ -83,7 +85,7 @@ public class MyDtTagGroupAction {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long id = Long.parseLong(userInfo.getUserId());
 		params.setEq_createUser(id);
-		params.setEq_isDeleted(0L);
+		params.setEq_isDeleted(Constants.DT_TG_EXIST);
 		params.setSql_key("tagsName like \'%" + params.getKeyword() + "%\' or "+ "synopsis like \'%" + params.getKeyword()+"%\'");
 		Page<DtTagGroup> result =  dtTagGroupService.query(params, pageable);
 		return new TablePageImpl<>(result);
@@ -99,8 +101,8 @@ public class MyDtTagGroupAction {
 	})
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
-			@io.swagger.annotations.ApiResponse(code=10002, message="无此标签组或已被删除"),
-			@io.swagger.annotations.ApiResponse(code=10003, message="无权限删除")
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.TAG_GROUP_NOT_FOUND, message="无此标签组或已被删除"),
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="无权限删除")
 	})
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.DELETE)
@@ -109,15 +111,15 @@ public class MyDtTagGroupAction {
 			@ApiIgnore @RequestParam(value="ids",required=false)String ids) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTagGroup tagGroup = dtTagGroupService.get(id);
-		if(tagGroup == null || tagGroup.getIsDeleted().equals(1L)){
-			throw new APIException(10002,"无此标签组或已被删除");
+		if(tagGroup == null || tagGroup.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+			throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND,"无此标签组或已被删除");
 		}
 		if(userInfo.getUserId().equals(tagGroup.getCreateUser().toString())){
 			tagGroup.setModifyTime(new Date());
 			dtTagGroupService.doSoftDelete(tagGroup);//级联软删除，子标签也会被删除
 			return new SuccessMessage("删除成功");
 		}else{
-			throw new APIException(10003,"无权限删除");
+			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"无权限删除");
 		}
 	}
 
@@ -130,9 +132,9 @@ public class MyDtTagGroupAction {
 	@RequestMapping(method=RequestMethod.POST)
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
-			@io.swagger.annotations.ApiResponse(code=10002, message="无此标签组或已被删除"),
-			@io.swagger.annotations.ApiResponse(code=10004, message="请不要调用POST方法进行删除操作,请用DELETE方法"),
-			@io.swagger.annotations.ApiResponse(code=10003, message="没有修改此标签组的权限")
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.TAG_GROUP_NOT_FOUND, message="无此标签组或已被删除"),
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_ERROE, message="请不要调用POST方法进行删除操作,请用DELETE方法"),
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="没有修改此标签组的权限")
 	})
 	public SuccessMessage doSave(@RequestBody DtTagGroup body) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -144,16 +146,16 @@ public class MyDtTagGroupAction {
 		} else {
 			//修改，记录更新时间等
 			DtTagGroup db = dtTagGroupService.get(body.getId());
-			if(db == null || db.getIsDeleted().equals(1L)){
-				throw new APIException(10002,"无此标签组或已被删除");
+			if(db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+				throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND,"无此标签组或已被删除");
 			}
 			if(db.getCreateUser().equals(userId)){
-				if(body.getIsDeleted()!= null && body.getIsDeleted().equals(1L)){
-					throw new APIException(500,"请不要调用POST方法进行删除操作,请用DELETE方法");
+				if(body.getIsDeleted()!= null && body.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请不要调用POST方法进行删除操作,请用DELETE方法");
 				}
 				dtTagGroupService.doUpdate(body,db);
 			}else{
-				throw new APIException(10003,"没有修改此标签组的权限");
+				throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"没有修改此标签组的权限");
 			}
 		}
 		return new SuccessMessage("保存成功");

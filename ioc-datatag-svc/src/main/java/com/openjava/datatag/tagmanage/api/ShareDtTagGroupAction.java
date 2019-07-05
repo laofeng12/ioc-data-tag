@@ -1,19 +1,18 @@
 package com.openjava.datatag.tagmanage.api;
 
+import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmanage.domain.DtShareTagGroup;
-import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
-import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtShareTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
+import com.openjava.datatag.tagmanage.service.DtTagService;
 import io.swagger.annotations.*;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.annotation.Security;
 import org.ljdp.secure.sso.SsoContext;
-import org.ljdp.ui.bootstrap.TablePage;
-import org.ljdp.ui.bootstrap.TablePageImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
 
 @Api(tags="SHARE_DT_TAG_GROUP")
 @RestController
@@ -33,7 +30,11 @@ public class ShareDtTagGroupAction {
     @Resource
     private DtShareTagGroupService dtShareTagGroupService;
 
-    @Resource DtTagGroupService dtTagGroupService;
+    @Resource
+    private DtTagGroupService dtTagGroupService;
+
+    @Resource
+    private DtTagService dtTagService;
 
     @ApiOperation(value = "标签组列表分页查询(共享)", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
     @ApiImplicitParams({
@@ -58,18 +59,20 @@ public class ShareDtTagGroupAction {
     })
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
-            @io.swagger.annotations.ApiResponse(code=10002, message="无此标签组或未共享")
+            @io.swagger.annotations.ApiResponse(code= MyErrorConstants.SHARE_TAG_GROUP_NOT_FOUND, message="无此标签组或未共享")
     })
     @Security(session=true)
     @RequestMapping(method=RequestMethod.POST)
-    public List<DtTag> doChooseShareTagGroup(
+    public SuccessMessage doChooseShareTagGroup(
             @RequestParam(value="id",required=false)Long id) throws APIException {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         DtTagGroup db = dtTagGroupService.get(id);
-        if(db == null || db.getIsDeleted().equals(1L) || db.getIsShare().equals(0L)){
-            throw new APIException(10002,"无此标签组或未共享");
+        if(db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED) || db.getIsShare().equals(Constants.DT_TG_PRIVATE)) {
+            throw new APIException(MyErrorConstants.SHARE_TAG_GROUP_NOT_FOUND, "无此标签组或未共享");
         }
-        return dtShareTagGroupService.choose(id);
-
+        dtShareTagGroupService.choose(id,Long.parseLong(userInfo.getUserId()));
+        return new SuccessMessage("选用成功");
     }
+
+
 }

@@ -7,8 +7,8 @@ public class Constants {
     //========公共状态============
     public static final String PUBLIC_YN = "public.YN";//共享数据字典
     public static final String PUBLIC_MODIFY_TYPE = "public.modify.type";//修改类型
-    public static final Long PUBLIC_NO = 0l;//否
-    public static final Long PUBLIC_YES = 1l;//是
+    public static final Long PUBLIC_NO = 0L;//否
+    public static final Long PUBLIC_YES = 1L;//是
     public static final Long PUBLIC_MODIFY_TYPE_DELETE = 1L;//删除
     public static final Long PUBLIC_MODIFY_TYPE_UPDATE = 2L;//修改
 
@@ -75,4 +75,9 @@ public class Constants {
     public static final Long TG_MODEL_ERROR = 3L;//运行出错
     public static final Long TG_MODEL_END = 4L;//运行结束
 
+    //===========标签组状态=================
+    public static final Long DT_TG_DELETED= 1L;
+    public static final Long DT_TG_EXIST = 0L;
+    public static final Long DT_TG_SHARED = 1L;
+    public static final Long DT_TG_PRIVATE = 1L;
 }

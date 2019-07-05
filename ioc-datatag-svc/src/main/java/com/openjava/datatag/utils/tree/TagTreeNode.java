@@ -2,6 +2,7 @@ package com.openjava.datatag.utils.tree;
 
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import io.swagger.annotations.ApiModel;
+import org.ljdp.common.bean.MyBeanUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,10 +50,24 @@ public class TagTreeNode{
 				tag.setPreaTagId(0L);
 			}
 			if(tag.getPreaTagId().equals(this.getTag().getId())) {
-				TagTreeNode child = new TagTreeNode(taglist,tag);
+				TagTreeNode child = new TagTreeNode(taglist,deepCopy(tag));
 				this.addChildrenNode(child);
 			}
 		}
+	}
+
+	private DtTag deepCopy(DtTag tag){
+		DtTag newTag = new DtTag();
+		newTag.setId(tag.getId());
+		newTag.setPreaTagId(tag.getPreaTagId());
+		newTag.setTagsId(tag.getTagsId());
+		newTag.setIsDeleted(tag.getTagsId());
+		newTag.setLvl(tag.getLvl());
+		newTag.setSynopsis(tag.getSynopsis());
+		newTag.setCreateTime(tag.getCreateTime());
+		newTag.setModifyTime(tag.getCreateTime());
+		newTag.setTagName(tag.getTagName());
+		return newTag;
 	}
 
 }
