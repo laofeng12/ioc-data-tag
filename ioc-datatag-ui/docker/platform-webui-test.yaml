@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: platform-webui
+  name: platform-webui
+  namespace: ioc-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: platform-webui
+  template:
+    metadata:
+      labels:
+        app: platform-webui
+    spec:
+      containers:
+      - image: harbor.alltosea.com:88/ioc-paas/platform-webui:latest
+        imagePullPolicy: Always
+        name: platform-webui
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        env:
+        - name: API_HOST
+          value: "platform-svr-app.ioc-paas-platform"
+        - name: API_PORT
+          value: "9101"
+        - name: ADMIN_HOST
+          value: "platform-admin"
+        - name: ADMIN_PORT
+          value: "8080"
+        - name: SERVER_HOST
+          value: "platform-service"
+        - name: SERVER_PORT
+          value: "8080"
+
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: platform-webui
+  namespace: ioc-platform
+spec:
+  type: NodePort
+  ports:
+    - name: "platform-webui-http"
+      port: 80
+      targetPort: 80
+      nodePort: 30003
+  selector:
+    app: platform-webui
+
