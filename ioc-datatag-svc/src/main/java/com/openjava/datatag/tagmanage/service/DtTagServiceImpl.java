@@ -1,13 +1,13 @@
 package com.openjava.datatag.tagmanage.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.log.domain.DtTagUpdateLog;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.query.DtTagDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagRepository;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
+import com.openjava.datatag.log.repository.DtTagUpdateLogRepository;
 import org.ljdp.common.bean.MyBeanUtils;
-import org.ljdp.component.exception.APIException;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.sequence.SequenceService;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +31,9 @@ public class DtTagServiceImpl implements DtTagService {
 	
 	@Resource
 	private DtTagRepository dtTagRepository;
+
+	@Resource
+	DtTagUpdateLogRepository dtTagUpdateLogRepository;
 	
 	public Page<DtTag> query(DtTagDBParam params, Pageable pageable){
 		Page<DtTag> pageresult = dtTagRepository.query(params, pageable);
@@ -65,56 +67,57 @@ public class DtTagServiceImpl implements DtTagService {
 		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId, Constants.DT_TG_EXIST);
 	}
 
-	public void doNew(DtTag tag){
+	public void doNew(DtTag body,Long userId,String ip){
+		String modifyContent = JSONObject.toJSONString(body);
 		//新增，记录创建时间等
 		//设置主键(请根据实际情况修改)
 		SequenceService ss = ConcurrentSequence.getInstance();
-		tag.setId(ss.getSequence());
-		tag.setIsDeleted(Constants.DT_TG_EXIST);
-		tag.setIsNew(true);//执行insert
+		body.setId(ss.getSequence());
+		body.setIsDeleted(Constants.DT_TG_EXIST);
+		body.setIsNew(true);//执行insert
 		Date now = new Date();
-		tag.setCreateTime(now);
-		tag.setModifyTime(now);
-		doSave(tag);
+		body.setCreateTime(now);
+		body.setModifyTime(now);
+		doSave(body);
+
+		//日志记录
+		DtTagUpdateLog log = new DtTagUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUser(userId);
+		log.setModifyUserip(ip);
+		log.setModifyType(Constants.DT_TG_LOG_NEW);
+		log.setModifyTime(body.getModifyTime());
+		log.setTagId(body.getId());
+		log.setModifyContent(modifyContent);
+		log.setIsNew(true);
+		dtTagUpdateLogRepository.save(log);
 	}
 
-	public void doUpdate(DtTag tag,DtTag db){
+	public void doUpdate(DtTag body,DtTag db,Long userId, String ip){
+		String oldContent = JSONObject.toJSONString(db);
+		String modifyContent = JSONObject.toJSONString(body);
 		//不允许修改父节点，层级和创建时间
-		tag.setPreaTagId(null);
-		tag.setCreateTime(null);
-		tag.setLvl(null);
-		tag.setModifyTime(new Date());
-		copyPropertiesNotBlank(db, tag);
+		body.setPreaTagId(null);
+		body.setCreateTime(null);
+		body.setLvl(null);
+		body.setModifyTime(new Date());
+		MyBeanUtils.copyPropertiesNotBlank(db, body);
 		db.setIsNew(false);//执行update
 		doSave(db);
+
+		//日志记录
+		DtTagUpdateLog log = new DtTagUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUser(userId);
+		log.setModifyUserip(ip);
+		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
+		log.setModifyTime(db.getModifyTime());
+		log.setTagId(db.getId());
+		log.setModifyContent("{\"old\":"+oldContent+ ",\"newRep\":"+ modifyContent+"}");
+		log.setIsNew(true);
+		dtTagUpdateLogRepository.save(log);
 	}
 
-	private static void copyPropertiesNotBlank(Object dest, Object orig) {
-		Field[] fields = orig.getClass().getDeclaredFields();
-
-		for(int i = 0; i < fields.length; ++i) {
-			String key = fields[i].getName();
-			if (!key.equals("serialVersionUID")) {
-				try {
-					Object origVal = PropertyUtils.getSimpleProperty(orig, key);
-					if (origVal != null) {
-						if (origVal instanceof String) {
-							if (StringUtils.isNotBlank(origVal.toString())) {
-								PropertyUtils.setSimpleProperty(dest, key, origVal);
-							}
-						} else {
-							PropertyUtils.setSimpleProperty(dest, key, origVal);
-						}
-					}
-				} catch (NoSuchMethodException var6) {
-					var6.printStackTrace();
-				} catch (Exception var7) {
-					System.out.println("ERROR on COPY:" + key);
-					var7.printStackTrace();
-				}
-			}
-		}
-	}
 
 
 
@@ -125,14 +128,26 @@ public class DtTagServiceImpl implements DtTagService {
 		    dtTagRepository.doSoftDeleteByPreaTagId(pId,now);
         }
 	}
-	public void doSoftDeleteByDtTag(DtTag tag){
+	public void doSoftDeleteByDtTag(DtTag db,Long userId,String ip){
 		Date now = new Date();
 		//先删除子节点
-		doSoftDeleteByRootID(tag.getId(),now);
+		doSoftDeleteByRootID(db.getId(),now);
 		//再删除本节点
-		tag.setIsDeleted(Constants.DT_TG_DELETED);
-		tag.setModifyTime(now);
-		doSave(tag);
+		db.setIsDeleted(Constants.DT_TG_DELETED);
+		db.setModifyTime(now);
+		doSave(db);
+
+		//日志记录
+		DtTagUpdateLog log = new DtTagUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUser(userId);
+		log.setModifyUserip(ip);
+		log.setModifyType(Constants.DT_TG_LOG_DELETE);
+		log.setModifyTime(db.getModifyTime());
+		log.setTagId(db.getId());
+		//log.setModifyContent(modifyContent);//删除就不需要详情了
+		log.setIsNew(true);
+		dtTagUpdateLogRepository.save(log);
 	}
 
 

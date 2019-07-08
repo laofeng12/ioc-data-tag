@@ -22,15 +22,13 @@ public interface DtTagService {
 	List<DtTag> findByTagsId(Long id);
 	DtTag doSave(DtTag m);
 
-	void doNew(DtTag tag);
+	void doNew(DtTag tag,Long userId,String ip);
 
-	void doUpdate(DtTag tag,DtTag db);
-
-
+	void doUpdate(DtTag tag,DtTag db,Long userId,String ip);
 
 	void doSoftDeleteByTagsID(Long id, Date now);
 
 	void doSoftDeleteByRootID(Long id,Date now);
 
-	void doSoftDeleteByDtTag(DtTag tag);
+	void doSoftDeleteByDtTag(DtTag tag,Long userId,String ip);
 }

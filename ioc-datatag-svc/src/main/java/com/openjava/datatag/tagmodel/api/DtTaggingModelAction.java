@@ -163,7 +163,7 @@ public class DtTaggingModelAction {
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"找不到该模型或模型已经被删除");
 		}
 		if(tagModel.getCreateUser() != null && tagModel.getCreateUser().equals(userId)){
-			tagModel.setCycle(body.getCYCLE());
+			tagModel.setCycle(body.getCycle());
 			tagModel.setStartTime(body.getStartTime());
 			tagModel.setIsNew(false);
 			tagModel.setModifyUser(userId);
