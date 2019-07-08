@@ -6,8 +6,13 @@ import javax.persistence.Column;
 
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.tagmanage.domain.DtTag;
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmanage.service.DtTagGroupService;
+import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.tagmodel.domain.*;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
 import com.openjava.datatag.tagmodel.repository.DtTagcolUpdateLogRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
 import io.swagger.annotations.ApiModelProperty;
@@ -47,6 +52,10 @@ public class DtSetColServiceImpl implements DtSetColService {
 	private DtTagConditionUpdateLogService DtTagConditionUpdateLogService;
 	@Resource
 	private DtTaggingModelService dtTaggingModelService;
+	@Resource
+	private DtTagGroupService dtTagGroupService;
+	@Resource
+	private DtTagService dtTagService;
 
 	public Page<DtSetCol> query(DtSetColDBParam params, Pageable pageable){
 		Page<DtSetCol> pageresult = dtSetColRepository.query(params, pageable);
@@ -210,6 +219,23 @@ public class DtSetColServiceImpl implements DtSetColService {
 			clone.setShowCol("copy"+col.getSourceCol()+"1");
 		}
 		doSave(clone);
+	}
+	public GetHistoryColDTO getHistoryCol(Long colId)throws Exception{
+		GetHistoryColDTO result = new GetHistoryColDTO();
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		result.setTagGroups(dtTagGroupService.getMyTagGroup(Long.valueOf(userInfo.getUserId())));//我的标签组
+		List<DtTagCondition> conditions = dtTagConditionService.findByColId(colId);
+		result.setCondtion(conditions);//打标的条件设置列表
+		if (CollectionUtils.isNotEmpty(conditions)) {
+			DtTagCondition condition =conditions.get(0);
+			DtTag selectTag = dtTagService.get(condition.getTagId());//用于前端展示选中的（默认用第一个）
+			DtTagGroup selectTagGroups = dtTagGroupService.get(selectTag.getTagsId());//用于前端展示选中的
+			List<DtTag> tagList= dtTagService.findByTagsId(selectTagGroups.getId());//默认选中标签组的所有标签
+			result.setSelectTags(selectTag);
+			result.setSelectTagGroup(selectTagGroups);
+			result.setTags(tagList);
+		}
+		return result;
 	}
 	public static void main(String[] args) {
 		System.out.println(RandomStringUtils.random(27,true,false).toUpperCase());

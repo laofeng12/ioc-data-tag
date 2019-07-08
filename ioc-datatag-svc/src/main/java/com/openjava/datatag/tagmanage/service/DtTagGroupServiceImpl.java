@@ -89,5 +89,8 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		doSave(db);
 	}
 
+	public List<DtTagGroup> getMyTagGroup(Long createUser){
+		return dtTagGroupRepository.getMyTagGroup(createUser);
+	}
 
 }

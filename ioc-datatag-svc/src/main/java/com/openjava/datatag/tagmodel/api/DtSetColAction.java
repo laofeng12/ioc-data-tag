@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
 import com.openjava.datatag.tagmodel.dto.SelectColDTO;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
@@ -134,7 +135,7 @@ public class DtSetColAction {
 		return new SuccessMessage("保存成功");
 	}
 	
-	@ApiOperation(value = "清除", nickname="delete")
+	@ApiOperation(value = "字段清除", nickname="delete")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
 		@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
@@ -161,6 +162,16 @@ public class DtSetColAction {
 	public SuccessMessage clone(@RequestParam(value="colId",required=true)Long colId)throws Exception{
 		dtSetColService.clone(colId);
 		return new SuccessMessage("克隆字段成功");
+	}
+
+	@ApiOperation(value = "确认打标-查询打标历史接口", nickname="getHistoryCol")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
+	})
+	@Security(session=true)
+	@RequestMapping(value="/getHistoryCol",method=RequestMethod.POST)
+	public GetHistoryColDTO getHistoryCol(@RequestParam(value="colId",required=true)Long colId)throws Exception{
+		return dtSetColService.getHistoryCol(colId);
 	}
 
 	/**

@@ -26,5 +26,6 @@ public interface DtTagGroupService {
 	void doNew(DtTagGroup body,Long userId);
 
 	void doUpdate(DtTagGroup body,DtTagGroup db);
-	
+
+	List<DtTagGroup> getMyTagGroup(Long createUser);
 }
