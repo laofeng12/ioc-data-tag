@@ -81,5 +81,23 @@ export default new Router({
         component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/shareLabel.vue')
       }]
     },
+    {
+      path: '/modelEdit/:id',
+      name: 'modelEdit',
+      meta: { title: '编辑模型' },
+      component: () => import('@/views/taggedImage/modelEdit.vue')
+    },
+    {
+      path: '/ImageDetail/:id',
+      name: 'ImageDetail',
+      meta: { title: '画像模型' },
+      component: () => import('@/views/taggedImage/ImageDetail.vue')
+    },
+    {
+      path: '/creatModel',
+      name: 'creatModel',
+      meta: { title: '画像模型' },
+      component: () => import('@/views/taggedImage/creatModel.vue')
+    }
   ]
 })
