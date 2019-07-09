@@ -7,6 +7,7 @@ import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.service.DtShareTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
+import com.openjava.datatag.utils.IpUtil;
 import io.swagger.annotations.*;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
@@ -22,8 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
-@Api(tags="SHARE_DT_TAG_GROUP")
+@Api(tags="共享标签列表")
 @RestController
 @RequestMapping("/datatag/tagmanage/shareDtTagGroup")
 public class ShareDtTagGroupAction {
@@ -64,13 +66,15 @@ public class ShareDtTagGroupAction {
     @Security(session=true)
     @RequestMapping(method=RequestMethod.POST)
     public SuccessMessage doChooseShareTagGroup(
-            @RequestParam(value="id",required=false)Long id) throws APIException {
+            @RequestParam(value="id",required=false)Long id,
+            HttpServletRequest request) throws APIException {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        String ip = IpUtil.getRealIP(request);
         DtTagGroup db = dtTagGroupService.get(id);
         if(db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED) || db.getIsShare().equals(Constants.DT_TG_PRIVATE)) {
             throw new APIException(MyErrorConstants.SHARE_TAG_GROUP_NOT_FOUND, "无此标签组或未共享");
         }
-        dtShareTagGroupService.choose(id,Long.parseLong(userInfo.getUserId()));
+        dtShareTagGroupService.choose(id,Long.parseLong(userInfo.getUserId()),ip);
         return new SuccessMessage("选用成功");
     }
 

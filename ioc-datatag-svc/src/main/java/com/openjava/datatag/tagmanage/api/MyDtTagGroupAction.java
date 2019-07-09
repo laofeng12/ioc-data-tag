@@ -6,6 +6,8 @@ import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
+import com.openjava.datatag.utils.IpUtil;
+import com.openjava.datatag.utils.StringUtil;
 import io.swagger.annotations.*;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 
@@ -28,7 +31,7 @@ import java.util.Date;
  * @author lch
  *
  */
-@Api(tags="MY_DT_TAG_GROUP")
+@Api(tags="我的标签列表")
 @RestController
 @RequestMapping("/datatag/tagmanage/myDtTagGroup")
 public class MyDtTagGroupAction {
@@ -81,7 +84,11 @@ public class MyDtTagGroupAction {
 	})
 	@Security(session=true)
 	@RequestMapping(value="/search",method=RequestMethod.GET)
-	public TablePage<DtTagGroup> doSearch(@ApiIgnore() DtTagGroupDBParam params, @ApiIgnore() Pageable pageable){
+	public TablePage<DtTagGroup> doSearch(@ApiIgnore() DtTagGroupDBParam params,
+										  @ApiIgnore() Pageable pageable,
+										  HttpServletRequest request){
+
+		params.setKeyword(StringUtil.stringToHtmlEntity(params.getKeyword()));
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long id = Long.parseLong(userInfo.getUserId());
 		params.setEq_createUser(id);
@@ -108,15 +115,17 @@ public class MyDtTagGroupAction {
 	@RequestMapping(method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
-			@ApiIgnore @RequestParam(value="ids",required=false)String ids) throws APIException {
+			HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		String ip = IpUtil.getRealIP(request);
+
 		DtTagGroup tagGroup = dtTagGroupService.get(id);
 		if(tagGroup == null || tagGroup.getIsDeleted().equals(Constants.DT_TG_DELETED)){
 			throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND,"无此标签组或已被删除");
 		}
 		if(userInfo.getUserId().equals(tagGroup.getCreateUser().toString())){
-			tagGroup.setModifyTime(new Date());
-			dtTagGroupService.doSoftDelete(tagGroup);//级联软删除，子标签也会被删除
+			//级联软删除，子标签也会被删除
+			dtTagGroupService.doSoftDelete(tagGroup,Long.parseLong(userInfo.getUserId()),ip);
 			return new SuccessMessage("删除成功");
 		}else{
 			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"无权限删除");
@@ -136,13 +145,14 @@ public class MyDtTagGroupAction {
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_ERROE, message="请不要调用POST方法进行删除操作,请用DELETE方法"),
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="没有修改此标签组的权限")
 	})
-	public SuccessMessage doSave(@RequestBody DtTagGroup body) throws APIException {
+	public SuccessMessage doSave(@RequestBody DtTagGroup body,HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long userId = Long.parseLong(userInfo.getUserId());
+		String ip = IpUtil.getRealIP(request);
 		//不能通过本接口修改热度
 		body.setPopularity(null);
 		if (body.getIsNew() == null || body.getIsNew()) {
-			dtTagGroupService.doNew(body,userId);
+			dtTagGroupService.doNew(body,userId,ip);
 		} else {
 			//修改，记录更新时间等
 			DtTagGroup db = dtTagGroupService.get(body.getId());
@@ -153,7 +163,7 @@ public class MyDtTagGroupAction {
 				if(body.getIsDeleted()!= null && body.getIsDeleted().equals(Constants.DT_TG_DELETED)){
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请不要调用POST方法进行删除操作,请用DELETE方法");
 				}
-				dtTagGroupService.doUpdate(body,db);
+				dtTagGroupService.doUpdate(body,db,userId,ip);
 			}else{
 				throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"没有修改此标签组的权限");
 			}

@@ -76,8 +76,11 @@ public class Constants {
     public static final Long TG_MODEL_END = 4L;//运行结束
 
     //===========标签组状态=================
-    public static final Long DT_TG_DELETED= 1L;
-    public static final Long DT_TG_EXIST = 0L;
-    public static final Long DT_TG_SHARED = 1L;
-    public static final Long DT_TG_PRIVATE = 1L;
+    public static final Long DT_TG_DELETED= 1L;//已删除的
+    public static final Long DT_TG_EXIST = 0L;//未删除的
+    public static final Long DT_TG_SHARED = 1L;//已共享的
+    public static final Long DT_TG_PRIVATE = 0L;//未共享的
+    public static final Long DT_TG_LOG_NEW = 1L;//日志记录为新增
+    public static final Long DT_TG_LOG_UPDATE = 0L;//日志记录为更新
+    public static final Long DT_TG_LOG_DELETE = -1L;//日志记录为删除
 }
