@@ -23,13 +23,13 @@ public interface DtSetColService {
 	
 	DtSetCol doSave(DtSetCol m);
 	
-	void doDelete(Long id)throws Exception;
+	void doDelete(Long id,String ip)throws Exception;
 	void doRemove(String ids)throws Exception;
 	List<DtSetCol> getByTaggingModelId(Long taggingModelId);
 	/**
 	 * 字段设置-确认选择
 	 */
-	DtTaggingModelDTO selectCol(DtTaggingModelDTO body)throws Exception;
+	DtTaggingModelDTO selectCol(DtTaggingModelDTO body,String id)throws Exception;
 	/**
 	 * 根据源表数据获取字段表
 	 */
@@ -37,5 +37,5 @@ public interface DtSetColService {
 	/**
 	 * 克隆字段
 	 */
-	void clone(Long colId)throws Exception;
+	void clone(Long colId,String ip)throws Exception;
 }

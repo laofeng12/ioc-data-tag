@@ -1,4 +1,4 @@
-package com.openjava.datatag.tagmodel.query;
+package com.openjava.datatag.log.query;
 
 import java.util.Date;
 

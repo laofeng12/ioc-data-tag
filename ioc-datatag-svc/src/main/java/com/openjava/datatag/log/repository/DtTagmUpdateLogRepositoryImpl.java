@@ -1,9 +1,9 @@
-package com.openjava.datatag.tagmodel.repository;
+package com.openjava.datatag.log.repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-public class DtTagcolUpdateLogRepositoryImpl implements DtTagcolUpdateLogRepositoryCustom {
+public class DtTagmUpdateLogRepositoryImpl implements DtTagmUpdateLogRepositoryCustom {
 	private EntityManager em;
 	
 	@PersistenceContext

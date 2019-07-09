@@ -2,22 +2,22 @@ package com.openjava.datatag.tagmodel.service;
 
 import java.util.*;
 import javax.annotation.Resource;
-import javax.persistence.Column;
 
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.log.domain.DtTagcolUpdateLog;
+import com.openjava.datatag.log.domain.DtTagmUpdateLog;
+import com.openjava.datatag.log.repository.DtTagmUpdateLogRepository;
 import com.openjava.datatag.tagmodel.domain.*;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
-import com.openjava.datatag.tagmodel.repository.DtTagcolUpdateLogRepository;
+import com.openjava.datatag.log.repository.DtTagcolUpdateLogRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
-import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.bag.SynchronizedSortedBag;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.Length;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
+import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import com.alibaba.fastjson.JSONObject;
@@ -48,6 +48,10 @@ public class DtSetColServiceImpl implements DtSetColService {
 	@Resource
 	private DtTaggingModelService dtTaggingModelService;
 
+	@Resource
+	private DtTagmUpdateLogRepository dtTagmUpdateLogRepository;
+
+
 	public Page<DtSetCol> query(DtSetColDBParam params, Pageable pageable){
 		Page<DtSetCol> pageresult = dtSetColRepository.query(params, pageable);
 		return pageresult;
@@ -71,7 +75,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 		return dtSetColRepository.save(m);
 	}
 	
-	public void doDelete(Long id) throws Exception{
+	public void doDelete(Long id,String ip) throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtSetCol dtSetCol = get(id);
 		if (dtSetCol==null||dtSetCol.getIsDeleted()== Constants.PUBLIC_YES){
@@ -109,6 +113,20 @@ public class DtSetColServiceImpl implements DtSetColService {
 			conditionLog.setModifyType(Constants.PUBLIC_MODIFY_TYPE_DELETE);
 			conditionLog.setTagConditionId(record.getTagConditionId());
 			DtTagConditionUpdateLogService.doSave(conditionLog);
+
+
+			//日志记录
+			DtTagcolUpdateLog log = new DtTagcolUpdateLog();
+			log.setId(ConcurrentSequence.getInstance().getSequence());
+			log.setModifyUserip(ip);
+			log.setModifyTime(dtSetCol.getModifyTime());
+			log.setModifyUser(Long.valueOf(userInfo.getUserId()));
+			log.setColId(dtSetCol.getColId());
+			log.setModifyType(Constants.DT_TG_LOG_DELETE);
+			//log.setModifyContent();//删除就不需要保存内容了
+			log.setIsNew(true);
+			dtTagcolUpdateLogRepository.save(log);
+
 		});
 	}
 	public void doRemove(String ids) throws Exception{
@@ -123,7 +141,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 	/**
 	 * 字段设置-确认选择
 	 */
-	public DtTaggingModelDTO selectCol(DtTaggingModelDTO body)throws Exception{
+	public DtTaggingModelDTO selectCol(DtTaggingModelDTO body,String ip)throws Exception{
 		String reqParams = JSONObject.toJSONString(body);//用来保存前端请求参数，保存在日志里，方便排查
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		if (body.getDataSetId() == null) {
@@ -149,6 +167,10 @@ public class DtSetColServiceImpl implements DtSetColService {
 			taggingModel = dtTaggingModelService.get(body.getTaggingModelId());
 			if (taggingModel==null) {
 				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此标签模型,taggingModelId无效");
+			}
+			//只有创建者有修改模型显示打标字段的权限
+			if (! taggingModel.getCreateUser().equals(Long.parseLong(userInfo.getUserId()))){
+				throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"无修改模型显示打标字段的权限");
 			}
 			if (!taggingModel.getDataSetId().equals(body.getDataSetId())) {
 				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选"+taggingModel.getDataSetName()+"进行字段选择");
@@ -183,6 +205,19 @@ public class DtSetColServiceImpl implements DtSetColService {
 				col = doSave(model);
 			}
 		}
+
+		//日志记录
+		DtTagmUpdateLog log = new DtTagmUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(body.getModifyTime());
+		log.setModifyUser(Long.valueOf(userInfo.getUserId()));
+		log.setTaggingModelId(body.getTaggingModelId());
+		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
+		log.setModifyContent(reqParams);
+		log.setIsNew(true);
+		dtTagmUpdateLogRepository.save(log);
+
 		return body;
 	}
 	public List<DtSetCol>  getBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId){
@@ -192,7 +227,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 	/**
 	 * 克隆字段
 	 */
-	public void clone(Long colId)throws Exception{
+	public void clone(Long colId,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtSetCol col = get(colId);
 		DtSetCol clone = new DtSetCol();
@@ -210,6 +245,18 @@ public class DtSetColServiceImpl implements DtSetColService {
 			clone.setShowCol("copy"+col.getSourceCol()+"1");
 		}
 		doSave(clone);
+
+		//日志记录
+		DtTagcolUpdateLog log = new DtTagcolUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(clone.getModifyTime());
+		log.setModifyUser(Long.valueOf(userInfo.getUserId()));
+		log.setColId(clone.getColId());
+		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
+		log.setModifyContent("{\"from\":"+ col +"}");
+		log.setIsNew(true);
+		dtTagcolUpdateLogRepository.save(log);
 	}
 	public static void main(String[] args) {
 		System.out.println(RandomStringUtils.random(27,true,false).toUpperCase());

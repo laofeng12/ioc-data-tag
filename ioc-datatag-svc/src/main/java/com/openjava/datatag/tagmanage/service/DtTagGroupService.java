@@ -23,8 +23,8 @@ public interface DtTagGroupService {
 
 	void doSoftDelete(DtTagGroup db,Long userId,String ip);
 
-	void doNew(DtTagGroup body,Long userId,String ip);
+	DtTagGroup doNew(DtTagGroup body,Long userId,String ip);
 
-	void doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip);
+	DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip);
 	
 }

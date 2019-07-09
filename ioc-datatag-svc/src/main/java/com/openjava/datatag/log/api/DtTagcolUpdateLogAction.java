@@ -1,22 +1,16 @@
-package com.openjava.datatag.tagmodel.api;
+package com.openjava.datatag.log.api;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.SequenceService;
-import org.ljdp.component.sequence.TimeSequence;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.secure.annotation.Security;
 import org.ljdp.ui.bootstrap.TablePage;
@@ -39,9 +33,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import springfox.documentation.annotations.ApiIgnore;
 
-import com.openjava.datatag.tagmodel.domain.DtTagcolUpdateLog;
-import com.openjava.datatag.tagmodel.service.DtTagcolUpdateLogService;
-import com.openjava.datatag.tagmodel.query.DtTagcolUpdateLogDBParam;
+import com.openjava.datatag.log.domain.DtTagcolUpdateLog;
+import com.openjava.datatag.log.service.DtTagcolUpdateLogService;
+import com.openjava.datatag.log.query.DtTagcolUpdateLogDBParam;
 
 
 /**

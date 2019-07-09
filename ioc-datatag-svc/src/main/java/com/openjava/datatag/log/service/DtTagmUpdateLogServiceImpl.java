@@ -1,7 +1,6 @@
-package com.openjava.datatag.tagmodel.service;
+package com.openjava.datatag.log.service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Resource;
 
@@ -10,9 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.openjava.datatag.tagmodel.domain.DtTagmUpdateLog;
-import com.openjava.datatag.tagmodel.query.DtTagmUpdateLogDBParam;
-import com.openjava.datatag.tagmodel.repository.DtTagmUpdateLogRepository;
+import com.openjava.datatag.log.domain.DtTagmUpdateLog;
+import com.openjava.datatag.log.query.DtTagmUpdateLogDBParam;
+import com.openjava.datatag.log.repository.DtTagmUpdateLogRepository;
 /**
  * 标签模型日志业务层
  * @author zmk

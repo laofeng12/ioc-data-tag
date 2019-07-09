@@ -1,22 +1,16 @@
-package com.openjava.datatag.tagmodel.api;
+package com.openjava.datatag.log.api;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.SequenceService;
-import org.ljdp.component.sequence.TimeSequence;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.secure.annotation.Security;
 import org.ljdp.ui.bootstrap.TablePage;
@@ -39,9 +33,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import springfox.documentation.annotations.ApiIgnore;
 
-import com.openjava.datatag.tagmodel.domain.DtTagmUpdateLog;
-import com.openjava.datatag.tagmodel.service.DtTagmUpdateLogService;
-import com.openjava.datatag.tagmodel.query.DtTagmUpdateLogDBParam;
+import com.openjava.datatag.log.domain.DtTagmUpdateLog;
+import com.openjava.datatag.log.service.DtTagmUpdateLogService;
+import com.openjava.datatag.log.query.DtTagmUpdateLogDBParam;
 
 
 /**
@@ -57,25 +51,8 @@ public class DtTagmUpdateLogAction {
 	@Resource
 	private DtTagmUpdateLogService dtTagmUpdateLogService;
 	
-	/**
-	 * 用主键获取数据
-	 * @param id
-	 * @return
-	 */
-	@ApiOperation(value = "根据ID获取", notes = "单个对象查询", nickname="id")
-	@ApiImplicitParams({
-		@ApiImplicitParam(name = "id", value = "主标识编码", required = true, dataType = "string", paramType = "path"),
-	})
-	@ApiResponses({
-		@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
-	})
-	@Security(session=true)
-	@RequestMapping(value="/{id}",method=RequestMethod.GET)
-	public DtTagmUpdateLog get(@PathVariable("id")Long id) {
-		DtTagmUpdateLog m = dtTagmUpdateLogService.get(id);
-		return m;
-	}
-	
+
+
 	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "eq_taggingModelId", value = "标签模型主键=", required = false, dataType = "Long", paramType = "query"),
@@ -86,57 +63,10 @@ public class DtTagmUpdateLogAction {
 	@RequestMapping(value="/search",method=RequestMethod.GET)
 	public TablePage<DtTagmUpdateLog> doSearch(@ApiIgnore() DtTagmUpdateLogDBParam params, @ApiIgnore() Pageable pageable){
 		Page<DtTagmUpdateLog> result =  dtTagmUpdateLogService.query(params, pageable);
-		
+
 		return new TablePageImpl<>(result);
 	}
-	
 
-	
-	/**
-	 * 保存
-	 */
-	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
-	@Security(session=true)
-	@RequestMapping(method=RequestMethod.POST)
-	public SuccessMessage doSave(@RequestBody DtTagmUpdateLog body
-
-			) {
-		if(body.isNew()) {
-			//新增，记录创建时间等
-			//设置主键(请根据实际情况修改)
-			SequenceService ss = ConcurrentSequence.getInstance();
-			body.setId(ss.getSequence());
-			body.setIsNew(true);//执行insert
-			DtTagmUpdateLog dbObj = dtTagmUpdateLogService.doSave(body);
-		} else {
-			//修改，记录更新时间等
-			DtTagmUpdateLog db = dtTagmUpdateLogService.get(body.getId());
-			MyBeanUtils.copyPropertiesNotBlank(db, body);
-			db.setIsNew(false);//执行update
-			dtTagmUpdateLogService.doSave(db);
-		}
-		
-		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
-		return new SuccessMessage("保存成功");
-	}
-	
-	@ApiOperation(value = "删除", nickname="delete")
-	@ApiImplicitParams({
-		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
-		@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
-	})
-	@Security(session=true)
-	@RequestMapping(method=RequestMethod.DELETE)
-	public SuccessMessage doDelete(
-			@RequestParam(value="id",required=false)Long id,
-			@RequestParam(value="ids",required=false)String ids) {
-		if(id != null) {
-			dtTagmUpdateLogService.doDelete(id);
-		} else if(ids != null) {
-			dtTagmUpdateLogService.doRemove(ids);
-		}
-		return new SuccessMessage("删除成功");//没有需要返回的数据，就直接返回一条消息
-	}
 	
 	/**
 	 * 导出Excel文件

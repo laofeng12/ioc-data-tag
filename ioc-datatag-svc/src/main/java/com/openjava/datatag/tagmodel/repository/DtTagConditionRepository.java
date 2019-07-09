@@ -1,6 +1,5 @@
 package com.openjava.datatag.tagmodel.repository;
 
-import com.openjava.datatag.tagmodel.domain.DtTagcolUpdateLog;
 import org.ljdp.core.spring.data.DynamicJpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
