@@ -43,4 +43,8 @@ public interface DtSetColService {
 	 * 查询字段打标历史
 	 */
 	GetHistoryColDTO getHistoryCol(Long colId)throws Exception;
+	/**
+	 *  确认打标保存接口
+	 */
+	void saveCondition(GetHistoryColDTO req)throws Exception;
 }

@@ -6,11 +6,15 @@ import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class GetHistoryColDTO {
+    @NotNull
+    @ApiModelProperty("字段表主键")
+    private Long colId;
     @ApiModelProperty("标签组数据")
     private List<DtTagGroup> tagGroups = new ArrayList<>();
     @ApiModelProperty("被选的标签组")
@@ -20,5 +24,5 @@ public class GetHistoryColDTO {
     @ApiModelProperty("被选标签层")
     private DtTag selectTags;
     @ApiModelProperty("打标规制数据")
-    private List<DtTagCondition> condtion = new ArrayList<>();
+    private List<DtTagConditionDTO> condtion = new ArrayList<>();
 }

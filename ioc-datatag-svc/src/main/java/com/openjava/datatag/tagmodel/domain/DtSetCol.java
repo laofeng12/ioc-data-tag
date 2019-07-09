@@ -90,12 +90,12 @@ public class DtSetCol implements Persistable<Long>,Serializable {
 	private Long isDeleted;
 	
 	@ApiModelProperty("是否手动打标字段")
-	@Max(9L)
-	@Column(name = "IS_HANDLE")
-	private Long isHandle;
+	@Max(1L)
+	@Column(name = "IS_P_KEY")
+	private Long isPKey;
 	
 	@ApiModelProperty("是否打标字段")
-	@Max(9L)
+	@Max(1L)
 	@Column(name = "IS_MARKING")
 	private Long isMarking;
 	

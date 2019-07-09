@@ -1,5 +1,7 @@
 package com.openjava.datatag.common;
 
+import io.swagger.models.auth.In;
+
 public class MyErrorConstants {
     //===========公共错误错误代码=========
     public static final Integer PUBLIC_ERROE = -200;//通用错误代码
@@ -9,4 +11,6 @@ public class MyErrorConstants {
 
     //=======标签模型相关错误代码============
     public static final Integer TAG_MODEL_NO_FIND = -30001;//此Id查无模型
+    //=======字段打标相关错误代码===========
+    public static final Integer  TAG_TAGGING_GRAMMAR_ERROR= -30002;//条件设置语法错误
 }

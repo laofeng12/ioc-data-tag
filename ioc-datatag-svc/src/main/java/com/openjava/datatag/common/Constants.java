@@ -75,4 +75,7 @@ public class Constants {
     public static final Long TG_MODEL_ERROR = 3L;//运行出错
     public static final Long TG_MODEL_END = 4L;//运行结束
 
+    //===========字段条件设置 =================
+    public static final String DT_TAG_CONIDTINS = "dt.tag.conditions";//条件设置条件符号
+
 }

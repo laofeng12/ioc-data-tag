@@ -11,10 +11,14 @@ import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.tagmodel.domain.*;
+import com.openjava.datatag.tagmodel.dto.DtTagConditionDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
 import com.openjava.datatag.tagmodel.repository.DtTagcolUpdateLogRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
+import com.openjava.datatag.utils.TagConditionUtils;
+import com.openjava.framework.sys.domain.SysCode;
+import com.openjava.framework.sys.service.SysCodeService;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.bag.SynchronizedSortedBag;
@@ -26,6 +30,7 @@ import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import com.alibaba.fastjson.JSONObject;
+import org.openjava.boot.conf.aop.ApiExceptionAOP;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.openjava.datatag.tagmodel.query.DtSetColDBParam;
 import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
+import org.springframework.web.bind.annotation.RequestBody;
+
 /**
  * 字段表业务层
  * @author zmk
@@ -56,6 +63,10 @@ public class DtSetColServiceImpl implements DtSetColService {
 	private DtTagGroupService dtTagGroupService;
 	@Resource
 	private DtTagService dtTagService;
+	@Resource
+	private SysCodeService sysCodeService;
+	@Resource
+	private DtFilterExpressionService dtFilterExpressionService;
 
 	public Page<DtSetCol> query(DtSetColDBParam params, Pageable pageable){
 		Page<DtSetCol> pageresult = dtSetColRepository.query(params, pageable);
@@ -172,7 +183,6 @@ public class DtSetColServiceImpl implements DtSetColService {
 				if (CollectionUtils.isNotEmpty(list)) {
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"字段"+col.getSourceCol()+"已存在");
 				}
-				col.setIsHandle(Constants.PUBLIC_NO);//非手动打标字段
 				col.setIsSource(Constants.PUBLIC_YES);//源字段
 				col.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
 				EntityClassUtil.dealCreateInfo(col,userInfo);
@@ -213,6 +223,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 		EntityClassUtil.dealCreateInfo(clone,userInfo);
 		clone.setColId(null);
 		clone.setIsNew(true);
+		clone.setIsSource(Constants.PUBLIC_NO);//非源字段
 		if (CollectionUtils.isNotEmpty(cols)) {
 			clone.setShowCol("copy"+col.getSourceCol()+(cols.size()+1));
 		}else{
@@ -220,12 +231,25 @@ public class DtSetColServiceImpl implements DtSetColService {
 		}
 		doSave(clone);
 	}
+
+	/**
+	 * 查询字段打标历史
+	 */
 	public GetHistoryColDTO getHistoryCol(Long colId)throws Exception{
 		GetHistoryColDTO result = new GetHistoryColDTO();
+		result.setColId(colId);
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		result.setTagGroups(dtTagGroupService.getMyTagGroup(Long.valueOf(userInfo.getUserId())));//我的标签组
+		result.setTagGroups(dtTagGroupService.getMyTagGroup(Long.valueOf(userInfo.getUserId())));//默认展示的标签组
 		List<DtTagCondition> conditions = dtTagConditionService.findByColId(colId);
-		result.setCondtion(conditions);//打标的条件设置列表
+		List<DtTagConditionDTO> conditionsDTOs = new ArrayList<>();
+		conditions.forEach(record->{
+			DtTagConditionDTO dto = new DtTagConditionDTO();
+			MyBeanUtils.copyPropertiesNotNull(dto,record);
+			List<DtFilterExpression> conditionSetting = dtFilterExpressionService.findByTagConditionId(record.getTagConditionId());
+			dto.setConditionSetting(conditionSetting);
+			conditionsDTOs.add(dto);
+		});
+		result.setCondtion(conditionsDTOs);//打标的条件设置列表
 		if (CollectionUtils.isNotEmpty(conditions)) {
 			DtTagCondition condition =conditions.get(0);
 			DtTag selectTag = dtTagService.get(condition.getTagId());//用于前端展示选中的（默认用第一个）
@@ -237,7 +261,106 @@ public class DtSetColServiceImpl implements DtSetColService {
 		}
 		return result;
 	}
+	/**
+	 *  确认打标保存接口
+	 */
+	public void saveCondition(GetHistoryColDTO req)throws Exception{
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		List<DtTagConditionDTO> saveconditions = req.getCondtion();
+		List<DtTagCondition> conditions = dtTagConditionService.findByColId(req.getColId());
+		if (CollectionUtils.isEmpty(saveconditions)) {
+			return ;
+		}
+		if (get(req.getColId())==null) {
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此字段，colId参数错误");
+		}
+		for (int i = 0; i < saveconditions.size(); i++) {
+			DtTagConditionDTO record =saveconditions.get(i);
+			//校验条件是否合法
+			String filterExpression = null;
+			try {
+				filterExpression= check(req.getColId(),record);
+			}catch (Exception e){
+				e.printStackTrace();
+				throw new APIException(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR,"条件设置语法错误:"+i);
+			}
+			//新增和修改
+			DtTagCondition newTagCondition = new DtTagCondition();
+			if (record.getColId()!=null) {
+				if (!record.getColId().equals(req.getColId())) {
+					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"conditions参数的colI错误");
+				}
+				DtTagCondition dbData = dtTagConditionService.get(record.getTagConditionId());
+				MyBeanUtils.copyPropertiesNotNull(dbData,record);
+				EntityClassUtil.dealModifyInfo(dbData,userInfo);
+				dbData.setFilterExpression(filterExpression);
+				dtTagConditionService.doSave(dbData);
+			}else{
+				MyBeanUtils.copyPropertiesNotNull(newTagCondition,record);
+				EntityClassUtil.dealCreateInfo(newTagCondition,userInfo);
+				newTagCondition.setFilterExpression(filterExpression);
+				dtTagConditionService.doSave(newTagCondition);
+			}
+			//规制表达式表
+			dtFilterExpressionService.doRemoveByTagConditionId(record.getTagConditionId());
+			for (int j = 0; j < record.getConditionSetting().size(); j++) {
+				DtFilterExpression expression = record.getConditionSetting().get(j);
+				expression.setSort(j);
+			}
+
+		}
+		//删除
+		for (DtTagCondition record:conditions) {
+			if (!saveconditions.contains(record)){
+				doDelete(record.getId());
+			}
+		}
+	}
+
+	/**
+	 * 校验条件是否合法
+	 */
+	public String check(Long colId,DtTagConditionDTO condtion) throws Exception{
+		DtSetCol col =  get(colId);
+		if (condtion==null) {
+			return null;
+		}
+		String checkSql = " ";
+		String resultSql = "" ;
+		List<DtFilterExpression> list = condtion.getConditionSetting();
+		for (int j = 0; j < list.size() ; j++) {
+			DtFilterExpression expression = list.get(j);
+			if (expression.getSymbol()!=null && expression.getIsConnectSymbol().equals(Constants.PUBLIC_YES)) {
+				checkSql += expression.getSymbol();
+				resultSql += expression.getSymbol();
+			}else{
+				if (StringUtils.isNotBlank(expression.getSymbol())) {
+					if (expression.getValuesType()==null) {
+						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"数据类型为空");
+					}
+					if (TagConditionUtils.isIntType(expression.getValuesType())) {
+						checkSql += " TAG_CONDITION_ID "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
+					}else{
+						checkSql += " SHOW_COL "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
+					}
+					resultSql += col.getShowCol() +TagConditionUtils.toSqlSymbol(expression.getSymbol());
+				}
+				if (StringUtils.isBlank(expression.getTheValues())) {
+					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"值不能为空");
+				}
+				String values[] = expression.getTheValues().split(",");
+				for (int k = 0; k < values.length; k++) {
+					checkSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol())+" ";
+					resultSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol())+" ";
+				}
+			}
+		}
+		dtSetColRepository.check(checkSql);
+		return resultSql;
+	}
 	public static void main(String[] args) {
 		System.out.println(RandomStringUtils.random(27,true,false).toUpperCase());
+		String kk = null;
+		System.out.println("sss"+kk);
 	}
 }

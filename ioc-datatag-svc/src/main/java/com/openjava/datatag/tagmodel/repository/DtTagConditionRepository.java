@@ -27,5 +27,4 @@ public interface DtTagConditionRepository extends DynamicJpaRepository<DtTagCond
      */
     @Query(value = "from DtTagCondition t where t.colId in(:colIds)")
     List<DtTagCondition> findByColIds(@Param("colIds")List<Long> colIds);
-
 }
