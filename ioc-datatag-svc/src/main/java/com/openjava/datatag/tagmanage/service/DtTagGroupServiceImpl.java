@@ -140,5 +140,8 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		return newdb;
 	}
 
+	public List<DtTagGroup> getMyTagGroup(Long createUser){
+		return dtTagGroupRepository.getMyTagGroup(createUser);
+	}
 
 }

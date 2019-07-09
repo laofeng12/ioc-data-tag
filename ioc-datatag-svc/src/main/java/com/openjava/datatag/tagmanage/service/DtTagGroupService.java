@@ -27,4 +27,7 @@ public interface DtTagGroupService {
 
 	DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip);
 	
+//	void doUpdate(DtTagGroup body,DtTagGroup db);
+
+	List<DtTagGroup> getMyTagGroup(Long createUser);
 }

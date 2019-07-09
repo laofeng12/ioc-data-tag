@@ -83,4 +83,7 @@ public class Constants {
     public static final Long DT_TG_LOG_NEW = 1L;//日志记录为新增
     public static final Long DT_TG_LOG_UPDATE = 0L;//日志记录为更新
     public static final Long DT_TG_LOG_DELETE = -1L;//日志记录为删除
+    //===========字段条件设置 =================
+    public static final String DT_TAG_CONIDTINS = "dt.tag.conditions";//条件设置条件符号
+
 }

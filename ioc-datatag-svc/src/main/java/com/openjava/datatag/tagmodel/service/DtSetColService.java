@@ -3,6 +3,7 @@ package com.openjava.datatag.tagmodel.service;
 import java.util.List;
 
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -38,4 +39,13 @@ public interface DtSetColService {
 	 * 克隆字段
 	 */
 	void clone(Long colId,String ip)throws Exception;
+//	void clone(Long colId)throws Exception;
+	/**
+	 * 查询字段打标历史
+	 */
+	GetHistoryColDTO getHistoryCol(Long colId)throws Exception;
+	/**
+	 *  确认打标保存接口
+	 */
+	void saveCondition(GetHistoryColDTO req)throws Exception;
 }

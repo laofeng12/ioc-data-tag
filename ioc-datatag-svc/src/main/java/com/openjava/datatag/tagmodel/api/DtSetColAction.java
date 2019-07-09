@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
 import com.openjava.datatag.tagmodel.dto.SelectColDTO;
 import com.openjava.datatag.utils.IpUtil;
 import org.ljdp.common.bean.MyBeanUtils;
@@ -46,7 +47,7 @@ import com.openjava.datatag.tagmodel.query.DtSetColDBParam;
  * @author zmk
  *
  */
-@Api(tags="字段表")
+@Api(tags="字段设置")
 @RestController
 @RequestMapping("/datatag/tagmodel/dtSetCol")
 public class DtSetColAction {
@@ -58,7 +59,7 @@ public class DtSetColAction {
 	 * 用主键获取数据
 	 * @param id
 	 * @return
-	 */
+	 *//*
 	@ApiOperation(value = "根据ID获取", notes = "单个对象查询", nickname="id")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "id", value = "主标识编码", required = true, dataType = "string", paramType = "path"),
@@ -71,9 +72,9 @@ public class DtSetColAction {
 	public DtSetCol get(@PathVariable("id")Long id) {
 		DtSetCol m = dtSetColService.get(id);
 		return m;
-	}
+	}*/
 	
-	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
+	/*@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "eq_taggingModelId", value = "标签模型主键=", required = false, dataType = "Long", paramType = "query"),
 		@ApiImplicitParam(name = "eq_taggingModelId", value = "标签模型编号=", required = false, dataType = "Long", paramType = "query"),
@@ -91,13 +92,13 @@ public class DtSetColAction {
 		Page<DtSetCol> result =  dtSetColService.query(params, pageable);
 		
 		return new TablePageImpl<>(result);
-	}
+	}*/
 	
 
 	
 	/**
 	 * 保存
-	 */
+	 *//*
 	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
 	@RequestMapping(value="/save", method=RequestMethod.POST)
@@ -121,7 +122,7 @@ public class DtSetColAction {
 		
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
 		return new SuccessMessage("保存成功");
-	}
+	}*/
 
 	/**
 	 * 字段设置确认选择接口
@@ -137,7 +138,7 @@ public class DtSetColAction {
 		return new SuccessMessage("保存成功");
 	}
 	
-	@ApiOperation(value = "清除", nickname="delete")
+	@ApiOperation(value = "字段清除", nickname="delete")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
 		@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
@@ -170,9 +171,30 @@ public class DtSetColAction {
 		return new SuccessMessage("克隆字段成功");
 	}
 
+	@ApiOperation(value = "确认打标-查询打标历史接口", nickname="getHistoryCol")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
+	})
+	@Security(session=true)
+	@RequestMapping(value="/getHistoryCol",method=RequestMethod.POST)
+	public GetHistoryColDTO getHistoryCol(@RequestParam(value="colId",required=true)Long colId)throws Exception{
+		return dtSetColService.getHistoryCol(colId);
+	}
+
+	@ApiOperation(value = "确认打标-保存接口", nickname="getHistoryCol", notes="")
+	@ApiImplicitParams({
+//			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
+	})
+	@Security(session=true)
+	@RequestMapping(value="/saveCondition",method=RequestMethod.POST)
+	public SuccessMessage saveCondition(@RequestBody GetHistoryColDTO req)throws Exception{
+		dtSetColService.saveCondition(req);
+		return new SuccessMessage("保存成功");
+	}
+
 	/**
 	 * 导出Excel文件
-	 */
+	 *//*
 	@Security(session=true)
 	@RequestMapping(value="/export", method=RequestMethod.GET)
 	public void doExport(HttpServletRequest request, HttpServletResponse response,
@@ -208,5 +230,5 @@ public class DtSetColAction {
 			} catch (Exception e2) {
 			}
 		}
-	}
+	}*/
 }

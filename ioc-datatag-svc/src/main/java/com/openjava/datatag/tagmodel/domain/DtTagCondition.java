@@ -49,7 +49,12 @@ public class DtTagCondition implements Persistable<Long>,Serializable {
 	@Max(9223372036854775806L)
 	@Column(name = "TAG_ID")
 	private Long tagId;
-	
+
+	@ApiModelProperty("是否手动打标")
+	@Max(1L)
+	@Column(name = "IS_HANDLE")
+	private Long isHandle;
+
 	@ApiModelProperty("逻辑语句")
 	@Length(min=0, max=128)
 	@Column(name = "FILTER_EXPRESSION")
@@ -118,5 +123,28 @@ public class DtTagCondition implements Persistable<Long>,Serializable {
     	}
     	return true;
     }
-    
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj){
+			return true;
+		}
+		if (obj == null){
+			return false;
+		}
+		if (getClass() != obj.getClass()){
+			return false;
+		}
+		DtTagCondition condition = (DtTagCondition) obj;
+		if (condition.getId() == null) {
+			return false;
+		}
+		if (this.getId() == null) {
+			if (condition.getId() != null){
+				return false;
+			}
+		} else if (!this.getId().equals(condition.getId())){
+			return false;
+		}
+		return true;
+	}
 }
