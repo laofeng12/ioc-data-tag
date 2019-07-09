@@ -1,12 +1,12 @@
-package com.openjava.datatag.tagmodel.service;
+package com.openjava.datatag.log.service;
 
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.openjava.datatag.tagmodel.domain.DtTagcolUpdateLog;
-import com.openjava.datatag.tagmodel.query.DtTagcolUpdateLogDBParam;
+import com.openjava.datatag.log.domain.DtTagcolUpdateLog;
+import com.openjava.datatag.log.query.DtTagcolUpdateLogDBParam;
 
 /**
  * 字段表日志业务层接口

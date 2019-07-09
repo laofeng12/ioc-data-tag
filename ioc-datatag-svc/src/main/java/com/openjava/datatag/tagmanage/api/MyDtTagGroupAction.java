@@ -145,14 +145,15 @@ public class MyDtTagGroupAction {
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_ERROE, message="请不要调用POST方法进行删除操作,请用DELETE方法"),
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="没有修改此标签组的权限")
 	})
-	public SuccessMessage doSave(@RequestBody DtTagGroup body,HttpServletRequest request) throws APIException {
+	public DtTagGroup doSave(@RequestBody DtTagGroup body,HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long userId = Long.parseLong(userInfo.getUserId());
 		String ip = IpUtil.getRealIP(request);
 		//不能通过本接口修改热度
 		body.setPopularity(null);
 		if (body.getIsNew() == null || body.getIsNew()) {
-			dtTagGroupService.doNew(body,userId,ip);
+			DtTagGroup db = dtTagGroupService.doNew(body,userId,ip);
+			return db;
 		} else {
 			//修改，记录更新时间等
 			DtTagGroup db = dtTagGroupService.get(body.getId());
@@ -163,11 +164,12 @@ public class MyDtTagGroupAction {
 				if(body.getIsDeleted()!= null && body.getIsDeleted().equals(Constants.DT_TG_DELETED)){
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请不要调用POST方法进行删除操作,请用DELETE方法");
 				}
-				dtTagGroupService.doUpdate(body,db,userId,ip);
+				DtTagGroup newdb = dtTagGroupService.doUpdate(body,db,userId,ip);
+				return newdb;
+
 			}else{
 				throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"没有修改此标签组的权限");
 			}
 		}
-		return new SuccessMessage("保存成功");
 	}
 }

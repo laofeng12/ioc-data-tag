@@ -2,6 +2,10 @@ package com.openjava.datatag.tagmodel.service;
 
 import java.util.List;
 
+import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
+import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import org.ljdp.component.exception.APIException;
+import org.ljdp.component.user.BaseUserInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,7 +25,11 @@ public interface DtTaggingModelService {
 	DtTaggingModel get(Long id);
 	
 	DtTaggingModel doSave(DtTaggingModel m);
-	
+	DtTaggingModel doNew(DtTaggingModel m,BaseUserInfo userInfo, String ip);
+	DtTaggingModel doUpdate(DtTaggingModel body, DtTaggingModel db, BaseUserInfo userInfo,String ip);
+
+
+	void doDispatch(DtTaggingDispatchDTO body, DtTaggingModel db, Long userId, String ip) throws APIException;
 	void doDelete(Long id);
 	void doRemove(String ids);
 
@@ -29,7 +37,7 @@ public interface DtTaggingModelService {
 	 * 克隆模型
 	 * @param id
 	 */
-	void copy(Long id)throws Exception;
+	void copy(Long id,String ip)throws Exception;
 
-	void doSoftDelete(DtTaggingModel taggingModel);
+	void doSoftDelete(DtTaggingModel taggingModel,Long userId,String ip);
 }

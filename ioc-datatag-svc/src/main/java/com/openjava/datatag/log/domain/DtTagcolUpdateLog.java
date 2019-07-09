@@ -1,4 +1,4 @@
-package com.openjava.datatag.tagmodel.domain;
+package com.openjava.datatag.log.domain;
 
 import java.util.Date;
 import java.io.Serializable;
@@ -25,13 +25,13 @@ import io.swagger.annotations.ApiModelProperty;
  * @author zmk
  *
  */
-@ApiModel("标签模型日志")
+@ApiModel("字段表日志")
 @Data
 @EqualsAndHashCode(callSuper = false)
 //@Accessors(chain = true)
 @Entity
-@Table(name = "DT_TAGM_UPDATE_LOG")
-public class DtTagmUpdateLog implements Persistable<Long>,Serializable {
+@Table(name = "DT_TAGCOL_UPDATE_LOG")
+public class DtTagcolUpdateLog implements Persistable<Long>,Serializable {
 	
 	@ApiModelProperty("日志编号")
 	@Id
@@ -40,10 +40,10 @@ public class DtTagmUpdateLog implements Persistable<Long>,Serializable {
 	@Column(name = "ID")
 	private Long id;
 	
-	@ApiModelProperty("标签模型主键")
+	@ApiModelProperty("字段表主键")
 	@Max(9223372036854775806L)
-	@Column(name = "TAGGING_MODEL_ID")
-	private Long taggingModelId;
+	@Column(name = "COL_ID")
+	private Long colId;
 	
 	@ApiModelProperty("修改者")
 	@Max(9223372036854775806L)
@@ -74,7 +74,6 @@ public class DtTagmUpdateLog implements Persistable<Long>,Serializable {
 	@ApiModelProperty("是否新增")
 	@Transient
     private Boolean isNew;
-
     
     @JsonIgnore
     @Transient

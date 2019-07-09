@@ -83,7 +83,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		dtTaggUpdateLogRepository.save(log);
 	}
 
-	public void doNew(DtTagGroup body,Long userId,String ip){
+	public DtTagGroup doNew(DtTagGroup body,Long userId,String ip){
 		String modifyContent = JSONObject.toJSONString(body);
 		//新增，记录创建时间等
 		//设置主键(请根据实际情况修改)
@@ -97,7 +97,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		body.setIsDeleted(Constants.DT_TG_EXIST);
 		body.setIsShare(Constants.DT_TG_PRIVATE);
 		body.setPopularity(0L);
-		dtTagGroupRepository.save(body);
+		DtTagGroup db = dtTagGroupRepository.save(body);
 
 		//日志记录
 		DtTaggUpdateLog log = new DtTaggUpdateLog();
@@ -110,9 +110,11 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		log.setModifyContent(modifyContent);
 		log.setIsNew(true);
 		dtTaggUpdateLogRepository.save(log);
+
+		return  db;
 	}
 
-	public void doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip){
+	public DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip){
 		String oldContent = JSONObject.toJSONString(db);
 		String modifyContent = JSONObject.toJSONString(body);
 		//Create* 应该保持不变，Modify更新
@@ -121,7 +123,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		body.setModifyTime(new Date());
 		MyBeanUtils.copyPropertiesNotBlank(db, body);
 		db.setIsNew(false);
-		doSave(db);
+		DtTagGroup newdb = doSave(db);
 
 		//日志记录
 		DtTaggUpdateLog log = new DtTaggUpdateLog();
@@ -134,6 +136,8 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		log.setModifyContent("{\"old\":"+oldContent+ ",\"newRep\":"+ modifyContent+"}");
 		log.setIsNew(true);
 		dtTaggUpdateLogRepository.save(log);
+
+		return newdb;
 	}
 
 

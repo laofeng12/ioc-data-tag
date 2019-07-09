@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.dto.SelectColDTO;
+import com.openjava.datatag.utils.IpUtil;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
@@ -129,8 +130,10 @@ public class DtSetColAction {
 			"修改的格式：{\"taggingModelId\":1,\"dataSetId\":1,\"dataSetName\":\"高考数据233\",\"colList\":[{\"colId\":1,\"taggingModelId\":1,\"sourceCol\":\"name\",\"sourceDataType\":\"String\",\"isMarking\":1},{\"sourceCol\":\"userId2\",\"sourceDataType\":\"Long\",\"isMarking\":1}]}")
 	@Security(session=true)
 	@RequestMapping(value="/selectCol", method=RequestMethod.POST)
-	public SuccessMessage selectCol(@RequestBody DtTaggingModelDTO body) throws Exception{
-		dtSetColService.selectCol(body);
+	public SuccessMessage selectCol(@RequestBody DtTaggingModelDTO body,
+									HttpServletRequest request) throws Exception{
+		String ip = IpUtil.getRealIP(request);
+		dtSetColService.selectCol(body,ip);
 		return new SuccessMessage("保存成功");
 	}
 	
@@ -143,9 +146,11 @@ public class DtSetColAction {
 	@RequestMapping(value="/delete",method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
-			@RequestParam(value="ids",required=false)String ids) throws Exception{
+			@RequestParam(value="ids",required=false)String ids,
+			HttpServletRequest request) throws Exception{
+		String ip = IpUtil.getRealIP(request);
 		if(id != null) {
-			dtSetColService.doDelete(id);
+			dtSetColService.doDelete(id,ip);
 		} else if(ids != null) {
 			dtSetColService.doRemove(ids);
 		}
@@ -158,8 +163,10 @@ public class DtSetColAction {
 	})
 	@Security(session=true)
 	@RequestMapping(value="/clone",method=RequestMethod.POST)
-	public SuccessMessage clone(@RequestParam(value="colId",required=true)Long colId)throws Exception{
-		dtSetColService.clone(colId);
+	public SuccessMessage clone(@RequestParam(value="colId",required=true)Long colId,
+								HttpServletRequest request)throws Exception{
+		String ip = IpUtil.getRealIP(request);
+		dtSetColService.clone(colId,ip);
 		return new SuccessMessage("克隆字段成功");
 	}
 

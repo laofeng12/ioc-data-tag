@@ -1,12 +1,17 @@
 package com.openjava.datatag.tagmodel.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.log.domain.DtTagmUpdateLog;
+import com.openjava.datatag.log.repository.DtTagmUpdateLogRepository;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.dto.DtSetColDTO;
 import com.openjava.datatag.tagmodel.dto.DtTagConditionDTO;
+import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
@@ -14,7 +19,9 @@ import com.openjava.datatag.tagmodel.repository.DtTagConditionRepository;
 import com.openjava.datatag.tagmodel.repository.DtTaggingModelRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
 import org.apache.commons.beanutils.BeanUtils;
+import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
+import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
@@ -43,12 +50,18 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	@Resource
 	private DtTagConditionRepository dtTagConditionRepository;
 
-	public void copy(Long id)throws Exception{
+	@Resource
+	private DtTagmUpdateLogRepository dtTagmUpdateLogRepository;
+
+
+	public void copy(Long id,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTaggingModel model = get(id);
 		if (model==null) {
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"此Id查无模型");
 		}
+		String content = JSONObject.toJSONString(model);
+
 		//克隆模型
 		DtTaggingModelDTO tempDTO = new DtTaggingModelDTO();
 		DtTaggingModel clone = new DtTaggingModel();
@@ -83,6 +96,19 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				dtTagConditionRepository.save(conditionClone);
 			}
 		}
+
+		//日志记录
+		DtTagmUpdateLog log = new DtTagmUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(clone.getCreateTime());
+		log.setModifyUser(Long.valueOf(userInfo.getUserId()));
+		log.setTaggingModelId(clone.getTaggingModelId());
+		log.setModifyType(Constants.DT_TG_LOG_NEW);
+		log.setModifyContent("{ \"from\": "+content+"}");
+		log.setIsNew(true);
+		dtTagmUpdateLogRepository.save(log);
+
 	}
 
 
@@ -109,15 +135,112 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		return dtTaggingModelRepository.save(m);
 	}
 
-	public void doSoftDelete(DtTaggingModel taggingModel){
-		Date now = new Date();
-		List<DtSetCol> list = dtSetColRepository.getByTaggingModelId(taggingModel.getId());
-		for (DtSetCol col: list){
-			dtTagConditionRepository.doSoftDeleteByColId(col.getColId(),now,taggingModel.getCreateUser());
+	public DtTaggingModel doNew(DtTaggingModel body,BaseUserInfo userInfo,String ip){
+		String content = JSONObject.toJSONString(body);
+		EntityClassUtil.dealCreateInfo(body,userInfo);
+		body.setRunState(Constants.TG_MODEL_NO_BEGIN);//未开始
+		body.setIsNew(true);//执行insert
+		body.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
+		DtTaggingModel dbObj = dtTaggingModelRepository.save(body);
+
+		//日志记录
+		DtTagmUpdateLog log = new DtTagmUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(body.getModifyTime());
+		log.setModifyUser(Long.valueOf(userInfo.getUserId()));
+		log.setTaggingModelId(body.getTaggingModelId());
+		log.setModifyType(Constants.DT_TG_LOG_NEW);
+		log.setModifyContent(content);
+		log.setIsNew(true);
+		dtTagmUpdateLogRepository.save(log);
+
+		return dbObj;
+	}
+
+	public DtTaggingModel doUpdate(DtTaggingModel body,DtTaggingModel db,BaseUserInfo userInfo,String ip){
+		String oldContent = JSONObject.toJSONString(db);
+		String modifyContent = JSONObject.toJSONString(body);
+		EntityClassUtil.dealModifyInfo(db,userInfo);
+		MyBeanUtils.copyPropertiesNotBlank(db, body);
+		db.setIsNew(false);//执行update
+		DtTaggingModel dbObj =dtTaggingModelRepository.save(db);
+
+		//日志记录
+		DtTagmUpdateLog log = new DtTagmUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(db.getModifyTime());
+		log.setModifyUser(Long.valueOf(userInfo.getUserId()));
+		log.setTaggingModelId(db.getTaggingModelId());
+		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
+		log.setModifyContent("{\"old\":"+oldContent+ ",\"newRep\":"+ modifyContent+"}");
+		log.setIsNew(true);
+		dtTagmUpdateLogRepository.save(log);
+
+		return dbObj;
+	}
+
+
+	/*
+	* 设置调度
+	*/
+	public void doDispatch(DtTaggingDispatchDTO body, DtTaggingModel db, Long userId, String ip) throws APIException {
+		String oldContent = JSONObject.toJSONString(db);
+		String modifyContent = JSONObject.toJSONString(body);
+		db.setModifyTime(new Date());
+		db.setModifyUser(userId);
+		//检查Cycle 字段是否合理--尚不明确前端传入的字段类型(或保存cron表达式或只保存周期标识)
+		if(checkCycle(body.getCycle())){
+			db.setCycle(body.getCycle());
+		}else{
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"Cycle不合法");
 		}
-		dtSetColRepository.doSoftDeleteByTaggingModelId(taggingModel.getId(),now,taggingModel.getCreateUser());
-		taggingModel.setIsDeleted(Constants.PUBLIC_YES);
-		dtTaggingModelRepository.save(taggingModel);
+		db.setStartTime(body.getStartTime());
+		dtTaggingModelRepository.save(db);
+
+		//日志记录
+		DtTagmUpdateLog log = new DtTagmUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(db.getModifyTime());
+		log.setModifyUser(userId);
+		log.setTaggingModelId(db.getTaggingModelId());
+		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
+		log.setModifyContent("{\"old\":"+oldContent+ ",\"newRep\":"+ modifyContent+"}");
+		log.setIsNew(true);
+		dtTagmUpdateLogRepository.save(log);
+	}
+
+	//检查Cycle是否合法
+	private boolean checkCycle(String Cycle){
+		return true;
+	}
+
+
+
+	public void doSoftDelete(DtTaggingModel db,Long userId,String ip){
+		Date now = new Date();
+		List<DtSetCol> list = dtSetColRepository.getByTaggingModelId(db.getId());
+		for (DtSetCol col: list){
+			dtTagConditionRepository.doSoftDeleteByColId(col.getColId(),now,db.getCreateUser());
+		}
+		dtSetColRepository.doSoftDeleteByTaggingModelId(db.getId(),now,db.getCreateUser());
+		db.setIsDeleted(Constants.PUBLIC_YES);
+		db.setModifyTime(now);
+		dtTaggingModelRepository.save(db);
+
+		//日志记录
+		DtTagmUpdateLog log = new DtTagmUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(db.getModifyTime());
+		log.setModifyUser(userId);
+		log.setTaggingModelId(db.getTaggingModelId());
+		log.setModifyType(Constants.DT_TG_LOG_DELETE);
+		//log.setModifyContent();//删除就不需要保存内容了
+		log.setIsNew(true);
+		dtTagmUpdateLogRepository.save(log);
 	}
 
 	public void doDelete(Long id) {
