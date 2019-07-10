@@ -6,6 +6,7 @@ import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.log.domain.DtTagmUpdateLog;
 import com.openjava.datatag.log.repository.DtTagmUpdateLogRepository;
+import com.openjava.datatag.log.service.DtTagmUpdateLogService;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
@@ -18,6 +19,8 @@ import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
 import com.openjava.datatag.tagmodel.repository.DtTagConditionRepository;
 import com.openjava.datatag.tagmodel.repository.DtTaggingModelRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
+import com.openjava.datatag.utils.StringUtil;
+import com.openjava.datatag.utils.TimeUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +55,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DtTagConditionRepository dtTagConditionRepository;
 
 	@Resource
-	private DtTagmUpdateLogRepository dtTagmUpdateLogRepository;
+	private DtTagmUpdateLogService dtTagmUpdateLogService;
 
 
 	public void copy(Long id,String ip)throws Exception{
@@ -98,16 +102,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		}
 
 		//日志记录
-		DtTagmUpdateLog log = new DtTagmUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUserip(ip);
-		log.setModifyTime(clone.getCreateTime());
-		log.setModifyUser(Long.valueOf(userInfo.getUserId()));
-		log.setTaggingModelId(clone.getTaggingModelId());
-		log.setModifyType(Constants.DT_TG_LOG_NEW);
-		log.setModifyContent("{ \"from\": "+content+"}");
-		log.setIsNew(true);
-		dtTagmUpdateLogRepository.save(log);
+		dtTagmUpdateLogService.loggingNew("{ \"from\": "+content+"}",clone,ip);
 
 	}
 
@@ -144,16 +139,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		DtTaggingModel dbObj = dtTaggingModelRepository.save(body);
 
 		//日志记录
-		DtTagmUpdateLog log = new DtTagmUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUserip(ip);
-		log.setModifyTime(body.getModifyTime());
-		log.setModifyUser(Long.valueOf(userInfo.getUserId()));
-		log.setTaggingModelId(body.getTaggingModelId());
-		log.setModifyType(Constants.DT_TG_LOG_NEW);
-		log.setModifyContent(content);
-		log.setIsNew(true);
-		dtTagmUpdateLogRepository.save(log);
+		dtTagmUpdateLogService.loggingNew(content,dbObj,ip);
 
 		return dbObj;
 	}
@@ -167,16 +153,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		DtTaggingModel dbObj =dtTaggingModelRepository.save(db);
 
 		//日志记录
-		DtTagmUpdateLog log = new DtTagmUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUserip(ip);
-		log.setModifyTime(db.getModifyTime());
-		log.setModifyUser(Long.valueOf(userInfo.getUserId()));
-		log.setTaggingModelId(db.getTaggingModelId());
-		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
-		log.setModifyContent("{\"old\":"+oldContent+ ",\"newRep\":"+ modifyContent+"}");
-		log.setIsNew(true);
-		dtTagmUpdateLogRepository.save(log);
+		dtTagmUpdateLogService.loggingUpdate(modifyContent,oldContent,db,ip);
 
 		return dbObj;
 	}
@@ -192,32 +169,68 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		db.setModifyUser(userId);
 		//检查Cycle 字段是否合理--尚不明确前端传入的字段类型(或保存cron表达式或只保存周期标识)
 		if(checkCycle(body.getCycle())){
-			db.setCycle(body.getCycle());
+			if (body.getCycle().equals(Constants.DT_DISPATCH_STOP)){
+				db.setRunState(Constants.TG_MODEL_STOP);
+				db.setStartTime(null);
+				db.setCycle(null);
+			}else if(body.getCycle().equals(Constants.DT_DISPATCH_ONCE)){
+				//仅运行一次cycle cron表达式就为空
+				db.setStartTime(body.getStartTime());
+				db.setCycle(null);
+			}else{
+				db.setStartTime(body.getStartTime());
+				db.setCycle(toCron(body.getCycle(),body.getStartTime()));
+			}
 		}else{
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"Cycle不合法");
 		}
-		db.setStartTime(body.getStartTime());
+
 		dtTaggingModelRepository.save(db);
 
 		//日志记录
-		DtTagmUpdateLog log = new DtTagmUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUserip(ip);
-		log.setModifyTime(db.getModifyTime());
-		log.setModifyUser(userId);
-		log.setTaggingModelId(db.getTaggingModelId());
-		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
-		log.setModifyContent("{\"old\":"+oldContent+ ",\"newRep\":"+ modifyContent+"}");
-		log.setIsNew(true);
-		dtTagmUpdateLogRepository.save(log);
+		dtTagmUpdateLogService.loggingUpdate(modifyContent,oldContent,db,ip);
 	}
 
 	//检查Cycle是否合法
-	private boolean checkCycle(String Cycle){
-		return true;
+	private boolean checkCycle(Long cycle){
+		return cycle >= Constants.DT_DISPATCH_STOP && cycle <= Constants.DT_DISPATCH_EACH_YEAR;
 	}
 
-
+	private String toCron(Long cycle,Date startTime) throws APIException {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(startTime);
+		int second = cal.get(Calendar.SECOND);
+		int minute = cal.get(Calendar.MINUTE);
+		int hour = cal.get(Calendar.HOUR_OF_DAY);
+		int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+		int month = cal.get(Calendar.MONTH)+1;
+		int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		int year = cal.get(Calendar.YEAR);
+		String[] cron = {"*","*","*","*","*","?","*"};
+		cron[0] = String.valueOf(second);
+		cron[1] = String.valueOf(minute);
+		cron[2] = String.valueOf(hour);
+		if (cycle.equals(Constants.DT_DISPATCH_EACH_DAY)){
+			//月份中的某一天
+			cron[3] = String.valueOf(dayOfMonth)+"/1";
+		}else if (cycle.equals(Constants.DT_DISPATCH_EACH_WEEK)){
+			cron[3] = String.valueOf(dayOfMonth)+"/7";
+		}else if (cycle.equals(Constants.DT_DISPATCH_EACH_MONTH)){
+		    cron[3] = String.valueOf(dayOfMonth);
+			cron[4] = String.valueOf(dayOfMonth)+"/1";
+		}else if (cycle.equals(Constants.DT_DISPATCH_EACH_YEAR)){
+		    cron[3]=String.valueOf(dayOfMonth);
+			cron[4] = String.valueOf(month);
+			cron[6] = String.valueOf(year) + "/1";
+		}else {
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"cycle in toCron must in{DT_DISPATCH_EACH_DAY/MONTH/YEAR}");
+		}
+        StringBuilder cronEx = new StringBuilder();
+        for (String c:cron){
+            cronEx.append(" ").append(c);
+        }
+		return cronEx.toString();
+	}
 
 	public void doSoftDelete(DtTaggingModel db,Long userId,String ip){
 		Date now = new Date();
@@ -231,16 +244,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		dtTaggingModelRepository.save(db);
 
 		//日志记录
-		DtTagmUpdateLog log = new DtTagmUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUserip(ip);
-		log.setModifyTime(db.getModifyTime());
-		log.setModifyUser(userId);
-		log.setTaggingModelId(db.getTaggingModelId());
-		log.setModifyType(Constants.DT_TG_LOG_DELETE);
-		//log.setModifyContent();//删除就不需要保存内容了
-		log.setIsNew(true);
-		dtTagmUpdateLogRepository.save(log);
+		dtTagmUpdateLogService.loggingDelete(db, ip);
 	}
 
 	public void doDelete(Long id) {

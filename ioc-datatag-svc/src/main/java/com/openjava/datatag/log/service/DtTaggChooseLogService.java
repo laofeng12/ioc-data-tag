@@ -3,6 +3,8 @@ package com.openjava.datatag.log.service;
 import java.util.List;
 
 import com.openjava.datatag.log.domain.DtTaggChooseLog;
+import com.openjava.datatag.log.domain.DtTaggUpdateLog;
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,6 +24,8 @@ public interface DtTaggChooseLogService {
 	
 	DtTaggChooseLog doSave(DtTaggChooseLog m);
 
-	Long CountChooseToday(Long userId,Long copiedTaggId);
+	Long countChooseToday(Long userId,Long copiedTaggId);
+
+	DtTaggChooseLog loggingChoose(Long fromTaggId, DtTagGroup db, Long userId, String ip);
 	
 }

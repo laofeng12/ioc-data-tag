@@ -5,6 +5,8 @@ import java.util.Optional;
 import javax.annotation.Resource;
 
 import com.openjava.datatag.log.domain.DtTaggChooseLog;
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import org.ljdp.component.sequence.ConcurrentSequence;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,7 +49,20 @@ public class DtTaggChooseLogServiceImpl implements DtTaggChooseLogService {
 		return dtTaggChooseLogRepository.save(m);
 	}
 
-	public Long CountChooseToday(Long userId,Long copiedTaggId){
-		return dtTaggChooseLogRepository.CountChooseToday(userId,copiedTaggId);
+	public Long countChooseToday(Long userId,Long copiedTaggId){
+		return dtTaggChooseLogRepository.countChooseToday(userId,copiedTaggId);
+	}
+
+	public DtTaggChooseLog loggingChoose(Long fromTaggId, DtTagGroup db,Long userId,String ip){
+		//日志记录
+		DtTaggChooseLog log = new DtTaggChooseLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setChooserIp(ip);
+		log.setChooseTime(db.getCreateTime());
+		log.setChooseUser(userId);
+		log.setCopiedTagg(fromTaggId);
+		log.setCopyTagg(db.getId());
+		log.setIsNew(true);
+		return dtTaggChooseLogRepository.save(log);
 	}
 }

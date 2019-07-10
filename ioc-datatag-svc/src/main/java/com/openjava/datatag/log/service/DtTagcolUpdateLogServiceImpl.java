@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
 
+import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.tagmodel.domain.DtSetCol;
+import org.ljdp.component.sequence.ConcurrentSequence;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -56,4 +59,48 @@ public class DtTagcolUpdateLogServiceImpl implements DtTagcolUpdateLogService {
 			dtTagcolUpdateLogRepository.deleteById(new Long(items[i]));
 		}
 	}
+
+	public DtTagcolUpdateLog loggingUpdate(String content,DtSetCol db, String ip){
+		DtTagcolUpdateLog log = new DtTagcolUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(db.getModifyTime());
+		log.setModifyUser(db.getModifyUser());
+		log.setColId(db.getColId());
+		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
+		log.setModifyContent(content);
+		log.setIsNew(true);
+		return dtTagcolUpdateLogRepository.save(log);
+	}
+
+	public DtTagcolUpdateLog loggingNew(String content,DtSetCol db,String ip){
+		DtTagcolUpdateLog log = new DtTagcolUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(db.getModifyTime());
+		log.setModifyUser(db.getModifyUser());
+		log.setColId(db.getColId());
+		log.setModifyType(Constants.DT_TG_LOG_NEW);
+		log.setModifyContent(content);
+		log.setIsNew(true);
+		return dtTagcolUpdateLogRepository.save(log);
+	}
+
+	public DtTagcolUpdateLog loggingDelete(DtSetCol db,String ip){
+		DtTagcolUpdateLog log = new DtTagcolUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(db.getModifyTime());
+		log.setModifyUser(db.getModifyUser());
+		log.setColId(db.getColId());
+		log.setModifyType(Constants.DT_TG_LOG_DELETE);
+		//log.setModifyContent();//删除就不需要保存内容了
+		log.setIsNew(true);
+		return dtTagcolUpdateLogRepository.save(log);
+	}
+
+
+
+
+
 }

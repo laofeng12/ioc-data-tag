@@ -3,6 +3,9 @@ package com.openjava.datatag.log.service;
 import java.util.List;
 
 import com.openjava.datatag.log.domain.DtTagUpdateLog;
+import com.openjava.datatag.log.domain.DtTagmUpdateLog;
+import com.openjava.datatag.tagmanage.domain.DtTag;
+import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,5 +24,11 @@ public interface DtTagUpdateLogService {
 	DtTagUpdateLog get(Long id);
 	
 	DtTagUpdateLog doSave(DtTagUpdateLog m);
+
+	DtTagUpdateLog loggingUpdate(String modifyContent,String oldContent,DtTag db,Long userId, String ip);
+
+	DtTagUpdateLog loggingNew(String modifyContent,DtTag db,Long userId,String ip);
+
+	DtTagUpdateLog loggingDelete(DtTag db,Long userId,String ip);
 	
 }

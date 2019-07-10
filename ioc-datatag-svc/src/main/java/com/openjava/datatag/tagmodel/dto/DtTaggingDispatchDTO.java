@@ -8,5 +8,5 @@ import java.util.Date;
 public class DtTaggingDispatchDTO {
     private Long id;
     private Date startTime;
-    private String Cycle;
+    private Long cycle;
 }

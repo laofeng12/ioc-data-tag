@@ -2,6 +2,7 @@ package com.openjava.datatag.log.service;
 
 import java.util.List;
 
+import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,7 +22,13 @@ public interface DtTagcolUpdateLogService {
 	DtTagcolUpdateLog get(Long id);
 	
 	DtTagcolUpdateLog doSave(DtTagcolUpdateLog m);
-	
+
+	DtTagcolUpdateLog loggingUpdate(String content,DtSetCol db, String ip);
+
+	DtTagcolUpdateLog loggingNew(String content,DtSetCol body,String ip);
+
+	DtTagcolUpdateLog loggingDelete(DtSetCol db,String ip);
+
 	void doDelete(Long id);
 	void doRemove(String ids);
 }

@@ -74,6 +74,8 @@ public class Constants {
     public static final Long TG_MODEL_BEGIN = 1L;//开始运行
     public static final Long TG_MODEL_ERROR = 3L;//运行出错
     public static final Long TG_MODEL_END = 4L;//运行结束
+    public static final Long TG_MODEL_STOP = -1L;//运行停止
+
 
     //===========标签组状态=================
     public static final Long DT_TG_DELETED= 1L;//已删除的
@@ -86,4 +88,12 @@ public class Constants {
     //===========字段条件设置 =================
     public static final String DT_TAG_CONIDTINS = "dt.tag.conditions";//条件设置条件符号
 
+
+    //=========调度运行周期=============
+    public static final Long DT_DISPATCH_STOP = 0L;
+    public static final Long DT_DISPATCH_ONCE = 1L;
+    public static final Long DT_DISPATCH_EACH_DAY = 2L;
+    public static final Long DT_DISPATCH_EACH_WEEK= 3L;
+    public static final Long DT_DISPATCH_EACH_MONTH = 4L;
+    public static final Long DT_DISPATCH_EACH_YEAR= 5L;
 }
