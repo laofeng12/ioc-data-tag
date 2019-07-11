@@ -4,7 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSONObject;
+import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.log.domain.DtTagUpdateLog;
+import com.openjava.datatag.log.domain.DtTaggChooseLog;
+import com.openjava.datatag.tagmanage.domain.DtTag;
+import org.ljdp.component.sequence.ConcurrentSequence;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,5 +52,49 @@ public class DtTagUpdateLogServiceImpl implements DtTagUpdateLogService {
 	public DtTagUpdateLog doSave(DtTagUpdateLog m) {
 		return dtTagUpdateLogRepository.save(m);
 	}
+
+	public DtTagUpdateLog loggingUpdate(String modifyContent,String oldContent,DtTag db,Long userId, String ip){
+		//日志记录
+		DtTagUpdateLog log = new DtTagUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUser(userId);
+		log.setModifyUserip(ip);
+		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
+		log.setModifyTime(db.getModifyTime());
+		log.setTagId(db.getId());
+		log.setModifyContent("{\"old\":"+oldContent+ ",\"newRep\":"+ modifyContent+"}");
+		log.setIsNew(true);
+		return dtTagUpdateLogRepository.save(log);
+	}
+
+	public DtTagUpdateLog loggingNew(String modifyContent,DtTag db,Long userId,String ip){
+		//日志记录
+		DtTagUpdateLog log = new DtTagUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUser(userId);
+		log.setModifyUserip(ip);
+		log.setModifyType(Constants.DT_TG_LOG_NEW);
+		log.setModifyTime(db.getModifyTime());
+		log.setTagId(db.getId());
+		log.setModifyContent(modifyContent);
+		log.setIsNew(true);
+		return dtTagUpdateLogRepository.save(log);
+	}
+
+	public DtTagUpdateLog loggingDelete(DtTag db,Long userId,String ip){
+		//日志记录
+		DtTagUpdateLog log = new DtTagUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUser(userId);
+		log.setModifyUserip(ip);
+		log.setModifyType(Constants.DT_TG_LOG_DELETE);
+		log.setModifyTime(db.getModifyTime());
+		log.setTagId(db.getId());
+		//log.setModifyContent(modifyContent);//删除就不需要详情了
+		log.setIsNew(true);
+		return dtTagUpdateLogRepository.save(log);
+	}
+
+
 	
 }

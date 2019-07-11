@@ -3,6 +3,7 @@ package com.openjava.datatag.tagmanage.service;
 import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.log.domain.DtTaggUpdateLog;
+import com.openjava.datatag.log.service.DtTaggUpdateLogService;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
@@ -36,7 +37,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 	private  DtTagService dtTagService;
 
 	@Resource
-	private DtTaggUpdateLogRepository dtTaggUpdateLogRepository;
+	private DtTaggUpdateLogService dtTaggUpdateLogService;
 	
 	public Page<DtTagGroup> query(DtTagGroupDBParam params, Pageable pageable){
 		Page<DtTagGroup> pageresult = dtTagGroupRepository.query(params, pageable);
@@ -69,18 +70,8 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		dtTagService.doSoftDeleteByTagsID(db.getId(),db.getModifyTime());
 		//修改标签组表的删除标识
 		doSave(db);
-
 		//日志记录
-		DtTaggUpdateLog log = new DtTaggUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUser(userId);
-		log.setModifyUserip(ip);
-		log.setModifyType(Constants.DT_TG_LOG_DELETE);
-		log.setModifyTime(db.getModifyTime());
-		log.setTaggId(db.getId());
-		//log.setModifyContent(modifyContent);//删除就不需要详情了
-		log.setIsNew(true);
-		dtTaggUpdateLogRepository.save(log);
+		dtTaggUpdateLogService.loggingDelete(db,userId,ip);
 	}
 
 	public DtTagGroup doNew(DtTagGroup body,Long userId,String ip){
@@ -100,16 +91,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		DtTagGroup db = dtTagGroupRepository.save(body);
 
 		//日志记录
-		DtTaggUpdateLog log = new DtTaggUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUser(body.getCreateUser());
-		log.setModifyUserip(ip);
-		log.setModifyType(Constants.DT_TG_LOG_NEW);
-		log.setModifyTime(body.getModifyTime());
-		log.setTaggId(body.getId());
-		log.setModifyContent(modifyContent);
-		log.setIsNew(true);
-		dtTaggUpdateLogRepository.save(log);
+		dtTaggUpdateLogService.loggingNew(modifyContent,db,userId,ip);
 
 		return  db;
 	}
@@ -126,17 +108,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		DtTagGroup newdb = doSave(db);
 
 		//日志记录
-		DtTaggUpdateLog log = new DtTaggUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUser(userId);
-		log.setModifyUserip(ip);
-		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
-		log.setModifyTime(db.getModifyTime());
-		log.setTaggId(db.getId());
-		log.setModifyContent("{\"old\":"+oldContent+ ",\"newRep\":"+ modifyContent+"}");
-		log.setIsNew(true);
-		dtTaggUpdateLogRepository.save(log);
-
+		dtTaggUpdateLogService.loggingUpdate(modifyContent,oldContent,db,userId,ip);
 		return newdb;
 	}
 

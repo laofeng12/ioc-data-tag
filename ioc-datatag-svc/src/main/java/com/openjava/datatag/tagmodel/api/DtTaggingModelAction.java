@@ -75,8 +75,8 @@ public class DtTaggingModelAction {
 	 */
 	@ApiOperation(value = "获取标签模型数据", notes = "单个对象查询", nickname="id")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "taggingModelId", value = "标签模型id", required = true, dataType = "string", paramType = "path"),
-		@ApiImplicitParam(name = "dataSetId", value = "打标目的表id", required = false, dataType = "string", paramType = "path"),
+		@ApiImplicitParam(name = "taggingModelId", value = "标签模型id", required = true, dataType = "string", paramType = "query"),
+		@ApiImplicitParam(name = "dataSetId", value = "打标目的表id", required = false, dataType = "string", paramType = "query"),
 	})
 	@ApiResponses({
 		@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
@@ -181,7 +181,7 @@ public class DtTaggingModelAction {
 	 */
 	@ApiOperation(value = "另存", nickname="clone", notes = "报文格式：content-type=application/json")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "id", value = "主键编码", required = true, paramType = "delete"),
+		@ApiImplicitParam(name = "id", value = "主键编码", required = true, paramType = "query"),
 	})
 	@Security(session=true)
 	@RequestMapping(value="/copy",method=RequestMethod.POST)

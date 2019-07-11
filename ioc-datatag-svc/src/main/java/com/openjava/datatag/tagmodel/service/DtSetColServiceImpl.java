@@ -8,6 +8,8 @@ import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.log.domain.DtTagcolUpdateLog;
 import com.openjava.datatag.log.domain.DtTagmUpdateLog;
 import com.openjava.datatag.log.repository.DtTagmUpdateLogRepository;
+import com.openjava.datatag.log.service.DtTagcolUpdateLogService;
+import com.openjava.datatag.log.service.DtTagmUpdateLogService;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
@@ -56,7 +58,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 	@Resource
 	private DtTagConditionService dtTagConditionService;
 	@Resource
-	private DtTagcolUpdateLogRepository dtTagcolUpdateLogRepository;
+	private DtTagcolUpdateLogService dtTagcolUpdateLogService;
 	@Resource
 	private DtTagConditionUpdateLogService DtTagConditionUpdateLogService;
 	@Resource
@@ -71,7 +73,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 	private DtFilterExpressionService dtFilterExpressionService;
 
 	@Resource
-	private DtTagmUpdateLogRepository dtTagmUpdateLogRepository;
+	private DtTagmUpdateLogService dtTagmUpdateLogService;
 
 
 	public Page<DtSetCol> query(DtSetColDBParam params, Pageable pageable){
@@ -117,11 +119,11 @@ public class DtSetColServiceImpl implements DtSetColService {
 			dtSetColRepository.save(record);
 			cloneCloIds.add(record.getColId());
 			//记录删除日志
-			DtTagcolUpdateLog dtTagcolUpdateLog = new DtTagcolUpdateLog();
-			EntityClassUtil.dealModifyInfo(dtTagcolUpdateLog,userInfo);
-			dtTagcolUpdateLog.setColId(dtSetCol.getColId());
-			dtTagcolUpdateLog.setModifyType(Constants.PUBLIC_MODIFY_TYPE_DELETE);
-			dtTagcolUpdateLogRepository.save(dtTagcolUpdateLog);
+//			DtTagcolUpdateLog dtTagcolUpdateLog = new DtTagcolUpdateLog();
+//			EntityClassUtil.dealModifyInfo(dtTagcolUpdateLog,userInfo);
+//			dtTagcolUpdateLog.setColId(dtSetCol.getColId());
+//			dtTagcolUpdateLog.setModifyType(Constants.PUBLIC_MODIFY_TYPE_DELETE);
+//			dtTagcolUpdateLogRepository.save(dtTagcolUpdateLog);
 		});
 		//级联删除条件设置表
 		List<DtTagCondition> conditions = dtTagConditionService.findByColIds(cloneCloIds);
@@ -136,20 +138,10 @@ public class DtSetColServiceImpl implements DtSetColService {
 			conditionLog.setTagConditionId(record.getTagConditionId());
 			DtTagConditionUpdateLogService.doSave(conditionLog);
 
-
-			//日志记录
-			DtTagcolUpdateLog log = new DtTagcolUpdateLog();
-			log.setId(ConcurrentSequence.getInstance().getSequence());
-			log.setModifyUserip(ip);
-			log.setModifyTime(dtSetCol.getModifyTime());
-			log.setModifyUser(Long.valueOf(userInfo.getUserId()));
-			log.setColId(dtSetCol.getColId());
-			log.setModifyType(Constants.DT_TG_LOG_DELETE);
-			//log.setModifyContent();//删除就不需要保存内容了
-			log.setIsNew(true);
-			dtTagcolUpdateLogRepository.save(log);
-
 		});
+
+		//记录（打标显示）字段的删除
+		dtTagcolUpdateLogService.loggingDelete(dtSetCol,ip);
 	}
 	public void doRemove(String ids) throws Exception{
 		String[] items = ids.split(",");
@@ -228,16 +220,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 		}
 
 		//日志记录
-		DtTagmUpdateLog log = new DtTagmUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUserip(ip);
-		log.setModifyTime(body.getModifyTime());
-		log.setModifyUser(Long.valueOf(userInfo.getUserId()));
-		log.setTaggingModelId(body.getTaggingModelId());
-		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
-		log.setModifyContent(reqParams);
-		log.setIsNew(true);
-		dtTagmUpdateLogRepository.save(log);
+		dtTagmUpdateLogService.loggingUpdate(reqParams,"setCol",taggingModel,ip);
 
 		return body;
 	}
@@ -269,16 +252,9 @@ public class DtSetColServiceImpl implements DtSetColService {
 		doSave(clone);
 
 		//日志记录
-		DtTagcolUpdateLog log = new DtTagcolUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUserip(ip);
-		log.setModifyTime(clone.getModifyTime());
-		log.setModifyUser(Long.valueOf(userInfo.getUserId()));
-		log.setColId(clone.getColId());
-		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
-		log.setModifyContent("{\"from\":"+ col +"}");
-		log.setIsNew(true);
-		dtTagcolUpdateLogRepository.save(log);
+		dtTagcolUpdateLogService.loggingNew("{ \"from\":" + col + "}",clone,ip);
+
+
 	}
 
 	/**

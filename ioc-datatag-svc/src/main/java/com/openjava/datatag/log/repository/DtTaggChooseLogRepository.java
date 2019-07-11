@@ -17,5 +17,5 @@ public interface DtTaggChooseLogRepository extends DynamicJpaRepository<DtTaggCh
             "and CHOOSE_USER = :userId " +
             "and to_char(CHOOSE_TIME,'yyyy-mm-dd') = to_char(sysdate,'yyyy-mm-dd')"
             ,nativeQuery = true)
-    Long CountChooseToday(Long userId,Long copiedTaggId);
+    Long countChooseToday(Long userId,Long copiedTaggId);
 }

@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
 
+import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.log.domain.DtTaggUpdateLog;
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
+import org.ljdp.component.sequence.ConcurrentSequence;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -46,14 +51,47 @@ public class DtTagmUpdateLogServiceImpl implements DtTagmUpdateLogService {
 	public DtTagmUpdateLog doSave(DtTagmUpdateLog m) {
 		return dtTagmUpdateLogRepository.save(m);
 	}
-	
-	public void doDelete(Long id) {
-		dtTagmUpdateLogRepository.deleteById(id);
+
+
+	public DtTagmUpdateLog loggingUpdate(String modifyContent,String oldContent, DtTaggingModel db, String ip){
+		//日志记录
+		DtTagmUpdateLog log = new DtTagmUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(db.getModifyTime());
+		log.setModifyUser(db.getModifyUser());
+		log.setTaggingModelId(db.getTaggingModelId());
+		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
+		log.setModifyContent("{\"old\":"+oldContent+ ",\"newRep\":"+ modifyContent+"}");
+		log.setIsNew(true);
+		return dtTagmUpdateLogRepository.save(log);
 	}
-	public void doRemove(String ids) {
-		String[] items = ids.split(",");
-		for (int i = 0; i < items.length; i++) {
-			dtTagmUpdateLogRepository.deleteById(new Long(items[i]));
-		}
+
+	public DtTagmUpdateLog loggingNew(String modifyContent,DtTaggingModel db,String ip){
+		DtTagmUpdateLog log = new DtTagmUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(db.getModifyTime());
+		log.setModifyUser(db.getCreateUser());
+		log.setTaggingModelId(db.getTaggingModelId());
+		log.setModifyType(Constants.DT_TG_LOG_NEW);
+		log.setModifyContent(modifyContent);
+		log.setIsNew(true);
+		return dtTagmUpdateLogRepository.save(log);
 	}
+
+	public DtTagmUpdateLog loggingDelete(DtTaggingModel db,String ip){
+		DtTagmUpdateLog log = new DtTagmUpdateLog();
+		log.setId(ConcurrentSequence.getInstance().getSequence());
+		log.setModifyUserip(ip);
+		log.setModifyTime(db.getModifyTime());
+		log.setModifyUser(db.getModifyUser());
+		log.setTaggingModelId(db.getTaggingModelId());
+		log.setModifyType(Constants.DT_TG_LOG_DELETE);
+		//log.setModifyContent();//删除就不需要保存内容了
+		log.setIsNew(true);
+		return dtTagmUpdateLogRepository.save(log);
+	}
+
+
 }
