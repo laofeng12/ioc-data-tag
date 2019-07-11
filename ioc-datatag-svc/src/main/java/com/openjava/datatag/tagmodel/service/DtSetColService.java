@@ -32,10 +32,17 @@ public interface DtSetColService {
 	 * 字段设置-确认选择
 	 */
 	DtTaggingModelDTO selectCol(DtTaggingModelDTO body,String id)throws Exception;
+
 	/**
-	 * 根据源表数据获取字段表
+	 * 根据源表数据获取单个源字段,正常应该只有一个元素
 	 */
-	List<DtSetCol>  getBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId);
+	List<DtSetCol>  getSourceSetColBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId);
+	/**
+	 * 根据源表数据获取所有源字段
+	 */
+	List<DtSetCol> getSourceSetColByTaggingModelId(Long taggingModelId);
+
+
 	/**
 	 * 克隆字段
 	 */

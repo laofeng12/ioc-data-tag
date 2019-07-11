@@ -26,6 +26,7 @@ public interface DtTaggingModelService {
 	
 	DtTaggingModel doSave(DtTaggingModel m);
 	DtTaggingModel doNew(DtTaggingModel m,BaseUserInfo userInfo, String ip);
+	DtTaggingModel doNew(DtTaggingModelDTO m,BaseUserInfo userInfo, String ip) throws APIException;
 	DtTaggingModel doUpdate(DtTaggingModel body, DtTaggingModel db, BaseUserInfo userInfo,String ip);
 
 

@@ -72,7 +72,7 @@ public class DtTaggingModel implements Persistable<Long>,Serializable {
 	@ApiModelProperty("声明的主键")
 	@Length(min=0, max=32)
 	@Column(name = "P_KEY")
-	private String pKey;
+	private String pkey;
 
 	@ApiModelProperty("创建用户")
 	@Column(name = "CREATE_USER")
