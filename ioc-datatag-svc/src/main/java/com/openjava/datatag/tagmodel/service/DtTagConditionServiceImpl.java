@@ -5,6 +5,12 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Resource;
 
+import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.utils.EntityClassUtil;
+import org.ljdp.component.exception.APIException;
+import org.ljdp.component.user.BaseUserInfo;
+import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,10 +54,17 @@ public class DtTagConditionServiceImpl implements DtTagConditionService {
 		return dtTagConditionRepository.save(m);
 	}
 	
-	public void doDelete(Long id) {
-		dtTagConditionRepository.deleteById(id);
+	public void doDelete(Long id) throws Exception{
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		DtTagCondition model = get(id);
+		if (model==null||model.getIsDeleted().equals(Constants.PUBLIC_YES)) {
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"无此字段或已删除");
+		}
+		model.setIsDeleted(Constants.PUBLIC_YES);
+		EntityClassUtil.dealModifyInfo(model,userInfo);
+		dtTagConditionRepository.save(model);
 	}
-	public void doRemove(String ids) {
+	public void doRemove(String ids) throws Exception{
 		String[] items = ids.split(",");
 		for (int i = 0; i < items.length; i++) {
 			dtTagConditionRepository.deleteById(new Long(items[i]));

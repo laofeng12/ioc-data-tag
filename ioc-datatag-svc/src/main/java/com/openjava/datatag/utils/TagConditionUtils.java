@@ -4,10 +4,27 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TagConditionUtils {
-    private static String[] connectSymbol ={"AND","OR","(",")"};
-    private static String[] operatorSymbol = {">","=","<","≤","≥","≠","LIKE"};
-    private static String[] intTypes = {"TINYINT","SMALLINT","INT","BIGINT","NUMBER","FLOAT","DOUBLE","tinyint","smallint","int","bigint","number","float","double"};
-    private static String[] stringTypes={"STRING","VARCHAR","CHAR","VARCHAR2","CLOB","string","varchar","char","varchar2","clob"};
+    //逻辑连接符
+    private static String[] connectSymbol ={
+            "AND","OR","(",")","IN",
+            "NOT IN"
+    };
+    //逻辑运算符
+    private static String[] operatorSymbol = {
+            ">","=","<","≤","≥",
+            "≠","LIKE"
+    };
+    //数字类型
+    private static String[] intTypes = {
+            "TINYINT","SMALLINT","INT","BIGINT","NUMBER",
+            "FLOAT","DOUBLE","tinyint","smallint","int",
+            "bigint","number","float","double"
+    };
+    //字符串类型
+    private static String[] stringTypes={
+            "STRING","VARCHAR","CHAR","VARCHAR2","CLOB",
+            "string","varchar","char","varchar2","clob"
+    };
 
     /**
      * 是否连接符
@@ -39,12 +56,12 @@ public class TagConditionUtils {
 
     /**
      * 是否数字类型
-     * @param symbol
+     * @param valueType
      * @return
      */
-    public static boolean isIntType(String symbol){
+    public static boolean isIntType(String valueType){
         List<String> list = Arrays.asList(intTypes);
-        if (list.contains(symbol)){
+        if (list.contains(valueType)){
             return true;
         }else {
             return false;
@@ -52,13 +69,13 @@ public class TagConditionUtils {
     }
 
     /**
-     * 字符串类型
-     * @param symbol
+     * 是否字符串类型
+     * @param valueType
      * @return
      */
-    public static boolean isStringType(String symbol){
+    public static boolean isStringType(String valueType){
         List<String> list = Arrays.asList(stringTypes);
-        if (list.contains(symbol)){
+        if (list.contains(valueType)){
             return true;
         }else {
             return false;
@@ -78,14 +95,13 @@ public class TagConditionUtils {
         }
     }
     public static String initValues(String values,String valueType,String symbool){
-        List<String> list = Arrays.asList(stringTypes);
-        if (list.contains(valueType)) {
+        if (isStringType(valueType)) {
             if ("LIKE".equals(symbool)) {
                 values = "%"+values+"%";
             }
             values = "'"+values+"'";
         }
-       return null;
+       return values;
     }
 
     public static void main(String[] args) {
