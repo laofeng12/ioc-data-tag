@@ -15,11 +15,9 @@ import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.tagmodel.domain.*;
-import com.openjava.datatag.tagmodel.dto.DtTagConditionDTO;
-import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.dto.*;
 import com.openjava.datatag.log.repository.DtTagcolUpdateLogRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
-import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
 import com.openjava.datatag.utils.EntityClassUtil;
 import com.openjava.datatag.utils.TagConditionUtils;
 import com.openjava.framework.sys.domain.SysCode;
@@ -60,7 +58,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 	@Resource
 	private DtTagcolUpdateLogService dtTagcolUpdateLogService;
 	@Resource
-	private DtTagConditionUpdateLogService DtTagConditionUpdateLogService;
+	private DtTagConditionUpdateLogService dtTagConditionUpdateLogService;
 	@Resource
 	private DtTaggingModelService dtTaggingModelService;
 	@Resource
@@ -136,7 +134,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 			EntityClassUtil.dealModifyInfo(conditionLog,userInfo);
 			conditionLog.setModifyType(Constants.PUBLIC_MODIFY_TYPE_DELETE);
 			conditionLog.setTagConditionId(record.getTagConditionId());
-			DtTagConditionUpdateLogService.doSave(conditionLog);
+			dtTagConditionUpdateLogService .doSave(conditionLog);
 
 		});
 
@@ -271,7 +269,13 @@ public class DtSetColServiceImpl implements DtSetColService {
 			DtTagConditionDTO dto = new DtTagConditionDTO();
 			MyBeanUtils.copyPropertiesNotNull(dto,record);
 			List<DtFilterExpression> conditionSetting = dtFilterExpressionService.findByTagConditionId(record.getTagConditionId());
-			dto.setConditionSetting(conditionSetting);
+			List<SaveConditionDtFilterExpressionDTO> conditionSettingDTO = new ArrayList<>();
+			conditionSetting.forEach(setting->{
+				SaveConditionDtFilterExpressionDTO settingDTO = new SaveConditionDtFilterExpressionDTO();
+				MyBeanUtils.copyProperties(settingDTO,setting);
+				conditionSettingDTO.add(settingDTO);
+			});
+			dto.setConditionSetting(conditionSettingDTO);
 			conditionsDTOs.add(dto);
 		});
 		result.setCondtion(conditionsDTOs);//打标的条件设置列表
@@ -289,61 +293,75 @@ public class DtSetColServiceImpl implements DtSetColService {
 	/**
 	 *  确认打标保存接口
 	 */
-	public void saveCondition(GetHistoryColDTO req)throws Exception{
+	public void saveCondition(SaveConditionDTO req)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		List<DtTagConditionDTO> saveconditions = req.getCondtion();
+		DtSetCol col = get(req.getColId());
 		List<DtTagCondition> conditions = dtTagConditionService.findByColId(req.getColId());
 		if (CollectionUtils.isEmpty(saveconditions)) {
 			return ;
 		}
-		if (get(req.getColId())==null) {
+		if (col==null) {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此字段，colId参数错误");
 		}
 		for (int i = 0; i < saveconditions.size(); i++) {
 			DtTagConditionDTO record =saveconditions.get(i);
+			if (record.getTagId()==null||dtTagService.get(record.getTagId())==null) {
+				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"condtion参数的tagId为空或查无此标签");
+			}
+			if (!record.getColId().equals(req.getColId())) {
+				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"conditions参数的colI错误");
+			}
 			//校验条件是否合法
 			String filterExpression = null;
 			try {
 				filterExpression= check(req.getColId(),record);
 			}catch (Exception e){
 				e.printStackTrace();
-				throw new APIException(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR,"条件设置语法错误:"+i);
+				throw new APIException(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR,"条件设置语法错误:"+i);//i参数可以告知前端第几个条件设置错误了
 			}
 			//新增和修改
 			DtTagCondition newTagCondition = new DtTagCondition();
-			if (record.getColId()!=null) {
-				if (!record.getColId().equals(req.getColId())) {
-					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"conditions参数的colI错误");
-				}
-				DtTagCondition dbData = dtTagConditionService.get(record.getTagConditionId());
-				MyBeanUtils.copyPropertiesNotNull(dbData,record);
-				EntityClassUtil.dealModifyInfo(dbData,userInfo);
-				dbData.setFilterExpression(filterExpression);
-				dtTagConditionService.doSave(dbData);
+			if (record.getTagConditionId()!=null) {
+				newTagCondition = dtTagConditionService.get(record.getTagConditionId());
+				MyBeanUtils.copyPropertiesNotNull(newTagCondition,record);
+				EntityClassUtil.dealModifyInfo(newTagCondition,userInfo);
+				newTagCondition.setFilterExpression(filterExpression);
+				newTagCondition = dtTagConditionService.doSave(newTagCondition);
 			}else{
 				MyBeanUtils.copyPropertiesNotNull(newTagCondition,record);
 				EntityClassUtil.dealCreateInfo(newTagCondition,userInfo);
 				newTagCondition.setFilterExpression(filterExpression);
-				dtTagConditionService.doSave(newTagCondition);
+				newTagCondition.setIsDeleted(Constants.PUBLIC_NO);
+				newTagCondition.setSourceCol(col.getSourceCol());
+				newTagCondition.setShowCol(col.getShowCol());
+				newTagCondition = dtTagConditionService.doSave(newTagCondition);
 			}
-			//规制表达式表
-			dtFilterExpressionService.doRemoveByTagConditionId(record.getTagConditionId());
+			//重新保存规制达式表
+			dtFilterExpressionService.doRemoveByTagConditionId(newTagCondition.getTagConditionId());
 			for (int j = 0; j < record.getConditionSetting().size(); j++) {
-				DtFilterExpression expression = record.getConditionSetting().get(j);
+				SaveConditionDtFilterExpressionDTO expressionDTO = record.getConditionSetting().get(j);
+				DtFilterExpression expression = new DtFilterExpression();
+				MyBeanUtils.copyProperties(expression,expressionDTO);
+				expression.setTagConditionId(newTagCondition.getTagConditionId());
 				expression.setSort(j);
+				expression.setIsNew(true);
+				dtFilterExpressionService.doSave(expression);
 			}
 
 		}
 		//删除
 		for (DtTagCondition record:conditions) {
-			if (!saveconditions.contains(record)){
-				doDelete(record.getId(),null);
+			DtTagConditionDTO d = new  DtTagConditionDTO();
+			d.setTagConditionId(record.getTagConditionId());
+			if (!saveconditions.contains(d)){
+				dtTagConditionService.doDelete(record.getId());
 			}
 		}
 	}
 
 	/**
-	 * 校验条件是否合法
+	 * 校验条件是否合法并返回sql语句
 	 */
 	public String check(Long colId,DtTagConditionDTO condtion) throws Exception{
 		DtSetCol col =  get(colId);
@@ -352,31 +370,58 @@ public class DtSetColServiceImpl implements DtSetColService {
 		}
 		String checkSql = " ";
 		String resultSql = "" ;
-		List<DtFilterExpression> list = condtion.getConditionSetting();
+		List<SaveConditionDtFilterExpressionDTO> list = condtion.getConditionSetting();
 		for (int j = 0; j < list.size() ; j++) {
-			DtFilterExpression expression = list.get(j);
-			if (expression.getSymbol()!=null && expression.getIsConnectSymbol().equals(Constants.PUBLIC_YES)) {
-				checkSql += expression.getSymbol();
-				resultSql += expression.getSymbol();
-			}else{
-				if (StringUtils.isNotBlank(expression.getSymbol())) {
-					if (expression.getValuesType()==null) {
-						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"数据类型为空");
-					}
-					if (TagConditionUtils.isIntType(expression.getValuesType())) {
-						checkSql += " TAG_CONDITION_ID "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
-					}else{
-						checkSql += " SHOW_COL "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
-					}
-					resultSql += col.getShowCol() +TagConditionUtils.toSqlSymbol(expression.getSymbol());
+			SaveConditionDtFilterExpressionDTO expression = list.get(j);
+			//自动打标
+			if (condtion.getIsHandle()!=null&&condtion.getIsHandle().equals(Constants.PUBLIC_YES)) {
+				if (TagConditionUtils.isIntType(expression.getValuesType())) {
+					checkSql += " TAG_CONDITION_ID "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
+				}else{
+					checkSql += " SHOW_COL "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
 				}
+				resultSql += col.getShowCol() +" "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
 				if (StringUtils.isBlank(expression.getTheValues())) {
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"值不能为空");
 				}
+				checkSql+=" ( ";
+				resultSql+=" ( ";
 				String values[] = expression.getTheValues().split(",");
 				for (int k = 0; k < values.length; k++) {
 					checkSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol())+" ";
 					resultSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol())+" ";
+					if (k!=values.length-1) {
+						checkSql+=",";
+						resultSql+=",";
+					}
+				}
+				checkSql+=" ) ";
+				resultSql+=" ) ";
+			}else {
+				if (expression.getSymbol()!=null && expression.getIsConnectSymbol().equals(Constants.PUBLIC_YES)) {
+					checkSql += expression.getSymbol();
+					resultSql += expression.getSymbol();
+				}else{
+					//运算符
+					if (StringUtils.isNotBlank(expression.getSymbol())) {
+						if (expression.getValuesType()==null) {
+							throw new APIException(MyErrorConstants.PUBLIC_ERROE,"数据类型为空");
+						}
+						if (TagConditionUtils.isIntType(expression.getValuesType())) {
+							checkSql += " TAG_CONDITION_ID "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
+						}else{
+							checkSql += " SHOW_COL "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
+						}
+						resultSql += " "+col.getShowCol() +" "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
+					}
+					if (StringUtils.isBlank(expression.getTheValues())) {
+						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"值不能为空");
+					}
+					String values[] = expression.getTheValues().split(",");
+					for (int k = 0; k < values.length; k++) {
+						checkSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol())+" ";
+						resultSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol())+" ";
+					}
 				}
 			}
 		}

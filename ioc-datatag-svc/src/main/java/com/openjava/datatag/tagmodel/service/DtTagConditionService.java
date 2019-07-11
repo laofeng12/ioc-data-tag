@@ -22,8 +22,8 @@ public interface DtTagConditionService {
 	
 	DtTagCondition doSave(DtTagCondition m);
 	
-	void doDelete(Long id);
-	void doRemove(String ids);
+	void doDelete(Long id)throws Exception;
+	void doRemove(String ids)throws Exception;
 	List<DtTagCondition> findByColId(Long colId);
 	List<DtTagCondition> findByColIds(List<Long> colIds);
 }

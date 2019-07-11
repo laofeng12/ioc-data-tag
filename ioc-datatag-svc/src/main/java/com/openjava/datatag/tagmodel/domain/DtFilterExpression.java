@@ -28,7 +28,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("规制表达式")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
+//@Accessors(chain = true)
 @Entity
 @Table(name = "DT_FILTER_EXPRESSION")
 public class DtFilterExpression implements Persistable<Long>,Serializable {
@@ -41,7 +41,6 @@ public class DtFilterExpression implements Persistable<Long>,Serializable {
 	private Long filterExpressionID;
 	
 	@ApiModelProperty("条件设置主键")
-	@Max(0L)
 	@Column(name = "TAG_CONDITION_ID")
 	private Long tagConditionId;
 	

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
+import com.openjava.datatag.tagmodel.dto.SaveConditionDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -47,5 +48,5 @@ public interface DtSetColService {
 	/**
 	 *  确认打标保存接口
 	 */
-	void saveCondition(GetHistoryColDTO req)throws Exception;
+	void saveCondition(SaveConditionDTO req)throws Exception;
 }

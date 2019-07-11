@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
+import com.openjava.datatag.tagmodel.dto.SaveConditionDTO;
 import com.openjava.datatag.tagmodel.dto.SelectColDTO;
 import com.openjava.datatag.utils.IpUtil;
 import org.ljdp.common.bean.MyBeanUtils;
@@ -181,13 +182,18 @@ public class DtSetColAction {
 		return dtSetColService.getHistoryCol(colId);
 	}
 
-	@ApiOperation(value = "确认打标-保存接口", nickname="getHistoryCol", notes="")
+	@ApiOperation(value = "确认打标-保存接口", nickname="getHistoryCol",
+			notes="数字类型修改：\n{\"colId\":2,\"condtion\":[{\"colId\":2,\"isHandle\":0,\"tagConditionId\":1000001,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\">\",\"theValues\":\"1\",\"valuesType\":\"NUMBER\"},{\"isConnectSymbol\":1,\"symbol\":\"AND\",\"theValues\":\"\",\"valuesType\":\"\"},{\"isConnectSymbol\":0,\"symbol\":\"<\",\"theValues\":\"5\",\"valuesType\":\"NUMBER\"}]},{\"colId\":2,\"isHandle\":1,\"tagConditionId\":1000000,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"IN\",\"theValues\":\"1,2,3,4\",\"valuesType\":\"NUMBER\"}]}]}\n" +
+					"字符串类型修改：\n{\"colId\":2,\"condtion\":[{\"colId\":2,\"isHandle\":0,\"tagConditionId\":1000001,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"=\",\"theValues\":\"王同学\",\"valuesType\":\"VARCHAR2\"},{\"isConnectSymbol\":1,\"symbol\":\"AND\",\"theValues\":\"\",\"valuesType\":\"\"},{\"isConnectSymbol\":0,\"symbol\":\"≠\",\"theValues\":\"李同学\",\"valuesType\":\"VARCHAR2\"}]},{\"colId\":2,\"isHandle\":1,\"tagConditionId\":1000000,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"IN\",\"theValues\":\"王同学,李同学,吴同学\",\"valuesType\":\"VARCHAR2\"}]}]}\n" +
+					"数字类型新增：\n{\"colId\":1,\"condtion\":[{\"colId\":1,\"isHandle\":0,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"=\",\"theValues\":\"123\",\"valuesType\":\"NUMBER\"},{\"isConnectSymbol\":1,\"symbol\":\"AND\",\"theValues\":\"\",\"valuesType\":\"\"},{\"isConnectSymbol\":0,\"symbol\":\"≠\",\"theValues\":\"2333\",\"valuesType\":\"NUMBER\"}]},{\"colId\":1,\"isHandle\":1,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"IN\",\"theValues\":\"1,2,3\",\"valuesType\":\"NUMBER\"}]}]}\n" +
+					"字符串类型新增：\n{\"colId\":1,\"condtion\":[{\"colId\":1,\"isHandle\":0,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"=\",\"theValues\":\"王同学\",\"valuesType\":\"VARCHAR2\"},{\"isConnectSymbol\":1,\"symbol\":\"AND\",\"theValues\":\"\",\"valuesType\":\"\"},{\"isConnectSymbol\":0,\"symbol\":\"≠\",\"theValues\":\"李同学\",\"valuesType\":\"VARCHAR2\"}]},{\"colId\":1,\"isHandle\":1,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"IN\",\"theValues\":\"王同学,李同学,吴同学\",\"valuesType\":\"VARCHAR2\"}]}]}\n" +
+					"")
 	@ApiImplicitParams({
 //			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
 	})
 	@Security(session=true)
 	@RequestMapping(value="/saveCondition",method=RequestMethod.POST)
-	public SuccessMessage saveCondition(@RequestBody GetHistoryColDTO req)throws Exception{
+	public SuccessMessage saveCondition(@RequestBody SaveConditionDTO req)throws Exception{
 		dtSetColService.saveCondition(req);
 		return new SuccessMessage("保存成功");
 	}
