@@ -2,6 +2,8 @@ package com.openjava.datatag.tagmanage.service;
 
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.log.domain.DtTaggChooseLog;
+import com.openjava.datatag.log.service.DtTaggChooseLogService;
 import com.openjava.datatag.tagmanage.domain.DtShareTagGroup;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.dto.DtTagDTO;
@@ -9,6 +11,7 @@ import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.repository.DtShareTagGroupRepository;
 import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
 import com.openjava.datatag.tagmanage.repository.DtTagRepository;
+import com.openjava.datatag.log.repository.DtTaggChooseLogRepository;
 import com.openjava.datatag.utils.tree.TagDTOTreeNode;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.sequence.ConcurrentSequence;
@@ -34,11 +37,15 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
     @Resource
     private DtTagRepository dtTagRepository;
 
+    @Resource
+    private DtTaggChooseLogService dtTaggChooseLogService;
+
+
     public Page<DtShareTagGroup> findList(String searchKey, Pageable pageable){
         return dtShareTagGroupRepository.findList("%" + searchKey+ "%", pageable);
     }
 
-    public void choose(Long id,Long userId) throws APIException {
+    public void choose(Long id,Long userId,String ip) throws APIException {
         Optional<DtTagGroup> o = dtTagGroupRepository.findById(id);
         DtTagGroup tgg = null;
         if(o.isPresent()){
@@ -67,6 +74,16 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
         TagDTOTreeNode tagTreeNode = new TagDTOTreeNode(TagDTOTreeNode.toDtTagDTO(tagList),root);
         //先序遍历标签树，新建保存一棵结构一样而id不同的树
         setNewIdAndSave(tagTreeNode,null,newId,now);
+
+        //选用日志记录
+        dtTaggChooseLogService.loggingChoose(id,newTgg,userId,ip);
+
+        //热度增加-每天每人只能加一次
+        Long c = dtTaggChooseLogService.countChooseToday(userId,id);
+        if(c.equals(1L)){
+           tgg.setPopularity(tgg.getPopularity()+1L);
+           dtTagGroupRepository.save(tgg);
+        }
     }
 
     private void setNewIdAndSave(TagDTOTreeNode tree, Long pId, Long tagsId, Date now){

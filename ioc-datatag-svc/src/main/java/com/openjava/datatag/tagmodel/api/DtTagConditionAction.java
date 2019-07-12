@@ -124,7 +124,7 @@ public class DtTagConditionAction {
 		return new SuccessMessage("保存成功");
 	}
 	
-	@ApiOperation(value = "删除", nickname="delete")
+	/*@ApiOperation(value = "删除", nickname="delete")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
 		@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
@@ -140,6 +140,6 @@ public class DtTagConditionAction {
 			dtTagConditionService.doRemove(ids);
 		}
 		return new SuccessMessage("删除成功");//没有需要返回的数据，就直接返回一条消息
-	}
+	}*/
 	
 }

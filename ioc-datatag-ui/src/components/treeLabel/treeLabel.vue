@@ -25,10 +25,11 @@
         <span>{{ node.label }}</span>
         <span>
           <!--<el-button-->
-            <!--type="text"-->
-            <!--size="mini"-->
-            <!--@click="() => append(data)">-->
+          <!--type="text"-->
+          <!--size="mini"-->
+          <!--@click="() => append(data)">-->
           <el-button
+            class="addBtn"
             type="text"
             size="mini"
             @click="addTwo">
@@ -40,7 +41,7 @@
             size="mini"
             @click="() => remove(node, data)">
             <!--Delete-->
-            <i class="el-icon-delete" ></i>
+            <i class="el-icon-delete"></i>
           </el-button>
         </span>
       </span>
@@ -49,43 +50,44 @@
 
     </div>
 
-<div class="tableContent">
-  <div class="newTable  daList">
-    <el-table ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
-              style="width: 100%;text-align: center"
-              :header-cell-style="{background:'#f0f2f5'}">
-      <template slot="empty">
-        <div v-if="Loading">
-          <div v-loading="saveLoading2" ></div>
-        </div>
-        <div v-else>暂无数据</div>
-      </template>
-      <el-table-column prop="name" label="标签名称">
-        <template slot-scope="scope">
-          <span>教育体系标签</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="people" label="创建时间" >2019/4/19  16:12:13</el-table-column>
-      <el-table-column prop="introduction" label="标签说明">这是教育体系标签简介</el-table-column>
-      <el-table-column label="操作" width="180px">
-        <template slot-scope="props" class="caozuo">
-          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+    <div class="tableContent">
+      <div class="newTable  daList">
+        <el-table ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
+                  style="width: 100%;text-align: center"
+                  :header-cell-style="{background:'#f0f2f5'}">
+          <template slot="empty">
+            <div v-if="Loading">
+              <div v-loading="saveLoading2"></div>
+            </div>
+            <div v-else>暂无数据</div>
+          </template>
+          <el-table-column prop="name" label="标签名称">
+            <template slot-scope="scope">
+              <span>教育体系标签</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="people" label="创建时间">2019/4/19 16:12:13</el-table-column>
+          <el-table-column prop="introduction" label="标签说明">这是教育体系标签简介</el-table-column>
+          <el-table-column label="操作" width="180px">
+            <template slot-scope="props" class="caozuo">
+              <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <span class="operationIcona">
                   <i class="el-icon-edit-outline iconLogo" @click="editLabel"></i>
               </span>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" ></i>
+                <i class="el-icon-delete iconLogo" @click="handleDelete"></i>
               </span>
-          </el-tooltip>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
-</div>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </div>
 
-    <el-dialog class="creat" title="添加顶级标签" :visible.sync="labelDialog" width="530px" center :close-on-click-modal="false"
+    <el-dialog class="creat" title="添加顶级标签" :visible.sync="labelDialog" width="530px" center
+               :close-on-click-modal="false"
                @close="closedialogOne">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
@@ -111,7 +113,8 @@
     </el-dialog>
 
 
-    <el-dialog class="creat" title="添加下级标签" :visible.sync="labelDialog2" width="530px" center :close-on-click-modal="false"
+    <el-dialog class="creat" title="添加下级标签" :visible.sync="labelDialog2" width="530px" center
+               :close-on-click-modal="false"
                @close="closedialogTwo">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
@@ -161,13 +164,30 @@
         </div>
       </div>
     </el-dialog>
+
+    <el-dialog class="creat" title="删除提示" :visible.sync="deleteDialog" width="530px" center :close-on-click-modal="false"
+               @close="closedelete">
+      <div class="del-dialog-cnt">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px">
+          <el-form-item >
+            您正在删除南城区高考成绩数据，是否确认删除？
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer device">
+        <div>
+          <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" >确定删除</el-button>
+          <el-button size="small" type="primary" class="queryBtn" >取消</el-button>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-    export default {
-        name: "treeLabel"
-    }
+  export default {
+    name: "treeLabel"
+  }
 </script>
 
 <script>
@@ -176,14 +196,16 @@
     name: "treeLabel",
     data() {
       return {
-        labelDialog:false,
-        labelDialog2:false,
-        editDialog:false,
+        labelDialog: false,
+        labelDialog2: false,
+        editDialog: false,
+        deleteDialog:false,
+        deleteLoading:false,
         filterText: '',
-        Loading:true,
-        saveLoading2:true,
-        shareDialog:false,
-        saveLoading:false,
+        Loading: true,
+        saveLoading2: true,
+        shareDialog: false,
+        saveLoading: false,
         percentage: 30,
         value1: '',
         textarea: '',
@@ -198,31 +220,31 @@
           label: '已共享'
         }],
         value: '',
-        ztableShowList:[{
-          name:'教育',
-          people:'数据搬运工',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多',
-          share:'已共享',
-        },{
-          name:'教育22',
-          people:'数据搬运工22',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多22',
-          share:'已共享',
+        ztableShowList: [{
+          name: '教育',
+          people: '数据搬运工',
+          time: '2019/4/19  16:17:22',
+          introduction: '动画的很多好很多',
+          share: '已共享',
+        }, {
+          name: '教育22',
+          people: '数据搬运工22',
+          time: '2019/4/19  16:17:22',
+          introduction: '动画的很多好很多22',
+          share: '已共享',
         }],
-        ruleForm:{
-          name:'',
-          introduction:'',
-          textarea:'',
-          textarea2:''
+        ruleForm: {
+          name: '',
+          introduction: '',
+          textarea: '',
+          textarea2: ''
         },
         rules: {
           name: [
-            {required: true, message: '请填写',trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'}
           ],
           textarea: [
-            {required: true, message: '请填写',trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'}
           ]
         },
         data: [{
@@ -277,7 +299,7 @@
         return data.label.indexOf(value) !== -1;
       },
       append(data) {
-        const newChild = { id: id++, label: 'testtest', children: [] };
+        const newChild = {id: id++, label: 'testtest', children: []};
         if (!data.children) {
           this.$set(data, 'children', []);
         }
@@ -290,44 +312,51 @@
         const index = children.findIndex(d => d.id === data.id);
         children.splice(index, 1);
       },
-      renderContent(h, { node, data, store }) {
+      renderContent(h, {node, data, store}) {
         return (
-          '<span class="custom-tree-node">'+
-          '<span>{node.label}</span>'+
-        '<span>'+
-        '<el-button size="mini" type="text" on-click={ () => this.append(data) }>Append</el-button>'+
-        '<el-button size="mini" type="text" on-click={ () => this.remove(node, data) }>Delete</el-button>'+
-        '</span>'+
-        '</span>');
+          '<span class="custom-tree-node">' +
+          '<span>{node.label}</span>' +
+          '<span>' +
+          '<el-button size="mini" type="text" on-click={ () => this.append(data) }>Append</el-button>' +
+          '<el-button size="mini" type="text" on-click={ () => this.remove(node, data) }>Delete</el-button>' +
+          '</span>' +
+          '</span>');
       },
-      openOne(){
+      openOne() {
         this.labelDialog = true
       },
-      addTwo(){
+      addTwo() {
         this.labelDialog2 = true
       },
-      closedialogOne(){
+      closedialogOne() {
         this.labelDialog = false
       },
-      closedialogTwo(){
+      closedialogTwo() {
         this.labelDialog2 = false
       },
-      editLabel(){
+      editLabel() {
         this.editDialog = true
       },
-      closeEdit(){
+      closeEdit() {
         this.editDialog = false
+      },
+      closedelete(){
+        this.deleteDialog = false
+      },
+      handleDelete(){
+        this.deleteDialog = true
       }
     },
   };
 </script>
 
 <style scoped>
-  .treeContainer{
+  .treeContainer {
     width: 100%;
     height: 700px;
     display: flex;
   }
+
   .custom-tree-node {
     flex: 1;
     display: flex;
@@ -336,16 +365,20 @@
     font-size: 14px;
     padding-right: 8px;
   }
-  .treelabel,.tableContent{
+
+  .treelabel, .tableContent {
     float: left;
   }
-  .treelabel{
+
+  .treelabel {
     width: 320px;
   }
-  .tableContent{
+
+  .tableContent {
     width: 81%;
   }
-  .labelTitle{
+
+  .labelTitle {
     width: 320px;
     height: 48px;
     font-size: 14px;
@@ -353,35 +386,44 @@
     background: rgb(240, 242, 245);
     margin-top: 20px;
   }
-  .labelName{
+
+  .labelName {
     float: left;
     line-height: 48px;
     margin-left: 15px;
   }
-  .add{
+
+  .add {
     float: right;
     line-height: 48px;
     margin-right: 15px;
   }
-  .elInput{
+
+  .elInput {
     width: 300px;
     margin-left: 10px;
     margin-top: 10px;
   }
-  .treeTop{
+
+  .treeTop {
     margin-top: 20px;
     padding-left: 5px;
     padding-right: 5px;
     height: 565px;
     overflow-y: auto;
   }
+
   .iconLogo {
     font-size: 18px;
     margin-left: 25px;
     cursor: pointer;
   }
+
   .newTable {
     height: 590px;
     overflow-y: auto;
+  }
+  .addBtn{
+    margin-right: 5px;
   }
 </style>

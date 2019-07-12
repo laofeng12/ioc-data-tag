@@ -1,5 +1,4 @@
 <template>
-  <!--<div class="app-container">标签管理</div>-->
   <div class="app-container">
     <div class="actionBar">
       <div>
@@ -10,9 +9,6 @@
           prefix-icon="el-icon-search"
           v-model="input2">
         </el-input>
-        <el-button class="zxlistBtn" size="small" type="primary">查询</el-button>
-      </div>
-      <div>
         <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
           <el-option
             v-for="item in options"
@@ -21,12 +17,14 @@
             :value="item.value">
           </el-option>
         </el-select>
+        <el-button class="zxlistBtn" size="small" type="primary">查询</el-button>
       </div>
+
       <div>
         <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
-        <el-button size="small" type="primary" >创建模型</el-button>
-        <el-button size="small" type="primary" >协作模型</el-button>
-        <el-button size="small" type="primary" >下载管理</el-button>
+        <el-button size="small" type="primary" @click="createModel">创建模型</el-button>
+        <el-button size="small" type="primary" @click="cooperationModel">协作模型</el-button>
+        <!--<el-button size="small" type="primary" >下载管理</el-button>-->
       </div>
 
     </div>
@@ -72,12 +70,17 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                   <span class="operationIcona">
+                    <!--<router-link :to="`dataManage/datasetEdit/${scope.row.dsDataSetId}`">-->
+                    <router-link :to="`/modelEdit/123`">
                       <i class="el-icon-edit-outline iconLogo" ></i>
+                    </router-link>
                   </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="画像" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-user iconLogo" ></i>
+                    <router-link :to="`/ImageDetail/456`">
+                      <i class="el-icon-user iconLogo" ></i>
+                    </router-link>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="导出数据" placement="top">
@@ -282,7 +285,12 @@
       createLabel(){
         this.$router.push('tree')
       },
-
+      createModel(){
+        this.$router.push('creatModel')
+      },
+      cooperationModel(){
+        this.$router.push('cooperationModel')
+      }
     },
     created() {
     },
@@ -302,7 +310,7 @@
     width: 240px;
   }
   .zxlistBtn {
-    margin-left: 10px;
+    margin-right: 10px;
   }
   .actionBar{
     display: flex;

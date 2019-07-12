@@ -1,0 +1,587 @@
+<template>
+  <div class="table-container">
+    <div class="header">
+      <div class="left">
+        <router-link class="return" to="/lableImage">
+          <i class="el-icon-arrow-left"></i>
+        </router-link>
+        <div class="name">
+          <div class="img"></div>
+          <div class="text">南城区高考成绩数据</div>
+        </div>
+      </div>
+      <div class="right">
+        <div>
+          <div class="img" @click="saveAs"></div>
+        </div>
+        <el-button class="button" type="info" size="small" @click="runModel">运行模型</el-button>
+        <el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>
+      </div>
+    </div>
+    <div class="content">
+      <Aside v-if="updateAsideForce" :dimensionList="dimensionList" :measureList="measureList" @updateAside="updateAside" />
+      <div class="components">
+        <div class="top">
+          <div class="left">
+            南城区高考成绩数据
+          </div>
+          <div class="right">
+            <span class="iconPeople"><i class="el-icon-user"></i></span>
+            <span class="cooperation">协作人员:</span>
+            <img class="imgPeople" src="../../assets/img/u163.png" height="25" width="25"/>
+            <span class="multiply">x</span>
+            <span class="num">3</span>
+            <span class="handlePeople"><i class="el-icon-arrow-down" @click="showIt"></i></span>
+          </div>
+          <div class="card" v-show="show">
+            <div class="clearfix">
+              <div class="peopleList">成员列表</div>
+              <div class="addPeople"><i class="el-icon-plus"></i></div>
+            </div>
+            <div class="peopleContent">
+              <div class="contentA clearfix">
+                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName">数据搬运工</div>
+                <div class="head"><i class="el-icon-delete"></i></div>
+              </div>
+
+              <div class="contentA clearfix">
+                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName">数据搬运工数据搬运工2</div>
+                <div class="head"><i class="el-icon-delete"></i></div>
+              </div>
+
+              <div class="contentA clearfix">
+                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName">数据搬运工</div>
+                <div class="head"><i class="el-icon-delete"></i></div>
+              </div>
+              <div class="contentA clearfix">
+                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName">数据搬运工</div>
+                <div class="head"><i class="el-icon-delete"></i></div>
+              </div>
+              <div class="contentA clearfix">
+                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName">数据搬运工</div>
+                <div class="head"><i class="el-icon-delete"></i></div>
+              </div>
+              <div class="contentA clearfix">
+                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName">数据搬运工</div>
+                <div class="head"><i class="el-icon-delete"></i></div>
+              </div>
+              <div class="contentA clearfix">
+                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName">数据搬运工</div>
+                <div class="head"><i class="el-icon-delete"></i></div>
+              </div>
+
+          </div>
+          </div>
+
+        </div>
+        <!--<EditTable v-if="componentsSwitch" :theadData="theadData" :tableData="tableData" />-->
+        <EditTable></EditTable>
+      </div>
+    </div>
+
+    <!--另存-->
+    <el-dialog class="creat" title="另存模型" :visible.sync="editDialog" width="530px" center :close-on-click-modal="false"
+               @close="closeSaveas">
+      <div class="del-dialog-cnt">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+          <el-form-item label="模型名称:" prop="name" class="nameOne">
+            <el-input v-model="ruleForm.name"></el-input>
+          </el-form-item>
+          <el-form-item label="模型简介:" prop="textarea2" class="nameOne">
+            <el-input
+              class="area"
+              type="textarea"
+              :autosize="{ minRows: 2, maxRows: 4}"
+              placeholder="请输入内容"
+              v-model="ruleForm.textarea2">
+            </el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer device">
+        <div>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认另存</el-button>
+        </div>
+      </div>
+    </el-dialog>
+    <!--运行-->
+    <el-dialog class="creat" title="运行模型" :visible.sync="runDialog" width="530px" center :close-on-click-modal="false"
+               @close="closeRun">
+      <div class="del-dialog-cnt">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px">
+          <el-form-item label="模型名称:" prop="modelName" class="nameOne">教育体系标签</el-form-item>
+          <el-form-item label="运行开始时间:" prop="date" class="nameOne">
+            <el-date-picker
+              size="small"
+              class="dateInp"
+              v-model="value1"
+              type="datetime"
+              placeholder="选择日期时间">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="运行时间周期:" prop="date2" class="nameOne">
+            <el-select class="controlChoose" size="small" v-model="value" placeholder="请选择">
+              <el-option
+                v-for="item in options2"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer device">
+        <div>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" >确定运行</el-button>
+        </div>
+      </div>
+    </el-dialog>
+    <!--保存-->
+    <el-dialog class="creat" title="保存模型" :visible.sync="saveDialog" width="530px" center :close-on-click-modal="false"
+               @close="closeSave">
+      <div class="del-dialog-cnt">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+          <el-form-item label="模型名称:" prop="name" class="nameOne">
+            <el-input v-model="ruleForm.name"></el-input>
+          </el-form-item>
+          <el-form-item label="模型简介:" prop="textarea2" class="nameOne">
+            <el-input
+              class="area"
+              type="textarea"
+              :autosize="{ minRows: 2, maxRows: 4}"
+              placeholder="请输入内容"
+              v-model="ruleForm.textarea2">
+            </el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer device">
+        <div>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认保存</el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!--添加-->
+  </div>
+</template>
+
+<script>
+  import EditTable from '../../components/ModeleEdit/EditTable'
+  import Aside from '../../components/ModeleEdit/Aside'
+
+  export default {
+    name: 'modelEdit',
+    data () {
+      return {
+        show:false,
+        editDialog:false,
+        saveLoading:false,
+        runDialog:false,
+        saveDialog:false,
+        value1:'',
+        value:'',
+        tableBoxWidth: 800,
+        tableBoxHeight: 800,
+        tableWidth: 800,
+        tableHeight: 800,
+        search: '',
+        ruleForm:{
+          name:'',
+          textarea2:'',
+          modelName:'',
+          date:''
+        },
+        options2: [{
+          value: '选项1',
+          label: '停止运行'
+        }, {
+          value: '选项2',
+          label: '运行一次'
+        }],
+        rules: {
+          name: [
+            {required: true, message: '请填写',trigger: 'blur'}
+          ],
+          textarea2: [
+            {required: true, message: '请填写',trigger: 'blur'}
+          ],
+          date:[{required: true, message: '请选择时间',trigger: 'blur'}],
+          date2:[{required: true, message: '请选择',trigger: 'change'}]
+        },
+        tableData: [],
+        theadData: [],
+        dimensionList: [],
+        measureList: [],
+        componentsSwitch: true,
+        datasetId: '',
+        updateAsideForce: true
+      }
+    },
+    components: { EditTable, Aside },
+    watch: {
+      theadData: function (val) {
+        this.tableWidth = val.length * 149
+      }
+    },
+    created () {
+      this.datasetId = this.$route.params.id
+    },
+    mounted () {
+      this.getDatasetDetails()
+    },
+    methods: {
+      updateAside (type, val) {
+        if (type === 'measure') {
+          this.measureList = val
+        } else {
+          this.dimensionList = val
+        }
+        this.updateAsideForce = false
+        this.$nextTick(() => (this.updateAsideForce = true))
+        // this.getTableDetails()
+      },
+      async getDatasetDetails () {
+        const { data: { dimensionList, measureList } } = await datasetWordDetailsApi(this.datasetId)
+        this.dimensionList = dimensionList
+        this.measureList = measureList
+        const newDimensionList = this.dimensionList.map(item => ({ columnName: item.columnName, values: [] }))
+        const newMeasureList = this.measureList.map(item => ({ columnName: item.columnName, values: [] }))
+        let cfgObj = {
+          rows: [],
+          filters: [],
+          values: [],
+          columns: []
+        }
+        cfgObj.columns = [...newDimensionList, ...newMeasureList]
+        let cfgStr = JSON.stringify(cfgObj)
+        const detailsParams = {
+          cfg: cfgStr,
+          dsDataSetId: this.datasetId,
+          dsDataSourceId: '',
+          query: '{}',
+          reload: true
+        }
+        const { data: { columnList: column, data: tableList } } = await datasetDetailsApi(detailsParams)
+        const theadData = column.map(item => ({ label: item.name }))
+        this.theadData = theadData
+        const tableData = tableList.map(item => {
+          const objItem = {}
+          item.forEach((v, i) => {
+            const key = `column${i + 1}`
+            objItem[key] = v
+          })
+          return objItem
+        })
+        this.tableData = tableData
+        this.componentsSwitch = false
+        this.$nextTick(() => (this.componentsSwitch = true))
+      },
+      // async previewTable () {
+      //   const columnList = [{index: 0, aggType: null, name: "SOURCE_NAME"}]
+      // },
+      async datasetSave () {
+        const data = {
+          dsDataSetId: Number(this.datasetId),
+          dimensionJson: JSON.stringify(this.dimensionList),
+          measureJson: JSON.stringify(this.measureList),
+          isNew: false
+        }
+        const res = await datasetChangeApi(data)
+      },
+    //
+      showIt(){
+        this.show = !this.show
+      },
+      saveAs(){
+        this.editDialog = true
+      },
+      closeSaveas(){
+        this.editDialog = false
+      },
+      runModel(){
+        this.runDialog = true
+      },
+      closeRun(){
+        this.runDialog = false
+      },
+      saveModel(){
+        this.saveDialog = true
+      },
+      closeSave(){
+        this.saveDialog = false
+      },
+    }
+  }
+</script>
+
+<style scoped lang="scss">
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    color: #ffffff;
+    background: rgba(22, 38, 59, 1);
+    .left {
+      display: flex;
+      align-items: center;
+      .return {
+        width: 60px;
+        border-right: 1px solid #999;
+        text-align: center;
+        font-size: 30px;
+        margin-right: 20px;
+      }
+      .name {
+        display: flex;
+        text-align: center;
+        .img {
+          width: 25px;
+          height: 25px;
+          margin-right: 10px;
+          background: url("../../assets/img/u71.png");
+          background-repeat: no-repeat;
+          background-size: 100% 100%;
+        }
+        .text {
+          line-height: 25px;
+        }
+      }
+    }
+    .right {
+      display: flex;
+      align-items: center;
+      padding-right: 20px;
+      box-sizing: border-box;
+      .img {
+        width: 25px;
+        height: 25px;
+        margin-right: 20px;
+        background: url("../../assets/img/save.png");
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+      .button {
+        width: 80px;
+      }
+    }
+  }
+  .content {
+    display: flex;
+    .aside {
+      width: 250px;
+      flex-shrink: 0;
+      position: fixed;
+      top: 60px;
+      bottom: 0;
+      left: 0;
+      color: #ffffff;
+      background: rgba(62, 71, 96, 1);
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 2;
+      .top {
+        height: 45px;
+        line-height: 45px;
+      }
+      .search {
+        margin-bottom: 20px;
+      }
+      .con {
+        color: #cccccc;
+        .box {
+          margin-bottom: 25px;
+          .title {
+            color: #ffffff;
+          }
+          .line {
+            display: flex;
+            justify-content: space-between;
+            height: 30px;
+            line-height: 30px;
+            position: relative;
+            .type {
+              width: 20%;
+            }
+            .name {
+              flex-shrink: 0;
+              width: 60%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+            .icon {
+              cursor: pointer;
+            }
+            .menu {
+              width: 150px;
+              position: absolute;
+              right: -170px;
+              top: -50px;
+              background: #ffffff;
+              color: #333;
+              font-size: 14px;
+              box-shadow: #999 0 0 4px;
+              padding: 10px;
+              border-radius: 5px;
+              box-sizing: border-box;
+              z-index: 2;
+              cursor: pointer;
+              .menu-con {
+                position: relative;
+                .menu-line {
+                  display: flex;
+                  height: 30px;
+                  line-height: 30px;
+                  .menu-icon {
+                    width: 25px;
+                    height: 25px;
+                    color: #999;
+                    font-size: 18px;
+                    margin-right: 5px;
+                    background-repeat: no-repeat;
+                    background-size: 100% 100%;
+                  }
+                  .menu-name {
+                    flex-grow: 1;
+                    border-bottom: 1px #ddd solid;
+                  }
+                }
+                .del {
+                  width: 15px;
+                  height: 15px;
+                  position: absolute;
+                  top: -10px;
+                  right: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .components {
+      width: 100%;
+      position: absolute;
+      top: 60px;
+      bottom: 0;
+      padding: 10px 10px 10px 260px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      .top {
+        display: flex;
+        justify-content: space-between;
+        .left {
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+          font-size: 14px;
+          .box {
+            width: 50%;
+            cursor: pointer;
+            .icon {
+              width: 25px;
+              height: 25px;
+              margin: 0 auto;
+              background-size: 100% 100%;
+              background-repeat: no-repeat;
+            }
+          }
+          .right-line {
+            border-right: 1px #ddd solid;
+          }
+        }
+      }
+    }
+  }
+
+  .cooperation,.multiply,.num{
+    font-size: 12px;
+    color: #999999;
+    margin-left: 4px;
+  }
+  .cooperation{
+    margin-right: 5px;
+  }
+  .iconPeople{
+    font-size: 15px;
+    margin-right: 2px;
+    margin-top: -5px;
+  }
+  .handlePeople{
+    font-size: 15px;
+    margin-left: 5px;
+  }
+  .right{
+    display: flex;
+    align-items: center;
+  }
+  .card{
+    width: 200px;
+    border: 1px solid #dedede;
+    position: absolute;
+    right: 15px;
+    z-index: 33;
+    margin-top: 35px;
+    background-color: #fff;
+    border-radius: 8px;
+  }
+  .peopleList,.addPeople{
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .peopleList{
+    float: left;
+    margin-left: 15px;
+  }
+  .addPeople{
+    float: right;
+    margin-right: 15px;
+  }
+  .peopleContent{
+    margin-top: 15px;
+    height: 280px;
+    overflow-y: auto;
+  }
+  .imgPeople2,.listName{
+    float: left;
+  }
+  .imgPeople2{
+    margin-top: 6px;
+    margin-left: 8px;
+  }
+  .listName{
+    font-size: 12px;
+    width: 105px;
+    margin-left: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .head{
+    font-size: 14px;
+    float: right;
+    margin-right: 8px;
+  }
+  .contentA{
+    height: 40px;
+    line-height: 40px;
+  }
+  .dateInp,.controlChoose{
+    width: 340px;
+  }
+  .clearfix:after{
+    content: '';
+    display: block;
+    clear: both;
+  }
+</style>

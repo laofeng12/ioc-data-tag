@@ -1,9 +1,13 @@
 package com.openjava.datatag.tagmanage.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.log.domain.DtTaggUpdateLog;
+import com.openjava.datatag.log.service.DtTaggUpdateLogService;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
+import com.openjava.datatag.log.repository.DtTaggUpdateLogRepository;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.sequence.SequenceService;
@@ -31,6 +35,9 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 
 	@Resource
 	private  DtTagService dtTagService;
+
+	@Resource
+	private DtTaggUpdateLogService dtTaggUpdateLogService;
 	
 	public Page<DtTagGroup> query(DtTagGroupDBParam params, Pageable pageable){
 		Page<DtTagGroup> pageresult = dtTagGroupRepository.query(params, pageable);
@@ -55,16 +62,20 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		return dtTagGroupRepository.save(m);
 	}
 
-	@Transactional
-	public void doSoftDelete(DtTagGroup m){
-		m.setIsDeleted(Constants.DT_TG_DELETED);
+
+	public void doSoftDelete(DtTagGroup db,Long userId,String ip){
+		db.setModifyTime(new Date());
+		db.setIsDeleted(Constants.DT_TG_DELETED);
 		//批量修改标签表的删除标识
-		dtTagService.doSoftDeleteByTagsID(m.getId(),m.getModifyTime());
+		dtTagService.doSoftDeleteByTagsID(db.getId(),db.getModifyTime());
 		//修改标签组表的删除标识
-		doSave(m);
+		doSave(db);
+		//日志记录
+		dtTaggUpdateLogService.loggingDelete(db,userId,ip);
 	}
 
-	public void doNew(DtTagGroup body,Long userId){
+	public DtTagGroup doNew(DtTagGroup body,Long userId,String ip){
+		String modifyContent = JSONObject.toJSONString(body);
 		//新增，记录创建时间等
 		//设置主键(请根据实际情况修改)
 		SequenceService ss = ConcurrentSequence.getInstance();
@@ -77,18 +88,32 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		body.setIsDeleted(Constants.DT_TG_EXIST);
 		body.setIsShare(Constants.DT_TG_PRIVATE);
 		body.setPopularity(0L);
-		doSave(body);
+		DtTagGroup db = dtTagGroupRepository.save(body);
+
+		//日志记录
+		dtTaggUpdateLogService.loggingNew(modifyContent,db,userId,ip);
+
+		return  db;
 	}
 
-	public void doUpdate(DtTagGroup body,DtTagGroup db){
+	public DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip){
+		String oldContent = JSONObject.toJSONString(db);
+		String modifyContent = JSONObject.toJSONString(body);
 		//Create* 应该保持不变，Modify更新
 		body.setCreateUser(db.getCreateUser());
 		body.setCreateTime(db.getCreateTime());
 		body.setModifyTime(new Date());
 		MyBeanUtils.copyPropertiesNotBlank(db, body);
 		db.setIsNew(false);
-		doSave(db);
+		DtTagGroup newdb = doSave(db);
+
+		//日志记录
+		dtTaggUpdateLogService.loggingUpdate(modifyContent,oldContent,db,userId,ip);
+		return newdb;
 	}
 
+	public List<DtTagGroup> getMyTagGroup(Long createUser){
+		return dtTagGroupRepository.getMyTagGroup(createUser);
+	}
 
 }

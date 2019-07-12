@@ -6,11 +6,17 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
+import com.openjava.datatag.tagmodel.dto.SaveConditionDTO;
 import com.openjava.datatag.tagmodel.dto.SelectColDTO;
+import com.openjava.datatag.utils.IpUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
+import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.SequenceService;
 import org.ljdp.component.sequence.ConcurrentSequence;
@@ -45,7 +51,7 @@ import com.openjava.datatag.tagmodel.query.DtSetColDBParam;
  * @author zmk
  *
  */
-@Api(tags="字段表")
+@Api(tags="字段设置")
 @RestController
 @RequestMapping("/datatag/tagmodel/dtSetCol")
 public class DtSetColAction {
@@ -57,7 +63,7 @@ public class DtSetColAction {
 	 * 用主键获取数据
 	 * @param id
 	 * @return
-	 */
+	 *//*
 	@ApiOperation(value = "根据ID获取", notes = "单个对象查询", nickname="id")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "id", value = "主标识编码", required = true, dataType = "string", paramType = "path"),
@@ -70,9 +76,9 @@ public class DtSetColAction {
 	public DtSetCol get(@PathVariable("id")Long id) {
 		DtSetCol m = dtSetColService.get(id);
 		return m;
-	}
+	}*/
 	
-	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
+	/*@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "eq_taggingModelId", value = "标签模型主键=", required = false, dataType = "Long", paramType = "query"),
 		@ApiImplicitParam(name = "eq_taggingModelId", value = "标签模型编号=", required = false, dataType = "Long", paramType = "query"),
@@ -90,13 +96,13 @@ public class DtSetColAction {
 		Page<DtSetCol> result =  dtSetColService.query(params, pageable);
 		
 		return new TablePageImpl<>(result);
-	}
+	}*/
 	
 
 	
 	/**
 	 * 保存
-	 */
+	 *//*
 	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
 	@RequestMapping(value="/save", method=RequestMethod.POST)
@@ -120,21 +126,33 @@ public class DtSetColAction {
 		
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
 		return new SuccessMessage("保存成功");
-	}
+	}*/
 
 	/**
 	 * 字段设置确认选择接口
 	 */
-	@ApiOperation(value = "字段设置确认选择接口", nickname="save", notes = "新增格式：{\"dataSetId\":1,\"dataSetName\":\"高考数据\",\"colList\":[{\"sourceCol\":\"user_name\",\"sourceDataType\":\"String\",\"isMarking\":1}]}" +
+	@ApiOperation(value = "字段设置确认选择接口", nickname="save", notes = "新增格式：{\"dataSetId\":1,\"dataSetName\":\"高考数据\",\"pKey\":\"user_name\",\"colList\":[{\"sourceCol\":\"user_name\",\"sourceDataType\":\"String\",\"isMarking\":1}]}" +
 			"修改的格式：{\"taggingModelId\":1,\"dataSetId\":1,\"dataSetName\":\"高考数据233\",\"colList\":[{\"colId\":1,\"taggingModelId\":1,\"sourceCol\":\"name\",\"sourceDataType\":\"String\",\"isMarking\":1},{\"sourceCol\":\"userId2\",\"sourceDataType\":\"Long\",\"isMarking\":1}]}")
 	@Security(session=true)
 	@RequestMapping(value="/selectCol", method=RequestMethod.POST)
-	public SuccessMessage selectCol(@RequestBody DtTaggingModelDTO body) throws Exception{
-		dtSetColService.selectCol(body);
+	public SuccessMessage selectCol(@RequestBody DtTaggingModelDTO body,
+									HttpServletRequest request) throws Exception{
+		String ip = IpUtil.getRealIP(request);
+		if (body.getDataSetId() == null) {
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"打标目标表id不能为空");
+		}
+		if (StringUtils.isBlank(body.getDataSetName())) {
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"打标源表名称不能为空");
+		}
+		if (StringUtils.isBlank(body.getPkey())){
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"数据源主键不能指定为空");
+			//这里应该添加验证主键唯一性约束
+		}
+		dtSetColService.selectCol(body,ip);
 		return new SuccessMessage("保存成功");
 	}
 	
-	@ApiOperation(value = "清除", nickname="delete")
+	@ApiOperation(value = "字段清除", nickname="delete")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
 		@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
@@ -143,9 +161,11 @@ public class DtSetColAction {
 	@RequestMapping(value="/delete",method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
-			@RequestParam(value="ids",required=false)String ids) throws Exception{
+			@RequestParam(value="ids",required=false)String ids,
+			HttpServletRequest request) throws Exception{
+		String ip = IpUtil.getRealIP(request);
 		if(id != null) {
-			dtSetColService.doDelete(id);
+			dtSetColService.doDelete(id,ip);
 		} else if(ids != null) {
 			dtSetColService.doRemove(ids);
 		}
@@ -158,14 +178,42 @@ public class DtSetColAction {
 	})
 	@Security(session=true)
 	@RequestMapping(value="/clone",method=RequestMethod.POST)
-	public SuccessMessage clone(@RequestParam(value="colId",required=true)Long colId)throws Exception{
-		dtSetColService.clone(colId);
+	public SuccessMessage clone(@RequestParam(value="colId",required=true)Long colId,
+								HttpServletRequest request)throws Exception{
+		String ip = IpUtil.getRealIP(request);
+		dtSetColService.clone(colId,ip);
 		return new SuccessMessage("克隆字段成功");
+	}
+
+	@ApiOperation(value = "确认打标-查询打标历史接口", nickname="getHistoryCol")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
+	})
+	@Security(session=true)
+	@RequestMapping(value="/getHistoryCol",method=RequestMethod.POST)
+	public GetHistoryColDTO getHistoryCol(@RequestParam(value="colId",required=true)Long colId)throws Exception{
+		return dtSetColService.getHistoryCol(colId);
+	}
+
+	@ApiOperation(value = "确认打标-保存接口", nickname="getHistoryCol",
+			notes="数字类型修改：\n{\"colId\":2,\"condtion\":[{\"colId\":2,\"isHandle\":0,\"tagConditionId\":1000001,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\">\",\"theValues\":\"1\",\"valuesType\":\"NUMBER\"},{\"isConnectSymbol\":1,\"symbol\":\"AND\",\"theValues\":\"\",\"valuesType\":\"\"},{\"isConnectSymbol\":0,\"symbol\":\"<\",\"theValues\":\"5\",\"valuesType\":\"NUMBER\"}]},{\"colId\":2,\"isHandle\":1,\"tagConditionId\":1000000,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"IN\",\"theValues\":\"1,2,3,4\",\"valuesType\":\"NUMBER\"}]}]}\n" +
+					"字符串类型修改：\n{\"colId\":2,\"condtion\":[{\"colId\":2,\"isHandle\":0,\"tagConditionId\":1000001,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"=\",\"theValues\":\"王同学\",\"valuesType\":\"VARCHAR2\"},{\"isConnectSymbol\":1,\"symbol\":\"AND\",\"theValues\":\"\",\"valuesType\":\"\"},{\"isConnectSymbol\":0,\"symbol\":\"≠\",\"theValues\":\"李同学\",\"valuesType\":\"VARCHAR2\"}]},{\"colId\":2,\"isHandle\":1,\"tagConditionId\":1000000,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"IN\",\"theValues\":\"王同学,李同学,吴同学\",\"valuesType\":\"VARCHAR2\"}]}]}\n" +
+					"数字类型新增：\n{\"colId\":1,\"condtion\":[{\"colId\":1,\"isHandle\":0,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"=\",\"theValues\":\"123\",\"valuesType\":\"NUMBER\"},{\"isConnectSymbol\":1,\"symbol\":\"AND\",\"theValues\":\"\",\"valuesType\":\"\"},{\"isConnectSymbol\":0,\"symbol\":\"≠\",\"theValues\":\"2333\",\"valuesType\":\"NUMBER\"}]},{\"colId\":1,\"isHandle\":1,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"IN\",\"theValues\":\"1,2,3\",\"valuesType\":\"NUMBER\"}]}]}\n" +
+					"字符串类型新增：\n{\"colId\":1,\"condtion\":[{\"colId\":1,\"isHandle\":0,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"=\",\"theValues\":\"王同学\",\"valuesType\":\"VARCHAR2\"},{\"isConnectSymbol\":1,\"symbol\":\"AND\",\"theValues\":\"\",\"valuesType\":\"\"},{\"isConnectSymbol\":0,\"symbol\":\"≠\",\"theValues\":\"李同学\",\"valuesType\":\"VARCHAR2\"}]},{\"colId\":1,\"isHandle\":1,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"IN\",\"theValues\":\"王同学,李同学,吴同学\",\"valuesType\":\"VARCHAR2\"}]}]}\n" +
+					"")
+	@ApiImplicitParams({
+//			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
+	})
+	@Security(session=true)
+	@RequestMapping(value="/saveCondition",method=RequestMethod.POST)
+	public SuccessMessage saveCondition(@RequestBody SaveConditionDTO req)throws Exception{
+		dtSetColService.saveCondition(req);
+		return new SuccessMessage("保存成功");
 	}
 
 	/**
 	 * 导出Excel文件
-	 */
+	 *//*
 	@Security(session=true)
 	@RequestMapping(value="/export", method=RequestMethod.GET)
 	public void doExport(HttpServletRequest request, HttpServletResponse response,
@@ -201,5 +249,5 @@ public class DtSetColAction {
 			} catch (Exception e2) {
 			}
 		}
-	}
+	}*/
 }

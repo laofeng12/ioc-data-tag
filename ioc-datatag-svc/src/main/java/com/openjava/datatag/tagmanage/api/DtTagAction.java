@@ -7,6 +7,7 @@ import com.openjava.datatag.tagmanage.dto.DtTagDTO;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
+import com.openjava.datatag.utils.IpUtil;
 import com.openjava.datatag.utils.tree.TagDTOTreeNode;
 import io.swagger.annotations.*;
 import org.ljdp.component.exception.APIException;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
@@ -26,7 +28,7 @@ import java.util.List;
  * @author lch
  *
  */
-@Api(tags="DT_TAG")
+@Api(tags="标签增删改/标签树查")
 @RestController
 @RequestMapping("/datatag/tagmanage/dtTag")
 public class DtTagAction {
@@ -49,13 +51,16 @@ public class DtTagAction {
 	})
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.POST)
-	public SuccessMessage doSave(@RequestBody DtTag body) throws APIException {
+	public SuccessMessage doSave(@RequestBody DtTag body,
+								 HttpServletRequest request) throws APIException {
 		//修改，记录更新时间等
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		Long userId = Long.valueOf(userInfo.getUserId());
+		String ip = IpUtil.getRealIP(request);
 		DtTagGroup tagGroup = dtTagGroupService.get(body.getTagsId());
 		if(userInfo.getUserId().equals(tagGroup.getCreateUser().toString())){
 			if(body.getIsNew() == null || body.getIsNew()) {
-				dtTagService.doNew(body);
+				dtTagService.doNew(body,userId,ip);
 				return new SuccessMessage("新建成功");
 			} else {
 				DtTag db = dtTagService.get(body.getId());
@@ -65,7 +70,7 @@ public class DtTagAction {
 				if (body.getIsDeleted()!= null && body.getIsDeleted().equals(Constants.DT_TG_DELETED)){
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请不要用此方法进行删除操作，请用DELETE方法");
 				}
-				dtTagService.doUpdate(body,db);
+				dtTagService.doUpdate(body,db,userId,ip);
 				return new SuccessMessage("修改成功");
 			}
 		}else{
@@ -87,15 +92,18 @@ public class DtTagAction {
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
-			@RequestParam(value="id",required=false)Long id) throws APIException {
+			@RequestParam(value="id",required=false)Long id,
+			HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		DtTag tag = dtTagService.get(id);
-		if(tag == null || tag.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+		Long userId = Long.valueOf(userInfo.getUserId());
+		String ip = IpUtil.getRealIP(request);
+		DtTag db = dtTagService.get(id);
+		if(db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED)){
 			throw new APIException(MyErrorConstants.TAG_NOT_FOUND,"无此标签或已被删除");
 		}
-		DtTagGroup tagGroup = dtTagGroupService.get(tag.getTagsId());
-		if(userInfo.getUserId().equals(tagGroup.getCreateUser().toString())){
-			dtTagService.doSoftDeleteByDtTag(tag);
+		DtTagGroup tagGroupdb = dtTagGroupService.get(db.getTagsId());
+		if(userInfo.getUserId().equals(tagGroupdb.getCreateUser().toString())){
+			dtTagService.doSoftDeleteByDtTag(db,userId,ip);
 			return new SuccessMessage("删除成功");
 		}else{
 			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"无权限删除");

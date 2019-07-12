@@ -1,8 +1,6 @@
 package com.openjava.datatag.utils;
 
-import org.ljdp.component.result.BasicApiResponse;
 import org.ljdp.component.user.BaseUserInfo;
-import org.ljdp.plugin.sys.vo.UserVO;
 
 import java.lang.reflect.Field;
 import java.util.Date;
@@ -91,5 +89,6 @@ public class EntityClassUtil {
 		}
 		
 	}
+
 	
 }

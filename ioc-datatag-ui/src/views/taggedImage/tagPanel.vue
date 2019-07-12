@@ -123,12 +123,16 @@
     },
     name: 'tagPanel',
     data() {
-      return {}
+      return {
+        tablelist:[]
+      }
     },
     mounted() {
 
     },
-    methods: {}
+    methods: {
+
+    }
   }
 </script>
 

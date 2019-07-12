@@ -16,6 +16,7 @@ import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.service.DtSetColService;
 import com.openjava.datatag.utils.EntityClassUtil;
+import com.openjava.datatag.utils.IpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
@@ -74,8 +75,8 @@ public class DtTaggingModelAction {
 	 */
 	@ApiOperation(value = "获取标签模型数据", notes = "单个对象查询", nickname="id")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "taggingModelId", value = "标签模型id", required = true, dataType = "string", paramType = "path"),
-		@ApiImplicitParam(name = "dataSetId", value = "打标目的表id", required = false, dataType = "string", paramType = "path"),
+		@ApiImplicitParam(name = "taggingModelId", value = "标签模型id", required = true, dataType = "string", paramType = "query"),
+		@ApiImplicitParam(name = "dataSetId", value = "打标目的表id", required = false, dataType = "string", paramType = "query"),
 	})
 	@ApiResponses({
 		@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
@@ -86,6 +87,9 @@ public class DtTaggingModelAction {
 			@RequestParam(value="taggingModelId",required=true)Long taggingModelId,
 			@RequestParam(value="dataSetId",required=false)Long dataSetId) throws Exception{
 		DtTaggingModel m = dtTaggingModelService.get(taggingModelId);
+		if (m == null || m.getIsDeleted().equals(Constants.PUBLIC_YES)){
+			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"无此标签模型或已被删除");
+		}
 		if (dataSetId!=null) {
 			if (!dataSetId.equals(m.getDataSetId())) {
 				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选择："+m.getDataSetName()+"进行打标");
@@ -100,7 +104,7 @@ public class DtTaggingModelAction {
 	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "like_modelName", value = "模型名字like", required = false, dataType = "String", paramType = "query"),
-		@ApiImplicitParam(name = "eq_runState", value = "运行状态:未运行/运行中/运行出错/运行结束=", required = false, dataType = "Long", paramType = "query"),
+		@ApiImplicitParam(name = "eq_runState", value = "运行状态:未运行/运行中/运行出错/运行结束/运行停止=", required = false, dataType = "Long", paramType = "query"),
 		//@ApiImplicitParam(name = "eq_isDeleted", value = "删除标记=", required = false, dataType = "Long", paramType = "query"),
 		@ApiImplicitParam(name = "le_startTime", value = "运行开始时间<=", required = false, dataType = "Date", paramType = "query"),
 		@ApiImplicitParam(name = "ge_startTime", value = "运行开始时间>=", required = false, dataType = "Date", paramType = "query"),
@@ -123,26 +127,25 @@ public class DtTaggingModelAction {
 	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
 	@RequestMapping(value="/save",method=RequestMethod.POST)
-	public DtTaggingModel doSave(@RequestBody DtTaggingModel body
-
-			) {
+	public DtTaggingModel doSave(@RequestBody DtTaggingModel body,
+								 HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		String ip = IpUtil.getRealIP(request);
 		Date now = new Date();
 		DtTaggingModel dbObj=null;
 		if(body.isNew()) {
 			//新增，记录创建时间等
-			EntityClassUtil.dealCreateInfo(body,userInfo);
-			body.setRunState(Constants.TG_MODEL_NO_BEGIN);//未开始
-			body.setIsNew(true);//执行insert
-			body.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
-			dbObj = dtTaggingModelService.doSave(body);
+			dtTaggingModelService.doNew(body,userInfo,ip);
 		} else {
 			//修改，记录更新时间等
 			DtTaggingModel db = dtTaggingModelService.get(body.getTaggingModelId());
-			EntityClassUtil.dealModifyInfo(db,userInfo);
-			MyBeanUtils.copyPropertiesNotBlank(db, body);
-			db.setIsNew(false);//执行update
-			dbObj =dtTaggingModelService.doSave(db);
+			if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
+				throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"找不到该模型或模型已经被删除");
+			}
+			if(body.getIsDeleted().equals(Constants.PUBLIC_YES)){
+				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"本接口不可用来删除");
+			}
+			dtTaggingModelService.doUpdate(body,dbObj,userInfo,ip);
 		}
 		
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
@@ -150,25 +153,24 @@ public class DtTaggingModelAction {
 	}
 
 	/**
-	 * 保存
+	 * 调度
 	 */
 	@ApiOperation(value = "设置调度", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
 	@RequestMapping(value="/Dispatch",method=RequestMethod.POST)
-	public SuccessMessage doDispatch(@RequestBody DtTaggingDispatchDTO body) throws APIException {
+	public SuccessMessage doDispatch(@RequestBody DtTaggingDispatchDTO body,
+									 HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long userId = Long.parseLong(userInfo.getUserId());
-		DtTaggingModel tagModel = dtTaggingModelService.get(body.getId());
-		if (tagModel == null || tagModel.getIsDeleted().equals(Constants.PUBLIC_YES)){
+		String ip = IpUtil.getRealIP(request);
+
+		DtTaggingModel db = dtTaggingModelService.get(body.getId());
+		if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"找不到该模型或模型已经被删除");
 		}
-		if(tagModel.getCreateUser() != null && tagModel.getCreateUser().equals(userId)){
-			tagModel.setCycle(body.getCYCLE());
-			tagModel.setStartTime(body.getStartTime());
-			tagModel.setIsNew(false);
-			tagModel.setModifyUser(userId);
-			tagModel.setModifyTime(new Date());
-			dtTaggingModelService.doSave(tagModel);
+		if(db.getCreateUser() != null && db.getCreateUser().equals(userId)){
+
+			dtTaggingModelService.doDispatch(body,db,userId,ip);
 		}else{
 			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"没有权限修改本模型");
 		}
@@ -182,12 +184,14 @@ public class DtTaggingModelAction {
 	 */
 	@ApiOperation(value = "另存", nickname="clone", notes = "报文格式：content-type=application/json")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "id", value = "主键编码", required = true, paramType = "delete"),
+		@ApiImplicitParam(name = "id", value = "主键编码", required = true, paramType = "query"),
 	})
 	@Security(session=true)
 	@RequestMapping(value="/copy",method=RequestMethod.POST)
-	public SuccessMessage clone(@RequestParam(value="id",required=true)Long id) throws Exception {
-		dtTaggingModelService.copy(id);
+	public SuccessMessage clone(@RequestParam(value="id",required=true)Long id,
+								HttpServletRequest request) throws Exception {
+		String ip = IpUtil.getRealIP(request);
+		dtTaggingModelService.copy(id,ip);
 		return new SuccessMessage("另存成功");
 	}
 
@@ -199,15 +203,17 @@ public class DtTaggingModelAction {
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
-			@RequestParam(value="id",required=false)Long id) throws APIException {
+			@RequestParam(value="id",required=false)Long id,
+			HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long userId = Long.parseLong(userInfo.getUserId());
-		DtTaggingModel tagModel = dtTaggingModelService.get(id);
-		if (tagModel == null || tagModel.getIsDeleted().equals(Constants.PUBLIC_YES)){
+		String ip = IpUtil.getRealIP(request);
+		DtTaggingModel db = dtTaggingModelService.get(id);
+		if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"找不到该模型或模型已经被删除");
 		}
-		if(tagModel.getCreateUser() != null && tagModel.getCreateUser().equals(userId)){
-			dtTaggingModelService.doSoftDelete(tagModel);
+		if(db.getCreateUser() != null && db.getCreateUser().equals(userId)){
+			dtTaggingModelService.doSoftDelete(db,userId,ip);
 		}else{
 			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"没有权限修改本模型");
 		}

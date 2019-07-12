@@ -1,6 +1,5 @@
 package com.openjava.datatag.tagmodel.repository;
 
-import com.openjava.datatag.tagmodel.domain.DtTagcolUpdateLog;
 import org.ljdp.core.spring.data.DynamicJpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
@@ -23,13 +22,13 @@ public interface DtTagConditionRepository extends DynamicJpaRepository<DtTagCond
      * @param colId
      * @return
      */
+    @Query(value = "from DtTagCondition t where t.isDeleted=0 and t.colId =:colId")
     List<DtTagCondition> findByColId(@Param("colId")Long colId);
     /**
      * 根据字段表主键批量获取条件设置表
      */
     @Query(value = "from DtTagCondition t where t.colId in(:colIds)")
     List<DtTagCondition> findByColIds(@Param("colIds")List<Long> colIds);
-
 
     @Transactional
     @Modifying
