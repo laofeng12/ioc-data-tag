@@ -5,9 +5,7 @@ import javax.annotation.Resource;
 
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
-import com.openjava.datatag.log.domain.DtTagcolUpdateLog;
-import com.openjava.datatag.log.domain.DtTagmUpdateLog;
-import com.openjava.datatag.log.repository.DtTagmUpdateLogRepository;
+
 import com.openjava.datatag.log.service.DtTagcolUpdateLogService;
 import com.openjava.datatag.log.service.DtTagmUpdateLogService;
 import com.openjava.datatag.tagmanage.domain.DtTag;
@@ -16,24 +14,17 @@ import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.tagmodel.domain.*;
 import com.openjava.datatag.tagmodel.dto.*;
-import com.openjava.datatag.log.repository.DtTagcolUpdateLogRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
-import com.openjava.datatag.utils.EntityClassUtil;
-import com.openjava.datatag.utils.StringUtil;
 import com.openjava.datatag.utils.TagConditionUtils;
-import com.openjava.framework.sys.domain.SysCode;
 import com.openjava.framework.sys.service.SysCodeService;
-import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
-import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import com.alibaba.fastjson.JSONObject;
-import org.openjava.boot.conf.aop.ApiExceptionAOP;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.openjava.datatag.tagmodel.query.DtSetColDBParam;
 import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
-import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * 字段表业务层
@@ -58,8 +48,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 	private DtTagConditionService dtTagConditionService;
 	@Resource
 	private DtTagcolUpdateLogService dtTagcolUpdateLogService;
-	@Resource
-	private DtTagConditionUpdateLogService dtTagConditionUpdateLogService;
+
 	@Resource
 	private DtTaggingModelService dtTaggingModelService;
 	@Resource
@@ -101,46 +90,27 @@ public class DtSetColServiceImpl implements DtSetColService {
 	public void doDelete(Long id,String ip) throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtSetCol dtSetCol = get(id);
-		if (dtSetCol==null||dtSetCol.getIsDeleted()== Constants.PUBLIC_YES){
+		if (dtSetCol==null||dtSetCol.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_COL_NO_FIND,"无此字段或字段已删除");
 		}
 		if (!userInfo.getUserId().equals(dtSetCol.getCreateUser().toString())){
 			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"您没有权限");
 		}
-		//删除字段和克隆的字段并记录删除字段的记录
-		List<DtSetCol>  clones = dtSetColRepository.getCloneClo(dtSetCol.getTaggingModelId(),dtSetCol.getSourceCol());
-		clones.add(dtSetCol);
-		List<Long> cloneCloIds = new ArrayList<>();
-		clones.forEach(record->{
-			//更新为删除状态
-			record.setIsDeleted(Constants.PUBLIC_YES);
-			EntityClassUtil.dealModifyInfo(record,userInfo);
-			dtSetColRepository.save(record);
-			cloneCloIds.add(record.getColId());
-			//记录删除日志
-//			DtTagcolUpdateLog dtTagcolUpdateLog = new DtTagcolUpdateLog();
-//			EntityClassUtil.dealModifyInfo(dtTagcolUpdateLog,userInfo);
-//			dtTagcolUpdateLog.setColId(dtSetCol.getColId());
-//			dtTagcolUpdateLog.setModifyType(Constants.PUBLIC_MODIFY_TYPE_DELETE);
-//			dtTagcolUpdateLogRepository.save(dtTagcolUpdateLog);
-		});
+		//删除字段
+		dtSetCol.setIsDeleted(Constants.PUBLIC_YES);
+		EntityClassUtil.dealModifyInfo(dtSetCol,userInfo);
+		dtSetColRepository.save(dtSetCol);
+
 		//级联删除条件设置表
-		List<DtTagCondition> conditions = dtTagConditionService.findByColIds(cloneCloIds);
+		List<DtTagCondition> conditions = dtTagConditionService.findByColId(dtSetCol.getColId());
 		conditions.forEach(record->{
 			record.setIsDeleted(Constants.PUBLIC_YES);
 			EntityClassUtil.dealModifyInfo(record,userInfo);
 			dtTagConditionService.doSave(record);
-			//添加删除记录
-			DtTagConditionUpdateLog conditionLog = new DtTagConditionUpdateLog();
-			EntityClassUtil.dealModifyInfo(conditionLog,userInfo);
-			conditionLog.setModifyType(Constants.PUBLIC_MODIFY_TYPE_DELETE);
-			conditionLog.setTagConditionId(record.getTagConditionId());
-			dtTagConditionUpdateLogService .doSave(conditionLog);
-
 		});
-
+		String content = "{\"delConditions\":" + JSONObject.toJSONString(conditions)+"}";
 		//记录（打标显示）字段的删除
-		dtTagcolUpdateLogService.loggingDelete(dtSetCol,ip);
+		dtTagcolUpdateLogService.loggingDelete(content,dtSetCol,ip);
 	}
 	public void doRemove(String ids) throws Exception{
 		String[] items = ids.split(",");
@@ -189,6 +159,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 
 			//处理 显示/打标列部分
 			List<DtSetCol> dbSourceSetCol = getSourceSetColByTaggingModelId(taggingModel.getId());
+			//遍历修改/新增 显示/打标列
 			for (DtSetCol col : colList){
 				//新建
 				if (col.getColId()==null){
@@ -204,7 +175,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 					col = doSave(col);
 				}else{
 					DtSetCol oldCol = get(col.getColId());
-					//移除掉报文里有的，剩下的被取消掉的
+					//移除掉报文里有的，剩下被取消掉的
 					dbSourceSetCol.remove(oldCol);
 					if (oldCol == null){
 						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此字段，colId无效");
@@ -221,7 +192,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 								getBySourceColAndTaggingModelId(taggingModel.getTaggingModelId(),col.getSourceCol());
 						for (DtSetCol delCol:delCols){
 							if (!delCol.getColId().equals(col.getColId())){
-								delCol.setIsDeleted(Constants.PUBLIC_YES);
+								doDelete(delCol.getColId(),ip);
 								removeCols.add(delCol);//日志记录
 							}
 						}
@@ -230,10 +201,13 @@ public class DtSetColServiceImpl implements DtSetColService {
 			}
 			//未勾选显示列的(包括其复制列)，全部删除
 			for (DtSetCol delSCol: dbSourceSetCol){
+				if(delSCol.getSourceCol().equals(taggingModel.getPkey())){
+					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"主键必须勾选！");
+				}
 				List<DtSetCol> delCols =
 						getBySourceColAndTaggingModelId(taggingModel.getTaggingModelId(),delSCol.getSourceCol());
 				for (DtSetCol delCol:delCols){
-					delSCol.setIsDeleted(Constants.PUBLIC_YES);
+					doDelete(delCol.getColId(),ip);
 				}
 				removeCols.addAll(delCols);//日志记录
 			}
@@ -285,8 +259,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 		doSave(clone);
 
 		//日志记录
-		dtTagcolUpdateLogService.loggingNew("{ \"from\":" + col + "}",clone,ip);
-
+		dtTagcolUpdateLogService.loggingNew("{ \"cloneFrom\":" + col + "}",clone,ip);
 
 	}
 
@@ -329,6 +302,8 @@ public class DtSetColServiceImpl implements DtSetColService {
 	 *  确认打标保存接口
 	 */
 	public void saveCondition(SaveConditionDTO req)throws Exception{
+		String reqParams = JSONObject.toJSONString(req);
+
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		List<DtTagConditionDTO> saveconditions = req.getCondtion();
 		DtSetCol col = get(req.getColId());
@@ -383,16 +358,20 @@ public class DtSetColServiceImpl implements DtSetColService {
 				expression.setIsNew(true);
 				dtFilterExpressionService.doSave(expression);
 			}
-
 		}
+		//记录删除的日志
+		List<DtTagCondition> delLog = new ArrayList<>();
 		//删除
 		for (DtTagCondition record:conditions) {
 			DtTagConditionDTO d = new  DtTagConditionDTO();
 			d.setTagConditionId(record.getTagConditionId());
 			if (!saveconditions.contains(d)){
+				delLog.add(record);
 				dtTagConditionService.doDelete(record.getId());
 			}
 		}
+		String content = "{\"req\":" + reqParams + ",\"delCondition\":" + delLog +"}";
+		dtTagcolUpdateLogService.loggingUpdate(content,col,req.getIp());
 	}
 
 	/**

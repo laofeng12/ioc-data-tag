@@ -27,7 +27,7 @@ public interface DtTagcolUpdateLogService {
 
 	DtTagcolUpdateLog loggingNew(String content,DtSetCol body,String ip);
 
-	DtTagcolUpdateLog loggingDelete(DtSetCol db,String ip);
+	DtTagcolUpdateLog loggingDelete(String content,DtSetCol db,String ip);
 
 	void doDelete(Long id);
 	void doRemove(String ids);
