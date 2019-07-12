@@ -10,9 +10,6 @@
           prefix-icon="el-icon-search"
           v-model="input2">
         </el-input>
-        <el-button class="zxlistBtn" size="small" type="primary">查询</el-button>
-      </div>
-      <div>
         <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
           <el-option
             v-for="item in options"
@@ -21,6 +18,7 @@
             :value="item.value">
           </el-option>
         </el-select>
+        <el-button class="zxlistBtn" size="small" type="primary">查询</el-button>
       </div>
       <div>
         <el-button size="small" type="primary" @click="createLabel">我的标签组</el-button>
@@ -217,7 +215,7 @@
     width: 240px;
   }
   .zxlistBtn {
-    margin-left: 10px;
+    margin-right: 10px;
   }
   .actionBar{
     display: flex;
