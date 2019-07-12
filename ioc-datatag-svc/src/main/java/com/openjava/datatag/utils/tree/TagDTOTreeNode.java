@@ -63,7 +63,6 @@ public class TagDTOTreeNode {
             DtTagDTO tagDTO = new DtTagDTO();
             tagDTO.setId(tag.getId());
             tagDTO.setCreateTime(tag.getCreateTime());
-            tagDTO.setIsDeleted(tag.getIsDeleted());
             tagDTO.setLvl(tag.getLvl());
             tagDTO.setModifyTime(tag.getModifyTime());
             tagDTO.setPreaTagId(tag.getPreaTagId());

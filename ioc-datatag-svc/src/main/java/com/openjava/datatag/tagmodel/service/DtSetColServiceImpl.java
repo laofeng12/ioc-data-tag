@@ -19,6 +19,7 @@ import com.openjava.datatag.tagmodel.dto.*;
 import com.openjava.datatag.log.repository.DtTagcolUpdateLogRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
 import com.openjava.datatag.utils.EntityClassUtil;
+import com.openjava.datatag.utils.StringUtil;
 import com.openjava.datatag.utils.TagConditionUtils;
 import com.openjava.framework.sys.domain.SysCode;
 import com.openjava.framework.sys.service.SysCodeService;
@@ -148,33 +149,24 @@ public class DtSetColServiceImpl implements DtSetColService {
 		}
 	}
 	public List<DtSetCol> getByTaggingModelId(Long taggingModelId){
-		return dtSetColRepository.getByTaggingModelId(taggingModelId);
+		return dtSetColRepository.getByTaggingModelIdAndIsDeleted(taggingModelId,Constants.PUBLIC_NO);
 	}
 	/**
 	 * 字段设置-确认选择
 	 */
 	public DtTaggingModelDTO selectCol(DtTaggingModelDTO body,String ip)throws Exception{
 		String reqParams = JSONObject.toJSONString(body);//用来保存前端请求参数，保存在日志里，方便排查
+		List<DtSetCol> removeCols = new ArrayList<>(); //保存软删除的显示列
+		String oldtagModelContent = null;
+		String oldColsContent = null;//保存旧的显示列
+
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		if (body.getDataSetId() == null) {
-			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"打标目标表id不能为空");
-		}
-		if (StringUtils.isBlank(body.getDataSetName())) {
-			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"打标源表名称不能为空");
-		}
 		DtTaggingModel taggingModel = new DtTaggingModel();//模型
 		List<DtSetCol> colList = body.getColList();//字段表
+
 		//如果taggingModelId为空则新建模型
 		if(body.getTaggingModelId()==null){
-			body.setModelName("新建模型");
-			body.setModelDesc("新建模型");
-			body.setRunState(Constants.TG_MODEL_NO_BEGIN);//未开始
-			body.setIsNew(true);//执行insert
-			body.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
-			MyBeanUtils.copyPropertiesNotNull(taggingModel,body);
-			EntityClassUtil.dealCreateInfo(taggingModel,userInfo);
-			taggingModel.setDataTableName("DT_"+RandomStringUtils.random(27,true,false).toUpperCase());//生成随机表名
-			taggingModel = dtTaggingModelService.doSave(taggingModel);
+			taggingModel = dtTaggingModelService.doNew(body,userInfo,ip);
 		}else{
 			taggingModel = dtTaggingModelService.get(body.getTaggingModelId());
 			if (taggingModel==null) {
@@ -187,44 +179,87 @@ public class DtSetColServiceImpl implements DtSetColService {
 			if (!taggingModel.getDataSetId().equals(body.getDataSetId())) {
 				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选"+taggingModel.getDataSetName()+"进行字段选择");
 			}
+			//记录以前的模样
+			oldColsContent = JSONObject.toJSONString(getByTaggingModelId(taggingModel.getTaggingModelId()));
+			oldtagModelContent = JSONObject.toJSONString(taggingModel);
+
 			MyBeanUtils.copyPropertiesNotNull(taggingModel,body);
 			EntityClassUtil.dealModifyInfo(taggingModel,userInfo);
 			taggingModel = dtTaggingModelService.doSave(taggingModel);
-		}
-		for (DtSetCol col:colList) {
-			if (col.getColId()==null){
-				List<DtSetCol> list = getBySourceColAndTaggingModelId(col.getSourceCol(),taggingModel.getTaggingModelId());
-				if (CollectionUtils.isNotEmpty(list)) {
-					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"字段"+col.getSourceCol()+"已存在");
+
+			//处理 显示/打标列部分
+			List<DtSetCol> dbSourceSetCol = getSourceSetColByTaggingModelId(taggingModel.getId());
+			for (DtSetCol col : colList){
+				//新建
+				if (col.getColId()==null){
+					List<DtSetCol> list = getSourceSetColBySourceColAndTaggingModelId(col.getSourceCol(),taggingModel.getTaggingModelId());
+					if (CollectionUtils.isNotEmpty(list)) {
+						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"字段"+col.getSourceCol()+"已存在");
+					}
+					col.setIsSource(Constants.PUBLIC_YES);//源字段
+					col.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
+					EntityClassUtil.dealCreateInfo(col,userInfo);
+					col.setTaggingModelId(taggingModel.getTaggingModelId());
+					col.setShowCol(col.getSourceCol());
+					col = doSave(col);
+				}else{
+					DtSetCol oldCol = get(col.getColId());
+					//移除掉报文里有的，剩下的被取消掉的
+					dbSourceSetCol.remove(oldCol);
+					if (oldCol == null){
+						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此字段，colId无效");
+					}
+					if (!oldCol.getTaggingModelId().equals(col.getTaggingModelId())) {
+						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"taggingModelId不匹配");
+					}
+					MyBeanUtils.copyPropertiesNotNull(oldCol,col);
+					EntityClassUtil.dealModifyInfo(oldCol,userInfo);
+					col = doSave(oldCol);
+					//显示列未勾选 允许打标的，克隆的列删除
+					if (col.getIsMarking().equals(Constants.PUBLIC_NO)){
+						List<DtSetCol> delCols =
+								getBySourceColAndTaggingModelId(taggingModel.getTaggingModelId(),col.getSourceCol());
+						for (DtSetCol delCol:delCols){
+							if (!delCol.getColId().equals(col.getColId())){
+								delCol.setIsDeleted(Constants.PUBLIC_YES);
+								removeCols.add(delCol);//日志记录
+							}
+						}
+					}
 				}
-				col.setIsSource(Constants.PUBLIC_YES);//源字段
-				col.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
-				EntityClassUtil.dealCreateInfo(col,userInfo);
-				col.setTaggingModelId(taggingModel.getTaggingModelId());
-				col.setShowCol(col.getSourceCol());
-				col = doSave(col);
-			}else{
-				DtSetCol model = get(col.getColId());
-				if (!model.getTaggingModelId().equals(col.getTaggingModelId())) {
-					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"taggingModelId不匹配");
-				}
-				if (model == null){
-					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此字段，colId无效");
-				}
-				MyBeanUtils.copyPropertiesNotNull(model,col);
-				EntityClassUtil.dealModifyInfo(model,userInfo);
-				col = doSave(model);
 			}
+			//未勾选显示列的(包括其复制列)，全部删除
+			for (DtSetCol delSCol: dbSourceSetCol){
+				List<DtSetCol> delCols =
+						getBySourceColAndTaggingModelId(taggingModel.getTaggingModelId(),delSCol.getSourceCol());
+				for (DtSetCol delCol:delCols){
+					delSCol.setIsDeleted(Constants.PUBLIC_YES);
+				}
+				removeCols.addAll(delCols);//日志记录
+			}
+			//日志记录
+			String content = "{\"reqParam\":" + reqParams + ",\"removeCol\":" + JSONObject.toJSONString(removeCols) + "}";
+			String oldContent = "{\"model\":" + oldtagModelContent + ",\"setCol\":"+ oldColsContent +"}";
+			dtTagmUpdateLogService.loggingUpdate(content,oldContent,taggingModel,ip);
 		}
-
-		//日志记录
-		dtTagmUpdateLogService.loggingUpdate(reqParams,"setCol",taggingModel,ip);
-
 		return body;
 	}
-	public List<DtSetCol>  getBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId){
-		return dtSetColRepository.getBySourceColAndTaggingModelId( sourceCol, taggingModelId);
+
+
+	public  List<DtSetCol> getBySourceColAndTaggingModelId(Long taggingModelId,String SourceCol){
+		return dtSetColRepository
+				.getByTaggingModelIdAndSourceColAndIsDeleted(taggingModelId,SourceCol,Constants.PUBLIC_NO);
 	}
+
+	public List<DtSetCol>  getSourceSetColBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId){
+		return dtSetColRepository
+				.getBySourceColAndTaggingModelIdAndIsSourceAndIsDeleted(sourceCol, taggingModelId,Constants.PUBLIC_YES,Constants.PUBLIC_NO);
+	}
+	public List<DtSetCol> getSourceSetColByTaggingModelId(Long taggingModelId){
+		return dtSetColRepository
+				.getByTaggingModelIdAndIsSourceAndIsDeleted(taggingModelId,Constants.PUBLIC_YES,Constants.PUBLIC_NO);
+	}
+
 
 	/**
 	 * 克隆字段
@@ -236,7 +271,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 		if (col==null) {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此字段，colId无效");
 		}
-		List<DtSetCol> cols = getBySourceColAndTaggingModelId(col.getSourceCol(),col.getTaggingModelId());
+		List<DtSetCol> cols = getSourceSetColBySourceColAndTaggingModelId(col.getSourceCol(),col.getTaggingModelId());
 		MyBeanUtils.copyProperties(clone,col);
 		EntityClassUtil.dealCreateInfo(clone,userInfo);
 		clone.setColId(null);

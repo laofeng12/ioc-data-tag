@@ -70,10 +70,10 @@ public class DtTagDTO implements Serializable{
     @Column(name = "MODIFY_TIME")
     private Date modifyTime;
 
-    @ApiModelProperty("删除标记")
-    @Max(1L)
-    @Column(name = "IS_DELETED")
-    private Long isDeleted;
+//    @ApiModelProperty("删除标记")
+//    @Max(1L)
+//    @Column(name = "IS_DELETED")
+//    private Long isDeleted;
 
     @ApiModelProperty("层级")
     @Max(9L)

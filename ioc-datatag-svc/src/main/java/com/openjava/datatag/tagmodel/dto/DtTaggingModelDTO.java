@@ -21,7 +21,7 @@ public class DtTaggingModelDTO {
 
     private String dataTableName;
 
-    private String pKey;
+    private String pkey;
 
     private Long createUser;
 

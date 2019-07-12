@@ -6,14 +6,17 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
 import com.openjava.datatag.tagmodel.dto.SaveConditionDTO;
 import com.openjava.datatag.tagmodel.dto.SelectColDTO;
 import com.openjava.datatag.utils.IpUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
+import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.SequenceService;
 import org.ljdp.component.sequence.ConcurrentSequence;
@@ -128,13 +131,23 @@ public class DtSetColAction {
 	/**
 	 * 字段设置确认选择接口
 	 */
-	@ApiOperation(value = "字段设置确认选择接口", nickname="save", notes = "新增格式：{\"dataSetId\":1,\"dataSetName\":\"高考数据\",\"colList\":[{\"sourceCol\":\"user_name\",\"sourceDataType\":\"String\",\"isMarking\":1}]}" +
+	@ApiOperation(value = "字段设置确认选择接口", nickname="save", notes = "新增格式：{\"dataSetId\":1,\"dataSetName\":\"高考数据\",\"pKey\":\"user_name\",\"colList\":[{\"sourceCol\":\"user_name\",\"sourceDataType\":\"String\",\"isMarking\":1}]}" +
 			"修改的格式：{\"taggingModelId\":1,\"dataSetId\":1,\"dataSetName\":\"高考数据233\",\"colList\":[{\"colId\":1,\"taggingModelId\":1,\"sourceCol\":\"name\",\"sourceDataType\":\"String\",\"isMarking\":1},{\"sourceCol\":\"userId2\",\"sourceDataType\":\"Long\",\"isMarking\":1}]}")
 	@Security(session=true)
 	@RequestMapping(value="/selectCol", method=RequestMethod.POST)
 	public SuccessMessage selectCol(@RequestBody DtTaggingModelDTO body,
 									HttpServletRequest request) throws Exception{
 		String ip = IpUtil.getRealIP(request);
+		if (body.getDataSetId() == null) {
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"打标目标表id不能为空");
+		}
+		if (StringUtils.isBlank(body.getDataSetName())) {
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"打标源表名称不能为空");
+		}
+		if (StringUtils.isBlank(body.getPkey())){
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"数据源主键不能指定为空");
+			//这里应该添加验证主键唯一性约束
+		}
 		dtSetColService.selectCol(body,ip);
 		return new SuccessMessage("保存成功");
 	}

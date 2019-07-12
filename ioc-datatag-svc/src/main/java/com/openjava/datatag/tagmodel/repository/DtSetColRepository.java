@@ -32,12 +32,18 @@ public interface DtSetColRepository extends DynamicJpaRepository<DtSetCol, Long>
      * @param taggingModelId
      * @return
      */
-    List<DtSetCol> getByTaggingModelId(Long taggingModelId);
+    List<DtSetCol> getByTaggingModelIdAndIsDeleted(Long taggingModelId,Long isDeleted);
     /**
-     * 根据源表数据获取字段表
+    *根据源表数据获取字段
+    */
+    List<DtSetCol>  getByTaggingModelIdAndSourceColAndIsDeleted(Long TaggingModelId,String sourceCol,Long isDeleted);
+    /**
+     * 根据源表数据获取源字段列
      */
-    List<DtSetCol>  getBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId);
+    List<DtSetCol>  getBySourceColAndTaggingModelIdAndIsSourceAndIsDeleted(String sourceCol,Long taggingModelId,Long isSource,Long isDeleted);
 
+    //获取字段表中的源字段列
+    List<DtSetCol>  getByTaggingModelIdAndIsSourceAndIsDeleted(Long TaggingModelId,Long isSource,Long isDeleted);
 
 
 

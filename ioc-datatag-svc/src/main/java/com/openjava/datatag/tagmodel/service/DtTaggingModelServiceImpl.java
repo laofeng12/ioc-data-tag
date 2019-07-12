@@ -7,6 +7,7 @@ import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.log.domain.DtTagmUpdateLog;
 import com.openjava.datatag.log.repository.DtTagmUpdateLogRepository;
 import com.openjava.datatag.log.service.DtTagmUpdateLogService;
+import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
@@ -22,6 +23,8 @@ import com.openjava.datatag.utils.EntityClassUtil;
 import com.openjava.datatag.utils.StringUtil;
 import com.openjava.datatag.utils.TimeUtil;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.sequence.ConcurrentSequence;
@@ -75,7 +78,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		EntityClassUtil.dealCreateInfo(clone,userInfo);
 		clone = doSave(clone);
 		//克隆字段
-		List<DtSetCol> cloList =  dtSetColRepository.getByTaggingModelId(model.getTaggingModelId());
+		List<DtSetCol> cloList =
+				dtSetColRepository.getByTaggingModelIdAndIsDeleted(model.getTaggingModelId(),Constants.PUBLIC_NO);
 		for (int i = 0; i <cloList.size() ; i++) {
 			DtSetCol record = cloList.get(i);
 			DtSetColDTO colDTO = new DtSetColDTO();
@@ -133,6 +137,12 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	public DtTaggingModel doNew(DtTaggingModel body,BaseUserInfo userInfo,String ip){
 		String content = JSONObject.toJSONString(body);
 		EntityClassUtil.dealCreateInfo(body,userInfo);
+		if (body.getModelName() == null){
+			body.setModelName("新建模型");
+		}
+		if (body.getModelDesc() == null){
+			body.setModelDesc("新建模型");
+		}
 		body.setRunState(Constants.TG_MODEL_NO_BEGIN);//未开始
 		body.setIsNew(true);//执行insert
 		body.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
@@ -143,6 +153,40 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 
 		return dbObj;
 	}
+
+	public DtTaggingModel doNew(DtTaggingModelDTO body,BaseUserInfo userInfo,String ip) throws APIException {
+		String reqParams = JSONObject.toJSONString(body);
+		List<DtSetCol> colList = body.getColList();//字段表
+		if (body.getModelName() == null){
+			body.setModelName("新建模型");
+		}
+		if (body.getModelDesc() == null){
+			body.setModelDesc("新建模型");
+		}
+		body.setRunState(Constants.TG_MODEL_NO_BEGIN);//未开始
+		body.setIsNew(true);//执行insert
+		body.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
+		DtTaggingModel taggingModel = new DtTaggingModel();
+		MyBeanUtils.copyPropertiesNotNull(taggingModel,body);
+		EntityClassUtil.dealCreateInfo(taggingModel,userInfo);
+		taggingModel.setDataTableName("DT_"+ RandomStringUtils.random(27,true,false).toUpperCase());//生成随机表名
+		taggingModel = doSave(taggingModel);
+
+		for (DtSetCol col :colList){
+			if ((!col.isNew()) || col.getColId() != null){
+				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"新建模型时选择字段必须为新");
+			}
+			col.setIsSource(Constants.PUBLIC_YES);//源字段
+			col.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
+			EntityClassUtil.dealCreateInfo(col,userInfo);
+			col.setTaggingModelId(taggingModel.getTaggingModelId());
+			col.setShowCol(col.getSourceCol());
+			col = dtSetColRepository.save(col);
+		}
+		dtTagmUpdateLogService.loggingNew(reqParams,taggingModel,ip);
+		return taggingModel;
+	}
+
 
 	public DtTaggingModel doUpdate(DtTaggingModel body,DtTaggingModel db,BaseUserInfo userInfo,String ip){
 		String oldContent = JSONObject.toJSONString(db);
@@ -160,8 +204,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 
 
 	/*
-	* 设置调度
-	*/
+	 * 设置调度
+	 */
 	public void doDispatch(DtTaggingDispatchDTO body, DtTaggingModel db, Long userId, String ip) throws APIException {
 		String oldContent = JSONObject.toJSONString(db);
 		String modifyContent = JSONObject.toJSONString(body);
@@ -196,6 +240,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		return cycle >= Constants.DT_DISPATCH_STOP && cycle <= Constants.DT_DISPATCH_EACH_YEAR;
 	}
 
+	//将前端传进来的数据转换成cron表达式
 	private String toCron(Long cycle,Date startTime) throws APIException {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(startTime);
@@ -206,35 +251,33 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		int month = cal.get(Calendar.MONTH)+1;
 		int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
 		int year = cal.get(Calendar.YEAR);
-		String[] cron = {"*","*","*","*","*","?","*"};
+		String[] cron = {"*","*","*","?","*","?","*"};
 		cron[0] = String.valueOf(second);
 		cron[1] = String.valueOf(minute);
 		cron[2] = String.valueOf(hour);
 		if (cycle.equals(Constants.DT_DISPATCH_EACH_DAY)){
 			//月份中的某一天
-			cron[3] = String.valueOf(dayOfMonth)+"/1";
+			cron[3] = "*";
 		}else if (cycle.equals(Constants.DT_DISPATCH_EACH_WEEK)){
-			cron[3] = String.valueOf(dayOfMonth)+"/7";
+			cron[5] = String.valueOf(dayOfWeek);
 		}else if (cycle.equals(Constants.DT_DISPATCH_EACH_MONTH)){
-		    cron[3] = String.valueOf(dayOfMonth);
-			cron[4] = String.valueOf(dayOfMonth)+"/1";
+			cron[3] = String.valueOf(dayOfMonth);
 		}else if (cycle.equals(Constants.DT_DISPATCH_EACH_YEAR)){
-		    cron[3]=String.valueOf(dayOfMonth);
+			cron[3]=String.valueOf(dayOfMonth);
 			cron[4] = String.valueOf(month);
-			cron[6] = String.valueOf(year) + "/1";
 		}else {
-			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"cycle in toCron must in{DT_DISPATCH_EACH_DAY/MONTH/YEAR}");
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"cycle in toCron must in{DT_DISPATCH_EACH_DAY/WEEK/MONTH/YEAR}");
 		}
-        StringBuilder cronEx = new StringBuilder();
-        for (String c:cron){
-            cronEx.append(" ").append(c);
-        }
+		StringBuilder cronEx = new StringBuilder();
+		for (String c:cron){
+			cronEx.append(" ").append(c);
+		}
 		return cronEx.toString();
 	}
 
 	public void doSoftDelete(DtTaggingModel db,Long userId,String ip){
 		Date now = new Date();
-		List<DtSetCol> list = dtSetColRepository.getByTaggingModelId(db.getId());
+		List<DtSetCol> list = dtSetColRepository.getByTaggingModelIdAndIsDeleted(db.getId(),Constants.PUBLIC_NO);
 		for (DtSetCol col: list){
 			dtTagConditionRepository.doSoftDeleteByColId(col.getColId(),now,db.getCreateUser());
 		}

@@ -87,6 +87,9 @@ public class DtTaggingModelAction {
 			@RequestParam(value="taggingModelId",required=true)Long taggingModelId,
 			@RequestParam(value="dataSetId",required=false)Long dataSetId) throws Exception{
 		DtTaggingModel m = dtTaggingModelService.get(taggingModelId);
+		if (m == null || m.getIsDeleted().equals(Constants.PUBLIC_YES)){
+			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"无此标签模型或已被删除");
+		}
 		if (dataSetId!=null) {
 			if (!dataSetId.equals(m.getDataSetId())) {
 				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选择："+m.getDataSetName()+"进行打标");
@@ -101,7 +104,7 @@ public class DtTaggingModelAction {
 	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "like_modelName", value = "模型名字like", required = false, dataType = "String", paramType = "query"),
-		@ApiImplicitParam(name = "eq_runState", value = "运行状态:未运行/运行中/运行出错/运行结束=", required = false, dataType = "Long", paramType = "query"),
+		@ApiImplicitParam(name = "eq_runState", value = "运行状态:未运行/运行中/运行出错/运行结束/运行停止=", required = false, dataType = "Long", paramType = "query"),
 		//@ApiImplicitParam(name = "eq_isDeleted", value = "删除标记=", required = false, dataType = "Long", paramType = "query"),
 		@ApiImplicitParam(name = "le_startTime", value = "运行开始时间<=", required = false, dataType = "Date", paramType = "query"),
 		@ApiImplicitParam(name = "ge_startTime", value = "运行开始时间>=", required = false, dataType = "Date", paramType = "query"),
