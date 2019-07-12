@@ -1,5 +1,4 @@
 <template>
-  <!--<div class="app-container">标签管理</div>-->
   <div class="app-container">
     <div class="actionBar">
       <div>
