@@ -1,5 +1,4 @@
 <template>
-  <!--<div class="app-container">标签管理</div>-->
   <div class="app-container">
     <div class="actionBar">
       <div>
@@ -24,7 +23,7 @@
       <div>
         <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
         <el-button size="small" type="primary" @click="createModel">创建模型</el-button>
-        <el-button size="small" type="primary" >协作模型</el-button>
+        <el-button size="small" type="primary" @click="cooperationModel">协作模型</el-button>
         <!--<el-button size="small" type="primary" >下载管理</el-button>-->
       </div>
 
@@ -289,6 +288,9 @@
       createModel(){
         this.$router.push('creatModel')
       },
+      cooperationModel(){
+        this.$router.push('cooperationModel')
+      }
     },
     created() {
     },

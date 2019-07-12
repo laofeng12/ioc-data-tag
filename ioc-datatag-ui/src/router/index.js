@@ -3,13 +3,14 @@ import Router from 'vue-router'
 import Home from '@/views/home/index'
 import ContainerWrapper from '@/views/ContainerWrapper'
 import Login from '@/views/login/index'
+
 Vue.use(Router)
 export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
-    { path: '/login', component: Login, hidden: true },
-    { path: '/404', component: () => import(/* webpackChunkName: "404" */ '@/views/404'), hidden: true },
+    {path: '/login', component: Login, hidden: true},
+    {path: '/404', component: () => import(/* webpackChunkName: "404" */ '@/views/404'), hidden: true},
     {
       path: '/',
       redirect: '/home'
@@ -38,28 +39,28 @@ export default new Router({
       name: 'taggedImage',
       component: ContainerWrapper,
       redirect: '/lableImage',
-      meta: { title: '数据标签与画像' },
+      meta: {title: '数据标签与画像'},
       children: [
         {
           path: '/lableImage',
           name: 'lableImage',
-          meta: { title: '模型部署管理' },
+          meta: {title: '模型部署管理'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/lableImage.vue')
         },
         {
           path: '/tagPanel',
           name: 'tagPanel',
-          meta: { title: '标签仪表盘' },
+          meta: {title: '标签仪表盘'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tagPanel.vue')
         }, {
           path: '/tagManage',
           name: 'tagManage',
-          meta: { title: '标签管理' },
+          meta: {title: '标签管理'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tagManage.vue')
-        },{
+        }, {
           path: '/portraitQuery',
           name: 'portraitQuery',
-          meta: { title: '画像查询' },
+          meta: {title: '画像查询'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/portraitQuery.vue')
         }]
     },
@@ -68,36 +69,47 @@ export default new Router({
       name: 'tagManage',
       component: ContainerWrapper,
       redirect: '/tagManage',
-      meta: { title: '标签管理' },
+      meta: {title: '标签管理'},
       children: [{
-          path: '/tree',
-          name: 'tree',
-          meta: { title: '创建标签组' },
-          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
-        },{
+        path: '/tree',
+        name: 'tree',
+        meta: {title: '创建标签组'},
+        component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
+      }, {
         path: '/shareLabel',
         name: 'shareLabel',
-        meta: { title: '共享标签组' },
+        meta: {title: '共享标签组'},
         component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/shareLabel.vue')
+      }, {
+        path: '/cooperationModel',
+        name: 'cooperationModel',
+        meta: {title: '协作模型'},
+        component: () => import('@/views/taggedImage/cooperationModel.vue')
       }]
     },
     {
       path: '/modelEdit/:id',
       name: 'modelEdit',
-      meta: { title: '编辑模型' },
+      meta: {title: '编辑模型'},
       component: () => import('@/views/taggedImage/modelEdit.vue')
     },
     {
       path: '/ImageDetail/:id',
       name: 'ImageDetail',
-      meta: { title: '画像模型' },
+      meta: {title: '画像模型'},
       component: () => import('@/views/taggedImage/ImageDetail.vue')
     },
     {
       path: '/creatModel',
       name: 'creatModel',
-      meta: { title: '画像模型' },
+      meta: {title: '创建模型'},
       component: () => import('@/views/taggedImage/creatModel.vue')
-    }
+    },
+    {
+      path: '/marking',
+      name: 'marking',
+      meta: {title: '协作打标'},
+      component: () => import('@/views/taggedImage/marking.vue')
+    },
   ]
 })
