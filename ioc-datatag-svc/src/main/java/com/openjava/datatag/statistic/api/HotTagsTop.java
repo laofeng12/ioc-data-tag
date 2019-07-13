@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/api/tagDashboard")
+@RequestMapping("/api/tagDashboard1")
 public class HotTagsTop {
     @Resource
     private com.openjava.datatag.statistic.service.TagDashboardService TagDashboardService;

@@ -22,7 +22,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/api/tagDashboard")
+@RequestMapping("/api/tagDashboard2")
 public class TagColumChart {
 
     @Resource
@@ -34,7 +34,7 @@ public class TagColumChart {
      * */
 
     @ResponseBody
-    @RequestMapping(value = "getMonthlyLabelChanges",method = RequestMethod.GET)
+    @RequestMapping(value = "/getMonthlyLabelChanges",method = RequestMethod.GET)
     public Object getMonthlyLabelChanges(){
         List<Object> list = TagDashboardService.getMonthlyLabelChanges();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();
@@ -47,7 +47,7 @@ public class TagColumChart {
      *获取标签变化左边数据列表
      * */
     @ResponseBody
-    @RequestMapping(value = "getAllYearMonth",method = RequestMethod.GET)
+    @RequestMapping(value = "/getAllYearMonth",method = RequestMethod.GET)
     public Object getLeftListData(){
         List<Object>  list = TagDashboardService.getAllYearMonth();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();
