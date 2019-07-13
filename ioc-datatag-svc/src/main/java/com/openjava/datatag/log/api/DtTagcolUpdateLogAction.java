@@ -50,26 +50,7 @@ public class DtTagcolUpdateLogAction {
 	
 	@Resource
 	private DtTagcolUpdateLogService dtTagcolUpdateLogService;
-	
-	/**
-	 * 用主键获取数据
-	 * @param id
-	 * @return
-	 */
-	@ApiOperation(value = "根据ID获取", notes = "单个对象查询", nickname="id")
-	@ApiImplicitParams({
-		@ApiImplicitParam(name = "id", value = "主标识编码", required = true, dataType = "string", paramType = "path"),
-	})
-	@ApiResponses({
-		@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
-	})
-	@Security(session=true)
-	@RequestMapping(value="/{id}",method=RequestMethod.GET)
-	public DtTagcolUpdateLog get(@PathVariable("id")Long id) {
-		DtTagcolUpdateLog m = dtTagcolUpdateLogService.get(id);
-		return m;
-	}
-	
+
 	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "eq_colId", value = "字段表主键=", required = false, dataType = "Long", paramType = "query"),
@@ -86,53 +67,6 @@ public class DtTagcolUpdateLogAction {
 	}
 	
 
-	
-	/**
-	 * 保存
-	 */
-	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
-	@Security(session=true)
-	@RequestMapping(method=RequestMethod.POST)
-	public SuccessMessage doSave(@RequestBody DtTagcolUpdateLog body
-
-			) {
-		if(body.isNew()) {
-			//新增，记录创建时间等
-			//设置主键(请根据实际情况修改)
-			SequenceService ss = ConcurrentSequence.getInstance();
-			body.setId(ss.getSequence());
-			body.setIsNew(true);//执行insert
-			DtTagcolUpdateLog dbObj = dtTagcolUpdateLogService.doSave(body);
-		} else {
-			//修改，记录更新时间等
-			DtTagcolUpdateLog db = dtTagcolUpdateLogService.get(body.getId());
-			MyBeanUtils.copyPropertiesNotBlank(db, body);
-			db.setIsNew(false);//执行update
-			dtTagcolUpdateLogService.doSave(db);
-		}
-		
-		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
-		return new SuccessMessage("保存成功");
-	}
-	
-	@ApiOperation(value = "删除", nickname="delete")
-	@ApiImplicitParams({
-		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
-		@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
-	})
-	@Security(session=true)
-	@RequestMapping(method=RequestMethod.DELETE)
-	public SuccessMessage doDelete(
-			@RequestParam(value="id",required=false)Long id,
-			@RequestParam(value="ids",required=false)String ids) {
-		if(id != null) {
-			dtTagcolUpdateLogService.doDelete(id);
-		} else if(ids != null) {
-			dtTagcolUpdateLogService.doRemove(ids);
-		}
-		return new SuccessMessage("删除成功");//没有需要返回的数据，就直接返回一条消息
-	}
-	
 	/**
 	 * 导出Excel文件
 	 */

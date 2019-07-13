@@ -37,24 +37,7 @@ public class DtTaggUpdateLogAction {
 	@Resource
 	private DtTaggUpdateLogService dtTaggUpdateLogService;
 	
-	/**
-	 * 用主键获取数据
-	 * @param id
-	 * @return
-	 */
-	@ApiOperation(value = "根据ID获取", notes = "单个对象查询", nickname="id")
-	@ApiImplicitParams({
-		@ApiImplicitParam(name = "id", value = "主标识编码", required = true, dataType = "string", paramType = "path"),
-	})
-	@ApiResponses({
-		@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
-	})
-	@Security(session=true)
-	@RequestMapping(value="/{id}",method=RequestMethod.GET)
-	public DtTaggUpdateLog get(@PathVariable("id")Long id) {
-		DtTaggUpdateLog m = dtTaggUpdateLogService.get(id);
-		return m;
-	}
+
 	
 	@ApiOperation(value = "列表分页查询-日志查询暂时不开放", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({

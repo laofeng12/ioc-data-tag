@@ -86,7 +86,7 @@ public class DtTagcolUpdateLogServiceImpl implements DtTagcolUpdateLogService {
 		return dtTagcolUpdateLogRepository.save(log);
 	}
 
-	public DtTagcolUpdateLog loggingDelete(DtSetCol db,String ip){
+	public DtTagcolUpdateLog loggingDelete(String content,DtSetCol db,String ip){
 		DtTagcolUpdateLog log = new DtTagcolUpdateLog();
 		log.setId(ConcurrentSequence.getInstance().getSequence());
 		log.setModifyUserip(ip);
@@ -94,7 +94,7 @@ public class DtTagcolUpdateLogServiceImpl implements DtTagcolUpdateLogService {
 		log.setModifyUser(db.getModifyUser());
 		log.setColId(db.getColId());
 		log.setModifyType(Constants.DT_TG_LOG_DELETE);
-		//log.setModifyContent();//删除就不需要保存内容了
+		log.setModifyContent(content);//删除就不需要保存内容了
 		log.setIsNew(true);
 		return dtTagcolUpdateLogRepository.save(log);
 	}
