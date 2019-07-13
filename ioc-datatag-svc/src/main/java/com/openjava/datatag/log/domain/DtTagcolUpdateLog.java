@@ -35,8 +35,8 @@ public class DtTagcolUpdateLog implements Persistable<Long>,Serializable {
 	
 	@ApiModelProperty("日志编号")
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commonseq")
-	@SequenceGenerator(name = "commonseq", sequenceName = "SEQ_COMMON_ID", allocationSize = 1)
+	//@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commonseq")
+	//@SequenceGenerator(name = "commonseq", sequenceName = "SEQ_COMMON_ID", allocationSize = 1)
 	@Column(name = "ID")
 	private Long id;
 	

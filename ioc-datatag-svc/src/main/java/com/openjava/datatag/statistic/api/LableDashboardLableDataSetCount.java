@@ -84,7 +84,7 @@ public class LableDashboardLableDataSetCount {
      * */
 
     @ResponseBody
-    @RequestMapping(value = "getMonthlyLabelChanges",method = RequestMethod.GET)
+    @RequestMapping(value = "/getMonthlyLabelChanges",method = RequestMethod.GET)
     public Object getMonthlyLabelChanges(){
         List<Object> list = TagDashboardService.getMonthlyLabelChanges();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();
@@ -97,7 +97,7 @@ public class LableDashboardLableDataSetCount {
     *获取标签变化左边数据列表
     * */
     @ResponseBody
-    @RequestMapping(value = "getAllYearMonth",method = RequestMethod.GET)
+    @RequestMapping(value = "/getAllYearMonth",method = RequestMethod.GET)
     public Object getLeftListData(){
         List<Object>  list = TagDashboardService.getAllYearMonth();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();
@@ -110,7 +110,7 @@ public class LableDashboardLableDataSetCount {
      *获取top 5的热门标签
      * */
     @ResponseBody
-    @RequestMapping(value = "getHotTags" ,method = RequestMethod.GET)
+    @RequestMapping(value = "/getHotTags" ,method = RequestMethod.GET)
     public  Object getHotTags(){
         List<Object>  list = TagDashboardService.getHotTags();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();

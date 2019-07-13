@@ -22,7 +22,7 @@ import javax.annotation.Resource;
  */
 
 @RestController
-@RequestMapping("/api/tagDashboard")
+@RequestMapping("/api/tagDashboard3")
 public class TagMonthIncrease {
     @Resource
     private com.openjava.datatag.statistic.service.TagDashboardService TagDashboardService;

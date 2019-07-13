@@ -5,8 +5,10 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+
 import com.openjava.datatag.utils.EntityClassUtil;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
@@ -30,6 +32,8 @@ public class DtTagConditionServiceImpl implements DtTagConditionService {
 	
 	@Resource
 	private DtTagConditionRepository dtTagConditionRepository;
+
+
 	
 	public Page<DtTagCondition> query(DtTagConditionDBParam params, Pageable pageable){
 		Page<DtTagCondition> pageresult = dtTagConditionRepository.query(params, pageable);
@@ -51,7 +55,9 @@ public class DtTagConditionServiceImpl implements DtTagConditionService {
 	}
 	
 	public DtTagCondition doSave(DtTagCondition m) {
-		return dtTagConditionRepository.save(m);
+		DtTagCondition db =  dtTagConditionRepository.save(m);
+		//dtTagConditionUpdateLogService.loggingUpdate()
+		return db;
 	}
 	
 	public void doDelete(Long id) throws Exception{

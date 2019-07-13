@@ -2,13 +2,15 @@ package com.openjava.datatag.tagmodel.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class SaveConditionDTO {
+@EqualsAndHashCode(callSuper = true)
+public class SaveConditionDTO extends BaseRequestDTO{
     @NotNull
     @ApiModelProperty("字段表主键")
     private Long colId;
