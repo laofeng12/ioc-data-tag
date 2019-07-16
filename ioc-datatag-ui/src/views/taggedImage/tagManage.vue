@@ -17,7 +17,7 @@
             :value="item.value">
           </el-option>
         </el-select>
-        <el-button class="zxlistBtn" size="small" type="primary">查询</el-button>
+        <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
       </div>
       <div>
         <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
@@ -36,26 +36,18 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="name" label="名称">
-            <template slot-scope="scope">
-              <span>教育体系标签</span>
-            </template>
+          <el-table-column prop="tagsName" label="名称"></el-table-column>
+          <el-table-column prop="modifyTime" label="修改时间" >
           </el-table-column>
-          <el-table-column prop="people" label="修改人/修改时间" >
-            <template slot-scope="scope">
-              <div style="text-align: center">
-                <div>数据搬运工</div>
-                <div>2019/4/19  16:12:13</div>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="introduction" label="标签组简介">这是教育体系标签简介</el-table-column>
-          <el-table-column prop="share" label="共享状态" >已共享</el-table-column>
+          <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
+          <el-table-column prop="isShare" label="共享状态" ></el-table-column>
           <el-table-column prop="source" label="使用热度" >
             <template slot-scope="scope">
               <div class="gress">
-                <div class="gressPercentage"><el-progress :percentage="percentage" :show-text="false" :color="customColorMethod"></el-progress></div>
-                <div>32211</div>
+                <div class="gressPercentage">
+                  <el-progress :percentage="percentage" :show-text="false" :color="customColorMethod"></el-progress>
+                </div>
+                <div>{{scope.row.popularity}}</div>
               </div>
             </template>
           </el-table-column>
@@ -79,6 +71,8 @@
             </template>
           </el-table-column>
         </el-table>
+        <element-pagination :pageSize="size"  :total="totalnum"  @handleCurrentChange="handleCurrentChange" @sureClick="goPage"></element-pagination>
+
       </div>
       <el-dialog class="creat" title="共享标签组" :visible.sync="shareDialog" width="530px" center :close-on-click-modal="false"
                  @close="closeShare">
@@ -117,90 +111,134 @@
 
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
-  export default {
-    components: {
-
-    },
-    name: "tagManage",
-    data() {
-      return {
-        input2: '',
-        Loading:true,
-        saveLoading2:true,
-        shareDialog:false,
-        saveLoading:false,
-        percentage: 30,
-        value1: '',
-        textarea: '',
-        options: [{
-          value: '选项1',
-          label: '全部'
-        }, {
-          value: '选项2',
-          label: '未共享'
-        }, {
-          value: '选项3',
-          label: '已共享'
-        }],
-        value: '',
-        ztableShowList:[{
-          name:'教育',
-          people:'数据搬运工',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多',
-          share:'已共享',
-        },{
-          name:'教育22',
-          people:'数据搬运工22',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多22',
-          share:'已共享',
-        }],
-        ruleForm:{
-          name:'',
-          introduction:'',
-          date:''
-        },
-        rules: {
-          date: [
-            {required: true, message: '请选择时间',trigger: 'change'}
-          ]
-        },
-      }
-    },
-    methods: {
-      customColorMethod(percentage) {
-        if (percentage < 30) {
-          return '#909399';
-        } else if (percentage < 70) {
-          return '#e6a23c';
-        } else {
-          return '#67c23a';
+  import ElementPagination from '@/components/ElementPagination'
+  import {getTagsData}  from '@/api/tagManage'
+    export default {
+      components: {ElementPagination},
+      name: "tagManage",
+      data() {
+        return{
+          totalnum:0,
+          eq_isShare:0,
+          keyword:'',
+          page:0,
+          size:10,
+          input2: '',
+          Loading: true,
+          saveLoading2: true,
+          shareDialog: false,
+          saveLoading: false,
+          percentage: 80,
+          value1: '',
+          textarea: '',
+          options: [{
+            value: '',
+            label: '全部'
+          }, {
+            value: '0',
+            label: '未共享'
+          }, {
+            value: '1',
+            label: '已共享'
+          }],
+          value: '',
+          ztableShowList: [{
+            name: '教育',
+            people: '数据搬运工',
+            time: '2019/4/19  16:17:22',
+            introduction: '动画的很多好很多',
+            share: '已共享',
+          }, {
+            name: '教育22',
+            people: '数据搬运工22',
+            time: '2019/4/19  16:17:22',
+            introduction: '动画的很多好很多22',
+            share: '已共享',
+          }],
+          ruleForm: {
+            name: '',
+            introduction: '',
+            date: ''
+          },
+          rules: {
+            date: [
+              {required: true, message: '请选择时间', trigger: 'change'}
+            ]
+          },
         }
       },
-      handleShare(){
-        this.shareDialog = true
+      methods: {
+        customColorMethod(percentage) {
+          if (percentage < 30) {
+            return '#909399';
+          } else if (percentage < 70) {
+            return '#e6a23c';
+          } else {
+            return '#67c23a';
+          }
+        },
+        handleShare() {
+          this.shareDialog = true
+        },
+        closeShare() {
+          this.shareDialog = false
+          this.$refs.ruleForm.resetFields()
+        },
+        closeShare2() {
+          this.shareDialog = false
+          this.$refs.ruleForm.resetFields()
+        },
+        cancelShare() {
+          this.shareDialog = false
+          this.$refs.ruleForm.resetFields()
+        },
+        createLabel() {
+          this.$router.push('tree')
+        },
+        shareLabel() {
+          this.$router.push('shareLabel')
+        },
+        // 我的标签列表数据
+        async getTagsData() {
+          const params = {
+            eq_isShare:this.eq_isShare,
+            keyword:this.keyword,
+            page: this.page,
+            size:this.size
+          }
+          try {
+            const data = await getTagsData(params)
+            if(data.rows.length!==0){
+              this.ztableShowList=data.rows
+              this.totalnum=data.total
+            }else {
+              this.ztableShowList=[]
+              this.Loading=false
+            }
+
+          } catch (e) {
+
+          }
+        },
+        //查询
+        getQuireData(){
+          this.page=0
+          this.eq_isShare=this.value
+          this.keyword=this.input2
+          this.getTagsData()
+        },
+        //点击分页跳转
+        handleCurrentChange(page){
+          this.page=page-1
+          this.getTagsData()
+        },
+        //点击分页确认
+        goPage () {
+
+        }
       },
-      closeShare(){
-        this.shareDialog = false
-        this.$refs.ruleForm.resetFields()
-      },
-      closeShare2(){
-        this.shareDialog = false
-        this.$refs.ruleForm.resetFields()
-      },
-      cancelShare(){
-        this.shareDialog = false
-        this.$refs.ruleForm.resetFields()
-      },
-      createLabel(){
-        this.$router.push('tree')
-      },
-      shareLabel(){
-        this.$router.push('shareLabel')
-      }
-    },
     created() {
+        this.getTagsData()
     },
     computed: {
 
