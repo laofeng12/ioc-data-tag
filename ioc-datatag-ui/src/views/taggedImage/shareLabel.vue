@@ -3,21 +3,21 @@
     <div class="actionBar">
       <div>
         <el-input
-          class="zxinp moduleOne"
+          class="zxinp tagSelect"
           size="small"
           placeholder="请输入内容"
           prefix-icon="el-icon-search"
           v-model="input2">
         </el-input>
-        <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-        <el-button class="zxlistBtn" size="small" type="primary">查询</el-button>
+        <!--<el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">-->
+          <!--<el-option-->
+            <!--v-for="item in options"-->
+            <!--:key="item.value"-->
+            <!--:label="item.label"-->
+            <!--:value="item.value">-->
+          <!--</el-option>-->
+        <!--</el-select>-->
+        <el-button class="zxlistBtn" size="small" type="primary" @click="shareQuery">查询</el-button>
       </div>
       <div>
         <el-button size="small" type="primary" @click="createLabel">我的标签组</el-button>
@@ -35,21 +35,17 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="name" label="名称">
+          <el-table-column prop="tagsName" label="名称"></el-table-column>
+          <el-table-column prop="people" label="共享人/共享时间" >
             <template slot-scope="scope">
-              <span>教育体系标签</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="people" label="修改人/修改时间" >
-            <template slot-scope="scope">
-              <div style="text-align: center">
-                <div>数据搬运工</div>
-                <div>2019/4/19  16:12:13</div>
+              <div>
+                <div>{{scope.row.shareUserName}}</div>
+                <div>{{scope.row.modifyTime}}</div>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="introduction" label="标签组简介">这是教育体系标签简介</el-table-column>
-          <el-table-column prop="share" label="共享状态" >已共享</el-table-column>
+          <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
+          <el-table-column prop="level1" label="单位" ></el-table-column>
           <el-table-column prop="source" label="使用热度" >
             <template slot-scope="scope">
               <div class="gress">
@@ -58,55 +54,33 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="180px">
+          <el-table-column label="操作" width="125px">
             <template slot-scope="props" class="caozuo">
-              <el-tooltip class="item" effect="dark" content="共享" placement="top">
-                <span class="operationIcona">
-                    <i class="el-icon-share iconLogo" @click="handleShare"></i>
-                </span>
-              </el-tooltip>
-              <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+              <el-tooltip class="item" effect="dark" content="查看" placement="top">
               <span class="operationIcona">
-                  <i class="el-icon-edit-outline iconLogo" ></i>
+                  <i class="el-icon-view iconLogo" ></i>
               </span>
               </el-tooltip>
-              <el-tooltip class="item" effect="dark" content="删除" placement="top">
+              <el-tooltip class="item" effect="dark" content="选用标签组" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" ></i>
+                <i class="el-icon-position iconLogo" @click="Selection(props.row.tagsId,props.row.tagsName)"></i>
               </span>
               </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
       </div>
-      <el-dialog class="creat" title="共享标签组" :visible.sync="shareDialog" width="530px" center :close-on-click-modal="false"
-                 @close="closeShare">
+      <el-dialog class="creat" title="选用标签组" :visible.sync="labelDialog" width="530px" center :close-on-click-modal="false"
+                 @close="closelabelDialog">
         <div class="del-dialog-cnt">
-          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
-            <el-form-item label="标签组名称:" prop="name" class="nameOne">教育体系标签</el-form-item>
-            <el-form-item label="标签组简介:" prop="introduction" class="nameOne">
-              <el-input
-                class="area"
-                type="textarea"
-                :autosize="{ minRows: 2, maxRows: 4}"
-                placeholder="请输入内容"
-                v-model="textarea">
-              </el-input>
-            </el-form-item>
-            <el-form-item label="截止日期:" prop="date" class="nameOne">
-              <el-date-picker
-                class="dateInp"
-                v-model="value1"
-                type="datetime"
-                placeholder="选择日期时间">
-              </el-date-picker>
-            </el-form-item>
+          <el-form label-width="80px">
+            <el-form-item >您正在选用{{this.selectiontagsName}}，是否确认选用？</el-form-item>
           </el-form>
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" plain class="btn-group"  @click="closeShare2">关闭</el-button>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="cancelShare">取消共享</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureOk">确定选用</el-button>
+            <el-button size="small"  class="queryBtn" @click="cancelNo">取消</el-button>
           </div>
         </div>
       </el-dialog>
@@ -115,11 +89,8 @@
 </template>
 
 <script>
-  import {mapActions, mapState, mapGetters} from 'vuex'
+  import {shareSearch,changeSelection} from '@/api/shareLabel.js'
   export default {
-    components: {
-
-    },
     name: "tagManage",
     data() {
       return {
@@ -128,43 +99,11 @@
         saveLoading2:true,
         shareDialog:false,
         saveLoading:false,
+        labelDialog:false,
+        selectionId:'',
+        selectiontagsName:'',
         percentage: 30,
-        value1: '',
-        textarea: '',
-        options: [{
-          value: '选项1',
-          label: '全部'
-        }, {
-          value: '选项2',
-          label: '未共享'
-        }, {
-          value: '选项3',
-          label: '已共享'
-        }],
-        value: '',
-        ztableShowList:[{
-          name:'教育',
-          people:'数据搬运工',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多',
-          share:'已共享',
-        },{
-          name:'教育22',
-          people:'数据搬运工22',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多22',
-          share:'已共享',
-        }],
-        ruleForm:{
-          name:'',
-          introduction:'',
-          date:''
-        },
-        rules: {
-          date: [
-            {required: true, message: '请选择时间',trigger: 'change'}
-          ]
-        },
+        ztableShowList:[],
       }
     },
     methods: {
@@ -193,10 +132,57 @@
         this.$refs.ruleForm.resetFields()
       },
       createLabel(){
-        this.$router.push('tree')
+        this.$router.push('tagManage')
+      },
+      async handleSearch(){
+        try{
+          const search = await shareSearch({
+            page:'',
+            searchKey:this.input2,
+            size:''
+          })
+          this.ztableShowList = search.content?search.content:[]
+          if(this.ztableShowList==''){
+            this.Loading = false
+          }
+        }catch (e) {
+          console.log(e);
+        }
+      },
+      shareQuery(){
+        this.handleSearch()
+      },
+      Selection(id,name){
+        this.labelDialog = true
+        this.selectionId = id
+        this.selectiontagsName = name
+      },
+      closelabelDialog(){
+        this.labelDialog = false
+      },
+      async sureOk(){
+        this.saveLoading = true
+        try{
+          const res = await changeSelection({
+            id: this.selectionId
+          })
+          this.$message({
+            message: res.message,
+            type: 'success'
+          });
+          this.saveLoading = false
+          this.labelDialog = false
+          this.$router.push('/tagManage')
+        }catch (e) {
+          console.log(e);
+        }
+      },
+      cancelNo(){
+        this.labelDialog = false
       }
     },
     created() {
+      this.handleSearch()
     },
     computed: {
 
