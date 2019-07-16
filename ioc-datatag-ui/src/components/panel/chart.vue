@@ -6,14 +6,16 @@
 
 <script>
   import echarts from 'echarts'
-
+  import {labelChange} from '@/api/tagPanel.js'
   export default {
     name: 'chart',
     data() {
-      return {}
+      return {
+        arr:[]
+      }
     },
     mounted() {
-      this.drawLine()
+
     },
     methods: {
       drawLine() {
@@ -59,10 +61,10 @@
           ],
           series: [
             {
-              name: '直接访问',
+              // name: '直接访问',
               type: 'bar',
               barWidth: '60%',
-              data: [0, 52, 200, 334, 390, 330, 220, 10, 52, 200, 334, 390],
+              data: this.arr,
               markLine: {
                 symbol: ['none', 'none'], //标示线，虚线
                 itemStyle: {
@@ -78,13 +80,15 @@
                   }
                 },
                 data: [{
-                  yAxis: 100
+                  yAxis: 2
                 }, {
-                  yAxis: 200
+                  yAxis: 4
                 }, {
-                  yAxis: 300
+                  yAxis: 6
                 }, {
-                  yAxis: 400
+                  yAxis: 8
+                },{
+                  yAxis: 10
                 }]
               }
             }
@@ -92,8 +96,22 @@
         };
         // 为echarts对象加载数据
         myChart.setOption(option)
+      },
+      async change(){
+        try{
+          const arr = await labelChange()
+          this.arr = arr.data
+          await this.drawLine()
+        }catch (e) {
+          console.log(e);
+        }
       }
-    }
+    },
+    created() {
+     this.change()
+    },
+    computed: {
+    },
   }
 </script>
 
