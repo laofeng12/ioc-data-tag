@@ -1,15 +1,14 @@
-import { login } from '@/api/login'
-import { removeToken } from '@/utils/auth'
-import { setLocalStorage } from '@/utils'
+import { login, logout } from '@/api/login'
+import { setToken, removeToken, setUserInfo, removeUserInfo } from '@/utils/auth'
 
-const defaultAvatar = require('../../../public/img/administrator.png')
+const defaultAvatar = require('@/assets/img/administrator.png')
 
 const user = {
   state: {
     token: '',
     apiv1Token: '',
     name: '',
-    userInfo: {},
+    userInfo: null,
     roles: []
   },
 
@@ -31,7 +30,7 @@ const user = {
   actions: {
     SetUserInfo ({ commit, dispatch }, userInfo) {
       commit('SET_USERINFO', userInfo)
-      setLocalStorage('userInfo', userInfo)
+      setUserInfo(userInfo)
     },
 
     // 登录
@@ -40,12 +39,9 @@ const user = {
       const userPwd = userInfo.userPwd
       return new Promise((resolve, reject) => {
         login(userAccount, userPwd).then(res => {
-          res.user.avatar = res.user.avatar ? res.user.avatar : defaultAvatar
           const user = res.user
           const token = user.tokenId
-
-          console.log('token', token)
-          console.log('user', user)
+          user.avatar = user.headImg ? user.headImg : defaultAvatar
           dispatch('SetToken', token)
           dispatch('SetUserInfo', user)
 
@@ -58,14 +54,11 @@ const user = {
 
     SetToken ({ commit, dispatch, state }, token) {
       return new Promise((resolve, reject) => {
-        console.log('token0000000', token)
-
         if (token) {
           commit('SET_TOKEN', token)
-          setLocalStorage('token', token)
-
           commit('SET_APIV1_TOKEN', token)
-          setLocalStorage('apiv1Token', token)
+
+          setToken(token)
           return resolve(token)
         }
 
@@ -73,40 +66,25 @@ const user = {
       })
     },
 
-    // 获取用户信息
-    GetInfo ({ commit }) {
-      // let userInfo = {}
-      // const infoItem = ['access_token', 'userInfo']
-
-      // infoItem.map(item => {
-      //   let paramsItem = GetQueryString(item)
-      //   userInfo[item] = paramsItem
-      // })
-    },
-
     // 登出
-    LogOut ({ commit, state }) {
+    logout ({ dispatch }) {
       return new Promise((resolve, reject) => {
-        // 暂时注释，不用请求退出登陆接口
-        // logout(state.token).then(() => {
-        //   commit('SET_TOKEN', '')
-        //   removeToken()
-        //   resolve()
-        // }).catch(error => {
-        //   reject(error)
-        // })
-
-        commit('SET_TOKEN', '')
-        removeToken()
-        resolve()
+        logout().then(res => {
+          dispatch('resetToken')
+          return resolve(res)
+        }).catch(err => {
+          return reject(err)
+        })
       })
     },
-
-    // 前端 登出
-    FedLogOut ({ commit }) {
+    resetToken ({ commit }) {
       return new Promise(resolve => {
-        commit('SET_TOKEN', '')
         removeToken()
+        removeUserInfo()
+
+        commit('SET_APIV1_TOKEN', '')
+        commit('SET_TOKEN', '')
+        commit('SET_USERINFO', {})
         resolve()
       })
     }
