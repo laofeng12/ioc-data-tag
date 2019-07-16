@@ -39,10 +39,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 				"org.ljdp.support.**.service",
 //				"org.ljdp.support.**.controller",
 				"com.openjava.**.service",
-				"com.openjava.**.component",
-				"com.openjava.**.dao",
+				//"com.openjava.**.component",
+				//"com.openjava.**.dao",
 				"com.openjava.**.api",
 				"org.openjava.boot.conf",
+				"com.openjava.datatag.utils.user"
 				})
 @ServletComponentScan(basePackages= {
 				"org.ljdp.support.web.listener2"})

@@ -25,9 +25,13 @@ public class DtTaggingModelDTO {
 
     private Long createUser;
 
+    private String createUserName;
+
     private Date createTime;
 
     private Long modifyUser;
+
+    private String modifyUserName;
 
     private Date modifyTime;
 
@@ -40,7 +44,7 @@ public class DtTaggingModelDTO {
     private Long isDeleted;
 
 
-    private Boolean isNew;
+   private Boolean isNew;
 
     private List<DtSetCol> colList = new ArrayList<>();
 }

@@ -25,7 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-@Api(tags="共享标签列表")
+@Api(tags="共享标签组列表")
 @RestController
 @RequestMapping("/datatag/tagmanage/shareDtTagGroup")
 public class ShareDtTagGroupAction {
@@ -45,11 +45,9 @@ public class ShareDtTagGroupAction {
             @ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
     })
     @Security(session=true)
-    @RequestMapping(value="/search",method= RequestMethod.GET)
-    public Page<DtShareTagGroup> doSearchShare(@ApiIgnore @RequestParam(value = "searchKey",required = false) String searchKey, @ApiIgnore() Pageable pageable){
-//        if(searchKey == null){
-//            searchKey = "";
-//        }
+    @RequestMapping(method= RequestMethod.GET)
+    public Page<DtShareTagGroup> doSearchShare(@ApiIgnore @RequestParam(value = "searchKey",required = false) String searchKey,
+                                               @ApiIgnore() Pageable pageable){
         Page<DtShareTagGroup> result =  dtShareTagGroupService.findList(searchKey,pageable);
         return result;
     }
@@ -71,7 +69,7 @@ public class ShareDtTagGroupAction {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         String ip = IpUtil.getRealIP(request);
         DtTagGroup db = dtTagGroupService.get(id);
-        if(db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED) || db.getIsShare().equals(Constants.DT_TG_PRIVATE)) {
+        if(db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES) || db.getIsShare().equals(Constants.PUBLIC_NO)) {
             throw new APIException(MyErrorConstants.SHARE_TAG_GROUP_NOT_FOUND, "无此标签组或未共享");
         }
         dtShareTagGroupService.choose(id,Long.parseLong(userInfo.getUserId()),ip);

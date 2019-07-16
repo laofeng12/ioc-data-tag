@@ -46,8 +46,9 @@ public class DtTagAction {
 	@ApiOperation(value = "修改标签:标签名-简介/新增标签:标签名-简介-上级标签id-标签组id", nickname="save", notes = "报文格式：content-type=application/json")
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
-			@io.swagger.annotations.ApiResponse(code=(int)MyErrorConstants.TAG_NOT_FOUND, message="无此标签或已被删除"),
-			@io.swagger.annotations.ApiResponse(code=(int)MyErrorConstants.PUBLIC_NO_AUTHORITY, message="无权限查看")
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.TAG_NOT_FOUND, message="无此标签或已被删除"),
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="无权限查看"),
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_ERROE, message="其他异常"),
 	})
 	@Security(session=true)
 	@RequestMapping(method=RequestMethod.POST)
@@ -64,10 +65,10 @@ public class DtTagAction {
 				return new SuccessMessage("新建成功");
 			} else {
 				DtTag db = dtTagService.get(body.getId());
-				if((db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED)) && body.getIsNew()){
+				if((db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)) && body.getIsNew()){
 					throw new APIException(MyErrorConstants.TAG_NOT_FOUND,"无此标签或已被删除");
 				}
-				if (body.getIsDeleted()!= null && body.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+				if (body.getIsDeleted()!= null && body.getIsDeleted().equals(Constants.PUBLIC_YES)){
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请不要用此方法进行删除操作，请用DELETE方法");
 				}
 				dtTagService.doUpdate(body,db,userId,ip);
@@ -98,7 +99,7 @@ public class DtTagAction {
 		Long userId = Long.valueOf(userInfo.getUserId());
 		String ip = IpUtil.getRealIP(request);
 		DtTag db = dtTagService.get(id);
-		if(db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+		if(db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_NOT_FOUND,"无此标签或已被删除");
 		}
 		DtTagGroup tagGroupdb = dtTagGroupService.get(db.getTagsId());
@@ -129,11 +130,11 @@ public class DtTagAction {
 	public TagDTOTreeNode get(@PathVariable("id")Long id) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTagGroup db = dtTagGroupService.get(id);
-		if(db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+		if(db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND,"无此标签组或已被删除");
 		}
 		//自己的和共享的标签组可以查看
-		if(userInfo.getUserId().equals(db.getCreateUser().toString()) || db.getIsShare().equals(Constants.DT_TG_SHARED)){
+		if(userInfo.getUserId().equals(db.getCreateUser().toString()) || db.getIsShare().equals(Constants.PUBLIC_YES)){
 			List<DtTag> tagList = dtTagService.findByTagsId(id);
 			DtTagDTO root = new DtTagDTO();
 			root.setId(TagDTOTreeNode.ROOT_ID);
@@ -145,5 +146,4 @@ public class DtTagAction {
 
 	}
 
-	
 }

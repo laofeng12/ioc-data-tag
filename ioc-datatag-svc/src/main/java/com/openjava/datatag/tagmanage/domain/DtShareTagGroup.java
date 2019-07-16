@@ -36,6 +36,7 @@ public class DtShareTagGroup {
     @ApiModelProperty("共享者名")
     private String shareUserName;
 
+    @ApiModelProperty("修改时间")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
@@ -49,5 +50,13 @@ public class DtShareTagGroup {
 
     @ApiModelProperty("OA-所在单位")
     private String level1;
+
+    @ApiModelProperty("用户名")
+    private String fullname;
+
+    @ApiModelProperty("热度等级-从0~4")
+    private String popularityLevel;
+
+
 
 }
