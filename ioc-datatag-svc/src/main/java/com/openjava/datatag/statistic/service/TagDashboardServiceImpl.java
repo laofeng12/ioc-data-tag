@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -32,8 +33,22 @@ public class TagDashboardServiceImpl implements TagDashboardService {
     public List<Object> getMonthlyLabelChanges(){return tagDashboardRepository.getMonthlyLabelChanges();}
 
     @Override
-    public List<Object> getAllYearMonth(){return tagDashboardRepository.getAllYearMonth();}
+    //public List<Object> getAllYearMonth(){return tagDashboardRepository.getAllYearMonth();}
+    public Map<String,String> getAllYearMonth(){return tagDashboardRepository.getAllYearMonth();}
+
 
     @Override
-    public List<Object> getHotTags(){return tagDashboardRepository.getHotTags();}
+    public List<Object> getYesterdayHotTags(){return tagDashboardRepository.getYesterdayHotTags();}
+
+    @Override
+    public List<Object> getLastweekHotTags(){return tagDashboardRepository.getLastweekHotTags();}
+
+    @Override
+    public List<Object> getLastMonthHotTags(){return tagDashboardRepository.getLastMonthHotTags();}
+
+    @Override
+    public List<Object> getLastYearHotTags(){return tagDashboardRepository.getLastYearHotTags();}
+
+    @Override
+    public List<Object> getSamedayHotTags(){return tagDashboardRepository.getSamedayHotTags();}
 }
