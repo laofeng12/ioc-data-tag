@@ -95,7 +95,10 @@
           ]
         };
         // 为echarts对象加载数据
-        myChart.setOption(option)
+        myChart.setOption(option);
+        window.onresize = function(){
+          myChart.resize();
+        }
       },
       async change(){
         try{

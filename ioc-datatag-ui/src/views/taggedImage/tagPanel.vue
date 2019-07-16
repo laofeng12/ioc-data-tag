@@ -267,4 +267,10 @@
   .contentBtn {
     padding-bottom: 10px;
   }
+
+  @media (max-width:1300px) {
+    .changeOne, .changeTwo, .changeThree {
+      width: 250px;
+    }
+  }
 </style>
