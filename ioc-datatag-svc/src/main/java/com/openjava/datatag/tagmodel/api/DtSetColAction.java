@@ -140,7 +140,7 @@ public class DtSetColAction {
 	@RequestMapping(value="/saveCondition",method=RequestMethod.POST)
 	public SuccessMessage saveCondition(@RequestBody SaveConditionDTO req,
 										HttpServletRequest request)throws Exception{
-		req.setRequest(request);
+		req.setIp(request);
 		dtSetColService.saveCondition(req);
 		return new SuccessMessage("保存成功");
 	}

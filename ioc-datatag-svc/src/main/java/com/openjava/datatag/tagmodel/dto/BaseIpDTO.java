@@ -8,21 +8,17 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Component
-public class BaseRequestDTO {
 
-    private HttpServletRequest httpServletRequest;
+public class BaseIpDTO {
+    private String Ip;
 
-    public HttpServletRequest getRequest() {
-        return httpServletRequest;
+    public void setIp(String ip) {
+        Ip = ip;
     }
-
-
-    public void setRequest(HttpServletRequest httpServletRequest) {
-        this.httpServletRequest = httpServletRequest;
+    public void setIp(HttpServletRequest request){
+        Ip = IpUtil.getRealIP(request);
     }
-
     public String getIp(){
-        return IpUtil.getRealIP(httpServletRequest);
+        return Ip;
     }
 }

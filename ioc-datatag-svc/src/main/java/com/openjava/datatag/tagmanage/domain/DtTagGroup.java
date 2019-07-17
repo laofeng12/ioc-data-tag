@@ -39,7 +39,7 @@ public class DtTagGroup implements Persistable<Long>,Serializable {
 	private Long id;
 
 	@ApiModelProperty("标签组名")
-	@Length(min=0, max=50)
+	@Length(min=0, max=64)
 	@Column(name = "TAGS_NAME")
 	private String tagsName;
 

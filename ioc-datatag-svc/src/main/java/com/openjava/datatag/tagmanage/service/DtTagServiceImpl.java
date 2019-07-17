@@ -65,7 +65,7 @@ public class DtTagServiceImpl implements DtTagService {
 
 	public List<DtTag> findByTagsId(Long tagsId){
 		//查询所有未删除的标签list
-		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId, Constants.DT_TG_EXIST);
+		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId, Constants.PUBLIC_NO);
 	}
 
 	public void doNew(DtTag body,Long userId,String ip){
@@ -74,7 +74,7 @@ public class DtTagServiceImpl implements DtTagService {
 		//设置主键(请根据实际情况修改)
 		SequenceService ss = ConcurrentSequence.getInstance();
 		body.setId(ss.getSequence());
-		body.setIsDeleted(Constants.DT_TG_EXIST);
+		body.setIsDeleted(Constants.PUBLIC_NO);
 		body.setIsNew(true);//执行insert
 		Date now = new Date();
 		body.setCreateTime(now);
@@ -103,7 +103,7 @@ public class DtTagServiceImpl implements DtTagService {
 		//先删除子节点
 		doSoftDeleteByRootID(db.getId(),now);
 		//再删除本节点
-		db.setIsDeleted(Constants.DT_TG_DELETED);
+		db.setIsDeleted(Constants.PUBLIC_YES);
 		db.setModifyTime(now);
 		doSave(db);
 

@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface DtTagGroupService {
 	Page<DtTagGroup> query(DtTagGroupDBParam params, Pageable pageable);
-	
+
 	List<DtTagGroup> queryDataOnly(DtTagGroupDBParam params, Pageable pageable);
 	
 	DtTagGroup get(Long id);
