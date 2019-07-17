@@ -9,6 +9,7 @@ import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.utils.IpUtil;
 import com.openjava.datatag.utils.tree.TagDTOTreeNode;
+import com.openjava.datatag.utils.tree.TagDTOTreeNodeShow;
 import io.swagger.annotations.*;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
@@ -127,7 +128,7 @@ public class DtTagAction {
 	})
 	@Security(session=true)
 	@RequestMapping(value="/{id}",method= RequestMethod.GET)
-	public TagDTOTreeNode get(@PathVariable("id")Long id) throws APIException {
+	public TagDTOTreeNodeShow get(@PathVariable("id")Long id) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTagGroup db = dtTagGroupService.get(id);
 		if(db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
@@ -139,7 +140,8 @@ public class DtTagAction {
 			DtTagDTO root = new DtTagDTO();
 			root.setId(TagDTOTreeNode.ROOT_ID);
 			TagDTOTreeNode treeNode = new TagDTOTreeNode(TagDTOTreeNode.toDtTagDTO(tagList),root);
-			return treeNode;
+			TagDTOTreeNodeShow treeNodeShow = new TagDTOTreeNodeShow(treeNode);
+			return treeNodeShow;
 		}else{
 			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"无权限查看");
 		}
