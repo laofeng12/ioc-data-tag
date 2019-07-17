@@ -196,7 +196,7 @@
           this.$router.push('tree')
         },
         shareLabel() {
-          this.$router.push('shareLabel')
+          this.$router.push('/shareLabel')
         },
         // 我的标签列表数据
         async getTagsData() {

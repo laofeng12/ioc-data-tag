@@ -67,7 +67,7 @@
         this.saveDialog = true
       },
       goback(){
-        this.$router.push('lableImage')
+        this.$router.push('/lableImage')
       }
     }
   }
