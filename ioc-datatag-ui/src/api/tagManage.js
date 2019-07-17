@@ -7,3 +7,20 @@ export function getTagsData (params) {
     params
   })
 }
+// 标签管理--共享
+export function getDtTagGroupData (data) {
+  return fetch({
+    url: '/datatag/tagmanage/myDtTagGroup',
+    method: 'post',
+    data
+  })
+}
+
+// 标签管理--删除
+export function delTagGroup (id) {
+  return fetch({
+    url: `/datatag/tagmanage/myDtTagGroup?id=${id}`,
+    method: 'delete'
+  })
+}
+
