@@ -45,7 +45,15 @@ export default new Router({
           path: '/lableImage',
           name: 'lableImage',
           meta: {title: '模型部署管理'},
-          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/lableImage.vue')
+          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/lableImage.vue'),
+          children:[
+            {
+              path: '/cooperationModel',
+              name: 'cooperationModel',
+              meta: {title: '协作模型'},
+              component: () => import('@/views/taggedImage/cooperationModel.vue')
+            }
+          ]
         },
         {
           path: '/tagPanel',
@@ -56,36 +64,33 @@ export default new Router({
           path: '/tagManage',
           name: 'tagManage',
           meta: {title: '标签管理'},
-          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tagManage.vue')
-        }, {
+          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tagManage.vue'),
+        },
+        {
+          path: '/shareLabel',
+          name: 'shareLabel',
+          meta: {title: '共享标签组'},
+          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/shareLabel.vue')
+        },
+        {
+          path: '/lookTree/:tagsId',
+          name: 'lookTree',
+          meta: {title: '查看标签组'},
+          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
+        },
+        {
+          path: '/tree',
+          name: 'tree',
+          meta: {title: '创建标签组'},
+          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
+        },
+        {
           path: '/portraitQuery',
           name: 'portraitQuery',
           meta: {title: '画像查询'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/portraitQuery.vue')
-        }]
-    },
-    {
-      path: '/tagManage',
-      name: 'tagManage',
-      component: ContainerWrapper,
-      redirect: '/tagManage',
-      meta: {title: '标签管理'},
-      children: [{
-        path: '/tree',
-        name: 'tree',
-        meta: {title: '创建标签组'},
-        component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
-      }, {
-        path: '/shareLabel',
-        name: 'shareLabel',
-        meta: {title: '共享标签组'},
-        component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/shareLabel.vue')
-      }, {
-        path: '/cooperationModel',
-        name: 'cooperationModel',
-        meta: {title: '协作模型'},
-        component: () => import('@/views/taggedImage/cooperationModel.vue')
-      }]
+        },
+        ]
     },
     {
       path: '/modelEdit/:id',

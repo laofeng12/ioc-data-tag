@@ -9,14 +9,6 @@
           prefix-icon="el-icon-search"
           v-model="input2">
         </el-input>
-        <!--<el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">-->
-          <!--<el-option-->
-            <!--v-for="item in options"-->
-            <!--:key="item.value"-->
-            <!--:label="item.label"-->
-            <!--:value="item.value">-->
-          <!--</el-option>-->
-        <!--</el-select>-->
         <el-button class="zxlistBtn" size="small" type="primary" @click="shareQuery">查询</el-button>
       </div>
       <div>
@@ -58,7 +50,9 @@
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="查看" placement="top">
               <span class="operationIcona">
-                  <i class="el-icon-view iconLogo" ></i>
+                <router-link :to="`lookTree/${props.row.tagsId}`">
+                  <i class="el-icon-view iconLogo"></i>
+                </router-link>
               </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="选用标签组" placement="top">
@@ -69,6 +63,7 @@
             </template>
           </el-table-column>
         </el-table>
+        <element-pagination :pageSize="size"  :total="totalnum"  @handleCurrentChange="handleCurrentChange" @sureClick="goPage"></element-pagination>
       </div>
       <el-dialog class="creat" title="选用标签组" :visible.sync="labelDialog" width="530px" center :close-on-click-modal="false"
                  @close="closelabelDialog">
@@ -90,10 +85,15 @@
 
 <script>
   import {shareSearch,changeSelection} from '@/api/shareLabel.js'
+  import ElementPagination from '@/components/ElementPagination'
   export default {
+    components: {ElementPagination},
     name: "tagManage",
     data() {
       return {
+        page:0,
+        size:10,
+        totalnum:0,
         input2: '',
         Loading:true,
         saveLoading2:true,
@@ -137,21 +137,29 @@
       async handleSearch(){
         try{
           const search = await shareSearch({
-            page:'',
+            page:this.page,
             searchKey:this.input2,
-            size:''
+            size:this.size
           })
           this.ztableShowList = search.content?search.content:[]
+          this.totalnum = search.totalElements
           if(this.ztableShowList==''){
             this.Loading = false
           }
         }catch (e) {
           console.log(e);
+          this.Loading = false
         }
       },
-      shareQuery(){
+      handleCurrentChange(page){
+        this.page = page-1
         this.handleSearch()
       },
+      shareQuery(){
+        this.page = 0
+        this.handleSearch()
+      },
+      goPage(){},
       Selection(id,name){
         this.labelDialog = true
         this.selectionId = id
