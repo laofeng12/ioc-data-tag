@@ -20,6 +20,7 @@
           default-expand-all
           :filter-node-method="filterNode"
           :expand-on-click-node="false"
+          @node-click="handleNodeClick"
           ref="tree">
         <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -52,7 +53,7 @@
 
     <div class="tableContent">
       <div class="newTable  daList">
-        <el-table ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
+        <el-table ref="multipleTable" :data="tableparentList" border stripe tooltip-effect="dark"
                   style="width: 100%;text-align: center"
                   :header-cell-style="{background:'#f0f2f5'}">
           <template slot="empty">
@@ -61,14 +62,37 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="name" label="标签名称">
-            <template slot-scope="scope">
-              <span>教育体系标签</span>
+          <el-table-column prop="tagName" label="标签名称"></el-table-column>
+          <el-table-column prop="createTime" label="创建时间"></el-table-column>
+          <el-table-column prop="synopsis" label="标签说明"></el-table-column>
+          <el-table-column label="操作" width="180px" v-if="labelEdit">
+            <template slot-scope="props" class="caozuo">
+              <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+              <span class="operationIcona">
+                  <i class="el-icon-edit-outline iconLogo" @click="editLabel"></i>
+              </span>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="删除" placement="top">
+              <span class="operationIcona">
+                <i class="el-icon-delete iconLogo" @click="handleDelete"></i>
+              </span>
+              </el-tooltip>
             </template>
           </el-table-column>
-          <el-table-column prop="people" label="创建时间">2019/4/19 16:12:13</el-table-column>
-          <el-table-column prop="introduction" label="标签说明">这是教育体系标签简介</el-table-column>
-          <el-table-column label="操作" width="180px" v-show="labelEdit">
+        </el-table>
+        <el-table class="secondTable" ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
+                  style="width: 100%;text-align: center"
+                  :header-cell-style="{background:'#f0f2f5'}">
+          <template slot="empty">
+            <div v-if="Loading2">
+              <div v-loading="saveLoading2"></div>
+            </div>
+            <div v-else>暂无数据</div>
+          </template>
+          <el-table-column prop="tagName" label=""></el-table-column>
+          <el-table-column prop="createTime" label=""></el-table-column>
+          <el-table-column prop="synopsis" label=""></el-table-column>
+          <el-table-column label="操作" width="180px" v-if="labelEdit">
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <span class="operationIcona">
@@ -112,7 +136,6 @@
       </div>
     </el-dialog>
 
-
     <el-dialog class="creat" title="添加下级标签" :visible.sync="labelDialog2" width="530px" center
                :close-on-click-modal="false"
                @close="closedialogTwo">
@@ -138,7 +161,6 @@
         </div>
       </div>
     </el-dialog>
-
 
     <el-dialog class="creat" title="编辑标签" :visible.sync="editDialog" width="530px" center :close-on-click-modal="false"
                @close="closeEdit">
@@ -183,7 +205,7 @@
 </template>
 
 <script>
-  import {lookTree} from '@/api/shareLabel.js'
+  import {lookTree,looktreeTable} from '@/api/shareLabel.js'
   let id = 1000;
   export default {
     name: "treeLabel",
@@ -196,6 +218,7 @@
         deleteLoading:false,
         filterText: '',
         Loading: true,
+        Loading2:true,
         saveLoading2: true,
         shareDialog: false,
         saveLoading: false,
@@ -203,6 +226,7 @@
         addLabel:true,
         topaddLabel:true,
         labelEdit:true,
+        treeID:'',
         value1: '',
         aa:'',
         textarea: '',
@@ -217,19 +241,8 @@
           label: '已共享'
         }],
         value: '',
-        ztableShowList: [{
-          name: '教育',
-          people: '数据搬运工',
-          time: '2019/4/19  16:17:22',
-          introduction: '动画的很多好很多',
-          share: '已共享',
-        }, {
-          name: '教育22',
-          people: '数据搬运工22',
-          time: '2019/4/19  16:17:22',
-          introduction: '动画的很多好很多22',
-          share: '已共享',
-        }],
+        tableparentList:[],
+        ztableShowList: [],
         ruleForm: {
           name: '',
           introduction: '',
@@ -253,7 +266,6 @@
     },
     watch: {
       filterText(val) {
-        console.log('val',val)
         this.$refs.tree.filter(val);
       }
     },
@@ -261,6 +273,15 @@
       filterNode(value, data) {
         if (!value) return true;
         return data.tagName.indexOf(value) !== -1;
+      },
+      async handleNodeClick(data) {
+        this.tableparentList = []
+        const treeTable = await looktreeTable(data.id)
+        this.ztableShowList = treeTable.childrenTag
+        this.tableparentList.push(treeTable.parentTag)
+        if(this.ztableShowList == ''){
+          this.Loading2 = false
+        }
       },
       append(data) {
         const newChild = {id: id++, label: 'testtest', children: []};
@@ -314,6 +335,14 @@
           try{
             const res = await lookTree(this.$route.params.tagsId)
             this.data = res.childrenNode
+            this.treeID = res.childrenNode[0].childrenNode[0].id
+            const treeTable = await looktreeTable(res.childrenNode[0].id)
+            if(treeTable == ''){
+              this.Loading = false
+            }else {
+              this.ztableShowList = treeTable.childrenTag?treeTable.childrenTag:[]
+              this.tableparentList.push(treeTable.parentTag)
+            }
           }catch (e) {
             console.log(e);
           }
@@ -325,6 +354,7 @@
         this.sharelookTree()
         this.addLabel = false
         this.topaddLabel = false
+        this.labelEdit = false
       }
     }
   };
@@ -408,5 +438,8 @@
   }
   .addBtn{
     margin-right: 5px;
+  }
+  .secondTable >>> .el-table__header-wrapper{
+    display: none;
   }
 </style>
