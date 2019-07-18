@@ -24,3 +24,21 @@ export function delTagGroup (id) {
   })
 }
 
+
+// 标签管理--编辑新建顶级
+export function getDtTagData (data) {
+  return fetch({
+    url: '/datatag/tagmanage/dtTag',
+    method: 'post',
+    data
+  })
+}
+
+
+// 标签管理--编辑-删除树节点
+export function delTree(id) {
+  return fetch({
+    url: `/datatag/tagmanage/dtTag/?id=${id}`,
+    method: 'delete'
+  })
+}

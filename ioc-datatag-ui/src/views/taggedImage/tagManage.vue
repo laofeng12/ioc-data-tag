@@ -64,9 +64,9 @@
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-              <span class="operationIcona">
+                <router-link :to="`editTree/${row.id}`">
                   <i class="el-icon-edit-outline iconLogo" ></i>
-              </span>
+                </router-link>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
@@ -120,7 +120,7 @@
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" plain class="btn-group"  @click="closeShare2">关闭</el-button>
+            <el-button size="small" plain class="btn-group"  @click="closeShare2">取消</el-button>
             <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">
              确定
             </el-button>
@@ -301,7 +301,7 @@
         async delTag(id){
           try {
             const data = await delTagGroup(id)
-            console.log(data)
+            //console.log(data)
             if(data.message=='删除成功'){
               this.$message({
                 message: '删除成功',

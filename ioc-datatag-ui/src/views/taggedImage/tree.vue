@@ -24,7 +24,8 @@
     },
     methods: {
       goback(){
-        this.$router.push('/lableImage')
+       // this.$router.push('/lableImage')
+        this.$router.go(-1)
       }
     }
   }

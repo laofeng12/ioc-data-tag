@@ -32,14 +32,14 @@
             class="addBtn"
             type="text"
             size="mini"
-            @click="addTwo">
+            @click="addTwo(node,data)">
             <!--Append-->
             <i class="el-icon-plus"></i>
           </el-button>
           <el-button
             type="text"
             size="mini"
-            @click="() => remove(node, data)">
+            @click="remove(node, data)">
             <!--Delete-->
             <i class="el-icon-delete"></i>
           </el-button>
@@ -107,7 +107,8 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认添加</el-button>
+          <el-button size="small" plain class="btn-group"  @click="cancel()">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="add(ruleForm.name,ruleForm.textarea)">添加</el-button>
         </div>
       </div>
     </el-dialog>
@@ -134,7 +135,8 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认添加</el-button>
+          <el-button size="small" plain class="btn-group"  @click="cancelOne()">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="addNext(ruleForm.name,ruleForm.textarea)">添加</el-button>
         </div>
       </div>
     </el-dialog>
@@ -184,11 +186,13 @@
 
 <script>
   import {lookTree} from '@/api/shareLabel.js'
+  import {getDtTagData,delTree}  from '@/api/tagManage'
   let id = 1000;
   export default {
     name: "treeLabel",
     data() {
       return {
+        preaTagId:0,
         labelDialog: false,
         labelDialog2: false,
         editDialog: false,
@@ -258,6 +262,28 @@
       }
     },
     methods: {
+      cancel(){
+       this.labelDialog=false
+        this.$refs.ruleForm.resetFields()
+      },
+      //取消添加下级
+      cancelOne(){
+        this.labelDialog2=false
+        this.$refs.ruleForm.resetFields()
+
+      },
+      add(synopsis,tagsName){
+        this.getDtTagData(null,synopsis,tagsName)
+        this.labelDialog=false
+        this.$refs.ruleForm.resetFields()
+
+      },
+      //添加下级
+      addNext(synopsis,tagsName){
+        this.getDtTagData(this.preaTagId,synopsis,tagsName)
+        this.labelDialog2=false
+        this.$refs.ruleForm.resetFields()
+      },
       filterNode(value, data) {
         if (!value) return true;
         return data.tagName.indexOf(value) !== -1;
@@ -271,10 +297,7 @@
       },
 
       remove(node, data) {
-        const parent = node.parent;
-        const children = parent.data.children || parent.data;
-        const index = children.findIndex(d => d.id === data.id);
-        children.splice(index, 1);
+       this.delTree(data.id)
       },
       renderContent(h, {node, data, store}) {
         return (
@@ -289,7 +312,9 @@
       openOne() {
         this.labelDialog = true
       },
-      addTwo() {
+      addTwo(node,data) {
+       // console.log('新建下级标签',node,data)
+        this.preaTagId=data.id
         this.labelDialog2 = true
       },
       closedialogOne() {
@@ -310,6 +335,43 @@
       handleDelete(){
         this.deleteDialog = true
       },
+      //删除
+      async delTree(id){
+        try {
+          const data = await delTree(id)
+          if(data.message=='删除成功'){
+            this.$message({
+              message: '删除成功',
+              duration:1000,
+              type: 'success'
+            });
+            this.sharelookTree()
+          }else {
+            this.$message.error(data.message)
+          }
+
+        } catch (e) {
+
+        }
+      },
+      //新建树节点
+      async getDtTagData(preaTagId,synopsis,tagsName) {
+        const tagsId= Number(this.$route.params.tagsId)
+        const params = {
+          preaTagId:preaTagId,
+          isNew: true,
+          synopsis:synopsis,
+          tagName:tagsName,
+          tagsId:tagsId,//标签组id
+        }
+        try {
+          const data = await getDtTagData(params)
+          this.sharelookTree()
+
+        } catch (e) {
+
+        }
+      },
       async sharelookTree(){
           try{
             const res = await lookTree(this.$route.params.tagsId)
@@ -325,6 +387,11 @@
         this.sharelookTree()
         this.addLabel = false
         this.topaddLabel = false
+      }else if(this.$route.name == 'editTree'){
+        this.sharelookTree()
+      }
+      else {
+
       }
     }
   };
