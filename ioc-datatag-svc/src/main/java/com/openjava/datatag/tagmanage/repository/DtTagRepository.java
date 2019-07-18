@@ -36,4 +36,6 @@ public interface DtTagRepository extends DynamicJpaRepository<DtTag, Long>, DtTa
     List<Long> findPIdByRootId(@Param("rootId") Long rootId);
 
     List<DtTag> findByTagsIdAndIsDeleted(Long tagsID,Long isDeleted);
+
+    List<DtTag> findByPreaTagIdAndIsDeleted(Long preaTagId,Long isDeteled);
 }
