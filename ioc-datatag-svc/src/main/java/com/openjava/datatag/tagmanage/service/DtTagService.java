@@ -20,6 +20,8 @@ public interface DtTagService {
 	
 	DtTag get(Long id);
 	List<DtTag> findByTagsId(Long id);
+	List<DtTag> findByPreaTagId(Long pId);
+
 	DtTag doSave(DtTag m);
 
 	void doNew(DtTag tag,Long userId,String ip);
