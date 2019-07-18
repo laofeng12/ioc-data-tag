@@ -35,9 +35,16 @@ export function loginApiV1 (userAccount, userPwd) {
 /**
  * 退出，暂时没用
  */
+// export function logout () {
+//   return request({
+//     url: '',
+//     method: 'post'
+//   })
+// }
+
 export function logout () {
   return request({
-    url: '',
+    url: '/admin/user/OA/loginOut',
     method: 'post'
   })
 }
