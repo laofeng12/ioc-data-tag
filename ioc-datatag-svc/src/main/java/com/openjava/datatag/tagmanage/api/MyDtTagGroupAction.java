@@ -88,7 +88,7 @@ public class MyDtTagGroupAction {
 		params.setSql_key("tagsName like \'%" + params.getKeyword() + "%\' or "+ "synopsis like \'%" + params.getKeyword()+"%\'");
 		Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
 				Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));
-		Page<DtTagGroup> results =  dtTagGroupService.query(params, mypage);
+		Page<DtTagGroup> results =  dtTagGroupService.searchMyTagGroup(params, mypage);
 		return new TablePageImpl<>(results);
 
 	}

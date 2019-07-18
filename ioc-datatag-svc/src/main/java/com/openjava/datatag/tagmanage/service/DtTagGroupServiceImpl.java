@@ -121,4 +121,13 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		return dtTagGroupRepository.getMyTagGroup(createUser);
 	}
 
+	public Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable){
+		Page<DtTagGroup> result = query(params,pageable);
+		for (DtTagGroup tgg: result){
+			Long plvl = dtTagGroupRepository.findPopuLvlByTagsId(tgg.getId());
+			tgg.setPopularityLevel(plvl);
+		}
+		return result;
+	}
+
 }

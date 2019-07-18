@@ -23,6 +23,5 @@ public interface DtShareTagGroupRepository extends DynamicJpaRepository<DtShareT
             "where e.LEVEL1 like :searchKey or e.TAGS_NAME like :searchKey or e.SYNOPSIS like :searchKey or e.FULLNAME like :searchKey")
     Page<DtShareTagGroup> findList(@Param("searchKey")String searchKey, Pageable pageable);
 
-
 }
 
