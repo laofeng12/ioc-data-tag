@@ -6,20 +6,32 @@ const TokenKey = 'authority-token'
 
 export function getToken () {
   // Cookies上带token进来 或者从本地获取token
-  const cookiesToken = Cookies.get(TokenKey)
+  const authorityToken = Cookies.get(TokenKey)
 
-  cookiesToken && store.dispatch('SetToken', cookiesToken)
-  const access_token = cookiesToken || localStorage.getItem('token')
+  authorityToken && store.dispatch('SetToken', authorityToken)
 
-  return access_token
+  return authorityToken
 }
 
 export function setToken (token) {
-  return Cookies.set(TokenKey, token)
+  Cookies.set(TokenKey, token)
 }
 
 export function removeToken () {
   Cookies.remove(TokenKey)
-  localStorage.removeItem('token')
-  localStorage.removeItem('apiv1Token')
+}
+
+export function getUserInfo () {
+  const cookiesUserInfo = Cookies.get('userInfo') ? JSON.parse(Cookies.get('userInfo')) : null
+  console.log('cookiesUserInfo',cookiesUserInfo)
+  const userInfo = store.getters.userInfo || cookiesUserInfo
+  return userInfo
+}
+
+export function setUserInfo (userInfo) {
+  Cookies.set('userInfo', userInfo)
+}
+
+export function removeUserInfo () {
+  Cookies.remove('userInfo')
 }

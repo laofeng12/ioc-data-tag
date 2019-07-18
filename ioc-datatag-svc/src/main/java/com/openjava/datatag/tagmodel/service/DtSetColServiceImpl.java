@@ -303,7 +303,10 @@ public class DtSetColServiceImpl implements DtSetColService {
 	 */
 	public void saveCondition(SaveConditionDTO req)throws Exception{
 		String reqParams = JSONObject.toJSONString(req);
-
+        //记录新增的日志
+        List<DtTagCondition> addLog = new ArrayList<>();
+        //记录删除的日志
+        List<DtTagCondition> delLog = new ArrayList<>();
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		List<DtTagConditionDTO> saveconditions = req.getCondtion();
 		DtSetCol col = get(req.getColId());
@@ -330,6 +333,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 				e.printStackTrace();
 				throw new APIException(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR,"条件设置语法错误:"+i);//i参数可以告知前端第几个条件设置错误了
 			}
+
 			//新增和修改
 			DtTagCondition newTagCondition = new DtTagCondition();
 			if (record.getTagConditionId()!=null) {
@@ -346,6 +350,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 				newTagCondition.setSourceCol(col.getSourceCol());
 				newTagCondition.setShowCol(col.getShowCol());
 				newTagCondition = dtTagConditionService.doSave(newTagCondition);
+				addLog.add(newTagCondition);
 			}
 			//重新保存规制达式表
 			dtFilterExpressionService.doRemoveByTagConditionId(newTagCondition.getTagConditionId());
@@ -359,8 +364,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 				dtFilterExpressionService.doSave(expression);
 			}
 		}
-		//记录删除的日志
-		List<DtTagCondition> delLog = new ArrayList<>();
+
 		//删除
 		for (DtTagCondition record:conditions) {
 			DtTagConditionDTO d = new  DtTagConditionDTO();
@@ -370,7 +374,11 @@ public class DtSetColServiceImpl implements DtSetColService {
 				dtTagConditionService.doDelete(record.getId());
 			}
 		}
-		String content = "{\"req\":" + reqParams + ",\"delCondition\":" + delLog +"}";
+
+		EntityClassUtil.dealModifyInfo(col,userInfo);
+		String content = "{\"req\":" + reqParams
+                + ",\"delCondition\":" + JSONObject.toJSONString(delLog)
+                + ",\"addCondition\":" + JSONObject.toJSONString(addLog) + "}";
 		dtTagcolUpdateLogService.loggingUpdate(content,col,req.getIp());
 	}
 

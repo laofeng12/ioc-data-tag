@@ -3,7 +3,7 @@
     <div class="treelabel">
       <div class="labelTitle">
         <div class="labelName">标签树</div>
-        <div><i class="el-icon-plus add" @click="openOne"></i></div>
+        <div v-show="topaddLabel"><i class="el-icon-plus add" @click="openOne"></i></div>
       </div>
       <el-input
         class="elInput"
@@ -23,7 +23,7 @@
           ref="tree">
         <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
-        <span>
+        <span v-show="addLabel">
           <!--<el-button-->
           <!--type="text"-->
           <!--size="mini"-->
@@ -68,7 +68,7 @@
           </el-table-column>
           <el-table-column prop="people" label="创建时间">2019/4/19 16:12:13</el-table-column>
           <el-table-column prop="introduction" label="标签说明">这是教育体系标签简介</el-table-column>
-          <el-table-column label="操作" width="180px">
+          <el-table-column label="操作" width="180px" v-show="labelEdit">
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <span class="operationIcona">
@@ -169,9 +169,7 @@
                @close="closedelete">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px">
-          <el-form-item >
-            您正在删除南城区高考成绩数据，是否确认删除？
-          </el-form-item>
+          <el-form-item >您正在删除南城区高考成绩数据，是否确认删除？</el-form-item>
         </el-form>
       </div>
       <div slot="footer" class="dialog-footer device">
@@ -185,12 +183,7 @@
 </template>
 
 <script>
-  export default {
-    name: "treeLabel"
-  }
-</script>
-
-<script>
+  import {lookTree} from '@/api/shareLabel.js'
   let id = 1000;
   export default {
     name: "treeLabel",
@@ -207,7 +200,11 @@
         shareDialog: false,
         saveLoading: false,
         percentage: 30,
+        addLabel:true,
+        topaddLabel:true,
+        labelEdit:true,
         value1: '',
+        aa:'',
         textarea: '',
         options: [{
           value: '选项1',
@@ -247,56 +244,23 @@
             {required: true, message: '请填写', trigger: 'blur'}
           ]
         },
-        data: [{
-          id: 1,
-          label: '一级 1',
-          children: [{
-            id: 4,
-            label: '二级 1-1',
-            children: [{
-              id: 9,
-              label: '三级 1-1-1'
-            }, {
-              id: 10,
-              label: '三级 1-1-2'
-            }]
-          }]
-        }, {
-          id: 2,
-          label: '一级 2',
-          children: [{
-            id: 5,
-            label: '二级 2-1'
-          }, {
-            id: 6,
-            label: '二级 2-2'
-          }]
-        }, {
-          id: 3,
-          label: '一级 3',
-          children: [{
-            id: 7,
-            label: '二级 3-1'
-          }, {
-            id: 8,
-            label: '二级 3-2'
-          }]
-        }],
+        data:[],
         defaultProps: {
-          children: 'children',
-          label: 'label'
+          children: 'childrenNode',
+          label: 'tagName'
         }
       };
     },
     watch: {
       filterText(val) {
+        console.log('val',val)
         this.$refs.tree.filter(val);
       }
     },
     methods: {
       filterNode(value, data) {
         if (!value) return true;
-        return data.label.indexOf(value) !== -1;
+        return data.tagName.indexOf(value) !== -1;
       },
       append(data) {
         const newChild = {id: id++, label: 'testtest', children: []};
@@ -345,8 +309,24 @@
       },
       handleDelete(){
         this.deleteDialog = true
+      },
+      async sharelookTree(){
+          try{
+            const res = await lookTree(this.$route.params.tagsId)
+            this.data = res.childrenNode
+          }catch (e) {
+            console.log(e);
+          }
       }
+
     },
+    created(){
+      if(this.$route.name == 'lookTree'){
+        this.sharelookTree()
+        this.addLabel = false
+        this.topaddLabel = false
+      }
+    }
   };
 </script>
 
@@ -372,10 +352,12 @@
 
   .treelabel {
     width: 320px;
+    margin-top: 20px;
   }
 
   .tableContent {
     width: 81%;
+    margin-top: 20px;
   }
 
   .labelTitle {
@@ -384,7 +366,7 @@
     font-size: 14px;
     color: #606266;
     background: rgb(240, 242, 245);
-    margin-top: 20px;
+    /*margin-top: 20px;*/
   }
 
   .labelName {
@@ -422,6 +404,7 @@
   .newTable {
     height: 590px;
     overflow-y: auto;
+    margin-top: -20px;
   }
   .addBtn{
     margin-right: 5px;

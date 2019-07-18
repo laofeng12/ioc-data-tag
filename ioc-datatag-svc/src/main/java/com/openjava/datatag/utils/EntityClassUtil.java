@@ -3,6 +3,8 @@ package com.openjava.datatag.utils;
 import org.ljdp.component.user.BaseUserInfo;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Date;
 
 /**
@@ -90,5 +92,34 @@ public class EntityClassUtil {
 		
 	}
 
-	
+	public static void getHtmlOfEntity(Object entity){
+		if (entity == null) {
+			return;
+		}
+		Class cls = entity.getClass();
+		Field[] fields = cls.getDeclaredFields();
+			for (Field field : fields){
+				try{
+					String type = field.getGenericType().toString();
+					if (type.equals("class java.lang.String")){
+						String name = field.getName();
+						name = name.substring(0, 1).toUpperCase() + name.substring(1);
+						Method mGet = entity.getClass().getMethod("get" + name);
+						// 调用getter方法获取属性值
+						String value = (String) mGet.invoke(entity);
+						String htmlValue = StringUtil.stringToHtmlEntity(value);
+						Method mSet = entity.getClass().getMethod("set" + name,String.class);
+						mSet.invoke(entity,htmlValue);
+					}
+				} catch (NoSuchMethodException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			}
+
+
+	}
 }
