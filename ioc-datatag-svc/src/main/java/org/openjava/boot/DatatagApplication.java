@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 //				"org.ljdp.support.**.controller",
 				"com.openjava.**.service",
 				"com.openjava.**.component",
-				"com.openjava.**.dao",
+//				"com.openjava.**.dao",
 				"com.openjava.**.api",
 				"org.openjava.boot.conf",
 				})
