@@ -6,10 +6,7 @@ import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.dto.DtTagGroupSaveDTO;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
-import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.utils.IpUtil;
-import com.openjava.datatag.utils.StringUtil;
-import com.openjava.datatag.utils.user.service.SysUserService;
 import io.swagger.annotations.*;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
@@ -20,7 +17,9 @@ import org.ljdp.secure.sso.SsoContext;
 import org.ljdp.ui.bootstrap.TablePage;
 import org.ljdp.ui.bootstrap.TablePageImpl;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -87,7 +86,9 @@ public class MyDtTagGroupAction {
 		params.setEq_createUser(id);
 		params.setEq_isDeleted(Constants.PUBLIC_NO);
 		params.setSql_key("tagsName like \'%" + params.getKeyword() + "%\' or "+ "synopsis like \'%" + params.getKeyword()+"%\'");
-		Page<DtTagGroup> results =  dtTagGroupService.query(params, pageable);
+		Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+				Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));
+		Page<DtTagGroup> results =  dtTagGroupService.query(params, mypage);
 		return new TablePageImpl<>(results);
 
 	}
@@ -146,6 +147,8 @@ public class MyDtTagGroupAction {
 		//EntityClassUtil.getHtmlOfEntity(body);
 		if (body.getIsNew() == null || body.getIsNew()) {
 			DtTagGroup db = dtTagGroupService.doNew(body,userId,ip);
+			db.setCode(200L);
+			db.setMessage("新建成功");
 			return db;
 		} else {
 			//修改，记录更新时间等
@@ -158,6 +161,8 @@ public class MyDtTagGroupAction {
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请不要调用POST方法进行删除操作,请用DELETE方法");
 				}
 				DtTagGroup newdb = dtTagGroupService.doUpdate(body,db,userId,ip);
+				newdb.setCode(200L);
+				newdb.setMessage("更新成功");
 				return newdb;
 
 			}else{

@@ -74,6 +74,12 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 	}
 
 	public DtTagGroup doNew(DtTagGroup body,Long userId,String ip){
+		if (body.getTagsName() == null){
+			body.setTagsName("新建标签组");
+		}
+		if (body.getSynopsis() == null){
+			body.setTagsName("未填写简介");
+		}
 		String modifyContent = JSONObject.toJSONString(body);
 		//新增，记录创建时间等
 		//设置主键(请根据实际情况修改)

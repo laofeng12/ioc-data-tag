@@ -31,8 +31,17 @@ public class TagDTOTreeNode {
         return childrenNode;
     }
 
-    public boolean isleaf(){
+    public boolean isLeaf(){
         return childrenNode.isEmpty();
+    }
+
+    public boolean isLeafParent(){
+        for (TagDTOTreeNode ctree : childrenNode){
+            if (ctree.isLeaf()){
+                return  true;
+            }
+        }
+        return false;
     }
 
     public List<DtTagDTO> toList(){

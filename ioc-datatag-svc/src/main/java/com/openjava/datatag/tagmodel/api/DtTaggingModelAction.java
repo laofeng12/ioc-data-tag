@@ -33,10 +33,7 @@ import org.ljdp.secure.sso.SsoContext;
 import org.ljdp.ui.bootstrap.TablePage;
 import org.ljdp.ui.bootstrap.TablePageImpl;
 import org.ljdp.util.DateFormater;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -124,7 +121,9 @@ public class DtTaggingModelAction {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		params.setEq_isDeleted(Constants.PUBLIC_NO);
 		params.setEq_createUser(Long.parseLong(userInfo.getUserId()));
-		Page<DtTaggingModel> results =  dtTaggingModelService.query(params, pageable);
+		Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+				Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));
+		Page<DtTaggingModel> results =  dtTaggingModelService.query(params, mypage);
 		List<DtTaggingModelDTO> showList = new ArrayList<>();
 		for (DtTaggingModel tgm: results){
 			DtTaggingModelDTO dto = new DtTaggingModelDTO();
