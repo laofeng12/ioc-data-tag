@@ -67,6 +67,9 @@ public class DtTagServiceImpl implements DtTagService {
 		//查询所有未删除的标签list
 		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId, Constants.PUBLIC_NO);
 	}
+	public List<DtTag> findByPreaTagId(Long pId){
+		return dtTagRepository.findByPreaTagIdAndIsDeleted(pId,Constants.PUBLIC_NO);
+	}
 
 	public void doNew(DtTag body,Long userId,String ip){
 		String modifyContent = JSONObject.toJSONString(body);
