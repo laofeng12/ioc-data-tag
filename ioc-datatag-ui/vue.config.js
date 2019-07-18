@@ -1,4 +1,4 @@
-const baseUrl = process.env.NODE_ENV === 'production' ? '/datatag/' : '/datatag/'
+const baseUrl = process.env.NODE_ENV === 'production' ? '/datatagweb/' : '/datatagweb/'
 module.exports = {
   lintOnSave: false,
   publicPath: baseUrl,
@@ -12,14 +12,11 @@ module.exports = {
   devServer: {
     proxy: {
       '/admin': {
-        // target: 'http://47.107.56.144:8081',
-        // target: 'http://19.104.40.36:31880', // 政务内网
         target: 'http://183.6.55.26:31075', // 公司测试环境
         changeOrigin: true
       },
       '/pds': {
         target: 'http://183.6.55.26:31013', // 公司测试环境
-        // target: 'http://192.168.4.209:8082', // zuoye
         changeOrigin: true
       },
       '/ljdp': {
@@ -27,8 +24,13 @@ module.exports = {
         changeOrigin: true
       },
       '/framework': {
-        target: 'http://183.6.55.26:31075', //
+        target: 'http://183.6.55.26:31075',
         changeOrigin: true
+      },
+      'datatagweb/datatag': {
+        target: 'http://183.6.55.26:30003', // test
+        changeOrigin: true,
+        pathRewrite: { '^/datatagweb/datatag/': '/datatagweb/datatag/' }
       },
     }
   },

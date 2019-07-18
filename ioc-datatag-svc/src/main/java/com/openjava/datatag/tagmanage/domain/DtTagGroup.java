@@ -6,6 +6,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 
+import com.openjava.datatag.tagmanage.dto.BaseMessageDTO;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.data.domain.Persistable;
 import org.hibernate.validator.constraints.Length;
@@ -31,7 +32,7 @@ import io.swagger.annotations.ApiModelProperty;
 //@Accessors(chain = true)
 @Entity
 @Table(name = "DT_TAG_GROUP")
-public class DtTagGroup implements Persistable<Long>,Serializable {
+public class DtTagGroup extends BaseMessageDTO implements Persistable<Long>,Serializable {
 
 	@ApiModelProperty("标签组编号")
 	@Id
@@ -39,7 +40,7 @@ public class DtTagGroup implements Persistable<Long>,Serializable {
 	private Long id;
 
 	@ApiModelProperty("标签组名")
-	@Length(min=0, max=50)
+	@Length(min=0, max=64)
 	@Column(name = "TAGS_NAME")
 	private String tagsName;
 

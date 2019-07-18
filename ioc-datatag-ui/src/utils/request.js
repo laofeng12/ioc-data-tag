@@ -2,6 +2,7 @@ import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
 import store from '@/store'
 import qs from 'qs'
+import { getToken } from '@/utils/auth'
 
 // formData格式的请求开始
 // 创建axios实例
@@ -14,14 +15,16 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     config = setRequestHeader(config)
-    if (config.method.toLowerCase() === 'post') {
+    // console.log('config', config)
+    if (config.method.toLowerCase() === 'post' || config.isJson === 0) {
       config.data = qs.stringify(config.data)
     }
+
     return config
   },
   error => {
     // Do something with request error
-    console.log('66',error) // for debug
+    console.log(error) // for debug
     Promise.reject(error)
   }
 )
@@ -52,7 +55,7 @@ requestUpload.interceptors.request.use(
   },
   error => {
     // Do something with request error
-    console.log('77',error) // for debug
+    // console.log(error) // for debug
     Promise.reject(error)
   }
 )
@@ -85,7 +88,7 @@ requestJson.interceptors.request.use(
   },
   error => {
     // Do something with request error
-    console.log('8888888888',error) // for debug
+    console.log(error) // for debug
     Promise.reject(error)
   }
 )
@@ -113,7 +116,7 @@ requestJsonHttpCode.interceptors.request.use(
   },
   error => {
     // Do something with request error
-    console.log('98',error) // for debug
+    console.log(error) // for debug
     Promise.reject(error)
   }
 )
@@ -133,15 +136,11 @@ requestJsonHttpCode.interceptors.response.use(
  * @param {object} config axios的config
  */
 function setRequestHeader (config) {
-  let token = store.getters.token || localStorage.getItem('token')
-  let apiv1Token = store.getters.apiv1Token || localStorage.getItem('apiv1Token')
+  const token = store.getters.token || getToken()
   if (token) {
     config.headers['authority-token'] = token // 让每个请求携带自定义token 请根据实际情况自行修改
-  }
-
-  if (apiv1Token) {
-    config.headers['Authorization'] = `Bearer ${apiv1Token}` // 让每个请求携带自定义token 请根据实际情况自行修改
-    // config.headers['namespace'] = 'ioc-paas-platform'
+    config.headers['Authorization'] = `Bearer ${token}` // 让每个请求携带自定义token 请根据实际情况自行修改
+    config.headers['namespace'] = 'ioc-paas-platform'
   }
 
   return config
@@ -160,11 +159,10 @@ function responseCode (response) {
    */
   const res = response.data
   if (res.code !== 200) {
-    // 20019:20020: 重新登陆;
+    // 20019:20020: 重新登录;
     if (res.code === 20019 || res.code === 20020) {
       authFailure(res)
     } else {
-      console.log('99')
       Message({
         message: res.message,
         type: 'error',
@@ -183,7 +181,7 @@ function responseCode (response) {
  * @param {object} error 后端返回的错误信息
  */
 function errorCode (error) {
-  console.log('err44' + error) // for debug
+  console.log('err' + error) // for debug
   let errorMsg = error.code === 'ECONNABORTED' ? '请求超时' : error.message
 
   errorMsg = error.message
@@ -233,7 +231,7 @@ function errorHttpCode (error) {
 }
 function authFailure (data) {
   MessageBox.alert(
-    data.message,
+    '权限认证失败',
     '警告',
     {
       confirmButtonText: '重新登录',
@@ -241,7 +239,7 @@ function authFailure (data) {
       showClose: false
     }
   ).then(() => {
-    store.dispatch('FedLogOut').then(() => {
+    store.dispatch('resetToken').then(() => {
       location.reload() // 为了重新实例化vue-router对象 避免bug
     })
   })

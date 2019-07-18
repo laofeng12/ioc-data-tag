@@ -2,6 +2,7 @@ import axios from 'axios'
 import qs from 'qs'
 import { Message, MessageBox } from 'element-ui'
 import store from '@/store'
+import { getToken } from '@/utils/auth'
 
 const service = axios.create({
   baseURL: process.env.BASE_URL, // api 的 base_url
@@ -117,7 +118,7 @@ function authFailure (data) {
       showClose: false
     }
   ).then(() => {
-    store.dispatch('FedLogOut').then(() => {
+    store.dispatch('resetToken').then(() => {
       location.reload() // 为了重新实例化vue-router对象 避免bug
     })
   })

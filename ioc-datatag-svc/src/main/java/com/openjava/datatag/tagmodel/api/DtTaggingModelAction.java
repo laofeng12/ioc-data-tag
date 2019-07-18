@@ -17,6 +17,7 @@ import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.service.DtSetColService;
 import com.openjava.datatag.utils.EntityClassUtil;
 import com.openjava.datatag.utils.IpUtil;
+import com.openjava.datatag.utils.user.service.SysUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
@@ -32,9 +33,7 @@ import org.ljdp.secure.sso.SsoContext;
 import org.ljdp.ui.bootstrap.TablePage;
 import org.ljdp.ui.bootstrap.TablePageImpl;
 import org.ljdp.util.DateFormater;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +68,9 @@ public class DtTaggingModelAction {
 
 	@Resource
 	private DtSetColService dtSetColService;
+
+	@Resource
+	private SysUserService sysUserService;
 	/**
 	 * 用主键获取数据
 	 * @return
@@ -98,6 +100,8 @@ public class DtTaggingModelAction {
 		DtTaggingModelDTO result = new DtTaggingModelDTO();
 		MyBeanUtils.copyPropertiesNotBlank(result,m);
 		result.setColList(dtSetColService.getByTaggingModelId(result.getTaggingModelId()));
+		result.setModifyUserName(sysUserService.get(result.getModifyUser()).getFullname());
+		result.setCreateUserName(sysUserService.get(result.getCreateUser()).getFullname());
 		return result;
 	}
 	
@@ -113,12 +117,23 @@ public class DtTaggingModelAction {
 	})
 	@Security(session=true)
 	@RequestMapping(value="/search",method=RequestMethod.GET)
-	public TablePage<DtTaggingModel> doSearch(@ApiIgnore() DtTaggingModelDBParam params, @ApiIgnore() Pageable pageable){
+	public TablePage<DtTaggingModelDTO> doSearch(@ApiIgnore() DtTaggingModelDBParam params, @ApiIgnore() Pageable pageable){
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		params.setEq_isDeleted(Constants.DT_TG_EXIST);
+		params.setEq_isDeleted(Constants.PUBLIC_NO);
 		params.setEq_createUser(Long.parseLong(userInfo.getUserId()));
-		Page<DtTaggingModel> result =  dtTaggingModelService.query(params, pageable);
-		return new TablePageImpl<>(result);
+		Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+				Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));
+		Page<DtTaggingModel> results =  dtTaggingModelService.query(params, mypage);
+		List<DtTaggingModelDTO> showList = new ArrayList<>();
+		for (DtTaggingModel tgm: results){
+			DtTaggingModelDTO dto = new DtTaggingModelDTO();
+			MyBeanUtils.copyPropertiesNotBlank(dto,tgm);
+			dto.setCreateUserName(sysUserService.get(dto.getCreateUser()).getFullname());
+			dto.setModifyUserName(sysUserService.get(dto.getModifyUser()).getFullname());
+			showList.add(dto);
+		}
+		Page<DtTaggingModelDTO> showResult = new PageImpl<>(showList,pageable,showList.size());
+		return new TablePageImpl<>(showResult);
 	}
 	
 	/**

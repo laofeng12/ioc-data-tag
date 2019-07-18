@@ -21,7 +21,6 @@ public class DtTagGroupDBParam extends RoDBQueryParam {
 	public String getSql_key() {
 		return sql_key;
 	}
-
 	public void setSql_key(String sql_key) {
 		this.sql_key = sql_key;
 	}

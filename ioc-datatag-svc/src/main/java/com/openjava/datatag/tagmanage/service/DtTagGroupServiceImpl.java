@@ -2,12 +2,10 @@ package com.openjava.datatag.tagmanage.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
-import com.openjava.datatag.log.domain.DtTaggUpdateLog;
 import com.openjava.datatag.log.service.DtTaggUpdateLogService;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
-import com.openjava.datatag.log.repository.DtTaggUpdateLogRepository;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.sequence.SequenceService;
@@ -43,6 +41,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		Page<DtTagGroup> pageresult = dtTagGroupRepository.query(params, pageable);
 		return pageresult;
 	}
+
 	
 	public List<DtTagGroup> queryDataOnly(DtTagGroupDBParam params, Pageable pageable){
 		return dtTagGroupRepository.queryDataOnly(params, pageable);
@@ -65,7 +64,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 
 	public void doSoftDelete(DtTagGroup db,Long userId,String ip){
 		db.setModifyTime(new Date());
-		db.setIsDeleted(Constants.DT_TG_DELETED);
+		db.setIsDeleted(Constants.PUBLIC_YES);
 		//批量修改标签表的删除标识
 		dtTagService.doSoftDeleteByTagsID(db.getId(),db.getModifyTime());
 		//修改标签组表的删除标识
@@ -75,6 +74,12 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 	}
 
 	public DtTagGroup doNew(DtTagGroup body,Long userId,String ip){
+		if (body.getTagsName() == null){
+			body.setTagsName("新建标签组");
+		}
+		if (body.getSynopsis() == null){
+			body.setTagsName("未填写简介");
+		}
 		String modifyContent = JSONObject.toJSONString(body);
 		//新增，记录创建时间等
 		//设置主键(请根据实际情况修改)
@@ -85,8 +90,8 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		Date now = new Date();
 		body.setCreateTime(now);
 		body.setModifyTime(now);
-		body.setIsDeleted(Constants.DT_TG_EXIST);
-		body.setIsShare(Constants.DT_TG_PRIVATE);
+		body.setIsDeleted(Constants.PUBLIC_NO);
+		body.setIsShare(Constants.PUBLIC_NO);
 		body.setPopularity(0L);
 		DtTagGroup db = dtTagGroupRepository.save(body);
 

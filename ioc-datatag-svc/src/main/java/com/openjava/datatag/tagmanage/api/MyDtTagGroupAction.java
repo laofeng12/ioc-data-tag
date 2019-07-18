@@ -3,12 +3,12 @@ package com.openjava.datatag.tagmanage.api;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmanage.dto.DtTagGroupSaveDTO;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
-import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.utils.IpUtil;
-import com.openjava.datatag.utils.StringUtil;
 import io.swagger.annotations.*;
+import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.user.BaseUserInfo;
@@ -17,13 +17,14 @@ import org.ljdp.secure.sso.SsoContext;
 import org.ljdp.ui.bootstrap.TablePage;
 import org.ljdp.ui.bootstrap.TablePageImpl;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 
 
 /**
@@ -31,18 +32,13 @@ import java.util.Date;
  * @author lch
  *
  */
-@Api(tags="我的标签列表")
+@Api(tags="我的标签组列表")
 @RestController
 @RequestMapping("/datatag/tagmanage/myDtTagGroup")
 public class MyDtTagGroupAction {
 	
 	@Resource
 	private DtTagGroupService dtTagGroupService;
-
-	@Resource
-	private DtTagService dtTagService;
-
-
 
 	/**
 	 * 用主键获取数据
@@ -62,7 +58,7 @@ public class MyDtTagGroupAction {
 	public DtTagGroup get(@PathVariable("id")Long id) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTagGroup m = dtTagGroupService.get(id);
-		if(m == null || m.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+		if(m == null || m.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			return null;
 		}
 		if(userInfo.getUserId().equals(m.getCreateUser().toString())){
@@ -76,9 +72,6 @@ public class MyDtTagGroupAction {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "keyword", value = "关键字-模糊查询标签组名和简介", required = false, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "eq_isShare", value = "是否共享=", required = false, dataType = "Long", paramType = "query"),
-			//@ApiImplicitParam(name = "like_synopsis", value = "标签组简介like", required = false, dataType = "String", paramType = "query"),
-			//@ApiImplicitParam(name = "eq_createUser", value = "创建者=", required = false, dataType = "Long", paramType = "query"),
-			//@ApiImplicitParam(name = "eq_isDeleted", value = "删除标记=", required = false, dataType = "Long", paramType = "query"),
 			@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
 	})
@@ -87,19 +80,18 @@ public class MyDtTagGroupAction {
 	public TablePage<DtTagGroup> doSearch(@ApiIgnore() DtTagGroupDBParam params,
 										  @ApiIgnore() Pageable pageable,
 										  HttpServletRequest request){
-
-		params.setKeyword(StringUtil.stringToHtmlEntity(params.getKeyword()));
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+
 		Long id = Long.parseLong(userInfo.getUserId());
 		params.setEq_createUser(id);
-		params.setEq_isDeleted(Constants.DT_TG_EXIST);
+		params.setEq_isDeleted(Constants.PUBLIC_NO);
 		params.setSql_key("tagsName like \'%" + params.getKeyword() + "%\' or "+ "synopsis like \'%" + params.getKeyword()+"%\'");
-		Page<DtTagGroup> result =  dtTagGroupService.query(params, pageable);
-		return new TablePageImpl<>(result);
+		Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+				Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));
+		Page<DtTagGroup> results =  dtTagGroupService.query(params, mypage);
+		return new TablePageImpl<>(results);
 
 	}
-
-
 
 	@ApiOperation(value = "删除", nickname="delete")
 	@ApiImplicitParams({
@@ -120,7 +112,7 @@ public class MyDtTagGroupAction {
 		String ip = IpUtil.getRealIP(request);
 
 		DtTagGroup tagGroup = dtTagGroupService.get(id);
-		if(tagGroup == null || tagGroup.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+		if(tagGroup == null || tagGroup.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND,"无此标签组或已被删除");
 		}
 		if(userInfo.getUserId().equals(tagGroup.getCreateUser().toString())){
@@ -145,26 +137,32 @@ public class MyDtTagGroupAction {
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_ERROE, message="请不要调用POST方法进行删除操作,请用DELETE方法"),
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="没有修改此标签组的权限")
 	})
-	public DtTagGroup doSave(@RequestBody DtTagGroup body,HttpServletRequest request) throws APIException {
+	public DtTagGroup doSave(@RequestBody DtTagGroupSaveDTO bodyDTO, HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long userId = Long.parseLong(userInfo.getUserId());
 		String ip = IpUtil.getRealIP(request);
-		//不能通过本接口修改热度
-		body.setPopularity(null);
+
+		DtTagGroup body = new DtTagGroup();
+		MyBeanUtils.copyPropertiesNotBlank(body,bodyDTO);
+		//EntityClassUtil.getHtmlOfEntity(body);
 		if (body.getIsNew() == null || body.getIsNew()) {
 			DtTagGroup db = dtTagGroupService.doNew(body,userId,ip);
+			db.setCode(200L);
+			db.setMessage("新建成功");
 			return db;
 		} else {
 			//修改，记录更新时间等
 			DtTagGroup db = dtTagGroupService.get(body.getId());
-			if(db == null || db.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+			if(db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
 				throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND,"无此标签组或已被删除");
 			}
 			if(db.getCreateUser().equals(userId)){
-				if(body.getIsDeleted()!= null && body.getIsDeleted().equals(Constants.DT_TG_DELETED)){
+				if(body.getIsDeleted()!= null && body.getIsDeleted().equals(Constants.PUBLIC_YES)){
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请不要调用POST方法进行删除操作,请用DELETE方法");
 				}
 				DtTagGroup newdb = dtTagGroupService.doUpdate(body,db,userId,ip);
+				newdb.setCode(200L);
+				newdb.setMessage("更新成功");
 				return newdb;
 
 			}else{
