@@ -11,6 +11,7 @@ public class TagDTOTreeNode {
     private List<TagDTOTreeNode> childrenNode;
     public static final Long ROOT_ID = 0L;
 
+
     public TagDTOTreeNode(DtTagDTO tag){
         this.tag = tag;
         childrenNode = new ArrayList<TagDTOTreeNode>();

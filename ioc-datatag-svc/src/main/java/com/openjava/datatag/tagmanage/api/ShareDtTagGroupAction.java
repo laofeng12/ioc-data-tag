@@ -48,6 +48,9 @@ public class ShareDtTagGroupAction {
     @RequestMapping(method= RequestMethod.GET)
     public Page<DtShareTagGroup> doSearchShare(@ApiIgnore @RequestParam(value = "searchKey",required = false) String searchKey,
                                                @ApiIgnore() Pageable pageable){
+        if (searchKey == null){
+            searchKey = "";
+        }
         Page<DtShareTagGroup> result =  dtShareTagGroupService.findList(searchKey,pageable);
         return result;
     }
