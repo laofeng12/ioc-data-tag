@@ -335,16 +335,22 @@
           try{
             const res = await lookTree(this.$route.params.tagsId)
             this.data = res.childrenNode
-            const treeTable = await looktreeTable(res.childrenNode[0].id)
-            if(treeTable == ''){
-              this.Loading = false
-            }else {
-              this.ztableShowList = treeTable.childrenTag?treeTable.childrenTag:[]
-              this.tableparentList.push(treeTable.parentTag)
-              if(this.ztableShowList == ''){
-                this.Loading2 = false
+            if(res.childrenNode.length != 0){
+              const treeTable = await looktreeTable(res.childrenNode[0].id)
+              if(treeTable == ''){
+                this.Loading = false
+              }else {
+                this.ztableShowList = treeTable.childrenTag?treeTable.childrenTag:[]
+                this.tableparentList.push(treeTable.parentTag)
+                if(this.ztableShowList == ''){
+                  this.Loading2 = false
+                }
               }
+            }else {
+              this.Loading = false
+              this.Loading2 = false
             }
+
           }catch (e) {
             console.log(e);
           }
