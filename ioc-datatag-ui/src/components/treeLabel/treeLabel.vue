@@ -511,8 +511,6 @@
         try {
           const res = await lookTree(this.$route.params.tagsId)
           this.data = res.childrenNode
-          console.log('res', res)
-          console.log('res', res.childrenNode)
           if (res.childrenNode && res.childrenNode.length > 0) {
             const treeTable = await looktreeTable(res.childrenNode[0].id)
             if (treeTable == '') {
