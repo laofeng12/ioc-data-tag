@@ -29,11 +29,11 @@
           <!--type="text"-->
           <!--size="mini"-->
           <!--@click="() => append(data)">-->
-          <el-button class="addBtn" type="text" size="mini" @click="addTwo(node,data)" :disabled="node.level>2">
+          <el-button class="addBtn" type="text" size="mini" @click.stop="addTwo(node,data)" :disabled="node.level>2">
             <!--Append-->
             <i class="el-icon-plus"></i>
           </el-button>
-          <el-button type="text" size="mini" @click="remove(node, data)" :disabled="node.level>2">
+          <el-button type="text" size="mini" @click.stop="remove(node, data)" :disabled="node.level>2">
             <!--Delete-->
             <i class="el-icon-delete"></i>
           </el-button>
@@ -124,8 +124,10 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" plain class="btn-group"  @click="cancel()">取消</el-button>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="add(ruleForm.name,ruleForm.textarea)">添加</el-button>
+          <el-button size="small" plain class="btn-group" @click="cancel()">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading"
+                     @click="add(ruleForm.name,ruleForm.textarea)">添加
+          </el-button>
         </div>
       </div>
     </el-dialog>
@@ -152,8 +154,10 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" plain class="btn-group"  @click="cancelOne()">取消</el-button>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="addNext(ruleForm.name,ruleForm.textarea)">添加</el-button>
+          <el-button size="small" plain class="btn-group" @click="cancelOne()">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="savelabelLoading"
+                     @click="addNext(ruleForm.name,ruleForm.textarea)">添加
+          </el-button>
         </div>
       </div>
     </el-dialog>
@@ -179,23 +183,27 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" plain class="btn-group"  @click="closeShare2">取消</el-button>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定</el-button>
+          <el-button size="small" plain class="btn-group" @click="closeShare2">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="editLoading" @click="sureShare">确定
+          </el-button>
         </div>
       </div>
     </el-dialog>
 
-    <el-dialog class="creat" title="删除提示" :visible.sync="deleteDialog" width="530px" center :close-on-click-modal="false"
+    <el-dialog class="creat" title="删除提示" :visible.sync="deleteDialog" width="530px" center
+               :close-on-click-modal="false"
                @close="closedelete">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px">
-          <el-form-item >您正在删除南城区高考成绩数据，是否确认删除？</el-form-item>
+          <el-form-item>您正在删除南城区高考成绩数据，是否确认删除？</el-form-item>
         </el-form>
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading"  @click="delTree(delTreeId)">确定删除</el-button>
-          <el-button size="small" type="primary" class="queryBtn" >取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="delTree(delTreeId)">
+            确定删除
+          </el-button>
+          <el-button size="small" type="primary" class="queryBtn">取消</el-button>
         </div>
       </div>
     </el-dialog>
@@ -203,35 +211,38 @@
 </template>
 
 <script>
-  import {lookTree,looktreeTable} from '@/api/shareLabel.js'
-  import {getDtTagData,delTree,delTagGroup}  from '@/api/tagManage'
+  import {lookTree, looktreeTable} from '@/api/shareLabel.js'
+  import {getDtTagData, delTree, delTagGroup} from '@/api/tagManage'
+
   let id = 1000;
   export default {
     name: "treeLabel",
     data() {
       return {
-        delTreeId:0,
-        lvl:1,
-        id:0,
-        preaTagId:0,
+        delTreeId: 0,
+        lvl: 1,
+        id: 0,
+        preaTagId: 0,
         labelDialog: false,
         labelDialog2: false,
         editDialog: false,
-        deleteDialog:false,
-        deleteLoading:false,
+        deleteDialog: false,
+        deleteLoading: false,
         filterText: '',
         Loading: true,
-        Loading2:true,
+        Loading2: true,
         saveLoading2: true,
         shareDialog: false,
         saveLoading: false,
+        savelabelLoading: false,
+        editLoading:false,
         percentage: 30,
-        addLabel:true,
-        topaddLabel:true,
-        labelEdit:true,
-        treeID:'',
+        addLabel: true,
+        topaddLabel: true,
+        labelEdit: true,
+        treeID: '',
         value1: '',
-        aa:'',
+        labelcreatID: '',
         textarea: '',
         options: [{
           value: '选项1',
@@ -244,7 +255,7 @@
           label: '已共享'
         }],
         value: '',
-        tableparentList:[],
+        tableparentList: [],
         ztableShowList: [],
         ruleForm: {
           name: '',
@@ -260,7 +271,7 @@
             {required: true, message: '请填写', trigger: 'blur'}
           ]
         },
-        data:[],
+        data: [],
         defaultProps: {
           children: 'childrenNode',
           label: 'tagName'
@@ -275,67 +286,103 @@
     methods: {
       //编辑标签弹窗
       editLabel(row) {
-       // console.log(row)
-        this.ruleForm.name=row.tagName
-        this.ruleForm.textarea2=row.synopsis
-        this.id=row.id
+        // console.log(row)
+        this.ruleForm.name = row.tagName
+        this.ruleForm.textarea2 = row.synopsis
+        this.id = row.id
         this.editDialog = true
       },
       // 编辑标签确认
       async sureShare() {
-        const tagsId= Number(this.$route.params.tagsId)
-        const params = {
-          id:this.id,
-          isNew: false,
-          synopsis:this.ruleForm.textarea2,
-          tagName:this.ruleForm.name,
-          tagsId:tagsId
-        }
-        try {
-          const data = await getDtTagData(params)
-          //console.log('编辑成功')
-          if(data.message=='修改成功'){
-            this.$message({
-              message: '修改成功',
-              duration:1000,
-              type: 'success'
-            })
-            this.sharelookTree()
-          }else {
-            this.$message.error(data.message)
+        this.editLoading = true
+        const tagsId = Number(this.$route.params.tagsId)
+        this.$refs.ruleForm.validate(async (valid) => {
+          if (valid) {
+            try {
+              const params = {
+                id: this.id,
+                isNew: false,
+                synopsis: this.ruleForm.textarea2,
+                tagName: this.ruleForm.name,
+                tagsId: tagsId
+              }
+              const data = await getDtTagData(params)
+              //console.log('编辑成功')
+              if (data.message == '修改成功') {
+                this.$message({
+                  message: '修改成功',
+                  duration: 1000,
+                  type: 'success'
+                })
+                this.sharelookTree()
+                this.editDialog = false
+                this.editLoading = false
+                this.$refs.ruleForm.resetFields()
+              } else {
+                this.editLoading = false
+                this.$message.error(data.message)
+              }
+            } catch (e) {
+              this.editLoading = false
+            }
+          } else {
+            this.editLoading = false
           }
-        } catch (e) {
-
-        }
-        this.editDialog = false
-        this.$refs.ruleForm.resetFields()
+        });
       },
 
       //添加顶级标签
-      add(synopsis,tagsName){
-        this.lvl=1
-        this.getDtTagData(null,synopsis,tagsName)
-        this.labelDialog=false
-        this.$refs.ruleForm.resetFields()
-
+      add(synopsis, tagsName) {
+        this.saveLoading = true
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            try {
+              this.lvl = 1
+              this.getDtTagData(null, synopsis, tagsName)
+              this.labelDialog = false
+              this.saveLoading = false
+              this.$refs.ruleForm.resetFields()
+            } catch (e) {
+              this.saveLoading = false
+              console.log(e);
+            }
+          } else {
+            this.saveLoading = false
+          }
+        });
       },
       //添加下级
-      addNext(synopsis,tagsName){
-        this.getDtTagData(this.preaTagId,synopsis,tagsName)
-        this.labelDialog2=false
-        this.$refs.ruleForm.resetFields()
+      addNext(synopsis, tagsName) {
+        this.savelabelLoading = true
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            try {
+              this.tableparentList = []
+              this.getDtTagData(this.preaTagId, synopsis, tagsName)
+              this.labelDialog2 = false
+              this.savelabelLoading = false
+              this.$refs.ruleForm.resetFields()
+            } catch (e) {
+              this.savelabelLoading = false
+              console.log(e);
+            }
+          } else {
+            this.savelabelLoading = false
+          }
+        });
+
       },
       closeShare2() {
         this.editDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      cancel(){
-        this.labelDialog=false
+      cancel() {
+        this.labelDialog = false
         this.$refs.ruleForm.resetFields()
       },
       //取消添加下级
-      cancelOne(){
-        this.labelDialog2=false
+      cancelOne() {
+        this.labelDialog2 = false
         this.$refs.ruleForm.resetFields()
 
       },
@@ -348,7 +395,7 @@
         const treeTable = await looktreeTable(data.id)
         this.ztableShowList = treeTable.childrenTag
         this.tableparentList.push(treeTable.parentTag)
-        if(this.ztableShowList == ''){
+        if (this.ztableShowList == '') {
           this.Loading2 = false
         }
       },
@@ -361,7 +408,8 @@
       },
 
       remove(node, data) {
-       this.delTree(data.id)
+        this.delTree(data.id)
+        console.log('remove', data.id)
       },
       renderContent(h, {node, data, store}) {
         return (
@@ -376,10 +424,10 @@
       openOne() {
         this.labelDialog = true
       },
-      addTwo(node,data) {
-       //console.log('新建下级标签',node,data)
-        this.lvl=node.level+1
-        this.preaTagId=data.id
+      addTwo(node, data) {
+        //console.log('新建下级标签',node,data)
+        this.lvl = node.level + 1
+        this.preaTagId = data.id
         this.labelDialog2 = true
       },
       closedialogOne() {
@@ -391,47 +439,48 @@
       closeEdit() {
         this.editDialog = false
       },
-      closedelete(){
+      closedelete() {
         this.deleteDialog = false
       },
-      handleDelete(id){
-        this.delTreeId=id
+      handleDelete(id) {
+        this.delTreeId = id
         this.deleteDialog = true
       },
       //删除
-      async delTree(id){
+      async delTree(id) {
+        this.tableparentList = []
         try {
           const data = await delTree(id)
-          if(data.message=='删除成功'){
+          if (data.message == '删除成功') {
             this.$message({
               message: '删除成功',
-              duration:1000,
+              duration: 1000,
               type: 'success'
             });
             this.sharelookTree()
 
-          }else {
+          } else {
             this.$message.error(data.message)
           }
 
         } catch (e) {
 
         }
-        this.deleteDialog=false
+        this.deleteDialog = false
       },
       //删除表格对应标签
-      async delTag(id){
+      async delTag(id) {
         try {
           const data = await delTree(id)
           //console.log(data)
-          if(data.message=='删除成功'){
+          if (data.message == '删除成功') {
             this.$message({
               message: '删除成功',
-              duration:1000,
+              duration: 1000,
               type: 'success'
             });
             this.getTagsData()
-          }else {
+          } else {
             this.$message.error(data.message)
           }
 
@@ -440,15 +489,15 @@
         }
       },
       //新建树节点
-      async getDtTagData(preaTagId,synopsis,tagsName) {
-        const tagsId= Number(this.$route.params.tagsId)
+      async getDtTagData(preaTagId, synopsis, tagsName) {
+        const tagsId = Number(this.$route.params.tagsId)
         const params = {
-          lvl:this.lvl,
-          preaTagId:preaTagId,
+          lvl: this.lvl,
+          preaTagId: preaTagId,
           isNew: true,
-          synopsis:synopsis,
-          tagName:tagsName,
-          tagsId:tagsId,//标签组id
+          synopsis: synopsis,
+          tagName: tagsName,
+          tagsId: tagsId,//标签组id
         }
         try {
           const data = await getDtTagData(params)
@@ -458,39 +507,42 @@
 
         }
       },
-      async sharelookTree(){
-          try{
-            const res = await lookTree(this.$route.params.tagsId)
-            this.data = res.childrenNode
-            if (res.childrenNode&&res.childrenNode.length > 0 ){
-              const treeTable = await looktreeTable(res.childrenNode[0].id)
-              if(treeTable == ''){
-                this.Loading = false
-              }else {
-                this.ztableShowList = treeTable.childrenTag?treeTable.childrenTag:[]
-                this.tableparentList.push(treeTable.parentTag)
-                if(this.ztableShowList == ''){
-                  this.Loading2 = false
-                }
-              }
-            }else {
+      async sharelookTree() {
+        try {
+          const res = await lookTree(this.$route.params.tagsId)
+          this.data = res.childrenNode
+          console.log('res', res)
+          console.log('res', res.childrenNode)
+          if (res.childrenNode && res.childrenNode.length > 0) {
+            const treeTable = await looktreeTable(res.childrenNode[0].id)
+            if (treeTable == '') {
               this.Loading = false
-              this.Loading2 = false
+            } else {
+              this.tableparentList = []
+              this.ztableShowList = treeTable.childrenTag ? treeTable.childrenTag : []
+              this.tableparentList.push(treeTable.parentTag)
+              if (this.ztableShowList == '') {
+                this.Loading2 = false
+              }
             }
-
-          }catch (e) {
-           // console.log(e);
+          } else {
+            this.Loading = false
+            this.Loading2 = false
           }
-      }
-
+        } catch (e) {
+          console.log(e);
+        }
+      },
     },
-    created(){
-      if(this.$route.name == 'lookTree'){
+    created() {
+      if (this.$route.name == 'lookTree') {
         this.sharelookTree()
         this.addLabel = false
         this.topaddLabel = false
         this.labelEdit = false
-      }else if(this.$route.name == 'editTree'){
+      } else if (this.$route.name == 'editTree') {
+        this.sharelookTree()
+      } else if (this.$route.name == 'labelcreatTree') {
         this.sharelookTree()
       }
       else {
@@ -575,10 +627,12 @@
     overflow-y: auto;
     margin-top: -20px;
   }
-  .addBtn{
+
+  .addBtn {
     margin-right: 5px;
   }
-  .secondTable >>> .el-table__header-wrapper{
+
+  .secondTable >>> .el-table__header-wrapper {
     display: none;
   }
 </style>
