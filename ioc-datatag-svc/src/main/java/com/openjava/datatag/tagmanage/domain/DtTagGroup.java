@@ -86,6 +86,11 @@ public class DtTagGroup extends BaseMessageDTO implements Persistable<Long>,Seri
 	@Transient
 	private Boolean isNew;
 
+	@ApiModelProperty("热度等级-从0~4")
+	@Transient
+	private Long popularityLevel;
+
+
 //	@Transient
 //	@JsonIgnore
 //	@Override
