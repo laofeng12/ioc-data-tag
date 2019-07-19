@@ -46,14 +46,12 @@ export default new Router({
           name: 'lableImage',
           meta: {title: '模型部署管理'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/lableImage.vue'),
-          children:[
-            {
-              path: '/cooperationModel',
-              name: 'cooperationModel',
-              meta: {title: '协作模型'},
-              component: () => import('@/views/taggedImage/cooperationModel.vue')
-            }
-          ]
+        },
+        {
+          path: '/cooperationModel',
+          name: 'cooperationModel',
+          meta: {title: '协作模型'},
+          component: () => import('@/views/taggedImage/cooperationModel.vue')
         },
         {
           path: '/tagPanel',
@@ -102,7 +100,7 @@ export default new Router({
           meta: {title: '画像查询'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/portraitQuery.vue')
         },
-        ]
+      ]
     },
     {
       path: '/modelEdit/:id',
