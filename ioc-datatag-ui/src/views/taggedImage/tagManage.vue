@@ -121,9 +121,7 @@
         <div slot="footer" class="dialog-footer device">
           <div>
             <el-button size="small" plain class="btn-group"  @click="closeShare2">取消</el-button>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">
-             确定
-            </el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定</el-button>
           </div>
         </div>
       </el-dialog>

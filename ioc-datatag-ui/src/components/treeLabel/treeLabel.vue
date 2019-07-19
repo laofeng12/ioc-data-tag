@@ -29,18 +29,11 @@
           <!--type="text"-->
           <!--size="mini"-->
           <!--@click="() => append(data)">-->
-          <el-button
-            class="addBtn"
-            type="text"
-            size="mini"
-            @click="addTwo(node,data)">
+          <el-button class="addBtn" type="text" size="mini" @click="addTwo(node,data)" :disabled="node.level>2">
             <!--Append-->
             <i class="el-icon-plus"></i>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="remove(node, data)">
+          <el-button type="text" size="mini" @click="remove(node, data)" :disabled="node.level>2">
             <!--Delete-->
             <i class="el-icon-delete"></i>
           </el-button>
@@ -64,17 +57,17 @@
           </template>
           <el-table-column prop="tagName" label="标签名称"></el-table-column>
           <el-table-column prop="createTime" label="创建时间"></el-table-column>
-          <el-table-column prop="synopsis" label="标签说明"></el-table-column>
+          <el-table-column prop="synopsis" label="标签简介"></el-table-column>
           <el-table-column label="操作" width="180px" v-if="labelEdit">
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <span class="operationIcona">
-                  <i class="el-icon-edit-outline iconLogo" @click="editLabel"></i>
+                  <i class="el-icon-edit-outline iconLogo" @click="editLabel(props.row)"></i>
               </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" @click="handleDelete"></i>
+                <i class="el-icon-delete iconLogo" @click="handleDelete(props.row.id)"></i>
               </span>
               </el-tooltip>
             </template>
@@ -96,12 +89,12 @@
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <span class="operationIcona">
-                  <i class="el-icon-edit-outline iconLogo" @click="editLabel"></i>
+                  <i class="el-icon-edit-outline iconLogo" @click="editLabel(props.row)"></i>
               </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" @click="handleDelete"></i>
+                <i class="el-icon-delete iconLogo" @click="handleDelete(props.row.id)"></i>
               </span>
               </el-tooltip>
             </template>
@@ -131,7 +124,8 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认添加</el-button>
+          <el-button size="small" plain class="btn-group"  @click="cancel()">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="add(ruleForm.name,ruleForm.textarea)">添加</el-button>
         </div>
       </div>
     </el-dialog>
@@ -185,7 +179,8 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认修改</el-button>
+          <el-button size="small" plain class="btn-group"  @click="closeShare2">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定</el-button>
         </div>
       </div>
     </el-dialog>
@@ -199,7 +194,7 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" >确定删除</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading"  @click="delTree(delTreeId)">确定删除</el-button>
           <el-button size="small" type="primary" class="queryBtn" >取消</el-button>
         </div>
       </div>
@@ -209,12 +204,15 @@
 
 <script>
   import {lookTree,looktreeTable} from '@/api/shareLabel.js'
-  import {getDtTagData,delTree}  from '@/api/tagManage'
+  import {getDtTagData,delTree,delTagGroup}  from '@/api/tagManage'
   let id = 1000;
   export default {
     name: "treeLabel",
     data() {
       return {
+        delTreeId:0,
+        lvl:1,
+        id:0,
         preaTagId:0,
         labelDialog: false,
         labelDialog2: false,
@@ -275,17 +273,47 @@
       }
     },
     methods: {
-      cancel(){
-       this.labelDialog=false
-        this.$refs.ruleForm.resetFields()
+      //编辑标签弹窗
+      editLabel(row) {
+       // console.log(row)
+        this.ruleForm.name=row.tagName
+        this.ruleForm.textarea2=row.synopsis
+        this.id=row.id
+        this.editDialog = true
       },
-      //取消添加下级
-      cancelOne(){
-        this.labelDialog2=false
-        this.$refs.ruleForm.resetFields()
+      // 编辑标签确认
+      async sureShare() {
+        const tagsId= Number(this.$route.params.tagsId)
+        const params = {
+          id:this.id,
+          isNew: false,
+          synopsis:this.ruleForm.textarea2,
+          tagName:this.ruleForm.name,
+          tagsId:tagsId
+        }
+        try {
+          const data = await getDtTagData(params)
+          //console.log('编辑成功')
+          if(data.message=='修改成功'){
+            this.$message({
+              message: '修改成功',
+              duration:1000,
+              type: 'success'
+            })
+            this.sharelookTree()
+          }else {
+            this.$message.error(data.message)
+          }
+        } catch (e) {
 
+        }
+        this.editDialog = false
+        this.$refs.ruleForm.resetFields()
       },
+
+      //添加顶级标签
       add(synopsis,tagsName){
+        this.lvl=1
         this.getDtTagData(null,synopsis,tagsName)
         this.labelDialog=false
         this.$refs.ruleForm.resetFields()
@@ -296,6 +324,20 @@
         this.getDtTagData(this.preaTagId,synopsis,tagsName)
         this.labelDialog2=false
         this.$refs.ruleForm.resetFields()
+      },
+      closeShare2() {
+        this.editDialog = false
+        this.$refs.ruleForm.resetFields()
+      },
+      cancel(){
+        this.labelDialog=false
+        this.$refs.ruleForm.resetFields()
+      },
+      //取消添加下级
+      cancelOne(){
+        this.labelDialog2=false
+        this.$refs.ruleForm.resetFields()
+
       },
       filterNode(value, data) {
         if (!value) return true;
@@ -335,7 +377,8 @@
         this.labelDialog = true
       },
       addTwo(node,data) {
-       // console.log('新建下级标签',node,data)
+       //console.log('新建下级标签',node,data)
+        this.lvl=node.level+1
         this.preaTagId=data.id
         this.labelDialog2 = true
       },
@@ -345,16 +388,14 @@
       closedialogTwo() {
         this.labelDialog2 = false
       },
-      editLabel() {
-        this.editDialog = true
-      },
       closeEdit() {
         this.editDialog = false
       },
       closedelete(){
         this.deleteDialog = false
       },
-      handleDelete(){
+      handleDelete(id){
+        this.delTreeId=id
         this.deleteDialog = true
       },
       //删除
@@ -368,6 +409,28 @@
               type: 'success'
             });
             this.sharelookTree()
+
+          }else {
+            this.$message.error(data.message)
+          }
+
+        } catch (e) {
+
+        }
+        this.deleteDialog=false
+      },
+      //删除表格对应标签
+      async delTag(id){
+        try {
+          const data = await delTree(id)
+          //console.log(data)
+          if(data.message=='删除成功'){
+            this.$message({
+              message: '删除成功',
+              duration:1000,
+              type: 'success'
+            });
+            this.getTagsData()
           }else {
             this.$message.error(data.message)
           }
@@ -380,6 +443,7 @@
       async getDtTagData(preaTagId,synopsis,tagsName) {
         const tagsId= Number(this.$route.params.tagsId)
         const params = {
+          lvl:this.lvl,
           preaTagId:preaTagId,
           isNew: true,
           synopsis:synopsis,
@@ -407,7 +471,7 @@
               this.tableparentList.push(treeTable.parentTag)
             }
           }catch (e) {
-            console.log(e);
+           // console.log(e);
           }
       }
 
