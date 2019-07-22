@@ -42,7 +42,7 @@
             <template slot-scope="scope">
               <div class="gress">
                 <div class="gressPercentage"><el-progress :percentage="percentage" :show-text="false" :color="customColorMethod"></el-progress></div>
-                <div>32211</div>
+                <div>{{scope.row.popularity}}</div>
               </div>
             </template>
           </el-table-column>
@@ -102,15 +102,15 @@
         labelDialog:false,
         selectionId:'',
         selectiontagsName:'',
-        percentage: 30,
+        percentage: 0,
         ztableShowList:[],
       }
     },
     methods: {
       customColorMethod(percentage) {
-        if (percentage < 30) {
+        if (percentage < 25) {
           return '#909399';
-        } else if (percentage < 70) {
+        } else if (percentage < 75) {
           return '#e6a23c';
         } else {
           return '#67c23a';
@@ -143,7 +143,21 @@
           })
           this.ztableShowList = search.content?search.content:[]
           this.totalnum = search.totalElements
-          if(this.ztableShowList==''){
+          if(search.content&&search.content.length > 0){
+            search.content.forEach(item => {
+              if(item.popularityLevel == 0){
+                this.percentage = 0
+              }else if(item.popularityLevel == 1){
+                this.percentage = 25
+              }else if(item.popularityLevel == 2){
+                this.percentage = 50
+              }else if(item.popularityLevel == 3){
+                this.percentage = 75
+              }else{
+                this.percentage = 100
+              }
+            })
+          }else {
             this.Loading = false
           }
         }catch (e) {
