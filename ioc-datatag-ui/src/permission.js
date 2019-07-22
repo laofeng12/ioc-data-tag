@@ -11,7 +11,7 @@ router.beforeEach((to, from, next) => {
   NProgress.start()
   const access_token = getToken()
   const userInfo = getUserInfo()
-  console.log('44444',userInfo)
+  // console.log('44444',userInfo)
   store.commit('SET_USERINFO', userInfo)
 
   if (access_token && userInfo) {
