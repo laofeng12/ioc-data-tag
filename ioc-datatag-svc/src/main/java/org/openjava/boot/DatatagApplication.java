@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 //				"org.ljdp.support.**.controller",
 				"com.openjava.**.service",
 				"com.openjava.**.component",
-				"com.openjava.**.dao",
+				"com.openjava.**.job",
 				"com.openjava.**.api",
 				"org.openjava.boot.conf",
 				})
@@ -82,15 +82,15 @@ public class DatatagApplication {
 	public JPASessionFactoryRouter sessionFactoryRouter() {
 		return new JPASessionFactoryRouter();
 	}
-	
+
 	@Bean("web.UserProvider")
 	public CloudUserProvider webUserProvider() {
 		return new CloudUserProvider();
 	}
 	
 	@Bean
-	public LjdpBootRunner ljdpRunner() {
-		return new LjdpBootRunner();
+	public DatatagRunner ljdpRunner() {
+		return new DatatagRunner();
 	}
 	
 	@Bean

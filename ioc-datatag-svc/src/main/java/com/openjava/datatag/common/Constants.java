@@ -71,10 +71,12 @@ public class Constants {
     //===========标签模型运行状态=========
     public static final String DT_TGMODEL_STATUS="dt.tgmode.status";//共享数据字典
     public static final Long TG_MODEL_NO_BEGIN = 0L;//未开始
-    public static final Long TG_MODEL_BEGIN = 1L;//开始运行
-    public static final Long TG_MODEL_ERROR = 3L;//运行出错
-    public static final Long TG_MODEL_END = 4L;//运行结束
-    public static final Long TG_MODEL_STOP = -1L;//运行停止
+    public static final Long TG_MODEL_WAIT = 1L;//等待运行
+    public static final Long TG_MODEL_RUNNING = 2L;//运行中
+    public static final Long TG_MODEL_SUCCESS = 3L;//运行成功
+    public static final Long TG_MODEL_ERROR = 4L;//运行失败
+    public static final Long TG_MODEL_END = -1L;//运行结束
+
 
 
     //===========标签组状态=================
@@ -96,4 +98,8 @@ public class Constants {
     public static final Long DT_DISPATCH_EACH_WEEK= 3L;
     public static final Long DT_DISPATCH_EACH_MONTH = 4L;
     public static final Long DT_DISPATCH_EACH_YEAR= 5L;
+
+    //==========定时任务调度组件============
+    public static final String DT_SCHEDULE_CORE_JOB_CLASS = "com.openjava.datatag.schedule.job.DtTaggingModelCalculationJob";//模型调度核心job
+    public static final String DT_SCHEDULE_GROUP = "datatag_job_group";//模型调度任务组名称
 }
