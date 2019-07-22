@@ -40,7 +40,12 @@
           <el-table-column prop="modifyTime" label="修改时间" >
           </el-table-column>
           <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
-          <el-table-column prop="isShare" label="共享状态" ></el-table-column>
+          <el-table-column prop="isShare" label="共享状态" >
+            <template slot-scope="scope">
+                <div v-if="scope.row.isShare===0">未共享</div>
+                <div v-if="scope.row.isShare===1">已共享</div>
+            </template>
+          </el-table-column>
           <el-table-column prop="source" label="使用热度" >
             <template slot-scope="scope">
               <div class="gress">
@@ -52,20 +57,20 @@
             </template>
           </el-table-column>
           <el-table-column label="操作" width="180px">
-            <template slot-scope="props" class="caozuo">
+            <template slot-scope="{row,$index}" class="caozuo">
               <el-tooltip class="item" effect="dark" content="共享" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-share iconLogo" @click="handleShare"></i>
+                    <i class="el-icon-share iconLogo" @click="handleShare(row,$index)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-              <span class="operationIcona">
+                <router-link :to="`editTree/${row.id}`">
                   <i class="el-icon-edit-outline iconLogo" ></i>
-              </span>
+                </router-link>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" ></i>
+                <i class="el-icon-delete iconLogo" @click="delTag(row.id)" ></i>
               </span>
               </el-tooltip>
             </template>
@@ -78,7 +83,14 @@
                  @close="closeShare">
         <div class="del-dialog-cnt">
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
-            <el-form-item label="标签组名称:" prop="name" class="nameOne">教育体系标签</el-form-item>
+            <el-form-item label="标签组名称:" prop="name" class="nameOne">
+              <el-input
+                class="zxinp moduleOne"
+                size="small"
+                placeholder="请输入内容"
+                v-model="labelName" style="width: 360px">
+              </el-input>
+            </el-form-item>
             <el-form-item label="标签组简介:" prop="introduction" class="nameOne">
               <el-input
                 class="area"
@@ -88,20 +100,28 @@
                 v-model="textarea">
               </el-input>
             </el-form-item>
-            <el-form-item label="截止日期:" prop="date" class="nameOne">
+            <el-form-item label="是否共享:" prop="introduction" class="nameOne">
+              <el-switch
+                v-model="isShare"
+                active-text="共享"
+                inactive-text="不共享">
+              </el-switch>
+            </el-form-item>
+
+      <!--      <el-form-item label="截止日期:" prop="date" class="nameOne">
               <el-date-picker
                 class="dateInp"
                 v-model="value1"
                 type="datetime"
                 placeholder="选择日期时间">
               </el-date-picker>
-            </el-form-item>
+            </el-form-item>-->
           </el-form>
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" plain class="btn-group"  @click="closeShare2">关闭</el-button>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="cancelShare">取消共享</el-button>
+            <el-button size="small" plain class="btn-group"  @click="closeShare2">取消</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定</el-button>
           </div>
         </div>
       </el-dialog>
@@ -112,14 +132,17 @@
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
   import ElementPagination from '@/components/ElementPagination'
-  import {getTagsData}  from '@/api/tagManage'
+  import {getTagsData,getDtTagGroupData,delTagGroup}  from '@/api/tagManage'
     export default {
       components: {ElementPagination},
       name: "tagManage",
       data() {
         return{
+          labelId:0,
+          isShare:false,
+          labelName:'',
           totalnum:0,
-          eq_isShare:0,
+          eq_isShare:'',
           keyword:'',
           page:0,
           size:10,
@@ -177,8 +200,18 @@
             return '#67c23a';
           }
         },
-        handleShare() {
+        handleShare(row,index) {
           this.shareDialog = true
+          this.labelName=row.tagsName
+          this.textarea=row.synopsis
+          if(row.isShare===0){
+            this.isShare=false
+          }else {
+            this.isShare=true
+          }
+          this.labelId=row.id
+          console.log(this.isShare)
+
         },
         closeShare() {
           this.shareDialog = false
@@ -188,8 +221,10 @@
           this.shareDialog = false
           this.$refs.ruleForm.resetFields()
         },
-        cancelShare() {
+        // 共享确认
+        sureShare() {
           this.shareDialog = false
+          this.getDtTagGroupData()
           this.$refs.ruleForm.resetFields()
         },
         createLabel() {
@@ -220,6 +255,30 @@
 
           }
         },
+
+        // 共享确认
+        async getDtTagGroupData() {
+          let isShare=0
+          if(this.isShare===false){
+             isShare=0
+          }else {
+             isShare=1
+          }
+          const params = {
+             id:this.labelId,
+             isNew: false,
+             isShare:isShare,
+             synopsis:this.textarea,
+             tagsName:this.labelName
+          }
+          try {
+            const data = await getDtTagGroupData(params)
+            this.getQuireData()
+
+          } catch (e) {
+
+          }
+        },
         //查询
         getQuireData(){
           this.page=0
@@ -235,6 +294,26 @@
         //点击分页确认
         goPage () {
 
+        },
+        //删除
+        async delTag(id){
+          try {
+            const data = await delTagGroup(id)
+            //console.log(data)
+            if(data.message=='删除成功'){
+              this.$message({
+                message: '删除成功',
+                duration:1000,
+                type: 'success'
+              });
+              this.getTagsData()
+            }else {
+              this.$message.error(data.message)
+            }
+
+          } catch (e) {
+
+          }
         }
       },
     created() {
