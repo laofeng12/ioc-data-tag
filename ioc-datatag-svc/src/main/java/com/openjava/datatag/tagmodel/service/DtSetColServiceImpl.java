@@ -234,6 +234,12 @@ public class DtSetColServiceImpl implements DtSetColService {
 				.getByTaggingModelIdAndIsSourceAndIsDeleted(taggingModelId,Constants.PUBLIC_YES,Constants.PUBLIC_NO);
 	}
 
+	//获取打标列(包括克隆)
+	public List<DtSetCol> getMarkingSetColByTaggingModelId(Long taggingModelId){
+		return dtSetColRepository
+				.getByTaggingModelIdAndIsMarkingAndIsDeleted(taggingModelId,Constants.PUBLIC_YES,Constants.PUBLIC_NO);
+	}
+
 
 	/**
 	 * 克隆字段

@@ -45,7 +45,8 @@ public interface DtSetColRepository extends DynamicJpaRepository<DtSetCol, Long>
     //获取字段表中的源字段列
     List<DtSetCol>  getByTaggingModelIdAndIsSourceAndIsDeleted(Long TaggingModelId,Long isSource,Long isDeleted);
 
-
+    //获取字段表的可打标字段
+    List<DtSetCol> getByTaggingModelIdAndIsMarkingAndIsDeleted(Long TaggingModelId,Long isMarking,Long isDelete);
 
     //根据父节点id伪删除子节点
     @Transactional
