@@ -180,7 +180,7 @@
         saveLoading: false,
         labelcreatDialog: false,
         creatsaveLoading: false,
-        percentage: 80,
+        percentage: 0,
         value1: '',
         textarea: '',
         options: [{
@@ -194,19 +194,7 @@
           label: '已共享'
         }],
         value: '',
-        ztableShowList: [{
-          name: '教育',
-          people: '数据搬运工',
-          time: '2019/4/19  16:17:22',
-          introduction: '动画的很多好很多',
-          share: '已共享',
-        }, {
-          name: '教育22',
-          people: '数据搬运工22',
-          time: '2019/4/19  16:17:22',
-          introduction: '动画的很多好很多22',
-          share: '已共享',
-        }],
+        ztableShowList: [],
         ruleForm: {
           labelName: '',
           textarea: '',
@@ -225,9 +213,9 @@
     },
     methods: {
       customColorMethod(percentage) {
-        if (percentage < 30) {
+        if (percentage < 25) {
           return '#909399';
-        } else if (percentage < 70) {
+        } else if (percentage < 75) {
           return '#e6a23c';
         } else {
           return '#67c23a';
@@ -325,9 +313,22 @@
         }
         try {
           const data = await getTagsData(params)
-          if (data.rows.length !== 0) {
+          if (data.rows&&data.rows.length > 0) {
             this.ztableShowList = data.rows
             this.totalnum = data.total
+            data.rows.forEach(item => {
+              if(item.popularityLevel == 0){
+                this.percentage = 0
+              }else if(item.popularityLevel == 1){
+                this.percentage = 25
+              }else if(item.popularityLevel == 2){
+                this.percentage = 50
+              }else if(item.popularityLevel == 3){
+                this.percentage = 75
+              }else{
+                this.percentage = 100
+              }
+            })
           } else {
             this.ztableShowList = []
             this.Loading = false
