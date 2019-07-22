@@ -23,16 +23,16 @@ public class TaskInfo implements Serializable {
 
 	@ApiModelProperty("任务名称")
 	private String jobName;
-	
+
 	@ApiModelProperty("任务分组")
 	private String jobGroup;
-	
+
 	@ApiModelProperty("任务描述")
 	private String jobDescription;
-	
+
 	@ApiModelProperty("任务状态")
 	private String jobStatus;
-	
+
 	@ApiModelProperty("任务表达式")
 	private String cronExpression;
 

@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 				"com.openjava.**.service",
 				"com.openjava.**.component",
 				"com.openjava.**.job",
+//				"com.openjava.**.dao",
 				"com.openjava.**.api",
 				"org.openjava.boot.conf",
 				})
