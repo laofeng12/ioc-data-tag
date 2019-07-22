@@ -1,13 +1,11 @@
 package com.openjava.datatag.tagmodel.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
-import com.openjava.datatag.log.domain.DtTagmUpdateLog;
-import com.openjava.datatag.log.repository.DtTagmUpdateLogRepository;
 import com.openjava.datatag.log.service.DtTagmUpdateLogService;
-import com.openjava.datatag.tagmanage.domain.DtTag;
+import com.openjava.datatag.schedule.domain.TaskInfo;
+import com.openjava.datatag.schedule.service.TaskService;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
@@ -20,14 +18,14 @@ import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
 import com.openjava.datatag.tagmodel.repository.DtTagConditionRepository;
 import com.openjava.datatag.tagmodel.repository.DtTaggingModelRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
-import com.openjava.datatag.utils.StringUtil;
-import com.openjava.datatag.utils.TimeUtil;
+import com.openjava.datatag.utils.MyTimeUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
-import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
@@ -36,10 +34,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * 标签模型业务层
  * @author zmk
@@ -48,7 +45,7 @@ import java.util.Optional;
 @Service
 @Transactional
 public class DtTaggingModelServiceImpl implements DtTaggingModelService {
-	
+	Logger logger = LogManager.getLogger(getClass());
 	@Resource
 	private DtTaggingModelRepository dtTaggingModelRepository;
 	@Resource
@@ -59,7 +56,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 
 	@Resource
 	private DtTagmUpdateLogService dtTagmUpdateLogService;
-
+	@Resource
+	private TaskService taskService;
 
 	public void copy(Long id,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -214,14 +212,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		//检查Cycle 字段是否合理--尚不明确前端传入的字段类型(或保存cron表达式或只保存周期标识)
 		if(checkCycle(body.getCycle())){
 			if (body.getCycle().equals(Constants.DT_DISPATCH_STOP)){
-				db.setRunState(Constants.TG_MODEL_STOP);
+				db.setRunState(Constants.TG_MODEL_END);
 				db.setStartTime(null);
 				db.setCycle(null);
-			}else if(body.getCycle().equals(Constants.DT_DISPATCH_ONCE)){
-				//仅运行一次cycle cron表达式就为空
-				db.setStartTime(body.getStartTime());
-				db.setCycle(null);
 			}else{
+				db.setRunState(Constants.TG_MODEL_WAIT);
 				db.setStartTime(body.getStartTime());
 				db.setCycle(toCron(body.getCycle(),body.getStartTime()));
 			}
@@ -249,28 +244,42 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		int hour = cal.get(Calendar.HOUR_OF_DAY);
 		int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 		int month = cal.get(Calendar.MONTH)+1;
-		int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)-1;
 		int year = cal.get(Calendar.YEAR);
 		String[] cron = {"*","*","*","?","*","?","*"};
 		cron[0] = String.valueOf(second);
 		cron[1] = String.valueOf(minute);
 		cron[2] = String.valueOf(hour);
-		if (cycle.equals(Constants.DT_DISPATCH_EACH_DAY)){
+		if (cycle.equals(Constants.DT_DISPATCH_ONCE)) {
+			cron[0] = String.valueOf(second);
+			cron[1] = String.valueOf(minute);
+			cron[2] = String.valueOf(hour);
+			cron[3]=String.valueOf(dayOfMonth);
+			cron[4] = String.valueOf(month);
+			cron[6] = String.valueOf(year) + "/20";//设置大一点（20年一次）就可以看成只执行一次
+		}else if (cycle.equals(Constants.DT_DISPATCH_EACH_DAY)){
 			//月份中的某一天
 			cron[3] = "*";
 		}else if (cycle.equals(Constants.DT_DISPATCH_EACH_WEEK)){
-			cron[5] = String.valueOf(dayOfWeek);
+			cron[3]="?";
+			cron[5] = MyTimeUtil.getWeekStr(startTime); // @TODO dayOfMonth/7 不准确
 		}else if (cycle.equals(Constants.DT_DISPATCH_EACH_MONTH)){
-			cron[3] = String.valueOf(dayOfMonth);
+		    cron[3] = String.valueOf(dayOfMonth);
+			cron[4] = String.valueOf(month)+"/1";
 		}else if (cycle.equals(Constants.DT_DISPATCH_EACH_YEAR)){
 			cron[3]=String.valueOf(dayOfMonth);
 			cron[4] = String.valueOf(month);
+//			cron[6] = String.valueOf(year) + "/1";//
 		}else {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"cycle in toCron must in{DT_DISPATCH_EACH_DAY/WEEK/MONTH/YEAR}");
 		}
-		StringBuilder cronEx = new StringBuilder();
-		for (String c:cron){
-			cronEx.append(" ").append(c);
+        StringBuilder cronEx = new StringBuilder();
+		for (int i=0;i<cron.length;i++){
+			if (i==0){
+				cronEx.append(cron[i]);
+			}else{
+				cronEx.append(" ").append(cron[i]);
+			}
 		}
 		return cronEx.toString();
 	}
@@ -299,4 +308,108 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			dtTaggingModelRepository.deleteById(new Long(items[i]));
 		}
 	}
+	/**
+	 * 根据runState获取型
+	 */
+	public List<DtTaggingModel> getModelByRunStates(List<Long> runStates){
+		List<DtTaggingModel> waitList = dtTaggingModelRepository.getModelByRunStates(runStates);
+		return waitList;
+	}
+	/**
+	 * 设置模型调度的方法（核心方法）
+	 */
+	public void setToJob(){
+		List<Long> allRunState = new ArrayList<>();
+		allRunState.add(Constants.TG_MODEL_WAIT);
+		allRunState.add(Constants.TG_MODEL_RUNNING);
+		allRunState.add(Constants.TG_MODEL_SUCCESS);
+		allRunState.add(Constants.TG_MODEL_ERROR);
+		allRunState.add(Constants.TG_MODEL_END);
+		List<DtTaggingModel> allModels =  getModelByRunStates(allRunState);
+		Map<Long, List<DtTaggingModel>> modelGroup = allModels.stream().collect(Collectors.groupingBy(DtTaggingModel::getRunState));
+		//等待执行调度的任务
+		List<DtTaggingModel> waitModels =  modelGroup.get(Constants.TG_MODEL_WAIT);
+		if (CollectionUtils.isNotEmpty(waitModels)) {
+			for (DtTaggingModel model:waitModels) {
+				try {
+					//新建
+					TaskInfo taskInfo = new TaskInfo();
+					taskInfo.setJobGroup(Constants.DT_SCHEDULE_GROUP);//必传
+					taskInfo.setJobName(model.getTaggingModelId().toString());//必传
+					taskInfo.setCronExpression(model.getCycle());//必传
+					taskInfo.setJobMethod(Constants.DT_SCHEDULE_CORE_JOB_CLASS);//必传
+					taskInfo.setCreateTime(new Date().toString());
+					if (!taskService.checkExists(model.getTaggingModelId().toString(),Constants.DT_SCHEDULE_GROUP)) {
+						taskInfo.setId(1);//1为新增0为修改
+						taskService.addJob(taskInfo);// @TODO 新增
+					}else{
+						//任务修改或者删除
+						taskInfo.setId(0);//1为新增0为修改
+						List<TaskInfo> taskInfos =  taskService.list();
+						for (TaskInfo t:taskInfos) {
+							if (t.getJobName().equals(taskInfo.getJobName()) && !t.getCronExpression().equals(taskInfo.getCronExpression())) {
+								taskService.edit(taskInfo);// @TODO 修改
+							}
+						}
+
+					}
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		//要删除的任务
+		List<DtTaggingModel> deleteModels = modelGroup.get(Constants.TG_MODEL_END);
+		if (CollectionUtils.isNotEmpty(deleteModels)) {
+			for (DtTaggingModel model:deleteModels) {
+				try {
+					if (taskService.checkExists(model.getTaggingModelId().toString(),Constants.DT_SCHEDULE_GROUP)) {
+						taskService.delete(model.getTaggingModelId().toString(),Constants.DT_SCHEDULE_GROUP);// @TODO 删除
+					}
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		//要重新启动的任务（服务器重启时要重新设置：2运行中、3运行成功状态的定时任务）
+		List<DtTaggingModel> reRunModels =  modelGroup.get(Constants.TG_MODEL_RUNNING);
+		List<DtTaggingModel> successModels =  modelGroup.get(Constants.TG_MODEL_SUCCESS);
+		if (CollectionUtils.isEmpty(reRunModels)) {
+			reRunModels = successModels;
+			if (CollectionUtils.isEmpty(reRunModels)){
+				return;
+			}
+		}else {
+			if (CollectionUtils.isNotEmpty(successModels)){
+				for (DtTaggingModel model:successModels) {
+					reRunModels.add(model);
+				}
+			}
+		}
+		reRunModels.forEach(record->{
+			try {
+				if (!taskService.checkExists(record.getTaggingModelId().toString(),Constants.DT_SCHEDULE_GROUP)) {
+					//新建
+					TaskInfo taskInfo = new TaskInfo();
+					taskInfo.setJobGroup(Constants.DT_SCHEDULE_GROUP);//必传
+					taskInfo.setJobName(record.getTaggingModelId().toString());//必传
+					taskInfo.setCronExpression(record.getCycle());//必传
+					taskInfo.setJobMethod(Constants.DT_SCHEDULE_CORE_JOB_CLASS);//必传
+					taskInfo.setCreateTime(new Date().toString());
+					taskInfo.setId(1);//1为新增0为修改
+					taskService.addJob(taskInfo);// @TODO 启动服务器时重新设置
+				}
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+		});
+	}
+	/**
+	 * 获取打标数据并根据规制自动打标（核心方法）
+	 */
+	public void calculation(Long taggingModelId){
+		//组件已搭好，只需要写业务逻辑
+		System.out.println("查询画像并计算："+taggingModelId);
+	}
+
 }

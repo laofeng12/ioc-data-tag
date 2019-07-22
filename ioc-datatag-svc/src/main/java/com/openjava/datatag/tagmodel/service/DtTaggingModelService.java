@@ -41,4 +41,17 @@ public interface DtTaggingModelService {
 	void copy(Long id,String ip)throws Exception;
 
 	void doSoftDelete(DtTaggingModel taggingModel,Long userId,String ip);
+	/**
+	 * 根据runState获取型
+	 */
+	List<DtTaggingModel> getModelByRunStates(List<Long> runStates);
+	/**
+	 * 设置模型调度的方法（核心方法）
+	 */
+	void setToJob();
+	/**
+	 * 获取打标数据并根据规制自动打标（核心方法）
+	 */
+	void calculation(Long taggingModelId);
+
 }
