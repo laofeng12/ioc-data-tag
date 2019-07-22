@@ -78,7 +78,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 			body.setTagsName("新建标签组");
 		}
 		if (body.getSynopsis() == null){
-			body.setTagsName("未填写简介");
+			body.setSynopsis("未填写简介");
 		}
 		String modifyContent = JSONObject.toJSONString(body);
 		//新增，记录创建时间等
@@ -119,6 +119,15 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 
 	public List<DtTagGroup> getMyTagGroup(Long createUser){
 		return dtTagGroupRepository.getMyTagGroup(createUser);
+	}
+
+	public Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable){
+		Page<DtTagGroup> result = query(params,pageable);
+		for (DtTagGroup tgg: result){
+			Long plvl = dtTagGroupRepository.findPopuLvlByTagsId(tgg.getId());
+			tgg.setPopularityLevel(plvl);
+		}
+		return result;
 	}
 
 }

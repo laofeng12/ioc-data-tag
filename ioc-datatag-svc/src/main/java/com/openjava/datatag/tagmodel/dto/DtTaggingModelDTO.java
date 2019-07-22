@@ -1,7 +1,9 @@
 package com.openjava.datatag.tagmodel.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,14 +29,20 @@ public class DtTaggingModelDTO {
 
     private String createUserName;
 
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     private Date createTime;
 
     private Long modifyUser;
 
     private String modifyUserName;
 
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     private Date modifyTime;
 
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     private Date startTime;
 
     private String cycle;
