@@ -32,16 +32,21 @@
                   :header-cell-style="{background:'#f0f2f5'}">
           <template slot="empty">
             <div v-if="Loading">
-              <div v-loading="saveLoading2" ></div>
+              <div v-loading="saveLoading2"></div>
             </div>
             <div v-else>暂无数据</div>
           </template>
           <el-table-column prop="tagsName" label="名称"></el-table-column>
-          <el-table-column prop="modifyTime" label="修改时间" >
+          <el-table-column prop="modifyTime" label="修改时间">
           </el-table-column>
           <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
-          <el-table-column prop="isShare" label="共享状态" ></el-table-column>
-          <el-table-column prop="source" label="使用热度" >
+          <el-table-column prop="isShare" label="共享状态">
+            <template slot-scope="scope">
+              <div v-if="scope.row.isShare===0">未共享</div>
+              <div v-if="scope.row.isShare===1">已共享</div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="source" label="使用热度">
             <template slot-scope="scope">
               <div class="gress">
                 <div class="gressPercentage">
@@ -52,56 +57,97 @@
             </template>
           </el-table-column>
           <el-table-column label="操作" width="180px">
-            <template slot-scope="props" class="caozuo">
+            <template slot-scope="{row,$index}" class="caozuo">
               <el-tooltip class="item" effect="dark" content="共享" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-share iconLogo" @click="handleShare"></i>
+                    <i class="el-icon-share iconLogo" @click="handleShare(row,$index)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-              <span class="operationIcona">
-                  <i class="el-icon-edit-outline iconLogo" ></i>
-              </span>
+                <router-link :to="`editTree/${row.id}`">
+                  <i class="el-icon-edit-outline iconLogo"></i>
+                </router-link>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" ></i>
+                <i class="el-icon-delete iconLogo" @click="delTag(row.id)"></i>
               </span>
               </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
-        <element-pagination :pageSize="size"  :total="totalnum"  @handleCurrentChange="handleCurrentChange" @sureClick="goPage"></element-pagination>
-
+        <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
+                            @sureClick="goPage"></element-pagination>
       </div>
-      <el-dialog class="creat" title="共享标签组" :visible.sync="shareDialog" width="530px" center :close-on-click-modal="false"
+      <el-dialog class="creat" title="共享标签组" :visible.sync="shareDialog" width="530px" center
+                 :close-on-click-modal="false"
                  @close="closeShare">
         <div class="del-dialog-cnt">
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
-            <el-form-item label="标签组名称:" prop="name" class="nameOne">教育体系标签</el-form-item>
-            <el-form-item label="标签组简介:" prop="introduction" class="nameOne">
+            <el-form-item label="标签组名称:" prop="labelName" class="nameOne">
+              <el-input
+                class="zxinp moduleOne"
+                size="small"
+                placeholder="请输入内容"
+                v-model="ruleForm.labelName" style="width: 360px">
+              </el-input>
+            </el-form-item>
+            <el-form-item label="标签组简介:" prop="textarea" class="nameOne">
               <el-input
                 class="area"
                 type="textarea"
                 :autosize="{ minRows: 2, maxRows: 4}"
                 placeholder="请输入内容"
-                v-model="textarea">
+                v-model="ruleForm.textarea">
               </el-input>
             </el-form-item>
-            <el-form-item label="截止日期:" prop="date" class="nameOne">
-              <el-date-picker
-                class="dateInp"
-                v-model="value1"
-                type="datetime"
-                placeholder="选择日期时间">
-              </el-date-picker>
+            <el-form-item label="是否共享:" prop="introduction" class="nameOne">
+              <el-switch
+                v-model="isShare"
+                active-text="共享"
+                inactive-text="不共享">
+              </el-switch>
             </el-form-item>
           </el-form>
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" plain class="btn-group"  @click="closeShare2">关闭</el-button>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="cancelShare">取消共享</el-button>
+            <el-button size="small" plain class="btn-group" @click="closeShare2">取消</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定
+            </el-button>
+          </div>
+        </div>
+      </el-dialog>
+      <el-dialog class="creat" title="创建标签组" :visible.sync="labelcreatDialog" width="530px" center
+                 :close-on-click-modal="false"
+                 @close="closeCreat">
+        <div class="del-dialog-cnt">
+          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+            <el-form-item label="标签组名称:" prop="tagsName" class="nameOne">
+              <el-input
+                class="zxinp moduleOne"
+                size="small"
+                placeholder="请输入内容"
+                v-model="ruleForm.tagsName" style="width: 360px">
+              </el-input>
+            </el-form-item>
+            <el-form-item label="标签组简介:" prop="synopsis" class="nameOne">
+              <el-input
+                class="area"
+                type="textarea"
+                :autosize="{ minRows: 2, maxRows: 4}"
+                placeholder="请输入内容"
+                v-model="ruleForm.synopsis">
+              </el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div slot="footer" class="dialog-footer device">
+          <div>
+            <el-button size="small" plain class="btn-group" @click="cancleCreat">取消</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="creatsaveLoading" @click="sureCreat">
+              确认并编辑
+            </el-button>
           </div>
         </div>
       </el-dialog>
@@ -112,140 +158,251 @@
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
   import ElementPagination from '@/components/ElementPagination'
-  import {getTagsData}  from '@/api/tagManage'
-    export default {
-      components: {ElementPagination},
-      name: "tagManage",
-      data() {
-        return{
-          totalnum:0,
-          eq_isShare:0,
-          keyword:'',
-          page:0,
-          size:10,
-          input2: '',
-          Loading: true,
-          saveLoading2: true,
-          shareDialog: false,
-          saveLoading: false,
-          percentage: 80,
-          value1: '',
-          textarea: '',
-          options: [{
-            value: '',
-            label: '全部'
-          }, {
-            value: '0',
-            label: '未共享'
-          }, {
-            value: '1',
-            label: '已共享'
-          }],
+  import {getTagsData, getDtTagGroupData, delTagGroup} from '@/api/tagManage'
+
+  export default {
+    components: {ElementPagination},
+    name: "tagManage",
+    data() {
+      return {
+        labelId: 0,
+        isShare: false,
+        labelName: '',
+        totalnum: 0,
+        eq_isShare: '',
+        keyword: '',
+        page: 0,
+        size: 10,
+        input2: '',
+        Loading: true,
+        saveLoading2: true,
+        shareDialog: false,
+        saveLoading: false,
+        labelcreatDialog: false,
+        creatsaveLoading: false,
+        percentage: 80,
+        value1: '',
+        textarea: '',
+        options: [{
           value: '',
-          ztableShowList: [{
-            name: '教育',
-            people: '数据搬运工',
-            time: '2019/4/19  16:17:22',
-            introduction: '动画的很多好很多',
-            share: '已共享',
-          }, {
-            name: '教育22',
-            people: '数据搬运工22',
-            time: '2019/4/19  16:17:22',
-            introduction: '动画的很多好很多22',
-            share: '已共享',
-          }],
-          ruleForm: {
-            name: '',
-            introduction: '',
-            date: ''
-          },
-          rules: {
-            date: [
-              {required: true, message: '请选择时间', trigger: 'change'}
-            ]
-          },
+          label: '全部'
+        }, {
+          value: '0',
+          label: '未共享'
+        }, {
+          value: '1',
+          label: '已共享'
+        }],
+        value: '',
+        ztableShowList: [{
+          name: '教育',
+          people: '数据搬运工',
+          time: '2019/4/19  16:17:22',
+          introduction: '动画的很多好很多',
+          share: '已共享',
+        }, {
+          name: '教育22',
+          people: '数据搬运工22',
+          time: '2019/4/19  16:17:22',
+          introduction: '动画的很多好很多22',
+          share: '已共享',
+        }],
+        ruleForm: {
+          labelName: '',
+          textarea: '',
+          tagsName: '',
+          synopsis: ''
+        },
+        rules: {
+          labelName: [
+            {required: true, message: '请填写名称', trigger: 'blur'}
+          ],
+          tagsName: [
+            {required: true, message: '请填写名称', trigger: 'blur'}
+          ],
+        },
+      }
+    },
+    methods: {
+      customColorMethod(percentage) {
+        if (percentage < 30) {
+          return '#909399';
+        } else if (percentage < 70) {
+          return '#e6a23c';
+        } else {
+          return '#67c23a';
         }
       },
-      methods: {
-        customColorMethod(percentage) {
-          if (percentage < 30) {
-            return '#909399';
-          } else if (percentage < 70) {
-            return '#e6a23c';
-          } else {
-            return '#67c23a';
-          }
-        },
-        handleShare() {
-          this.shareDialog = true
-        },
-        closeShare() {
-          this.shareDialog = false
-          this.$refs.ruleForm.resetFields()
-        },
-        closeShare2() {
-          this.shareDialog = false
-          this.$refs.ruleForm.resetFields()
-        },
-        cancelShare() {
-          this.shareDialog = false
-          this.$refs.ruleForm.resetFields()
-        },
-        createLabel() {
-          this.$router.push('tree')
-        },
-        shareLabel() {
-          this.$router.push('/shareLabel')
-        },
-        // 我的标签列表数据
-        async getTagsData() {
-          const params = {
-            eq_isShare:this.eq_isShare,
-            keyword:this.keyword,
-            page: this.page,
-            size:this.size
-          }
-          try {
-            const data = await getTagsData(params)
-            if(data.rows.length!==0){
-              this.ztableShowList=data.rows
-              this.totalnum=data.total
-            }else {
-              this.ztableShowList=[]
-              this.Loading=false
+      handleShare(row, index) {
+        this.shareDialog = true
+        this.ruleForm.labelName = row.tagsName
+        this.ruleForm.textarea = row.synopsis
+        if (row.isShare === 0) {
+          this.isShare = false
+        } else {
+          this.isShare = true
+        }
+        this.labelId = row.id
+        console.log(this.isShare)
+
+      },
+      closeShare() {
+        this.shareDialog = false
+        this.$refs.ruleForm.resetFields()
+      },
+      closeShare2() {
+        this.shareDialog = false
+        this.$refs.ruleForm.resetFields()
+      },
+      // 共享确认
+      sureShare() {
+        this.saveLoading = true
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            try {
+              this.getDtTagGroupData()
+              this.shareDialog = false
+              this.saveLoading = false
+            } catch (e) {
+              this.saveLoading = false
+              console.log(e);
             }
-
-          } catch (e) {
-
+          } else {
+            this.saveLoading = false
           }
-        },
-        //查询
-        getQuireData(){
-          this.page=0
-          this.eq_isShare=this.value
-          this.keyword=this.input2
-          this.getTagsData()
-        },
-        //点击分页跳转
-        handleCurrentChange(page){
-          this.page=page-1
-          this.getTagsData()
-        },
-        //点击分页确认
-        goPage () {
+        });
+
+      },
+      createLabel() {
+        this.labelcreatDialog = true
+      },
+      sureCreat() {
+        try {
+          this.creatsaveLoading = true
+          this.$refs.ruleForm.validate(async (valid) => {
+            if (valid) {
+              try {
+                const data = await getDtTagGroupData({
+                  id: '',
+                  isNew: true,
+                  isShare: '',
+                  synopsis: this.ruleForm.synopsis,
+                  tagsName: this.ruleForm.tagsName
+                })
+                this.creatsaveLoading = false
+                this.$router.push('/labelcreatTree/' + data.id)
+              } catch (e) {
+                this.creatsaveLoading = false
+                console.log(e);
+              }
+            } else {
+              this.creatsaveLoading = false
+            }
+          });
+        } catch (e) {
+          this.creatsaveLoading = false
+          console.log(e);
+        }
+      },
+      closeCreat() {
+        this.$refs.ruleForm.resetFields();
+        this.labelcreatDialog = false
+      },
+      cancleCreat() {
+        this.$refs.ruleForm.resetFields();
+        this.labelcreatDialog = false
+      },
+      shareLabel() {
+        this.$router.push('/shareLabel')
+      },
+      // 我的标签列表数据
+      async getTagsData() {
+        const params = {
+          eq_isShare: this.eq_isShare,
+          keyword: this.keyword,
+          page: this.page,
+          size: this.size
+        }
+        try {
+          const data = await getTagsData(params)
+          if (data.rows.length !== 0) {
+            this.ztableShowList = data.rows
+            this.totalnum = data.total
+          } else {
+            this.ztableShowList = []
+            this.Loading = false
+          }
+
+        } catch (e) {
 
         }
       },
-    created() {
+
+      // 共享确认
+      async getDtTagGroupData() {
+        let isShare = 0
+        if (this.isShare === false) {
+          isShare = 0
+        } else {
+          isShare = 1
+        }
+        const params = {
+          id: this.labelId,
+          isNew: false,
+          isShare: isShare,
+          synopsis: this.ruleForm.textarea,
+          tagsName: this.ruleForm.labelName
+        }
+        try {
+          const data = await getDtTagGroupData(params)
+          this.getQuireData()
+
+        } catch (e) {
+
+        }
+      },
+      //查询
+      getQuireData() {
+        this.page = 0
+        this.eq_isShare = this.value
+        this.keyword = this.input2
         this.getTagsData()
-    },
-    computed: {
+      },
+      //点击分页跳转
+      handleCurrentChange(page) {
+        this.page = page - 1
+        this.getTagsData()
+      },
+      //点击分页确认
+      goPage() {
 
-    },
-    watch: {
+      },
+      //删除
+      async delTag(id) {
+        try {
+          const data = await delTagGroup(id)
+          //console.log(data)
+          if (data.message == '删除成功') {
+            this.$message({
+              message: '删除成功',
+              duration: 1000,
+              type: 'success'
+            });
+            this.getTagsData()
+          } else {
+            this.$message.error(data.message)
+          }
 
+        } catch (e) {
+
+        }
+      }
     },
+    created() {
+      this.getTagsData()
+    },
+    computed: {},
+    watch: {},
     mounted() {
     }
   }
@@ -255,32 +412,39 @@
   .zxinp {
     width: 240px;
   }
+
   .zxlistBtn {
     margin-right: 10px;
   }
-  .actionBar{
+
+  .actionBar {
     display: flex;
     justify-content: flex-end;
   }
-  .tagSelect{
+
+  .tagSelect {
     margin-left: 10px;
     margin-right: 10px;
   }
-  .gress{
+
+  .gress {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-around;
   }
-  .gressPercentage{
+
+  .gressPercentage {
     width: 60%;
   }
+
   .iconLogo {
     font-size: 18px;
     margin-left: 24px;
     cursor: pointer;
   }
-  .area,.dateInp{
+
+  .area, .dateInp {
     width: 360px;
   }
 </style>

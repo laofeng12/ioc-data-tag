@@ -86,3 +86,9 @@ ljdp:
     api:
       skey: abdefghijklmnopqrstuvwxyz1234567890
 
+schedulejob: #定时任务组件
+  jobMethod: com.openjava.datatag.schedule.job.Schedulejob
+  jobGroup: scanjob
+  jobName: scanjob
+  queue: 0 0/1 * * * ? * #扫描新建模型频率
+

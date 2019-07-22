@@ -23,7 +23,7 @@ export function removeToken () {
 
 export function getUserInfo () {
   const cookiesUserInfo = Cookies.get('userInfo') ? JSON.parse(Cookies.get('userInfo')) : null
-  console.log('cookiesUserInfo',cookiesUserInfo)
+  // console.log('cookiesUserInfo',cookiesUserInfo)
   const userInfo = store.getters.userInfo || cookiesUserInfo
   return userInfo
 }

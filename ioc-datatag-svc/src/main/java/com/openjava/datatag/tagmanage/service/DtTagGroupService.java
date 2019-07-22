@@ -30,4 +30,7 @@ public interface DtTagGroupService {
 //	void doUpdate(DtTagGroup body,DtTagGroup db);
 
 	List<DtTagGroup> getMyTagGroup(Long createUser);
+
+	Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable);
+
 }

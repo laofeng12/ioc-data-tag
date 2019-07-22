@@ -36,3 +36,14 @@ export function lookTree(id) {
   })
 }
 
+/**
+ *
+ * @param params
+ */
+export function looktreeTable(id) {
+  return fetch({
+    url:'/datatag/tagmanage/dtTag/table/'+id,
+    method:'get'
+  })
+}
+
