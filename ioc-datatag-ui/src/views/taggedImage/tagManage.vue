@@ -50,7 +50,8 @@
             <template slot-scope="scope">
               <div class="gress">
                 <div class="gressPercentage">
-                  <el-progress :percentage="percentage" :show-text="false" :color="customColorMethod"></el-progress>
+                  <el-progress :percentage="scope.row.popularityLevel" :show-text="false"
+                               :color="customColorMethod"></el-progress>
                 </div>
                 <div>{{scope.row.popularity}}</div>
               </div>
@@ -180,7 +181,7 @@
         saveLoading: false,
         labelcreatDialog: false,
         creatsaveLoading: false,
-        percentage: 0,
+        percentage: '',
         value1: '',
         textarea: '',
         options: [{
@@ -313,20 +314,24 @@
         }
         try {
           const data = await getTagsData(params)
-          if (data.rows&&data.rows.length > 0) {
+          if (data.rows && data.rows.length > 0) {
             this.ztableShowList = data.rows
             this.totalnum = data.total
-            data.rows.forEach(item => {
-              if(item.popularityLevel == 0){
-                this.percentage = 0
-              }else if(item.popularityLevel == 1){
-                this.percentage = 25
-              }else if(item.popularityLevel == 2){
-                this.percentage = 50
-              }else if(item.popularityLevel == 3){
-                this.percentage = 75
-              }else{
-                this.percentage = 100
+            data.rows.map(item => {
+              if (item.popularityLevel == 0) {
+                item.popularityLevel = 0
+              }
+              if (item.popularityLevel == 1) {
+                item.popularityLevel = 25
+              }
+              if (item.popularityLevel == 2) {
+                item.popularityLevel = 50
+              }
+              if (item.popularityLevel == 3) {
+                item.popularityLevel = 75
+              }
+              if (item.popularityLevel == 4) {
+                item.popularityLevel = 100
               }
             })
           } else {
