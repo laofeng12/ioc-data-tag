@@ -2,6 +2,7 @@ package com.openjava.datatag.schedule.service;
 
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.schedule.domain.TaskInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,7 +80,9 @@ public class TaskServiceImpl implements TaskService{
                 logger.info("===> AddJob fail, job already exist, jobGroup:{}, jobName:{}", jobGroup, jobName);
                 throw new APIException(MyErrorConstants.PUBLIC_ERROE,String.format("Job已经存在, jobName:{%s},jobGroup:{%s}", jobName, jobGroup));
             }
-
+            if (StringUtils.isBlank(cronExpression)) {
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE,String.format("调度运行周期信息设置不完善，cycle字段为空", jobName, jobGroup));
+            }
             TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
             JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
 
