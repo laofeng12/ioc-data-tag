@@ -88,7 +88,7 @@ public class Constants {
 
 
     //=========调度运行周期=============
-    public static final String DT_MODEL_DISPATCH = "dt.model.dispatch";//条件设置条件符号
+    public static final String DT_MODEL_DISPATCH = "dt.model.dispatch";//周期枚举
     public static final Long DT_DISPATCH_STOP = 0L;
     public static final Long DT_DISPATCH_ONCE = 1L;
     public static final Long DT_DISPATCH_EACH_DAY = 2L;

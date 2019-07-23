@@ -2,9 +2,7 @@ package com.openjava.datatag.tagmodel.api;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -15,18 +13,13 @@ import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.service.DtSetColService;
-import com.openjava.datatag.utils.EntityClassUtil;
 import com.openjava.datatag.utils.IpUtil;
 import com.openjava.datatag.utils.user.service.SysUserService;
-import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
-import org.ljdp.component.sequence.SequenceService;
-import org.ljdp.component.sequence.TimeSequence;
-import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.annotation.Security;
 import org.ljdp.secure.sso.SsoContext;
@@ -34,7 +27,6 @@ import org.ljdp.ui.bootstrap.TablePage;
 import org.ljdp.ui.bootstrap.TablePageImpl;
 import org.ljdp.util.DateFormater;
 import org.springframework.data.domain.*;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -173,6 +165,12 @@ public class DtTaggingModelAction {
 	@ApiOperation(value = "设置调度", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
 	@RequestMapping(value="/Dispatch",method=RequestMethod.POST)
+	@ApiResponses({
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.TAG_MODEL_NO_FIND, message="找不到该模型或模型已经被删除"),
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="没有权限修改本模型"),
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.TAGM_DISPATCH_NONE_START_TIME, message="未设置开始时间"),
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.TAGM_DISPATCH_CYCLE_ERROR, message="Cycle不合法")
+	})
 	public SuccessMessage doDispatch(@RequestBody DtTaggingDispatchDTO body,
 									 HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -184,13 +182,46 @@ public class DtTaggingModelAction {
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"找不到该模型或模型已经被删除");
 		}
 		if(db.getCreateUser() != null && db.getCreateUser().equals(userId)){
-
 			dtTaggingModelService.doDispatch(body,db,userId,ip);
 		}else{
 			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"没有权限修改本模型");
 		}
 		return new SuccessMessage("修改调度成功");
 	}
+
+	/**
+	 * 用主键获取数据
+	 * @return
+	 */
+	@ApiOperation(value = "获取标签模型调度数据", notes = "单个对象查询", nickname="id")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "taggingModelId", value = "标签模型id", required = true, dataType = "string", paramType = "query"),
+	})
+	@ApiResponses({
+			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.TAG_MODEL_NO_FIND, message="找不到该模型或模型已经被删除"),
+			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="无此标签模型权限"),
+	})
+	@Security(session=true)
+	@RequestMapping(value="/Dispatch",method=RequestMethod.GET)
+	public DtTaggingDispatchDTO getDispatch(
+			@RequestParam(value="taggingModelId",required=true)Long taggingModelId) throws Exception{
+		DtTaggingModel m = dtTaggingModelService.get(taggingModelId);
+		if (m == null || m.getIsDeleted().equals(Constants.PUBLIC_YES)){
+			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"无此标签模型或已被删除");
+		}
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		Long userId = Long.parseLong(userInfo.getUserId());
+		if (!m.getCreateUser().equals(userId)){
+			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"无此标签模型权限");
+		}
+		DtTaggingDispatchDTO dto = new DtTaggingDispatchDTO();
+		dto.setCycleEnum(m.getCycleEnum());
+		dto.setStartTime(m.getStartTime());
+		dto.setId(m.getTaggingModelId());
+		return dto;
+	}
+
 
 
 

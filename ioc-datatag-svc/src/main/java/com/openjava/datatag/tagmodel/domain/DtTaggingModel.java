@@ -103,10 +103,14 @@ public class DtTaggingModel implements Persistable<Long>,Serializable {
 	@Column(name = "START_TIME")
 	private Date startTime;
 	
-	@ApiModelProperty("调度运行周期")
+	@ApiModelProperty("调度运行周期-cron 表达式")
 	@Length(min=0, max=32)
 	@Column(name = "CYCLE")
 	private String cycle;
+
+	@ApiModelProperty("调度运行周期- 周期枚举 DT_MODEL_DISPATCH")
+	@Column(name = "CYCLE_ENUM")
+	private Long cycleEnum;
 	
 	@ApiModelProperty("运行状态:未运行/运行中/运行出错/运行结束")
 	@Max(9L)
