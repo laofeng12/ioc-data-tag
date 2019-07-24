@@ -21,7 +21,18 @@ export function getDispatch(data) {
   return fetch({
     url:'/datatag/tagmodel/dtTaggingModel/Dispatch',
     method:'post',
-    // contentType: 'application/x-www-form-urlencoded',
     data
+  })
+}
+
+/**
+ *
+ * @param params
+ */
+export function getDelete(params) {
+  return fetch({
+    url:'/datatag/tagmodel/dtTaggingModel',
+    method:'delete',
+    params
   })
 }
