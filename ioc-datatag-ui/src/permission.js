@@ -3,6 +3,7 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken,getUserInfo } from './utils/auth'
 import store from '@/store'
+import Cookies from 'js-cookie'
 
 NProgress.configure({ showSpinner: false })// NProgress configuration
 
@@ -19,7 +20,28 @@ router.beforeEach((to, from, next) => {
       next({ path: '/index' })
       NProgress.done()
     } else {
-      next()
+      // next()
+      const routerBase = router.options.base
+      const toPath = to.fullPath
+      console.log('routerBase',routerBase)
+      console.log('toPath',toPath)
+      const rootPath = toPath.substring(0, toPath.replace('/', '-').indexOf('/') + 1)
+      console.log('rootPath',rootPath)
+      if (rootPath === routerBase) {
+        next(toPath.replace(routerBase, '/'))
+      } else if (to.matched.length === 0) {
+        if (Cookies.get(rootPath)) {
+          next('/404')
+        } else {
+          Cookies.set(rootPath, 1)
+          console.log('toPath2222',toPath)
+          window.location.replace(toPath)
+        }
+      } else {
+        console.log('remove',routerBase)
+        Cookies.remove(routerBase)
+        next()
+      }
     }
   } else {
     if (whiteList.indexOf(to.path) !== -1) {

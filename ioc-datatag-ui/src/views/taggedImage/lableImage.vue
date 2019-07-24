@@ -61,7 +61,7 @@
             <template slot-scope="scope" class="caozuo">
               <el-tooltip class="item" effect="dark" content="调度" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-s-operation iconLogo" @click="handleControl(scope.row.modelName)"></i>
+                    <i class="el-icon-s-operation iconLogo" @click="handleControl(scope.row.modelName,scope.row.taggingModelId)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -104,13 +104,15 @@
               <el-date-picker
                 size="small"
                 class="dateInp"
-                v-model="value1"
+                v-model="ruleForm.date"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd HH:mm:ss"
                 type="datetime"
                 placeholder="选择日期时间">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="调度时间周期:" prop="region" class="nameOne">
-              <el-select class="controlChoose" size="small" v-model="value" placeholder="请选择">
+              <el-select class="controlChoose" size="small" v-model="ruleForm.region" placeholder="请选择">
                 <el-option
                   v-for="item in options2"
                   :key="item.value"
@@ -123,7 +125,7 @@
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定调度</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="dispatchLoading" @click="sureDispatch">确定调度</el-button>
           </div>
         </div>
       </el-dialog>
@@ -133,7 +135,7 @@
                  @close="closeDownload">
         <div class="del-dialog-cnt">
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px">
-            <el-form-item label="下载数据范围:" prop="date" class="nameOne">
+            <el-form-item label="下载数据范围:" prop="download" class="nameOne">
               <el-select class="controlChoose" size="small" v-model="value" placeholder="请选择">
                 <el-option
                   v-for="item in options2"
@@ -148,6 +150,8 @@
                 size="small"
                 class="dateInp"
                 v-model="value1"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd HH:mm:ss"
                 type="datetimerange"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期">
@@ -176,7 +180,7 @@
         <div slot="footer" class="dialog-footer device">
           <div>
             <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定删除</el-button>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">取消</el-button>
+            <el-button size="small" type="primary" class="queryBtn" >取消</el-button>
           </div>
         </div>
       </el-dialog>
@@ -186,7 +190,7 @@
 
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
-  import {getmodelList} from '@/api/lableImage.js'
+  import {getmodelList,getDispatch} from '@/api/lableImage.js'
   import ElementPagination from '@/components/ElementPagination'
 
   export default {
@@ -200,12 +204,14 @@
         like_modelName:'',
         eq_runState:'',
         dispatchName:'',
+        dispatchId:'',
         input2: '',
         Loading: true,
         saveLoading2: true,
         controlDialog: false,
         downloadDialog: false,
         deleteDialog: false,
+        dispatchLoading:false,
         saveLoading: false,
         percentage: 30,
         value1: '',
@@ -286,9 +292,10 @@
           return "backgroundColor:#ee0320";
         }
       },
-      handleControl(name) {
+      handleControl(name,id) {
         this.controlDialog = true
         this.dispatchName = name
+        this.dispatchId = id
       },
       closeControl() {
         this.controlDialog = false
@@ -366,6 +373,34 @@
       modelQuery(){
         this.page = 0
         this.datamodelList()
+      },
+      sureDispatch(){
+        const param = {
+          "cycleEnum": this.ruleForm.region,
+          "id": this.dispatchId,
+          "startTime": this.ruleForm.date
+        }
+        this.dispatchLoading = true
+        this.$refs.ruleForm.validate(async(valid) => {
+          if (valid) {
+            try {
+              const res = await getDispatch(param)
+              this.$message({
+                message: res.message,
+                type: 'success'
+              });
+              this.dispatchLoading = false
+              this.controlDialog = false
+              this.datamodelList()
+            } catch (e) {
+              console.log(e);
+              this.dispatchLoading = false
+            }
+          } else {
+            this.dispatchLoading = false
+          }
+        });
+
       },
     },
     created() {

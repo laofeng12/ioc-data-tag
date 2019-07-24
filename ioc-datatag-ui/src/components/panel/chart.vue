@@ -11,7 +11,8 @@
     name: 'chart',
     data() {
       return {
-        arr:[]
+        arr:[],
+        newArr:[]
       }
     },
     mounted() {
@@ -38,7 +39,7 @@
           xAxis: [
             {
               type: 'category',
-              data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+              data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
               axisTick: {
                 alignWithLabel: true
               }
@@ -54,43 +55,21 @@
                 "show": false
               },
               "splitLine": {
-                "show": false
+                "show": true,
+                lineStyle: {
+                  color: ['#CCCCCC'],  //网格线
+                  width: 1,
+                  type:'dashed'
+                }
               }
             },
 
           ],
           series: [
             {
-              // name: '直接访问',
               type: 'bar',
               barWidth: '60%',
               data: this.arr,
-              markLine: {
-                symbol: ['none', 'none'], //标示线，虚线
-                itemStyle: {
-                  normal: {
-                    lineStyle:
-                      {
-                        type: 'dotted',
-                      },
-                    label:
-                      {
-                        show: false,
-                      }
-                  }
-                },
-                data: [{
-                  yAxis: 2
-                }, {
-                  yAxis: 4
-                }, {
-                  yAxis: 6
-                }, {
-                  yAxis: 8
-                },{
-                  yAxis: 10
-                }]
-              }
             }
           ]
         };
