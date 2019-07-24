@@ -209,19 +209,24 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		String modifyContent = JSONObject.toJSONString(body);
 		db.setModifyTime(new Date());
 		db.setModifyUser(userId);
-		//检查Cycle 字段是否合理--尚不明确前端传入的字段类型(或保存cron表达式或只保存周期标识)
-		if(checkCycle(body.getCycle())){
-			if (body.getCycle().equals(Constants.DT_DISPATCH_STOP)){
+		//检查Cycle 字段是否合理
+		if(checkCycle(body.getCycleEnum())){
+			if (body.getCycleEnum().equals(Constants.DT_DISPATCH_STOP)){
 				db.setRunState(Constants.TG_MODEL_END);
 				db.setStartTime(null);
 				db.setCycle(null);
+				db.setCycleEnum(null);
 			}else{
+				if (body.getStartTime() == null){
+					throw new APIException(MyErrorConstants.TAGM_DISPATCH_NONE_START_TIME,"未设置开始时间");
+				}
 				db.setRunState(Constants.TG_MODEL_WAIT);
 				db.setStartTime(body.getStartTime());
-				db.setCycle(toCron(body.getCycle(),body.getStartTime()));
+				db.setCycle(toCron(body.getCycleEnum(),body.getStartTime()));
+				db.setCycleEnum(body.getCycleEnum());
 			}
 		}else{
-			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"Cycle不合法");
+			throw new APIException(MyErrorConstants.TAGM_DISPATCH_CYCLE_ERROR,"Cycle不合法");
 		}
 
 		dtTaggingModelRepository.save(db);
