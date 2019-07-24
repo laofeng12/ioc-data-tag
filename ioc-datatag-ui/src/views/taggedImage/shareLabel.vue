@@ -41,7 +41,7 @@
           <el-table-column prop="source" label="使用热度" >
             <template slot-scope="scope">
               <div class="gress">
-                <div class="gressPercentage"><el-progress :percentage="percentage" :show-text="false" :color="customColorMethod"></el-progress></div>
+                <div class="gressPercentage"><el-progress :percentage="scope.row.popularityLevel" :show-text="false" :color="customColorMethod"></el-progress></div>
                 <div>{{scope.row.popularity}}</div>
               </div>
             </template>
@@ -146,15 +146,15 @@
           if(search.content&&search.content.length > 0){
             search.content.forEach(item => {
               if(item.popularityLevel == 0){
-                this.percentage = 0
+                item.popularityLevel = 0
               }else if(item.popularityLevel == 1){
-                this.percentage = 25
+                item.popularityLevel = 25
               }else if(item.popularityLevel == 2){
-                this.percentage = 50
+                item.popularityLevel = 50
               }else if(item.popularityLevel == 3){
-                this.percentage = 75
+                item.popularityLevel = 75
               }else{
-                this.percentage = 100
+                item.popularityLevel = 100
               }
             })
           }else {
