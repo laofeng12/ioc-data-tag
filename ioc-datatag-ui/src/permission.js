@@ -35,7 +35,9 @@ router.beforeEach((to, from, next) => {
         } else {
           Cookies.set(rootPath, 1)
           console.log('toPath2222',toPath)
-          window.location.replace(toPath)
+          // window.location.replace(toPath)
+          //测试
+          this.$router.push(toPath)
         }
       } else {
         console.log('remove',routerBase)
