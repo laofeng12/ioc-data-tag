@@ -86,7 +86,7 @@
 
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" @click="handleDelete"></i>
+                <i class="el-icon-delete iconLogo" @click="handleDelete(scope.row.modelName,scope.row.taggingModelId)"></i>
               </span>
               </el-tooltip>
             </template>
@@ -172,15 +172,13 @@
                  @close="closedelete">
         <div class="del-dialog-cnt">
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px">
-            <el-form-item>
-              您正在删除南城区高考成绩数据，是否确认删除？
-            </el-form-item>
+            <el-form-item>您正在删除{{this.deleteName}}，是否确认删除？</el-form-item>
           </el-form>
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定删除</el-button>
-            <el-button size="small" type="primary" class="queryBtn" >取消</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="sureDelete">确定删除</el-button>
+            <el-button size="small" type="primary" class="queryBtn" @click="cancelDelete">取消</el-button>
           </div>
         </div>
       </el-dialog>
@@ -190,7 +188,7 @@
 
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
-  import {getmodelList,getDispatch} from '@/api/lableImage.js'
+  import {getmodelList,getDispatch,getDelete} from '@/api/lableImage.js'
   import ElementPagination from '@/components/ElementPagination'
 
   export default {
@@ -205,6 +203,8 @@
         eq_runState:'',
         dispatchName:'',
         dispatchId:'',
+        deleteName:'',
+        deleteId:'',
         input2: '',
         Loading: true,
         saveLoading2: true,
@@ -212,6 +212,7 @@
         downloadDialog: false,
         deleteDialog: false,
         dispatchLoading:false,
+        deleteLoading:false,
         saveLoading: false,
         percentage: 30,
         value1: '',
@@ -308,10 +309,16 @@
         this.downloadDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      handleDelete() {
+      handleDelete(name,id) {
         this.deleteDialog = true
+        this.deleteName = name
+        this.deleteId = id
+        console.log(id);
       },
       closedelete() {
+        this.deleteDialog = false
+      },
+      cancelDelete(){
         this.deleteDialog = false
       },
       createLabel() {
@@ -402,6 +409,17 @@
         });
 
       },
+      async sureDelete(){
+        const res = await getDelete({
+          id:this.deleteId
+        })
+        this.$message({
+          message: res.message,
+          type: 'success'
+        });
+        this.deleteDialog = false
+        this.datamodelList()
+      }
     },
     created() {
       this.datamodelList()
