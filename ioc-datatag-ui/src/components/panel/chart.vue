@@ -80,15 +80,15 @@
                   }
                 },
                 data: [{
-                  yAxis: 2
+                  yAxis: 20
                 }, {
-                  yAxis: 4
+                  yAxis: 40
                 }, {
-                  yAxis: 6
+                  yAxis: 60
                 }, {
-                  yAxis: 8
+                  yAxis: 80
                 },{
-                  yAxis: 10
+                  yAxis: 100
                 }]
               }
             }
