@@ -99,4 +99,36 @@ public class Constants {
     //==========定时任务调度组件============
     public static final String DT_SCHEDULE_CORE_JOB_CLASS = "com.openjava.datatag.schedule.job.DtTaggingModelCalculationJob";//模型调度核心job
     public static final String DT_SCHEDULE_GROUP = "datatag_job_group";//模型调度任务组名称
+
+    /**
+     * 数据库类型(0:Oracle;1:MySql高版本;2;Mysql低版本;3:PostgreSql)
+     */
+    public static final Long DB_TYPE_LONG_ORACLE = 0L;
+
+    public static final Long DB_TYPE_LONG_MYSQL_HIGH = 1L;
+
+    public static final Long DB_TYPE_LONG_MYSQL_LOW = 2L;
+
+    public static final Long DB_TYPE_LONG_POSTGRE = 3L;
+
+    public static final Long DB_TYPE_LONG_HIVE = 4L;
+
+    public static final int DB_TYPE_INT_ORACLE = 0;
+
+    public static final int DB_TYPE_INT_MYSQL_HIGH = 1;
+
+    public static final int DB_TYPE_INT_MYSQL_LOW = 2;
+
+    public static final int DB_TYPE_INT_POSTGRE = 3;
+
+    public static final int DB_TYPE_INT_HIVE = 4;
+
+    /**
+     * 数据湖获取数据库表所查询的表
+     */
+    public static final String DATA_LAKE_TABLE = "";
+    /**
+     * 数据湖获取数据库表所查询的目录ID
+     */
+    public static final String DATA_LAKE_CATEGORY = "";
 }
