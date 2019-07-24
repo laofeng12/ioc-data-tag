@@ -23,10 +23,7 @@ router.beforeEach((to, from, next) => {
       // next()
       const routerBase = router.options.base
       const toPath = to.fullPath
-      console.log('routerBase',routerBase)
-      console.log('toPath',toPath)
       const rootPath = toPath.substring(0, toPath.replace('/', '-').indexOf('/') + 1)
-      console.log('rootPath',rootPath)
       if (rootPath === routerBase) {
         next(toPath.replace(routerBase, '/'))
       } else if (to.matched.length === 0) {
@@ -34,13 +31,9 @@ router.beforeEach((to, from, next) => {
           next('/404')
         } else {
           Cookies.set(rootPath, 1)
-          console.log('toPath2222',toPath)
-          // window.location.replace(toPath)
-          //测试
-          this.$router.push(toPath)
+          window.location.replace(toPath)
         }
       } else {
-        console.log('remove',routerBase)
         Cookies.remove(routerBase)
         next()
       }
