@@ -34,8 +34,6 @@ service.interceptors.request.use(
     }
     // DELETE
     if (config.method.toLowerCase() === 'delete') {
-      console.log('dd',config.params)
-      console.log('33',JSON.stringify(config.params))
       // config.params = JSON.stringify(config.params)
       config.params = config.params
     }
