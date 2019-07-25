@@ -166,7 +166,6 @@
           </div>
         </div>
       </el-dialog>
-      <!--删除-->
       <el-dialog class="creat" title="删除提示" :visible.sync="deleteDialog" width="530px" center
                  :close-on-click-modal="false"
                  @close="closedelete">
@@ -182,6 +181,39 @@
           </div>
         </div>
       </el-dialog>
+      <el-dialog class="creat" title="创建标签组" :visible.sync="labelcreatDialog" width="530px" center
+                 :close-on-click-modal="false"
+                 @close="closeCreat">
+        <div class="del-dialog-cnt">
+          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+            <el-form-item label="标签组名称:" prop="tagsName" class="nameOne">
+              <el-input
+                class="zxinp moduleOne"
+                size="small"
+                placeholder="请输入内容"
+                v-model="ruleForm.tagsName" style="width: 360px">
+              </el-input>
+            </el-form-item>
+            <el-form-item label="标签组简介:" prop="synopsis" class="nameOne">
+              <el-input
+                class="area"
+                type="textarea"
+                :autosize="{ minRows: 2, maxRows: 4}"
+                placeholder="请输入内容"
+                v-model="ruleForm.synopsis">
+              </el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div slot="footer" class="dialog-footer device">
+          <div>
+            <el-button size="small" plain class="btn-group" @click="cancleCreat">取消</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="creatsaveLoading" @click="sureCreat">
+              确认并编辑
+            </el-button>
+          </div>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -189,6 +221,7 @@
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
   import {getmodelList,getDispatch,getDelete} from '@/api/lableImage.js'
+  import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
 
   export default {
@@ -214,6 +247,8 @@
         dispatchLoading:false,
         deleteLoading:false,
         saveLoading: false,
+        labelcreatDialog: false,
+        creatsaveLoading:false,
         percentage: 30,
         value1: '',
         textarea: '',
@@ -262,7 +297,9 @@
         ztableShowList: [],
         ruleForm: {
           region: '',
-          date: ''
+          date: '',
+          tagsName: '',
+          synopsis: ''
         },
         rules: {
           date: [
@@ -270,6 +307,12 @@
           ],
           region: [
             { required: true, message: '请选择周期', trigger: 'change' }
+          ],
+          labelName: [
+            {required: true, message: '请填写名称', trigger: 'blur'}
+          ],
+          tagsName: [
+            {required: true, message: '请填写名称', trigger: 'blur'}
           ]
         },
       }
@@ -322,7 +365,8 @@
         this.deleteDialog = false
       },
       createLabel() {
-        this.$router.push('tree')
+        this.labelcreatDialog = true
+        // this.$router.push('tree')
       },
       createModel() {
         this.$router.push('creatModel')
@@ -419,7 +463,43 @@
         });
         this.deleteDialog = false
         this.datamodelList()
-      }
+      },
+      closeCreat() {
+        this.$refs.ruleForm.resetFields();
+        this.labelcreatDialog = false
+      },
+      cancleCreat() {
+        this.$refs.ruleForm.resetFields();
+        this.labelcreatDialog = false
+      },
+      sureCreat() {
+        try {
+          this.creatsaveLoading = true
+          this.$refs.ruleForm.validate(async (valid) => {
+            if (valid) {
+              try {
+                const data = await getDtTagGroupData({
+                  id: '',
+                  isNew: true,
+                  isShare: '',
+                  synopsis: this.ruleForm.synopsis,
+                  tagsName: this.ruleForm.tagsName
+                })
+                this.creatsaveLoading = false
+                this.$router.push('/tree/'+ data.id)
+              } catch (e) {
+                this.creatsaveLoading = false
+                console.log(e);
+              }
+            } else {
+              this.creatsaveLoading = false
+            }
+          });
+        } catch (e) {
+          this.creatsaveLoading = false
+          console.log(e);
+        }
+      },
     },
     created() {
       this.datamodelList()
