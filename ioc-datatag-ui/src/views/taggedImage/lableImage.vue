@@ -37,7 +37,7 @@
           <el-table-column prop="createUserName" label="创建者"></el-table-column>
           <el-table-column prop="people" label="修改人/修改时间">
             <template slot-scope="scope">
-              <div style="text-align: center">
+              <div>
                 <div>{{scope.row.modifyUserName}}</div>
                 <div>{{scope.row.modifyTime}}</div>
               </div>
