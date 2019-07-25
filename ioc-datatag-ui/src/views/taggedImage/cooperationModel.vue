@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
     <div class="actionBar">
-      <div>
         <el-input
           class="zxinp moduleOne"
           size="small"
@@ -18,17 +17,12 @@
           </el-option>
         </el-select>
         <el-button class="zxlistBtn" size="small" type="primary">查询</el-button>
-      </div>
-
-      <div>
         <router-link  to="/tree">
           <el-button  class="zxlistBtn" size="small" type="primary">创建标签</el-button>
         </router-link>
         <router-link  to="/lableImage">
           <el-button size="small" type="primary">我的模型</el-button>
         </router-link>
-      </div>
-
     </div>
     <div class="tableBar">
       <div class="newTable  daList">

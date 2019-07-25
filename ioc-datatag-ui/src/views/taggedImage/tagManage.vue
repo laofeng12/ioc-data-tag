@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
     <div class="actionBar">
-      <div>
         <el-input
           class="zxinp moduleOne"
           size="small"
@@ -18,12 +17,8 @@
           </el-option>
         </el-select>
         <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
-      </div>
-      <div>
         <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
         <el-button size="small" type="primary" @click="shareLabel">共享标签组</el-button>
-      </div>
-
     </div>
     <div class="tableBar">
       <div class="newTable  daList">

@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
     <div class="actionBar">
-      <div>
         <el-input
           class="zxinp tagSelect"
           size="small"
@@ -10,11 +9,7 @@
           v-model="input2">
         </el-input>
         <el-button class="zxlistBtn" size="small" type="primary" @click="shareQuery">查询</el-button>
-      </div>
-      <div>
         <el-button size="small" type="primary" @click="createLabel">我的标签组</el-button>
-      </div>
-
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
