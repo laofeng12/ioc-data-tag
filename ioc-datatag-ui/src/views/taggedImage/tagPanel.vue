@@ -70,19 +70,19 @@
             </div>
           </div>
           <div class="barGraphOne">
-            <div class="titleName">最后一个星期</div>
+            <div class="titleName">最近一个星期</div>
             <div class="contentBtn">
               <div class="contentSpacing"><span class="titleContent" v-for="(item,index) in tablelistThree" :key="index">{{item}}</span></div>
             </div>
           </div>
           <div class="barGraphOne">
-            <div class="titleName">最后一个月</div>
+            <div class="titleName">最近一个月</div>
             <div class="contentBtn">
               <div class="contentSpacing"><span class="titleContent" v-for="(item,index) in tablelistFouth" :key="index">{{item}}</span></div>
             </div>
           </div>
           <div class="barGraphOne">
-            <div class="titleName">最后一年</div>
+            <div class="titleName">最近一年</div>
             <div class="contentBtn">
               <div class="contentSpacing"><span class="titleContent" v-for="(item,index) in tablelistFifth" :key="index">{{item}}</span></div>
             </div>

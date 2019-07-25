@@ -542,9 +542,9 @@
         this.sharelookTree()
       } else if (this.$route.name == 'labelcreatTree') {
         this.sharelookTree()
-      }
-      else {
-      }
+      }else if(this.$route.name == 'tree'){
+        this.sharelookTree()
+      }else {}
     }
   };
 </script>
