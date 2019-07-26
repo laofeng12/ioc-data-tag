@@ -1,103 +1,166 @@
 <template>
   <div>
-    <!--<div class="con" :style="`width: ${tableBoxWidth}px; height: ${tableBoxHeight}px`">-->
-      <!--<div class="showCon" :style="`width: ${tableWidth}px; height: ${tableHeight}px`">-->
-        <!--<el-table :data="tableData">-->
-          <!--<el-table-column v-for="(item, index) in theadData" :key="index" :property="`column${index+1}`"-->
-                           <!--:label="item.label" min-width="149" align="center"></el-table-column>-->
-        <!--</el-table>-->
-        <div class="newTable  daList">
-          <el-table ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
-                    style="width: 100%;text-align: center"
-                    :header-cell-style="{background:'#f0f2f5'}">
-            <template slot="empty">
-              <div v-if="Loading">
-                <div v-loading="saveLoading2" ></div>
-              </div>
-              <div v-else>暂无数据</div>
-            </template>
-            <el-table-column prop="name" label="名称">
-              <template slot-scope="scope">
-                <span>教育体系标签</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="creator" label="创建者"></el-table-column>
-            <el-table-column prop="people" label="修改人/修改时间" >
-                  <div>数据搬运工</div>
-            </el-table-column>
-            <el-table-column prop="state" label="状态" >
-              <template slot-scope="scope">
-                <div class="state">
-                  <div class="spot"></div>
-                  <div class="stateName">{{scope.row.state}}</div>
-                </div>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
+    <el-table border class="my-table"
+      :data="tableDataOne"
+      style="width: 100%">
+      <el-table-column
+       v-for="(item,index) in theadDataOne" :prop="item.prop" :key="index">
+        <template slot="header" slot-scope="scope">
+          <el-dropdown @command="handleCommandTags($event,item)"  v-if="item.isTag===true">
+              <span class="el-dropdown-link">
+                {{item.lable}} <i class="el-icon-setting"></i>
+              </span>
+                        <el-dropdown-menu slot="dropdown">
+                          <el-dropdown-item command="0" icon="el-icon-document-copy">克隆字段</el-dropdown-item>
+                          <el-dropdown-item command="1" icon="el-icon-price-tag">字段打标</el-dropdown-item>
+                          <el-dropdown-item command="2" icon="el-icon-close">清除字段</el-dropdown-item>
+                        </el-dropdown-menu>
+          </el-dropdown>
+          <span v-else>
+            {{item.lable}}
+          </span>
+      </template>
+      </el-table-column>
+    </el-table>
+    <!--字段设置-->
+    <el-dialog class="creat" title="数据打标"  :visible.sync="setTagsDialog" width="630px" center :modal-append-to-body="false" :close-on-click-modal="false"
+               @close="close">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="选择标签组" prop="region">
+          <el-col :span="11">
+          <el-select v-model="ruleForm.tagTeam" filterable placeholder="请选择" size="small">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+          </el-col>
+          <el-col :span="11">
+            <el-link type="primary">编辑标签组</el-link>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="选择标签层" prop="region">
+          <el-col :span="11">
+            <el-select v-model="ruleForm.tagTeam" filterable placeholder="请选择" size="small">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="打标设置" prop="region">
+          <el-col :span="11">
+            <el-select v-model="ruleForm.tagTeam" filterable placeholder="请选择" size="small">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-col>
+          <el-col :span="11">
+            <el-row>
+              <el-button type="primary" size="small">自动打标</el-button>
+              <el-button type="primary" size="small">人工打标</el-button>
+            </el-row>
+          </el-col>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer device">
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认打标</el-button>
       </div>
-    <!--</div>-->
-  <!--</div>-->
+    </el-dialog>
+  </div>
+
 </template>
 
 <script>
 export default {
   name: 'datasetEditable',
   props: {
-    tableData: {
-      type: Array,
-      required: true
-    },
-    theadData: {
-      type: Array,
-      required: true
-    }
   },
   data () {
     return {
-      tableBoxWidth: 800,
-      tableBoxHeight: 700,
-      tableWidth: 800,
-      tableHeight: 700,
-      Loading:true,
-      saveLoading2:true,
-      ztableShowList:[{
-        name:'教育',
-        creator:'大雄',
-        people:'数据搬运工',
-        time:'2019/4/19  16:17:22',
-        introduction:'动画的很多好很多',
-        state:'运行中',
+      saveLoading:false,
+      ruleForm:{
+        tagTeam:''
+      },
+      rules:{
+
+      },
+      options:[],
+      setTagsDialog:false,
+      theadDataOne:[{
+        prop:'date',
+        lable:'日期',
+        isTag:true
       },{
-        name:'教育22',
-        creator:'大雄',
-        people:'数据搬运工22',
-        time:'2019/4/19  16:17:22',
-        introduction:'动画的很多好很多22',
-        state:'运行中',
+        prop:'name',
+        lable:'名称',
+        isTag:true
       }],
+      tableDataOne: [{
+        date: '2016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        date: '2016-05-04',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1517 弄'
+      }, {
+        date: '2016-05-01',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1519 弄'
+      }, {
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1516 弄'
+      }]
     }
   },
   watch: {
-    theadData (val) {
-      this.tableWidth = val.length * 140
-    }
   },
   created () {
-    this.tableBoxWidth = document.body.offsetWidth - 280
-    this.tableBoxHeight = document.body.offsetHeight - 120
-    this.tableWidth = this.theadData.length * 149
-    this.tableHeight = this.tableData.length * 48
   },
   mounted () {
-    // this.tableWidth = this.theadData
   },
-  methods: {}
+  methods: {
+    //字段打标
+    colSetTags(){
+      this.setTagsDialog=true
+    },
+    //下拉菜单处理
+    handleCommandTags(dropIndex,data) {
+      switch (dropIndex) {
+        case '0': // 克隆字段
+         // this.renameTreeItem(node, data, 1)
+          break
+        case '1': // 字段打标
+          this.colSetTags()
+          break
+        case '2': // 清除字段
+         // this.moveTreeItem(data, 1)
+      }
+    },
+    //关闭打标
+    close(){
+
+    }
+  }
 }
 </script>
 
 <style scoped lang="scss">
-  .con {
-    overflow: auto;
+.my-table{
+  .el-icon-setting{
+    color: #409eff;
+    cursor: pointer;
   }
+}
 </style>
