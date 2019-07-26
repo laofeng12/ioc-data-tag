@@ -1,5 +1,6 @@
 package com.openjava.datatag.tagcol.api;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -13,13 +14,19 @@ import javax.servlet.http.HttpServletResponse;
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
 import com.openjava.datatag.tagcol.dto.DtCooTagcolLimitDTO;
 import com.openjava.datatag.tagcol.dto.DtCooperationDTO;
+import com.openjava.datatag.tagcol.dto.DtCooperationModelDTO;
+import com.openjava.datatag.tagcol.dto.DtCooperationSetCol;
 import com.openjava.datatag.tagcol.query.DtCooTagcolLimitDBParam;
+import com.openjava.datatag.tagcol.query.DtCooperationSetColParam;
 import com.openjava.datatag.tagcol.service.DtCooTagcolLimitService;
+import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
+import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.utils.user.service.SysUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
+import org.ljdp.component.result.DataApiResponse;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.SequenceService;
 import org.ljdp.component.sequence.TimeSequence;
@@ -125,9 +132,41 @@ public class DtCooperationAction {
 		Page<DtCooperationDTO> showResult = new PageImpl<>(dtoList,pageable,dtoList.size());
 		return new TablePageImpl<>(showResult);
 	}
-	
+	@ApiOperation(value = "根据用户ID获取该用户的协作模型记录", notes = "结果对象数组", nickname="userId")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "userId", value = "协作用户Id", required = true, dataType = "Long", paramType = "path"),
+	})
+	@ApiResponses({
+			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
+	})
+	@Security(session=true)
+	@RequestMapping(value="/searchcool/{userId}",method=RequestMethod.GET)
 
-	
+	public DataApiResponse<DtCooperationModelDTO> doSearchCool(@PathVariable("userId")Long userId){
+		List<DtCooperationModelDTO> result =dtCooperationService.findUserModelByUserId(userId);
+		DataApiResponse<DtCooperationModelDTO> resp = new DataApiResponse<>();
+		resp.setRows(result);
+		return  resp;
+	}
+	@ApiOperation(value = "根据模型ID获取该用户的协作字段记录", notes = "结果对象数组")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "userId", value = "协作用户Id", required = true, dataType = "Long", paramType = "query"),
+			@ApiImplicitParam(name = "modelId", value = "协作模型Id", required = true, dataType = "Long", paramType = "query"),
+
+	})
+	@ApiResponses({
+			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
+	})
+	@Security(session=true)
+	@RequestMapping(value="/searchcoofield",method=RequestMethod.POST)
+
+	public DataApiResponse<DtCooperationSetCol> doSearchCooField(@ApiIgnore() DtCooperationSetColParam params){
+		List<DtCooperationSetCol> result =dtCooperationService.findUserModelCooField(params.getUserId(),params.getModelId());
+		DataApiResponse<DtCooperationSetCol> resp = new DataApiResponse<>();
+		resp.setRows(result);
+		return  resp;
+	}
+
 	/**
 	 * 保存
 	 */
