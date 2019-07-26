@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
     <div class="actionBar">
-      <div>
         <el-input
           class="zxinp moduleOne"
           size="small"
@@ -18,15 +17,10 @@
           </el-option>
         </el-select>
         <el-button class="zxlistBtn" size="small" type="primary" @click="modelQuery">查询</el-button>
-      </div>
-
-      <div>
         <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
         <el-button size="small" type="primary" @click="createModel">创建模型</el-button>
         <el-button size="small" type="primary" @click="cooperationModel">协作模型</el-button>
         <!--<el-button size="small" type="primary" >下载管理</el-button>-->
-      </div>
-
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -43,7 +37,7 @@
           <el-table-column prop="createUserName" label="创建者"></el-table-column>
           <el-table-column prop="people" label="修改人/修改时间">
             <template slot-scope="scope">
-              <div style="text-align: center">
+              <div>
                 <div>{{scope.row.modifyUserName}}</div>
                 <div>{{scope.row.modifyTime}}</div>
               </div>
@@ -170,7 +164,7 @@
                  :close-on-click-modal="false"
                  @close="closedelete">
         <div class="del-dialog-cnt">
-          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px">
+          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" style="text-align: center">
             <el-form-item>您正在删除{{this.deleteName}}，是否确认删除？</el-form-item>
           </el-form>
         </div>
@@ -556,5 +550,8 @@
 
   .stateName {
     color: #00CC33;
+  }
+  .area {
+    width: 360px;
   }
 </style>
