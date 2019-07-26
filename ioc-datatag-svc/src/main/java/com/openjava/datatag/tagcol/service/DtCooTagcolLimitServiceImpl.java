@@ -37,6 +37,9 @@ public class DtCooTagcolLimitServiceImpl implements DtCooTagcolLimitService {
 	public List<DtCooTagcolLimit> findByColId(Long colId){
 		return dtCooTagcolLimitRepository.findByColId(colId);
 	}
+	public int deleteBycoolId(Long colId){
+		return dtCooTagcolLimitRepository.deleteBycoolId(colId);
+	};
 	public DtCooTagcolLimit get(Long id) {
 		Optional<DtCooTagcolLimit> o = dtCooTagcolLimitRepository.findById(id);
 		if(o.isPresent()) {

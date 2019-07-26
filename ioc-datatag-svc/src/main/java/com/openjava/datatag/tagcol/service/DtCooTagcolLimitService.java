@@ -22,6 +22,7 @@ public interface DtCooTagcolLimitService {
 	
 	DtCooTagcolLimit doSave(DtCooTagcolLimit m);
 	List<DtCooTagcolLimit> findByColId(Long colId);
+	int deleteBycoolId(Long colId);
 	void doDelete(Long id);
 	void doRemove(String ids);
 }
