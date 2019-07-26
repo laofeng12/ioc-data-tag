@@ -12,7 +12,7 @@
       </el-tree>
     </div>
     <!--字段设置-->
-    <el-dialog class="creat" title="字段设置"  :visible.sync="colSetDialog" width="630px" center :modal-append-to-body="false" :close-on-click-modal="false"
+    <el-dialog class="creat" title="字段设置"  :visible.sync="colSetDialog" width="680px" center :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close">
       <div class="col-set-box">
         <el-container class="">
