@@ -4,7 +4,7 @@
     <div   class="tree">
       <el-tree icon-class="el-icon-folder"  class="tree" :props="props" :filter-node-method="filterNode" ref="tree"  :load="loadNode" lazy>
         <span class="custom-tree-node" slot-scope="{ node, data }">
-        <div class="cus-node-title">{{ data.orgName }}</div>
+        <div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>
           <el-button  class="set-btn" type="text" size="mini" v-if="node.level>1"  @click.stop="setTags(node,data)">
             <i class="el-icon-setting settingIcon"></i>
           </el-button>
