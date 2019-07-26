@@ -249,7 +249,7 @@
         },
         searchText: '',
         isIndeterminate: true,
-        addSetDialog: true,
+        addSetDialog: false,
         tableData: [{
           colName: 'std',
           colNameType: 'number'
