@@ -17,7 +17,6 @@
           <div class="img" @click="saveAs"></div>
         </div>
         <el-button class="button" type="info" size="small" @click="runModel">模型调度</el-button>
- <!--       <el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
       </div>
     </div>
     <div class="content">
@@ -39,40 +38,42 @@
           <div class="card" v-show="show">
             <div class="clearfix">
               <div class="peopleList">成员列表</div>
-              <div class="addPeople"><i class="el-icon-plus"></i></div>
+              <div class="addPeople"><i class="el-icon-plus" @click="addPeople"></i></div>
             </div>
             <div class="peopleContent">
               <div class="contentA clearfix">
+                <div>
+                  <img class="imgPeople2" src="../../assets/img/Uadmin.png" height="16" width="16"/>
+                  <img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName" title="数据搬运工">数据搬运工</div>
+                <!--<div class="head"><i class="el-icon-delete"></i></div>-->
+              </div>
+              <div class="contentB clearfix">
+                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName" title="数据搬运工数据搬运工2">数据搬运工数据搬运工2</div>
+                <div class="head"><i class="el-icon-delete"></i></div>
+              </div>
+              <div class="contentB clearfix">
                 <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
                 <div class="listName">数据搬运工</div>
                 <div class="head"><i class="el-icon-delete"></i></div>
               </div>
-              <div class="contentA clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工数据搬运工2</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
-              <div class="contentA clearfix">
+              <div class="contentB clearfix">
                 <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
                 <div class="listName">数据搬运工</div>
                 <div class="head"><i class="el-icon-delete"></i></div>
               </div>
-              <div class="contentA clearfix">
+              <div class="contentB clearfix">
                 <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
                 <div class="listName">数据搬运工</div>
                 <div class="head"><i class="el-icon-delete"></i></div>
               </div>
-              <div class="contentA clearfix">
+              <div class="contentB clearfix">
                 <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
                 <div class="listName">数据搬运工</div>
                 <div class="head"><i class="el-icon-delete"></i></div>
               </div>
-              <div class="contentA clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
-              <div class="contentA clearfix">
+              <div class="contentB clearfix">
                 <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
                 <div class="listName">数据搬运工</div>
                 <div class="head"><i class="el-icon-delete"></i></div>
@@ -110,8 +111,8 @@
         </div>
       </div>
     </el-dialog>
-    <!--运行-->
-    <el-dialog class="creat" title="运行模型" :visible.sync="runDialog" width="530px" center :close-on-click-modal="false"
+    <!--模型调度-->
+    <el-dialog class="creat" title="模型调度" :visible.sync="runDialog" width="530px" center :close-on-click-modal="false"
                @close="closeRun">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px">
@@ -139,67 +140,123 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" >确定运行</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定运行</el-button>
         </div>
       </div>
     </el-dialog>
-    <!--保存-->
-    <el-dialog class="creat" title="保存模型" :visible.sync="saveDialog" width="530px" center :close-on-click-modal="false"
-               @close="closeSave">
-      <div class="del-dialog-cnt">
-        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
-          <el-form-item label="模型名称:" prop="name" class="nameOne">
-            <el-input v-model="ruleForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="模型简介:" prop="textarea2" class="nameOne">
-            <el-input
-              class="area"
-              type="textarea"
-              :autosize="{ minRows: 2, maxRows: 4}"
-              placeholder="请输入内容"
-              v-model="ruleForm.textarea2">
-            </el-input>
-          </el-form-item>
-        </el-form>
+    <!--协作添加-->
+    <el-dialog class="creat addCreat" title="添加成员" :visible.sync="addSetDialog" width="950px" center
+               :modal-append-to-body="false" :close-on-click-modal="false"
+               @close="close">
+      <div class="col-set-box">
+        <el-container class="">
+          <el-aside width="250px" class="left">
+            <h3>选择协作用户</h3>
+            <el-input placeholder="输入关键词搜索列表" v-model="searchText" size="small" suffix-icon="el-icon-search"></el-input>
+            <div class="allPeople">
+              <div class="userContent clearfix">
+                <div class="peopleName">大雄1</div>
+                <div><i class="el-icon-circle-plus-outline addIcon"></i></div>
+              </div>
+              <div class="userContent clearfix">
+                <div class="peopleName">大雄2</div>
+                <div><i class="el-icon-circle-plus-outline addIcon"></i></div>
+              </div>
+              <div class="userContent clearfix">
+                <div class="peopleName">大雄3</div>
+                <div><i class="el-icon-circle-plus-outline addIcon"></i></div>
+              </div>
+            </div>
+          </el-aside>
+          <el-aside width="250px" class="left">
+            <h3>已选用户</h3>
+            <el-input placeholder="输入关键词搜索列表" v-model="searchText" size="small" suffix-icon="el-icon-search"></el-input>
+            <div class="allPeople">
+              <div class="userContent clearfix">
+                <div class="peopleName">大雄1</div>
+                <div><i class="el-icon-delete addIcon"></i></div>
+              </div>
+              <div class="userContent clearfix">
+                <div class="peopleName">大雄2</div>
+                <div><i class="el-icon-delete addIcon"></i></div>
+              </div>
+              <div class="userContent clearfix">
+                <div class="peopleName">大雄3</div>
+                <div><i class="el-icon-delete addIcon"></i></div>
+              </div>
+            </div>
+          </el-aside>
+          <div class="right2">
+            <h3>选择协作打标字段</h3>
+            <div>
+              <el-table class="my-table" border style="width: 100%"
+                        :data="tableData"
+                        tooltip-effect="dark">
+
+                <el-table-column
+                  label="字段" prop="colName">
+                </el-table-column>
+                <el-table-column
+                  prop="colNameType"
+                  label="类型"
+                  width="100">
+                </el-table-column>
+                <el-table-column
+                  label="选择打标字段" width="120">
+                  <template slot-scope="scope">
+                    <el-checkbox></el-checkbox>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+          </div>
+        </el-container>
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认保存</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认添加</el-button>
         </div>
       </div>
     </el-dialog>
-
-    <!--添加-->
   </div>
 </template>
 
 <script>
   import EditTable from '../../components/ModeleEdit/EditTable'
   import Aside from '../../components/ModeleEdit/Aside'
-
   export default {
     name: 'creatModel',
-    data () {
+    data() {
       return {
-        modelName:'未命名',
-        show:false,
-        editDialog:false,
-        saveLoading:false,
-        runDialog:false,
-        saveDialog:false,
-        value1:'',
-        value:'',
+        modelName: '未命名',
+        show: false,
+        editDialog: false,
+        saveLoading: false,
+        runDialog: false,
+        saveDialog: false,
+        value1: '',
+        value: '',
         tableBoxWidth: 800,
         tableBoxHeight: 800,
         tableWidth: 800,
         tableHeight: 800,
         search: '',
-        ruleForm:{
-          name:'',
-          textarea2:'',
-          modelName:'',
-          date:''
+        ruleForm: {
+          name: '',
+          textarea2: '',
+          modelName: '',
+          date: ''
         },
+        searchText: '',
+        isIndeterminate: true,
+        addSetDialog: false,
+        tableData: [{
+          colName: 'std',
+          colNameType: 'number'
+        },{
+          colName: 'std2',
+          colNameType: 'number'
+        }],
         options2: [{
           value: '选项1',
           label: '停止运行'
@@ -209,114 +266,57 @@
         }],
         rules: {
           name: [
-            {required: true, message: '请填写',trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'}
           ],
           textarea2: [
-            {required: true, message: '请填写',trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'}
           ],
-          date:[{required: true, message: '请选择时间',trigger: 'blur'}],
-          date2:[{required: true, message: '请选择',trigger: 'change'}]
+          date: [{required: true, message: '请选择时间', trigger: 'blur'}],
+          date2: [{required: true, message: '请选择', trigger: 'change'}]
         },
-        tableData: [],
         theadData: [],
-        dimensionList: [],
-        measureList: [],
-        componentsSwitch: true,
         datasetId: '',
         updateAsideForce: true
       }
     },
-    components: { EditTable, Aside },
+    components: {EditTable, Aside},
     watch: {
       theadData: function (val) {
         this.tableWidth = val.length * 149
       }
     },
-    created () {
+    created() {
       this.datasetId = this.$route.params.id
     },
-    mounted () {
-      //this.getDatasetDetails()
+    mounted() {
+
     },
     methods: {
-      updateAside (type, val) {
-        if (type === 'measure') {
-          this.measureList = val
-        } else {
-          this.dimensionList = val
-        }
-        this.updateAsideForce = false
-        this.$nextTick(() => (this.updateAsideForce = true))
-        // this.getTableDetails()
+      addPeople() {
+        this.addSetDialog = true
       },
-      async getDatasetDetails () {
-        const { data: { dimensionList, measureList } } = await datasetWordDetailsApi(this.datasetId)
-        this.dimensionList = dimensionList
-        this.measureList = measureList
-        const newDimensionList = this.dimensionList.map(item => ({ columnName: item.columnName, values: [] }))
-        const newMeasureList = this.measureList.map(item => ({ columnName: item.columnName, values: [] }))
-        let cfgObj = {
-          rows: [],
-          filters: [],
-          values: [],
-          columns: []
-        }
-        cfgObj.columns = [...newDimensionList, ...newMeasureList]
-        let cfgStr = JSON.stringify(cfgObj)
-        const detailsParams = {
-          cfg: cfgStr,
-          dsDataSetId: this.datasetId,
-          dsDataSourceId: '',
-          query: '{}',
-          reload: true
-        }
-        const { data: { columnList: column, data: tableList } } = await datasetDetailsApi(detailsParams)
-        const theadData = column.map(item => ({ label: item.name }))
-        this.theadData = theadData
-        const tableData = tableList.map(item => {
-          const objItem = {}
-          item.forEach((v, i) => {
-            const key = `column${i + 1}`
-            objItem[key] = v
-          })
-          return objItem
-        })
-        this.tableData = tableData
-        this.componentsSwitch = false
-        this.$nextTick(() => (this.componentsSwitch = true))
+      close() {
+        this.addSetDialog = false
       },
-      // async previewTable () {
-      //   const columnList = [{index: 0, aggType: null, name: "SOURCE_NAME"}]
-      // },
-      async datasetSave () {
-        const data = {
-          dsDataSetId: Number(this.datasetId),
-          dimensionJson: JSON.stringify(this.dimensionList),
-          measureJson: JSON.stringify(this.measureList),
-          isNew: false
-        }
-        const res = await datasetChangeApi(data)
-      },
-      //
-      showIt(){
+      showIt() {
         this.show = !this.show
       },
-      saveAs(){
+      saveAs() {
         this.editDialog = true
       },
-      closeSaveas(){
+      closeSaveas() {
         this.editDialog = false
       },
-      runModel(){
+      runModel() {
         this.runDialog = true
       },
-      closeRun(){
+      closeRun() {
         this.runDialog = false
       },
-      saveModel(){
+      saveModel() {
         this.saveDialog = true
       },
-      closeSave(){
+      closeSave() {
         this.saveDialog = false
       },
     }
@@ -375,6 +375,7 @@
       }
     }
   }
+
   .content {
     display: flex;
     .aside {
@@ -396,78 +397,7 @@
       .search {
         margin-bottom: 20px;
       }
-      .con {
-        color: #cccccc;
-        .box {
-          margin-bottom: 25px;
-          .title {
-            color: #ffffff;
-          }
-          .line {
-            display: flex;
-            justify-content: space-between;
-            height: 30px;
-            line-height: 30px;
-            position: relative;
-            .type {
-              width: 20%;
-            }
-            .name {
-              flex-shrink: 0;
-              width: 60%;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            }
-            .icon {
-              cursor: pointer;
-            }
-            .menu {
-              width: 150px;
-              position: absolute;
-              right: -170px;
-              top: -50px;
-              background: #ffffff;
-              color: #333;
-              font-size: 14px;
-              box-shadow: #999 0 0 4px;
-              padding: 10px;
-              border-radius: 5px;
-              box-sizing: border-box;
-              z-index: 2;
-              cursor: pointer;
-              .menu-con {
-                position: relative;
-                .menu-line {
-                  display: flex;
-                  height: 30px;
-                  line-height: 30px;
-                  .menu-icon {
-                    width: 25px;
-                    height: 25px;
-                    color: #999;
-                    font-size: 18px;
-                    margin-right: 5px;
-                    background-repeat: no-repeat;
-                    background-size: 100% 100%;
-                  }
-                  .menu-name {
-                    flex-grow: 1;
-                    border-bottom: 1px #ddd solid;
-                  }
-                }
-                .del {
-                  width: 15px;
-                  height: 15px;
-                  position: absolute;
-                  top: -10px;
-                  right: 0;
-                }
-              }
-            }
-          }
-        }
-      }
+
     }
     .components {
       width: 100%;
@@ -485,48 +415,40 @@
           justify-content: space-around;
           align-items: center;
           font-size: 14px;
-          .box {
-            width: 50%;
-            cursor: pointer;
-            .icon {
-              width: 25px;
-              height: 25px;
-              margin: 0 auto;
-              background-size: 100% 100%;
-              background-repeat: no-repeat;
-            }
-          }
-          .right-line {
-            border-right: 1px #ddd solid;
-          }
+
         }
       }
     }
   }
 
-  .cooperation,.multiply,.num{
+  .cooperation, .multiply, .num {
     font-size: 12px;
     color: #999999;
     margin-left: 4px;
   }
-  .cooperation{
+
+  .cooperation {
     margin-right: 5px;
   }
-  .iconPeople{
+
+  .iconPeople {
     font-size: 15px;
     margin-right: 2px;
     margin-top: -5px;
   }
-  .handlePeople{
+
+  .handlePeople {
     font-size: 15px;
     margin-left: 5px;
   }
-  .right{
+
+  .right {
     display: flex;
     align-items: center;
   }
-  .card{
-    width: 200px;
+
+  .card {
+    width: 220px;
     border: 1px solid #dedede;
     position: absolute;
     right: 15px;
@@ -535,31 +457,38 @@
     background-color: #fff;
     border-radius: 8px;
   }
-  .peopleList,.addPeople{
+
+  .peopleList, .addPeople {
     font-size: 14px;
     margin-top: 10px;
   }
-  .peopleList{
+
+  .peopleList {
     float: left;
     margin-left: 15px;
   }
-  .addPeople{
+
+  .addPeople {
     float: right;
     margin-right: 15px;
   }
-  .peopleContent{
+
+  .peopleContent {
     margin-top: 15px;
     height: 280px;
     overflow-y: auto;
   }
-  .imgPeople2,.listName{
+
+  .imgPeople2, .listName {
     float: left;
   }
-  .imgPeople2{
+
+  .imgPeople2 {
     margin-top: 6px;
     margin-left: 8px;
   }
-  .listName{
+
+  .listName {
     font-size: 12px;
     width: 105px;
     margin-left: 8px;
@@ -567,21 +496,98 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .head{
+
+  .head {
     font-size: 14px;
     float: right;
     margin-right: 8px;
   }
-  .contentA{
+
+  .contentA, .contentB {
     height: 40px;
     line-height: 40px;
   }
-  .dateInp,.controlChoose{
+
+  .contentB {
+    margin-left: 24px;
+  }
+
+  .dateInp, .controlChoose {
     width: 340px;
   }
-  .clearfix:after{
+
+  .allPeople {
+    height: 300px;
+    overflow: auto;
+  }
+
+  .userContent {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: rgba(242, 242, 242, 1);
+    border-radius: 3px;
+  }
+
+  .peopleName {
+    width: 180px;
+    font-size: 14px;
+    color: #606266;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    float: left;
+  }
+
+  .addIcon {
+    font-size: 16px;
+    float: right;
+    cursor: pointer;
+  }
+
+  .clearfix:after {
     content: '';
     display: block;
     clear: both;
   }
+
+  .addCreat {
+    .col-set-box {
+      .left {
+        border-right: 1px solid #eee;
+        padding: 0 10px;
+        color: #000000;
+      }
+      h3 {
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 32px;
+        border-bottom: 1px solid #eee;
+      }
+    }
+    .right2 {
+      min-width: 400px;
+      padding: 0 10px;
+    }
+    .my-table {
+      i {
+        cursor: pointer;
+      }
+    }
+    .my-table > > >
+    thead {
+      color: #222222;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f4f9fb;
+      padding: 5px 0;
+    }
+    // hover
+    tr:hover > td {
+      background-color: #f4f9fb;
+    }
+
+  }
 </style>
+
