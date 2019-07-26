@@ -86,3 +86,21 @@
       }
     }
   }
+.el-tree {
+  .el-tree-node__expand-icon.expanded {
+    transform: none;
+  }
+  .el-tree-node__expand-icon.expanded:before {
+    content: "\e784";
+  }
+  .el-tree-node__expand-icon {
+    color: #c0c4cc;
+  }
+}
+.el-table{
+  th{
+    background-color: #f4f9fb
+  }
+
+}
+

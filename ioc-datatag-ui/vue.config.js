@@ -15,27 +15,15 @@ module.exports = {
         target: 'http://183.6.55.26:31075', // 公司测试环境
         changeOrigin: true
       },
-      '/pds': {
-        target: 'http://183.6.55.26:31013', // 公司测试环境
-        changeOrigin: true
-      },
-      '/ljdp': {
-        target: 'http://183.6.55.26:31075', // 临时上传文件
-        changeOrigin: true
-      },
-      '/framework': {
-        target: 'http://183.6.55.26:31075',
-        changeOrigin: true
-      },
-      // 'datatagweb/datatag': {
-      //   target: 'http://183.6.55.26:30003', // test
-      //   changeOrigin: true,
-      //   pathRewrite: { '^/datatagweb/datatag/': '/datatagweb/datatag/' }
-      // },
       '/datatagweb/datatag': {
         target: 'http://183.6.55.26:30003', // test
         changeOrigin: true,
         pathRewrite: { '^/datatagweb/datatag/datatag': '/datatag/datatag' }
+      },
+      '/datatagweb/pds': {
+        target: 'http://183.6.55.26:31013', // 公司测试环境
+        pathRewrite: { '^/datatagweb/pds': '/pds' },
+        changeOrigin: true
       },
     }
   },

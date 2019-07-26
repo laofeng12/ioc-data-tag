@@ -7,19 +7,22 @@
         </router-link>
         <div class="name">
           <div class="img"></div>
-          <div class="text">南城区高考成绩数据</div>
+          <div class="text">
+            <el-input v-model="modelName" placeholder="请输入内容"></el-input>
+          </div>
         </div>
       </div>
       <div class="right">
         <div>
           <div class="img" @click="saveAs"></div>
         </div>
-        <el-button class="button" type="info" size="small" @click="runModel">运行模型</el-button>
-        <el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>
+        <el-button class="button" type="info" size="small" @click="runModel">模型调度</el-button>
+ <!--       <el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
       </div>
     </div>
     <div class="content">
-      <Aside v-if="updateAsideForce" :dimensionList="dimensionList" :measureList="measureList" @updateAside="updateAside" />
+      <!--左边数据树目录结构-->
+      <Aside/>
       <div class="components">
         <div class="top">
           <div class="left">
@@ -44,13 +47,11 @@
                 <div class="listName">数据搬运工</div>
                 <div class="head"><i class="el-icon-delete"></i></div>
               </div>
-
               <div class="contentA clearfix">
                 <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
                 <div class="listName">数据搬运工数据搬运工2</div>
                 <div class="head"><i class="el-icon-delete"></i></div>
               </div>
-
               <div class="contentA clearfix">
                 <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
                 <div class="listName">数据搬运工</div>
@@ -76,12 +77,10 @@
                 <div class="listName">数据搬运工</div>
                 <div class="head"><i class="el-icon-delete"></i></div>
               </div>
-
             </div>
           </div>
 
         </div>
-        <!--<EditTable v-if="componentsSwitch" :theadData="theadData" :tableData="tableData" />-->
         <EditTable></EditTable>
       </div>
     </div>
@@ -182,6 +181,7 @@
     name: 'creatModel',
     data () {
       return {
+        modelName:'未命名',
         show:false,
         editDialog:false,
         saveLoading:false,
@@ -236,7 +236,7 @@
       this.datasetId = this.$route.params.id
     },
     mounted () {
-      this.getDatasetDetails()
+      //this.getDatasetDetails()
     },
     methods: {
       updateAside (type, val) {
