@@ -79,14 +79,14 @@ public class DtTaggingModelAction {
 	@RequestMapping(value="/getModel",method=RequestMethod.GET)
 	public DtTaggingModelDTO get(
 			@RequestParam(value="taggingModelId",required=true)Long taggingModelId,
-			@RequestParam(value="dataSetId",required=false)Long dataSetId) throws Exception{
+			@RequestParam(value="dataSetId",required=false)Long resourceId) throws Exception{
 		DtTaggingModel m = dtTaggingModelService.get(taggingModelId);
 		if (m == null || m.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"无此标签模型或已被删除");
 		}
-		if (dataSetId!=null) {
-			if (!dataSetId.equals(m.getDataSetId())) {
-				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选择："+m.getDataSetName()+"进行打标");
+		if (resourceId!=null) {
+			if (!resourceId.equals(m.getResourceId())) {
+				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选择："+m.getResourceName()+"进行打标");
 			}
 		}
 		DtTaggingModelDTO result = new DtTaggingModelDTO();
