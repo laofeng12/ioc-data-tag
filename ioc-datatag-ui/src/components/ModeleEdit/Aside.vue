@@ -1,12 +1,12 @@
 <template>
-  <div class="aside">
+  <div class="aside treeCode">
     <el-input placeholder="输入关键词搜索" v-model="filterText" class="search"   size="small" suffix-icon="el-icon-search"></el-input>
     <div   class="tree">
       <el-tree icon-class="el-icon-folder"  class="tree" :props="props" :filter-node-method="filterNode" ref="tree"  :load="loadNode" lazy>
         <span class="custom-tree-node" slot-scope="{ node, data }">
-        <span class="cus-node-title">{{ data.orgName }}</span>
+        <div class="cus-node-title">{{ data.orgName }}</div>
           <el-button  class="set-btn" type="text" size="mini" v-if="node.level>1"  @click.stop="setTags(node,data)">
-            <i class="el-icon-setting"></i>
+            <i class="el-icon-setting settingIcon"></i>
           </el-button>
         </span>
       </el-tree>
@@ -324,6 +324,11 @@ export default {
       }
     }
   }
+.settingIcon{
+  margin-left: 5px;
+  vertical-align: text-top;
+  margin-top: -2px;
+}
 </style>
 <style lang="stylus" scoped>
   .my-table >>>
