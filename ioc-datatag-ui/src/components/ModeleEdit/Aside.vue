@@ -2,7 +2,7 @@
   <div class="aside">
     <el-input placeholder="输入关键词搜索" v-model="filterText" class="search"   size="small" suffix-icon="el-icon-search"></el-input>
     <div   class="tree">
-      <el-tree icon-class="el-icon-folder"  :props="props" :filter-node-method="filterNode" ref="tree"  :load="loadNode" lazy>
+      <el-tree icon-class="el-icon-folder"  class="tree" :props="props" :filter-node-method="filterNode" ref="tree"  :load="loadNode" lazy>
         <span class="custom-tree-node" slot-scope="{ node, data }">
         <span class="cus-node-title">{{ data.orgName }}</span>
           <el-button  class="set-btn" type="text" size="mini" v-if="node.level>1"  @click.stop="setTags(node,data)">
@@ -16,7 +16,7 @@
                @close="close">
       <div class="col-set-box">
         <el-container class="">
-          <el-aside width="200px" class="left">
+          <el-aside width="250px" class="left">
             <h3>选择字段</h3>
             <el-input placeholder="输入关键词搜索列表" v-model="searchText" size="small" suffix-icon="el-icon-search"></el-input>
             <div class="h4">
