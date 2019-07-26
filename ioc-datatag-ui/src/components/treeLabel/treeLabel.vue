@@ -194,7 +194,7 @@
                :close-on-click-modal="false"
                @close="closedelete">
       <div class="del-dialog-cnt">
-        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" style="text-align: center">
           <el-form-item>您正在删除南城区高考成绩数据，是否确认删除？</el-form-item>
         </el-form>
       </div>
@@ -542,9 +542,9 @@
         this.sharelookTree()
       } else if (this.$route.name == 'labelcreatTree') {
         this.sharelookTree()
-      }
-      else {
-      }
+      }else if(this.$route.name == 'tree'){
+        this.sharelookTree()
+      }else {}
     }
   };
 </script>

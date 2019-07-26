@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
     <div class="actionBar">
-      <div>
         <el-input
           class="zxinp moduleOne"
           size="small"
@@ -18,15 +17,10 @@
           </el-option>
         </el-select>
         <el-button class="zxlistBtn" size="small" type="primary" @click="modelQuery">查询</el-button>
-      </div>
-
-      <div>
         <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
         <el-button size="small" type="primary" @click="createModel">创建模型</el-button>
         <el-button size="small" type="primary" @click="cooperationModel">协作模型</el-button>
         <!--<el-button size="small" type="primary" >下载管理</el-button>-->
-      </div>
-
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -43,7 +37,7 @@
           <el-table-column prop="createUserName" label="创建者"></el-table-column>
           <el-table-column prop="people" label="修改人/修改时间">
             <template slot-scope="scope">
-              <div style="text-align: center">
+              <div>
                 <div>{{scope.row.modifyUserName}}</div>
                 <div>{{scope.row.modifyTime}}</div>
               </div>
@@ -61,7 +55,7 @@
             <template slot-scope="scope" class="caozuo">
               <el-tooltip class="item" effect="dark" content="调度" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-s-operation iconLogo" @click="handleControl(scope.row.modelName)"></i>
+                    <i class="el-icon-s-operation iconLogo" @click="handleControl(scope.row.modelName,scope.row.taggingModelId)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -86,7 +80,7 @@
 
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" @click="handleDelete"></i>
+                <i class="el-icon-delete iconLogo" @click="handleDelete(scope.row.modelName,scope.row.taggingModelId)"></i>
               </span>
               </el-tooltip>
             </template>
@@ -104,13 +98,15 @@
               <el-date-picker
                 size="small"
                 class="dateInp"
-                v-model="value1"
+                v-model="ruleForm.date"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd HH:mm:ss"
                 type="datetime"
                 placeholder="选择日期时间">
               </el-date-picker>
             </el-form-item>
             <el-form-item label="调度时间周期:" prop="region" class="nameOne">
-              <el-select class="controlChoose" size="small" v-model="value" placeholder="请选择">
+              <el-select class="controlChoose" size="small" v-model="ruleForm.region" placeholder="请选择">
                 <el-option
                   v-for="item in options2"
                   :key="item.value"
@@ -123,7 +119,7 @@
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定调度</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="dispatchLoading" @click="sureDispatch">确定调度</el-button>
           </div>
         </div>
       </el-dialog>
@@ -133,7 +129,7 @@
                  @close="closeDownload">
         <div class="del-dialog-cnt">
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px">
-            <el-form-item label="下载数据范围:" prop="date" class="nameOne">
+            <el-form-item label="下载数据范围:" prop="download" class="nameOne">
               <el-select class="controlChoose" size="small" v-model="value" placeholder="请选择">
                 <el-option
                   v-for="item in options2"
@@ -148,6 +144,8 @@
                 size="small"
                 class="dateInp"
                 v-model="value1"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd HH:mm:ss"
                 type="datetimerange"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期">
@@ -162,21 +160,51 @@
           </div>
         </div>
       </el-dialog>
-      <!--删除-->
       <el-dialog class="creat" title="删除提示" :visible.sync="deleteDialog" width="530px" center
                  :close-on-click-modal="false"
                  @close="closedelete">
         <div class="del-dialog-cnt">
-          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px">
-            <el-form-item>
-              您正在删除南城区高考成绩数据，是否确认删除？
+          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" style="text-align: center">
+            <el-form-item>您正在删除{{this.deleteName}}，是否确认删除？</el-form-item>
+          </el-form>
+        </div>
+        <div slot="footer" class="dialog-footer device">
+          <div>
+            <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="sureDelete">确定删除</el-button>
+            <el-button size="small" type="primary" class="queryBtn" @click="cancelDelete">取消</el-button>
+          </div>
+        </div>
+      </el-dialog>
+      <el-dialog class="creat" title="创建标签组" :visible.sync="labelcreatDialog" width="530px" center
+                 :close-on-click-modal="false"
+                 @close="closeCreat">
+        <div class="del-dialog-cnt">
+          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+            <el-form-item label="标签组名称:" prop="tagsName" class="nameOne">
+              <el-input
+                class="zxinp moduleOne"
+                size="small"
+                placeholder="请输入内容"
+                v-model="ruleForm.tagsName" style="width: 360px">
+              </el-input>
+            </el-form-item>
+            <el-form-item label="标签组简介:" prop="synopsis" class="nameOne">
+              <el-input
+                class="area"
+                type="textarea"
+                :autosize="{ minRows: 2, maxRows: 4}"
+                placeholder="请输入内容"
+                v-model="ruleForm.synopsis">
+              </el-input>
             </el-form-item>
           </el-form>
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定删除</el-button>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">取消</el-button>
+            <el-button size="small" plain class="btn-group" @click="cancleCreat">取消</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="creatsaveLoading" @click="sureCreat">
+              确认并编辑
+            </el-button>
           </div>
         </div>
       </el-dialog>
@@ -186,7 +214,8 @@
 
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
-  import {getmodelList} from '@/api/lableImage.js'
+  import {getmodelList,getDispatch,getDelete} from '@/api/lableImage.js'
+  import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
 
   export default {
@@ -200,13 +229,20 @@
         like_modelName:'',
         eq_runState:'',
         dispatchName:'',
+        dispatchId:'',
+        deleteName:'',
+        deleteId:'',
         input2: '',
         Loading: true,
         saveLoading2: true,
         controlDialog: false,
         downloadDialog: false,
         deleteDialog: false,
+        dispatchLoading:false,
+        deleteLoading:false,
         saveLoading: false,
+        labelcreatDialog: false,
+        creatsaveLoading:false,
         percentage: 30,
         value1: '',
         textarea: '',
@@ -255,7 +291,9 @@
         ztableShowList: [],
         ruleForm: {
           region: '',
-          date: ''
+          date: '',
+          tagsName: '',
+          synopsis: ''
         },
         rules: {
           date: [
@@ -263,6 +301,12 @@
           ],
           region: [
             { required: true, message: '请选择周期', trigger: 'change' }
+          ],
+          labelName: [
+            {required: true, message: '请填写名称', trigger: 'blur'}
+          ],
+          tagsName: [
+            {required: true, message: '请填写名称', trigger: 'blur'}
           ]
         },
       }
@@ -286,9 +330,10 @@
           return "backgroundColor:#ee0320";
         }
       },
-      handleControl(name) {
+      handleControl(name,id) {
         this.controlDialog = true
         this.dispatchName = name
+        this.dispatchId = id
       },
       closeControl() {
         this.controlDialog = false
@@ -301,14 +346,21 @@
         this.downloadDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      handleDelete() {
+      handleDelete(name,id) {
         this.deleteDialog = true
+        this.deleteName = name
+        this.deleteId = id
+        console.log(id);
       },
       closedelete() {
         this.deleteDialog = false
       },
+      cancelDelete(){
+        this.deleteDialog = false
+      },
       createLabel() {
-        this.$router.push('tree')
+        this.labelcreatDialog = true
+        // this.$router.push('tree')
       },
       createModel() {
         this.$router.push('creatModel')
@@ -367,6 +419,81 @@
         this.page = 0
         this.datamodelList()
       },
+      sureDispatch(){
+        const param = {
+          "cycleEnum": this.ruleForm.region,
+          "id": this.dispatchId,
+          "startTime": this.ruleForm.date
+        }
+        this.dispatchLoading = true
+        this.$refs.ruleForm.validate(async(valid) => {
+          if (valid) {
+            try {
+              const res = await getDispatch(param)
+              this.$message({
+                message: res.message,
+                type: 'success'
+              });
+              this.dispatchLoading = false
+              this.controlDialog = false
+              this.datamodelList()
+            } catch (e) {
+              console.log(e);
+              this.dispatchLoading = false
+            }
+          } else {
+            this.dispatchLoading = false
+          }
+        });
+
+      },
+      async sureDelete(){
+        const res = await getDelete({
+          id:this.deleteId
+        })
+        this.$message({
+          message: res.message,
+          type: 'success'
+        });
+        this.deleteDialog = false
+        this.datamodelList()
+      },
+      closeCreat() {
+        this.$refs.ruleForm.resetFields();
+        this.labelcreatDialog = false
+      },
+      cancleCreat() {
+        this.$refs.ruleForm.resetFields();
+        this.labelcreatDialog = false
+      },
+      sureCreat() {
+        try {
+          this.creatsaveLoading = true
+          this.$refs.ruleForm.validate(async (valid) => {
+            if (valid) {
+              try {
+                const data = await getDtTagGroupData({
+                  id: '',
+                  isNew: true,
+                  isShare: '',
+                  synopsis: this.ruleForm.synopsis,
+                  tagsName: this.ruleForm.tagsName
+                })
+                this.creatsaveLoading = false
+                this.$router.push('/tree/'+ data.id)
+              } catch (e) {
+                this.creatsaveLoading = false
+                console.log(e);
+              }
+            } else {
+              this.creatsaveLoading = false
+            }
+          });
+        } catch (e) {
+          this.creatsaveLoading = false
+          console.log(e);
+        }
+      },
     },
     created() {
       this.datamodelList()
@@ -423,5 +550,8 @@
 
   .stateName {
     color: #00CC33;
+  }
+  .area {
+    width: 360px;
   }
 </style>

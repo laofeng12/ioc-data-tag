@@ -34,7 +34,8 @@ service.interceptors.request.use(
     }
     // DELETE
     if (config.method.toLowerCase() === 'delete') {
-      config.params = JSON.stringify(config.params)
+      // config.params = JSON.stringify(config.params)
+      config.params = config.params
     }
     return config
   },

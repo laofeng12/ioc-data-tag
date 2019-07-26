@@ -89,7 +89,7 @@ export default new Router({
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
         },
         {
-          path: '/tree',
+          path: '/tree/:tagsId',
           name: 'tree',
           meta: {title: '创建标签组'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
