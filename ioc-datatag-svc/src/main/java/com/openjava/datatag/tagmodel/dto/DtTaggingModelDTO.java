@@ -17,11 +17,11 @@ public class DtTaggingModelDTO {
 
     private String modelDesc;
 
-    private Long dataSetId;
+    private Long resourceId;
 
-    private String dataSetName;
+    private String resourceName;
 
-    private String dataTableName;
+    private Long resourceType;
 
     private String pkey;
 
