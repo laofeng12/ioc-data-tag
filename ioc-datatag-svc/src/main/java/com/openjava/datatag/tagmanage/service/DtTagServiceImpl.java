@@ -8,11 +8,13 @@ import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.query.DtTagDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagRepository;
 import com.openjava.datatag.log.repository.DtTagUpdateLogRepository;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.sequence.SequenceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -121,7 +123,9 @@ public class DtTagServiceImpl implements DtTagService {
 		    dtTagRepository.doSoftDeleteByPreaTagId(pId,now);
         }
 	}
-
+	public List<DtTag> findByTagIds(List<Long> tagIds){
+		return dtTagRepository.findByTagIds(tagIds);
+	}
 
 
 }

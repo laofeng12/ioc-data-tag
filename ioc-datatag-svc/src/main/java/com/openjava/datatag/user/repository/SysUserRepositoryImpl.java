@@ -1,6 +1,4 @@
-package com.openjava.datatag.utils.user.repository;
-
-import com.openjava.datatag.utils.user.repository.SysUserRepositoryCustom;
+package com.openjava.datatag.user.repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

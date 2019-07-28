@@ -1,6 +1,6 @@
-package com.openjava.datatag.utils.user.repository;
+package com.openjava.datatag.user.repository;
 
-import com.openjava.datatag.utils.user.domain.SysUser;
+import com.openjava.datatag.user.domain.SysUser;
 import org.ljdp.core.spring.data.DynamicJpaRepository;
 
 /**
@@ -8,7 +8,7 @@ import org.ljdp.core.spring.data.DynamicJpaRepository;
  * @author 黄文鑫
  *
  */
-public interface SysUserRepository extends DynamicJpaRepository<SysUser, Long>, SysUserRepositoryCustom{
+public interface SysUserRepository extends DynamicJpaRepository<SysUser, Long>, SysUserRepositoryCustom {
 	
 	public SysUser findByAccount(String account);
 

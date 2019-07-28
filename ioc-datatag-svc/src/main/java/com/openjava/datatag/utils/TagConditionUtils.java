@@ -25,6 +25,11 @@ public class TagConditionUtils {
             "STRING","VARCHAR","CHAR","VARCHAR2","CLOB",
             "string","varchar","char","varchar2","clob"
     };
+    //时间类型
+    private static String[] dateTypes={
+            "TIME","DATE","TIMESTAMP","DATETIME","time",
+            "date","timestamp","datetime"
+    };
 
     /**
      * 是否连接符
@@ -76,6 +81,20 @@ public class TagConditionUtils {
     public static boolean isStringType(String valueType){
         List<String> list = Arrays.asList(stringTypes);
         if (list.contains(valueType)){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    /**
+     * 是否字符串类型
+     * @param dateTypes
+     * @return
+     */
+    public static boolean isDateType(String dateTypes){
+        List<String> list = Arrays.asList(dateTypes);
+        if (list.contains(dateTypes)){
             return true;
         }else {
             return false;

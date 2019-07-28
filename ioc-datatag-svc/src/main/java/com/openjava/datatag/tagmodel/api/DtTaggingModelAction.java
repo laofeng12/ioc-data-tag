@@ -14,7 +14,7 @@ import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.service.DtSetColService;
 import com.openjava.datatag.utils.IpUtil;
-import com.openjava.datatag.utils.user.service.SysUserService;
+import com.openjava.datatag.user.service.SysUserService;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
