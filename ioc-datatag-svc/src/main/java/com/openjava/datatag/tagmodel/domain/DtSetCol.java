@@ -103,6 +103,11 @@ public class DtSetCol implements Persistable<Long>,Serializable {
 	@Max(9L)
 	@Column(name = "IS_SOURCE")
 	private Long isSource;
+
+	@ApiModelProperty("排序")
+	@Max(4L)
+	@Column(name = "COL_SORT")
+	private Long colSort;
 	
 	
 	@ApiModelProperty("是否新增")

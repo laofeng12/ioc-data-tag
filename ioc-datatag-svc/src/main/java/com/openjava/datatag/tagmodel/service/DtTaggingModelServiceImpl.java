@@ -167,9 +167,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		DtTaggingModel taggingModel = new DtTaggingModel();
 		MyBeanUtils.copyPropertiesNotNull(taggingModel,body);
 		EntityClassUtil.dealCreateInfo(taggingModel,userInfo);
-		taggingModel.setDataTableName("DT_"+ RandomStringUtils.random(27,true,false).toUpperCase());//生成随机表名
 		taggingModel = doSave(taggingModel);
-
+		taggingModel.setDataTableName("DT_"+ taggingModel.getTaggingModelId());//RandomStringUtils.random(27,true,false).toUpperCase()不合适，用模型id为后缀,这样比较有意义，表名就能看出是哪个模型的
+		taggingModel = doSave(taggingModel);
 		for (DtSetCol col :colList){
 			if ((!col.isNew()) || col.getColId() != null){
 				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"新建模型时选择字段必须为新");
