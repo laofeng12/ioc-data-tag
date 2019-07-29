@@ -23,6 +23,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+
+
 @EntityScan(basePackages= {
 		"org.ljdp.plugin.batch.persistent",
 		"org.ljdp.support.attach.domain",
@@ -44,10 +46,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 //				"com.openjava.**.dao",
 				"com.openjava.**.api",
 				"org.openjava.boot.conf",
-				"com.openjava.datatag.utils.user"
-				})
+				"com.openjava.datatag.user",
+		})
 @ServletComponentScan(basePackages= {
-				"org.ljdp.support.web.listener2"})
+		"org.ljdp.support.web.listener2"})
 @ImportResource("classpath:springconfig/transaction.xml")
 @EnableCaching
 public class DatatagApplication {
@@ -73,12 +75,12 @@ public class DatatagApplication {
 		return new RedisSessionVaidator(apiSkey);
 //		return new EhcacheSessionValidator();
 	}
-	
+
 	@Bean
 	public LmAuthorityPersistent authorityPersistent() {
 		return new LmAuthorityPersistent();
 	}
-	
+
 	//============LJDP相关配置=======================
 	@Bean("db.SessionFactoryRouter")
 	public JPASessionFactoryRouter sessionFactoryRouter() {
@@ -89,19 +91,19 @@ public class DatatagApplication {
 	public CloudUserProvider webUserProvider() {
 		return new CloudUserProvider();
 	}
-	
+
 	@Bean
 	public DatatagRunner ljdpRunner() {
 		return new DatatagRunner();
 	}
-	
+
 	@Bean
 	public SpringContext springContext() {
 		return SpringContext.getEmbedInstance();
 	}
 
-    public static void main(String[] args) {
-        SpringApplication.run(DatatagApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(DatatagApplication.class, args);
+	}
 
 }

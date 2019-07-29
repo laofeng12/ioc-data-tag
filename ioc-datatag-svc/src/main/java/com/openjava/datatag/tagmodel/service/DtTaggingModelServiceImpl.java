@@ -6,6 +6,8 @@ import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.log.service.DtTagmUpdateLogService;
 import com.openjava.datatag.schedule.domain.TaskInfo;
 import com.openjava.datatag.schedule.service.TaskService;
+import com.openjava.datatag.tagmanage.domain.DtTag;
+import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
@@ -19,6 +21,8 @@ import com.openjava.datatag.tagmodel.repository.DtTagConditionRepository;
 import com.openjava.datatag.tagmodel.repository.DtTaggingModelRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
 import com.openjava.datatag.utils.MyTimeUtil;
+import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
+import lombok.Data;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -34,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,13 +49,15 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@Data
 public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	Logger logger = LogManager.getLogger(getClass());
 	@Resource
 	private DtTaggingModelRepository dtTaggingModelRepository;
 	@Resource
 	private DtSetColRepository dtSetColRepository;
-
+	@Resource
+	private DtTagService dtTagService;
 	@Resource
 	private DtTagConditionRepository dtTagConditionRepository;
 
@@ -58,6 +65,14 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DtTagmUpdateLogService dtTagmUpdateLogService;
 	@Resource
 	private TaskService taskService;
+	@Resource
+	private DtSetColService dtSetColService;
+	@Resource
+	private DtTagConditionService dtTagConditionService;
+
+	private static String colJson ="";
+
+	private static String valueJson="";
 
 	public void copy(Long id,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -413,8 +428,86 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	 * 获取打标数据并根据规制自动打标（核心方法）
 	 */
 	public void calculation(Long taggingModelId){
-		//组件已搭好，只需要写业务逻辑
-		System.out.println("查询画像并计算："+taggingModelId);
+		DtTaggingModel tagModel = get(taggingModelId);
+		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
+		if (CollectionUtils.isEmpty(cols)){
+			return ;
+		}
+//		Map<Long, List<DtSetCol>> colGroup = cols.stream().collect(Collectors.groupingBy(DtSetCol::getColId));
+		//第一步、若存在删表
+		MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();
+		mppUtil.dropTable();//删表
+		//第二步、建表
+		mppUtil.setTableName(tagModel.getDataTableName());//表名
+		mppUtil.setTableKey(tagModel.getPkey());//主键
+		Map<String,String> colmap  = new LinkedHashMap<>();//字段，注释
+		Map<String,String> cloTypeMap  = new LinkedHashMap<>();//字段，字段类型
+		mppUtil.setTableName(tagModel.getDataTableName());
+		cols.forEach(record->{
+			colmap.put(record.getShowCol(),"");
+			cloTypeMap.put(record.getShowCol(),record.getSourceDataType());
+		});
+		mppUtil.createTable(colmap,cloTypeMap);
+		//第三步、获取数据集数据并同步到mpp
+		List<Map<String,String>> colList = new LinkedList<>();
+		colList = JSONObject.parseObject(colJson,List.class);//字段
+		List<Array> valueList = JSONObject.parseObject(valueJson,List.class);//值
+		//第四步update数据（计算再mpp里面,用sql去计算）
+		logger.info(String.format("模型：{%s}打标成功",taggingModelId));
 	}
 
+	/**
+	 * 获取可执行执行的打标sql，用去mpp自动打标(核心方法)
+	 */
+	public List<String> getMarkingSQL(Long taggingModelId){
+		DtTaggingModel tagModel = get(taggingModelId);//模型
+		if (tagModel==null) {
+			return null;
+		}
+		List<DtSetCol> cols = dtSetColService.getByTaggingModelId(taggingModelId);//模型字段列表
+		if (CollectionUtils.isEmpty(cols)){
+			return null;
+		}
+		List<Long> colIds = new ArrayList<>();
+		cols.forEach(record->{
+			colIds.add(record.getColId());
+		});
+		List<DtTagCondition>  conditions =  dtTagConditionService.findByColIds(colIds);//条件设置
+		if (CollectionUtils.isEmpty(conditions)) {
+			return null;
+		}
+		List<Long> tagIds = new ArrayList<>();
+		conditions.forEach(record->{
+			tagIds.add(record.getTagId());
+		});
+		List<DtTag> dtTags = dtTagService.findByTagIds(tagIds);//标签
+		if (CollectionUtils.isEmpty(dtTags)){
+			return null;
+		}
+		Map<Long, List<DtTag>> tagGroup = dtTags.stream().collect(Collectors.groupingBy(DtTag::getId));
+		List<String> markingSQL = new ArrayList<>();
+		for (DtTagCondition condition:conditions) {
+			StringBuilder updateBuff = new StringBuilder();
+			updateBuff.append(" UPDATE ");
+			updateBuff.append(tagModel.getDataTableName());
+			updateBuff.append(" SET ");
+			updateBuff.append(condition.getShowCol());
+			updateBuff.append(" = ");
+			updateBuff.append(tagGroup.get(condition.getTagId()).get(0).getTagName());
+			updateBuff.append(" where ");
+			updateBuff.append(condition.getFilterExpression());
+			markingSQL.add(updateBuff.toString());
+		}
+		return markingSQL;
+	}
+
+	public static void main(String[] args) {
+		String colJson = "[{\"index\":0,\"aggType\":null,\"name\":\"tb_0_MODIFY_ID\"},{\"index\":1,\"aggType\":null,\"name\":\"tb_0_CREATE_NAME\"},{\"index\":2,\"aggType\":null,\"name\":\"tb_0_SOURCE_NAME\"}]";
+		List<Map<String,String>> colList = new LinkedList<>();
+		colList = JSONObject.parseObject(colJson,List.class);
+		String vauleJson  = "[[\"2\",\"1\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"本地测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"]]";
+		List<Array> valueList = JSONObject.parseObject(vauleJson,List.class);
+		Map<String,String> values =  new LinkedHashMap<>();
+
+	}
 }

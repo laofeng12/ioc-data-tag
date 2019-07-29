@@ -27,7 +27,7 @@ public interface DtTagConditionRepository extends DynamicJpaRepository<DtTagCond
     /**
      * 根据字段表主键批量获取条件设置表
      */
-    @Query(value = "from DtTagCondition t where t.colId in(:colIds)")
+    @Query(value = "from DtTagCondition t where t.isDeleted=0 and t.colId in(:colIds)")
     List<DtTagCondition> findByColIds(@Param("colIds")List<Long> colIds);
 
     @Transactional

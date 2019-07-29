@@ -1,6 +1,7 @@
 package com.openjava.datatag.tagcol.repository;
 
 
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import org.ljdp.core.spring.data.DynamicJpaRepository;
@@ -43,4 +44,12 @@ public interface DtCooperationRepository extends DynamicJpaRepository<DtCooperat
             "where TAGGING_MODEL_ID=:modelId"
             ,nativeQuery = true)
     List<Map<String,String>> findUserModelCooField(@Param("userId")Long userId, @Param("modelId") Long modelId);
+    /**
+     *根据模型Id/打标字段名查找该用户配置的协作标签组
+     */
+    @Query(value ="select * from DT_TAG_GROUP t where t.ID in(\n" +
+            "select l.USE_TAG_GROUP from DT_COO_TAGCOL_LIMIT l left join DT_COOPERATION o on l.COO_ID=o.ID\n" +
+            "where l.TAG_COL_NAME=:colField and o.COO_USER=:userId and o.TAGGM_ID=:modelId)"
+            ,nativeQuery = true)
+    List<Map<String, String>> findCurrentUserTagGroup(@Param("userId")Long userId, @Param("modelId") Long modelId, @Param("colField") String colField);
 }

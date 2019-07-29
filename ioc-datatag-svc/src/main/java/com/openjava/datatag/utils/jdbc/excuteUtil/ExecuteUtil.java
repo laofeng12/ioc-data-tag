@@ -28,24 +28,24 @@ public abstract class ExecuteUtil {
      * 创建数据库表
      * @return
      */
-    protected abstract Result createTable(Map<String,String> columnMap);
+    public abstract Result createTable(Map<String,String> columnMap,Map<String,String> columnTypeMap);
     /**
      * 获取建表语句
      * @return
      */
-    protected abstract List<String> getCreateTableSqlList();
+    public abstract List<String> getCreateTableSqlList();
 
     /**
      * 删表
      * @return
      */
-    protected abstract Result dropTable();
+    public abstract Result dropTable();
 
     /**
      * 获取删表语句
      * @return
      */
-    protected abstract String getDropTableSql();
+    public abstract String getDropTableSql();
 
     /*==================================处理数据==============================*/
 
@@ -53,11 +53,21 @@ public abstract class ExecuteUtil {
      * 插入数据
      * @return
      */
-    protected abstract Result insertDataList();
+    public abstract Result insertDataList();
 
     /**
      * 获取插入数据的sql
      * @return
      */
-    protected abstract List<String> getInsertDataSqlList();
+    public abstract List<String> getInsertDataSqlList();
+
+    /**
+     * 更新数据
+     */
+    public abstract Result updateDataList();
+
+    /**
+     * 获取更新语句sql
+     */
+    public abstract  List<String> getUpdateDataList();
 }
