@@ -54,4 +54,8 @@ public interface DtTaggingModelService {
 	 */
 	void calculation(Long taggingModelId);
 
+	/**
+	 * 获取可执行执行的打标sql，用去mpp自动打标
+	 */
+	List<String> getMarkingSQL(Long taggingModelId);
 }

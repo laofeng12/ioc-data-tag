@@ -1,4 +1,4 @@
-package com.openjava.datatag.utils.user.domain;
+package com.openjava.datatag.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;

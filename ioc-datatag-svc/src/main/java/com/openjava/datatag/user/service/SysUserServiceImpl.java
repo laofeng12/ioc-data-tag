@@ -1,8 +1,8 @@
-package com.openjava.datatag.utils.user.service;
+package com.openjava.datatag.user.service;
 
 
-import com.openjava.datatag.utils.user.domain.SysUser;
-import com.openjava.datatag.utils.user.repository.SysUserRepository;
+import com.openjava.datatag.user.domain.SysUser;
+import com.openjava.datatag.user.repository.SysUserRepository;
 import com.openjava.framework.sys.domain.SysCode;
 import com.openjava.framework.sys.service.SysCodeService;
 import org.springframework.stereotype.Service;
