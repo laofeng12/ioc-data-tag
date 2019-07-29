@@ -54,7 +54,7 @@ public class DtTaggingModel implements Persistable<Long>,Serializable {
 	private String modelDesc;
 
 	@ApiModelProperty("打标目标表id")
-	@Max(18L)
+	@Max(9223372036854775806L)
 	@Min(1L)
 	@Column(name = "DATA_SET_ID")
 	private Long resourceId;
