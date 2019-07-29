@@ -8,36 +8,31 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
-import com.openjava.datatag.tagcol.dto.DtCooTagcolLimitDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationModelDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationSetCol;
+import com.openjava.datatag.tagcol.dto.*;
 import com.openjava.datatag.tagcol.query.DtCooTagcolLimitDBParam;
 import com.openjava.datatag.tagcol.query.DtCooperationSetColParam;
 import com.openjava.datatag.tagcol.service.DtCooTagcolLimitService;
-import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
-import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.utils.user.service.SysUserService;
-import org.apache.commons.lang3.StringUtils;
+
 import org.ljdp.common.bean.MyBeanUtils;
-import org.ljdp.common.file.ContentType;
-import org.ljdp.common.file.POIExcelBuilder;
+
 import org.ljdp.component.result.DataApiResponse;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.SequenceService;
-import org.ljdp.component.sequence.TimeSequence;
+
 import org.ljdp.component.sequence.ConcurrentSequence;
+import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.annotation.Security;
+import org.ljdp.secure.sso.SsoContext;
 import org.ljdp.ui.bootstrap.TablePage;
 import org.ljdp.ui.bootstrap.TablePageImpl;
-import org.ljdp.util.DateFormater;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -95,13 +90,19 @@ public class DtCooperationAction {
 	
 	@ApiOperation(value = "列表分页查询协作成员记录", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "eq_createUser", value = "（非必填）发起者=", required = false, dataType = "Long", paramType = "query"),
-		@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
+		@ApiImplicitParam(name = "eq_createUser", value = "（不传时默认当前用户）发起者=", required = false, dataType = "Long", paramType = "query"),
+			@ApiImplicitParam(name = "eq_taggmId", value = "（非必填）标签模型主键=", required = false, dataType = "Long", paramType = "query"),
+			@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
 		@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
 	})
 	@Security(session=true)
 	@RequestMapping(value="/search",method=RequestMethod.GET)
 	public TablePage<DtCooperationDTO> doSearch(@ApiIgnore() DtCooperationDBParam params, @ApiIgnore() Pageable pageable){
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		Long currentuserId = Long.valueOf(userInfo.getUserId());
+		if(params.getEq_createUser()==null){
+			params.setEq_createUser(currentuserId);
+		}
 		List<DtCooperationDTO> dtoList=new ArrayList<>();
 		Page<DtCooperation> result =  dtCooperationService.query(params, pageable);
 
@@ -134,15 +135,15 @@ public class DtCooperationAction {
 	}
 	@ApiOperation(value = "根据用户ID获取该用户的协作模型记录", notes = "结果对象数组", nickname="userId")
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "userId", value = "协作用户Id", required = true, dataType = "Long", paramType = "path"),
+			@ApiImplicitParam(name = "userId", value = "协作用户Id(不传时默认当前用户)", required = false, dataType = "Long", paramType = "query"),
 	})
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
 	})
 	@Security(session=true)
-	@RequestMapping(value="/searchcool/{userId}",method=RequestMethod.GET)
+	@RequestMapping(value="/searchcool",method=RequestMethod.POST)
 
-	public DataApiResponse<DtCooperationModelDTO> doSearchCool(@PathVariable("userId")Long userId){
+	public DataApiResponse<DtCooperationModelDTO> doSearchCool(@RequestParam(value="userId",required=false)Long userId){
 		List<DtCooperationModelDTO> result =dtCooperationService.findUserModelByUserId(userId);
 		DataApiResponse<DtCooperationModelDTO> resp = new DataApiResponse<>();
 		resp.setRows(result);
@@ -150,7 +151,7 @@ public class DtCooperationAction {
 	}
 	@ApiOperation(value = "根据模型ID获取该用户的协作字段记录", notes = "结果对象数组")
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "userId", value = "协作用户Id", required = true, dataType = "Long", paramType = "query"),
+			@ApiImplicitParam(name = "userId", value = "协作用户Id(不传时默认当前用户)", required = false, dataType = "Long", paramType = "query"),
 			@ApiImplicitParam(name = "modelId", value = "协作模型Id", required = true, dataType = "Long", paramType = "query"),
 
 	})
@@ -166,7 +167,20 @@ public class DtCooperationAction {
 		resp.setRows(result);
 		return  resp;
 	}
+	@ApiOperation(value = "根据模型ID及字段名查询当前用户可配置的标签组记录", nickname="标签组记录集")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "modelId", value = "协作模型ID", required = true,dataType = "Long", paramType = "query"),
+			@ApiImplicitParam(name = "colField", value = "协作打标字段名称", required = true,dataType = "String", paramType = "query"),
 
+	})
+	@Security(session=true)
+	@RequestMapping(value="/taggroup",method=RequestMethod.POST)
+	public DataApiResponse<DtTagGroup> tagGroup(@RequestParam(value="modelId",required=true)Long modelId,@RequestParam(value="colField",required=true)String colField){
+		List<DtTagGroup> result =dtCooperationService.findCurrentUserTagGroup(modelId,colField);
+		DataApiResponse<DtTagGroup> resp = new DataApiResponse<>();
+		resp.setRows(result);
+		return  resp;
+	}
 	/**
 	 * 保存
 	 */
@@ -197,11 +211,11 @@ public class DtCooperationAction {
 	/**
 	 * 保存
 	 */
-	@ApiOperation(value = "保存协作成功", nickname="save", notes = "报文格式：content-type=application/json")
+	@ApiOperation(value = "保存协作成员", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
 	@RequestMapping(value = "/dosave",method=RequestMethod.POST)
-	public SuccessMessage doCoolSave(@RequestBody DtCooperationDTO body	) throws Exception{
-		dtCooperationService.doCoolSave(body);
+	public SuccessMessage doCoolSave(@RequestBody DtCooperationListDTO body	) throws Exception{
+		dtCooperationService.doCoolListSave(body);
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
 		return new SuccessMessage("保存成功");
 	}
