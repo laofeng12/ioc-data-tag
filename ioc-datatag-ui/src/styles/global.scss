@@ -79,3 +79,6 @@ p {
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+.treeCode .el-tree-node>.el-tree-node__children{
+  overflow: inherit !important;
+}
