@@ -36,8 +36,10 @@ public class DtCooperationDTO {
     private Date modifyTime;
     @ApiModelProperty("标签模型主键")
     private Long taggmId;
-    @ApiModelProperty("协作用户")
+    @ApiModelProperty("协作用户Id")
     private Long cooUser;
+    @ApiModelProperty("协作用户名称")
+    private String cooUserName;
     @ApiModelProperty("协作成员限制的打标字段")
     private List<DtCooTagcolLimitDTO> cooTagcolLimitList=new ArrayList<>();
 

@@ -119,6 +119,7 @@ public class DtCooperationAction {
             dto.setCreateUser(opera.getCreateUser());
             dto.setCreateTime(opera.getCreateTime());
             dto.setModifyTime(opera.getModifyTime());
+            dto.setCooUserName(sysUserService.get(opera.getCooUser()).getFullname());
             dto.setCreateUserName(sysUserService.get(dto.getCreateUser()).getFullname());
             List<DtCooTagcolLimit> results = dtCooTagcolLimitService.findByColId(opera.getId());
             List<DtCooTagcolLimitDTO> limtdtoList = new ArrayList<>();
