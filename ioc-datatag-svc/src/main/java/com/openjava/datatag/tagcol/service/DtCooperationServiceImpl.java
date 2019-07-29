@@ -9,10 +9,10 @@ import com.commons.utils.VoUtils;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
 import com.openjava.datatag.tagcol.domain.DtTagmCooLog;
-import com.openjava.datatag.tagcol.dto.DtCooTagcolLimitDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationModelDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationSetCol;
+import com.openjava.datatag.tagcol.dto.*;
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
+import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
@@ -20,6 +20,7 @@ import com.openjava.datatag.utils.TimeUtil;
 import com.openjava.datatag.utils.user.service.SysUserService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
@@ -55,6 +56,9 @@ public class DtCooperationServiceImpl implements DtCooperationService {
     private DtTaggingModelService dtTaggingModelService;
     @Resource
     private SysUserService sysUserService;
+    @Resource
+    private DtTagGroupService dtTagGroupService;
+
 
     public Page<DtCooperation> query(DtCooperationDBParam params, Pageable pageable) {
         Page<DtCooperation> pageresult = dtCooperationRepository.query(params, pageable);
@@ -65,8 +69,16 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         return dtCooperationRepository.queryDataOnly(params, pageable);
     }
 
-
+    /**
+     * 描述：根据用户ID查找该用户的协作模型记录
+     */
     public List<DtCooperationModelDTO> findUserModelByUserId(Long userId) {
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        Long currentuserId = Long.valueOf(userInfo.getUserId());
+        //userId不传时默认查询当前用户
+        if(userId==null){
+            userId= currentuserId;
+        }
         List<Map<String, String>> result = dtCooperationRepository.findUserModelByUserId(userId);
         List<DtCooperationModelDTO> dtoList = new ArrayList<>();
         for (Map<String, String> map : result) {
@@ -120,7 +132,16 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         return dtoList;
     }
 
+    /**
+     * 描述：根据用户ID及协作模型ID查找该用户所在的模型里配置的字段记录，并用IsCooField标注该字段是否该用户的协作打标字段
+     */
     public List<DtCooperationSetCol> findUserModelCooField(Long userId, Long modelId) {
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        Long currentuserId = Long.valueOf(userInfo.getUserId());
+        //userId不传时默认查询当前用户
+        if(userId==null){
+            userId= currentuserId;
+        }
         List<Map<String, String>> result = dtCooperationRepository.findUserModelCooField(userId, modelId);
         List<DtCooperationSetCol> dtoList = new ArrayList<>();
         for (Map<String, String> map : result) {
@@ -169,6 +190,44 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         return dtoList;
     }
 
+    /**
+     * 描述：根据协作模型Id及协作打标字段名称查询当前用户的协作打标的标签组记录
+     */
+    public List<DtTagGroup> findCurrentUserTagGroup(Long modelId, String colField) {
+        List<DtTagGroup> lst = new ArrayList<>();
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        Long userId = Long.valueOf(userInfo.getUserId());
+        DtTaggingModel model = dtTaggingModelService.get(modelId);
+        //如果模型的创建者是当前用户时，要拿该用户创建的所有标签组
+        if (model.getCreateUser().equals(userId)) {
+            lst = dtTagGroupService.getMyTagGroup(userId);
+        } else {
+            List<Map<String, String>> result = dtCooperationRepository.findCurrentUserTagGroup(userId, modelId, colField);
+            for (Map<String, String> map : result) {
+                DtTagGroup group = new DtTagGroup();
+                if (StringUtils.isNotBlank(map.get("CREATE_TIME"))) {
+                    Date createdate = TimeUtil.StrToDate(map.get("CREATE_TIME"));
+                    group.setCreateTime(createdate);
+                }
+                if (StringUtils.isNotBlank(map.get("MODIFY_TIME"))) {
+                    Date modifydate = TimeUtil.StrToDate(map.get("MODIFY_TIME"));
+                    group.setModifyTime(modifydate);
+                }
+                Long createuserId = VoUtils.toLong(map.get("CREATE_USER"));
+                group.setCreateUser(createuserId);
+                group.setIsDeleted(VoUtils.toLong(map.get("IS_DELETED")));
+                group.setPopularity(VoUtils.toLong(map.get("POPULARITY")));
+                group.setId(VoUtils.toLong(map.get("ID")));
+                group.setIsShare(VoUtils.toLong(map.get("IS_SHARE")));
+                group.setSynopsis(map.get("SYNOPSIS"));
+                group.setTagsName(map.get("TAGS_NAME"));
+
+                lst.add(group);
+            }
+        }
+        return lst;
+    }
+
     public DtCooperation get(Long id) {
         Optional<DtCooperation> o = dtCooperationRepository.findById(id);
         if (o.isPresent()) {
@@ -181,6 +240,77 @@ public class DtCooperationServiceImpl implements DtCooperationService {
 
     public DtCooperation doSave(DtCooperation m) {
         return dtCooperationRepository.save(m);
+    }
+
+    /**
+     * 描述：新增、修改协作用户
+     */
+    public void doCoolListSave(DtCooperationListDTO list) throws Exception {
+        String reqParams = JSONObject.toJSONString(list);
+        DtTagmCooLog log = new DtTagmCooLog();
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        Long userId = Long.valueOf(userInfo.getUserId());
+        Long taggmId=list.getTaggmId();
+        for (CooperationDTO req : list.getCooperaList()) {
+            List<DtCooTagcolLimitDTO> colLimit = req.getCooTagcolLimitList();
+            DtTaggingModel tag = dtTaggingModelService.get(taggmId);
+
+            if (CollectionUtils.isEmpty(colLimit)) {
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数必传");
+            }
+            if (tag == null) {
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数错误");
+            }
+            //新增和修改
+            DtCooperation col = get(req.getId());
+            if (col != null) {
+                col.setTaggmId(taggmId);
+                col.setCooUser(req.getCooUser());
+                col.setIsNew(false);
+                col.setModifyTime(new Date());
+                //MyBeanUtils.copyPropertiesNotNull(col,req);
+                //EntityClassUtil.dealModifyInfo(col,userInfo);
+                col = dtCooperationRepository.save(col);
+            } else {
+                col = new DtCooperation();
+                col.setTaggmId(taggmId);
+                col.setCooUser(req.getCooUser());
+                col.setCreateUser(userId);
+                col.setIsNew(true);
+                col.setModifyTime(new Date());
+                col.setCreateTime(new Date());
+                //MyBeanUtils.copyPropertiesNotNull(col,req);
+                //EntityClassUtil.dealCreateInfo(col,userInfo);
+                col.setId(ConcurrentSequence.getInstance().getSequence());
+                col = dtCooperationRepository.save(col);
+            }
+            for (int i = 0; i < colLimit.size(); i++) {
+                DtCooTagcolLimitDTO record = colLimit.get(i);
+                DtCooTagcolLimit newcolLimit = dtCooTagcolLimitService.get(record.getId());
+                if (record.getCooId() == null) {
+                    throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数的cooId为空或查无此标签");
+                }
+                if (!record.getCooId().equals(req.getId())) {
+                    throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数的cooId错误");
+                }
+                if (newcolLimit != null) {
+                    newcolLimit.setUseTagGroup(record.getUseTagGroup());
+                    newcolLimit.setTagColName(record.getTagColName());
+                    newcolLimit.setCooId(col.getId());
+                    newcolLimit.setIsNew(false);
+                    newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
+                } else {
+                    newcolLimit = new DtCooTagcolLimit();
+                    newcolLimit.setIsNew(true);
+                    newcolLimit.setUseTagGroup(record.getUseTagGroup());
+                    newcolLimit.setTagColName(record.getTagColName());
+                    newcolLimit.setCooId(col.getId());
+                    newcolLimit.setId(ConcurrentSequence.getInstance().getSequence());
+                    newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
+                }
+
+            }
+        }
     }
 
     /**
