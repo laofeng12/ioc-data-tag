@@ -21,6 +21,7 @@ import com.openjava.datatag.tagmodel.repository.DtTagConditionRepository;
 import com.openjava.datatag.tagmodel.repository.DtTaggingModelRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
 import com.openjava.datatag.utils.MyTimeUtil;
+import com.openjava.datatag.utils.TagConditionUtils;
 import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
 import lombok.Data;
 import org.apache.commons.beanutils.BeanUtils;
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -454,6 +456,30 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		List<Array> valueList = JSONObject.parseObject(valueJson,List.class);//值
 		//第四步update数据（计算再mpp里面,用sql去计算）
 		logger.info(String.format("模型：{%s}打标成功",taggingModelId));
+	}
+
+
+	/**
+	 * 获取数据集数据（核心方法）
+	 */
+	public Object getDataFromDataSet(Long taggingModelId,Pageable pageable){
+		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
+		List<String[]> data = new LinkedList<>();
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		for (int j = 0; j < pageable.getPageSize(); j++) {
+			String[] kk = new String[cols.size()];
+			for (int i = 0; i < cols.size(); i++) {
+				if (TagConditionUtils.isDateType(cols.get(i).getSourceDataType())) {
+					kk[i] = f.format(new Date());
+				}else if(TagConditionUtils.isIntType(cols.get(i).getSourceDataType())){
+					kk[i] = i+j+"";
+				}else{
+					kk[i] =RandomStringUtils.random(4,true,false).toUpperCase();
+				}
+			}
+			data.add(kk);
+		}
+		return data;
 	}
 
 	/**
