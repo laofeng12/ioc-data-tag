@@ -16,8 +16,8 @@ import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
+import com.openjava.datatag.user.service.SysUserService;
 import com.openjava.datatag.utils.TimeUtil;
-import com.openjava.datatag.utils.user.service.SysUserService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
@@ -259,7 +259,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数必传");
             }
             if (tag == null) {
-                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数错误");
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数不能为空");
             }
             //新增和修改
             DtCooperation col = get(req.getId());
@@ -328,7 +328,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数必传");
         }
         if (tag == null) {
-            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数错误");
+            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数不能为空");
         }
         //新增和修改
         DtCooperation col = get(req.getId());
