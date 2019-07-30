@@ -7,10 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.openjava.datatag.common.MyErrorConstants;
-import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
-import com.openjava.datatag.tagmodel.dto.GetHistoryColDTO;
-import com.openjava.datatag.tagmodel.dto.SaveConditionDTO;
-import com.openjava.datatag.tagmodel.dto.SelectColDTO;
+import com.openjava.datatag.tagmodel.dto.*;
 import com.openjava.datatag.utils.IpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
@@ -67,7 +64,7 @@ public class DtSetColAction {
 			"修改的格式：{\"taggingModelId\":1,\"pkey\":\"userId2\",\"resourceId\":1,\"resourceName\":\"高考数据233\",\"resourceType\":1,\"colList\":[{\"colId\":1,\"taggingModelId\":1,\"sourceCol\":\"name\",\"sourceDataType\":\"String\",\"isMarking\":1},{\"sourceCol\":\"userId2\",\"sourceDataType\":\"Long\",\"isMarking\":1}]}")
 	@Security(session=true)
 	@RequestMapping(value="/selectCol", method=RequestMethod.POST)
-	public SuccessMessage selectCol(@RequestBody DtTaggingModelDTO body,
+	public SelectColSuccessDTO selectCol(@RequestBody DtTaggingModelDTO body,
 									HttpServletRequest request) throws Exception{
 		String ip = IpUtil.getRealIP(request);
 		if (body.getResourceId() == null) {
@@ -80,8 +77,13 @@ public class DtSetColAction {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"数据源主键不能指定为空");
 			//这里应该添加验证主键唯一性约束
 		}
-		dtSetColService.selectCol(body,ip);
-		return new SuccessMessage("保存成功");
+		DtTaggingModelDTO dtTaggingModelDTO =  dtSetColService.selectCol(body,ip);
+		Long id = dtTaggingModelDTO.getTaggingModelId();
+		SelectColSuccessDTO success = new SelectColSuccessDTO();
+		success.setCode(200L);
+		success.setMessage("保存成功");
+		success.setTaggingModelId(id);
+		return success;
 	}
 	
 	@ApiOperation(value = "字段清除", nickname="delete")
