@@ -114,12 +114,12 @@ public class TagConditionUtils {
         }
     }
     public static String initValues(String values,String valueType,String symbool){
-        if (isStringType(valueType)) {
+//        if (isStringType(valueType)) {
             if ("LIKE".equals(symbool)) {
                 values = "%"+values+"%";
             }
             values = "'"+values+"'";
-        }
+//        }
        return values;
     }
 
