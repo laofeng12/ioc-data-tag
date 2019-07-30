@@ -532,8 +532,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		req.setPage(pageable.getPageNumber());
 		req.setSize(pageable.getPageSize());
 		System.out.println( JSONObject.toJSONString(req));
-		//HttpResponse resp = client.postJSON("http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
-		HttpResponse resp = client.postJSON("http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
+		HttpResponse resp = client.postJSON("http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
+//		HttpResponse resp = client.postJSON("http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
 		String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
 		if (resp.getStatusLine().getStatusCode()==200) {
 			DataSetRspDTO result = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
