@@ -4,7 +4,9 @@ import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.collections.bag.SynchronizedSortedBag;
+import org.hibernate.validator.constraints.Length;
 
+import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +22,12 @@ public class DtTagConditionDTO {
     private String tagName;
     @ApiModelProperty("是否手动设置")
     private Long isHandle;
+    @ApiModelProperty("逻辑语句")
+    private String filterExpression;
+    @ApiModelProperty("源字段名")
+    private String sourceCol;
+    @ApiModelProperty("显示字段名")
+    private String showCol;
     @ApiModelProperty("条件设置")
     private List<SaveConditionDtFilterExpressionDTO> conditionSetting = new ArrayList<>();
     @Override

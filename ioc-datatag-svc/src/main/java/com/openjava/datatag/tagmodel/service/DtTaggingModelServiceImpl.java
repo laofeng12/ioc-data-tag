@@ -8,13 +8,11 @@ import com.openjava.datatag.schedule.domain.TaskInfo;
 import com.openjava.datatag.schedule.service.TaskService;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.service.DtTagService;
+import com.openjava.datatag.tagmodel.domain.DtFilterExpression;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
-import com.openjava.datatag.tagmodel.dto.DtSetColDTO;
-import com.openjava.datatag.tagmodel.dto.DtTagConditionDTO;
-import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
-import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.dto.*;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
 import com.openjava.datatag.tagmodel.repository.DtTagConditionRepository;
@@ -25,6 +23,8 @@ import com.openjava.datatag.utils.TagConditionUtils;
 import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
 import lombok.Data;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -64,7 +64,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DtTagService dtTagService;
 	@Resource
 	private DtTagConditionRepository dtTagConditionRepository;
-
+	@Resource
+	private DtFilterExpressionService dtFilterExpressionService;
 	@Resource
 	private DtTagmUpdateLogService dtTagmUpdateLogService;
 	@Resource
@@ -89,11 +90,14 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		//克隆模型
 		DtTaggingModelDTO tempDTO = new DtTaggingModelDTO();
 		DtTaggingModel clone = new DtTaggingModel();
+		BeanUtilsBean.getInstance().getConvertUtils()
+				.register(new SqlDateConverter(null), Date.class);//解决时间空复制时出现异常
 		BeanUtils.copyProperties(tempDTO,model);
 		BeanUtils.copyProperties(clone,tempDTO);
 		clone.setTaggingModelId(null);
 		EntityClassUtil.dealCreateInfo(clone,userInfo);
 		clone = doSave(clone);
+		clone.setDataTableName("DT_"+clone.getTaggingModelId());//@TODO 这里要注意
 		//克隆字段
 		List<DtSetCol> cloList =
 				dtSetColRepository.getByTaggingModelIdAndIsDeleted(model.getTaggingModelId(),Constants.PUBLIC_NO);
@@ -118,7 +122,18 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				conditionClone.setTagConditionId(null);
 				conditionClone.setColId(colClone.getColId());
 				EntityClassUtil.dealCreateInfo(conditionClone,userInfo);
-				dtTagConditionRepository.save(conditionClone);
+				conditionClone = dtTagConditionRepository.save(conditionClone);
+				//克隆规制表达式
+				List<DtFilterExpression> expressions = dtFilterExpressionService.findByTagConditionId(condition.getTagConditionId());
+				for (DtFilterExpression expression: expressions) {
+					DtFilterExpression copyExpression = new DtFilterExpression();
+					CopyDtFilterExpressionDTO copyExpressionDTO = new CopyDtFilterExpressionDTO();
+					BeanUtils.copyProperties(copyExpressionDTO,expression);
+					BeanUtils.copyProperties(copyExpression,copyExpressionDTO);
+					copyExpression.setFilterExpressionID(null);
+					copyExpression.setTagConditionId(conditionClone.getTagConditionId());
+					dtFilterExpressionService.doSave(copyExpression);
+				}
 			}
 		}
 
@@ -481,6 +496,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			mppUtil.setUpdateSqlList(markingSql);
 			mppUtil.updateDataList();
 		}
+		//第五步，记录更新结果
+
 		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},总耗时:{%s}毫秒",taggingModelId,10000*successCount,end.getTime()-begin.getTime()));
 	}
 

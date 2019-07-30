@@ -227,11 +227,11 @@ public class DtTaggingModelAction {
 	 */
 	@ApiOperation(value = "另存", nickname="clone", notes = "报文格式：content-type=application/json")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "id", value = "主键编码", required = true, paramType = "query"),
+		@ApiImplicitParam(name = "taggingModelId", value = "主键编码", required = true, paramType = "path"),
 	})
 	@Security(session=true)
-	@RequestMapping(value="/copy",method=RequestMethod.POST)
-	public SuccessMessage clone(@RequestParam(value="id",required=true)Long id,
+	@RequestMapping(value="/copy/{taggingModelId}",method=RequestMethod.POST)
+	public SuccessMessage clone(@PathVariable(value="taggingModelId")Long id,
 								HttpServletRequest request) throws Exception {
 		String ip = IpUtil.getRealIP(request);
 		dtTaggingModelService.copy(id,ip);
