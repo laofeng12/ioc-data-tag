@@ -272,7 +272,7 @@ public class DtTaggingModelAction {
 			@ApiImplicitParam(name = "page", value = "页码", dataType = "String", paramType = "path"),
 	})
 	@Security(session=true)
-	@RequestMapping(value="/{taggingModelId}/{page}/{size}/{type}",method=RequestMethod.POST)
+	@RequestMapping(value="/{taggingModelId}/{page}/{size}/{type}",method=RequestMethod.GET)
 	public DataApiResponse<Object> getDataSetData(
 			@PathVariable(value="taggingModelId")Long taggingModelId,
 			@PathVariable(value="type")int type,
