@@ -3,6 +3,7 @@ package com.openjava.datatag.tagmodel.service;
 import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.component.TokenGenerator;
 import com.openjava.datatag.demo.dto.BaseResp;
 import com.openjava.datatag.demo.dto.TopDepartmentReqReqDTO;
 import com.openjava.datatag.log.service.DtTagmUpdateLogService;
@@ -79,10 +80,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DtSetColService dtSetColService;
 	@Resource
 	private DtTagConditionService dtTagConditionService;
-
-	private static String colJson ="";
-
-	private static String valueJson="";
+	@Resource
+	private TokenGenerator tokenGenerator;
 
 	public void copy(Long id,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -472,7 +471,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			if (TagConditionUtils.isDateType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())) {
 				cloTypeMap.put(record.getShowCol(),"date");
 			}else if(TagConditionUtils.isIntType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())){
-				cloTypeMap.put(record.getShowCol(),"bigint");
+				if (record.getSourceDataType().indexOf("，")==-1) {
+					cloTypeMap.put(record.getShowCol(),"decimal");
+				}else{
+					cloTypeMap.put(record.getShowCol(),"bigint");
+				}
 			}else{
 				cloTypeMap.put(record.getShowCol(),"varchar");
 			}
@@ -482,7 +485,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		Date begin = new Date();
 		int successCount = 0;
 		try	{
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 1; i++) {
 				++successCount;
 				logger.info("第"+successCount+"次");
 				List<Object> data = new LinkedList<>();
@@ -524,7 +527,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			client.setHeader("authority-token",SsoContext.getToken());
 			client.setHeader("User-Agent",userInfo.getUserAgent());
 		}else{
-			client.setHeader("authority-token",SsoContext.getToken());
+			client.setHeader("authority-token",tokenGenerator.createToken(392846190550001L));
 			client.setHeader("User-Agent","platform-schedule-job");
 		}
 		DataSetReqDTO req = new DataSetReqDTO();
@@ -546,7 +549,6 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 						ob += "\""+cols.get(j).getShowCol()+"\":\""+listData.get(i).get(j)+"\",";
 					}
 					ob="{"+ob.substring(0,ob.length()-1)+"}";
-					System.out.println(ob);
 					tempData.add(JSONObject.parseObject(ob,Object.class));
 				}
 				return tempData;

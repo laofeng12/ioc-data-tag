@@ -249,9 +249,14 @@ public class MppPgExecuteUtil extends ExecuteUtil {
                 StringBuilder valuesSb = new StringBuilder();
                 List<Object> item = (List<Object>) object;
                 for (Object v : item) {
-                    valuesSb.append("'");
-                    valuesSb.append(String.valueOf(v));
-                    valuesSb.append("',");
+                    if (StringUtils.isBlank(String.valueOf(v))){
+                        valuesSb.append("null");
+                        valuesSb.append(",");
+                    }else{
+                        valuesSb.append("'");
+                        valuesSb.append(String.valueOf(v));
+                        valuesSb.append("',");
+                    }
                 }
                 String values = valuesSb.toString();
                 values = values.substring(0, values.length() - 1);
