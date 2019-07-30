@@ -216,6 +216,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 			String oldContent = "{\"model\":" + oldtagModelContent + ",\"setCol\":"+ oldColsContent +"}";
 			dtTagmUpdateLogService.loggingUpdate(content,oldContent,taggingModel,ip);
 		}
+		body.setTaggingModelId(taggingModel.getTaggingModelId());
 		return body;
 	}
 

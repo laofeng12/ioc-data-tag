@@ -1,6 +1,7 @@
 package com.openjava.datatag.tagmodel.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.openjava.datatag.tagmanage.dto.BaseMessageDTO;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class DtTaggingModelDTO {
+public class DtTaggingModelDTO{
     private Long taggingModelId;
 
     private String modelName;
