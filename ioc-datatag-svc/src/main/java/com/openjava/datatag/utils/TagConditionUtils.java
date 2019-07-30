@@ -28,7 +28,7 @@ public class TagConditionUtils {
     //时间类型
     private static String[] dateTypes={
             "TIME","DATE","TIMESTAMP","DATETIME","time",
-            "date","timestamp","datetime"
+            "date","timestamp","datetime","date"
     };
 
     /**

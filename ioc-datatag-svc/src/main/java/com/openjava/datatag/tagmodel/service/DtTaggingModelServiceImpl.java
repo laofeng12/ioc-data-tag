@@ -3,6 +3,8 @@ package com.openjava.datatag.tagmodel.service;
 import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.demo.dto.BaseResp;
+import com.openjava.datatag.demo.dto.TopDepartmentReqReqDTO;
 import com.openjava.datatag.log.service.DtTagmUpdateLogService;
 import com.openjava.datatag.schedule.domain.TaskInfo;
 import com.openjava.datatag.schedule.service.TaskService;
@@ -28,9 +30,12 @@ import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ljdp.common.bean.MyBeanUtils;
+import org.ljdp.common.http.HttpClientUtils;
+import org.ljdp.common.http.LjdpHttpClient;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
@@ -506,24 +511,50 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	 * 获取数据集数据（核心方法）
 	 */
 	public Object getDataFromDataSet(Long taggingModelId,Pageable pageable){
-		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
-		List<List<Object>> data = new LinkedList<>();
-		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		for (int j = 0; j < pageable.getPageSize(); j++) {
-			List<Object> kk = new LinkedList<>();
+		List<List<Object>> data = new LinkedList<>();//最终返回的数据
+		try{
+			List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
+			DtTaggingModel taggingModel = get(taggingModelId);
+			String colStr[]= new String[cols.size()];
 			for (int i = 0; i < cols.size(); i++) {
-				if (TagConditionUtils.isDateType(cols.get(i).getSourceDataType())) {
-					kk.add(f.format(new Date()));
-				}else if(TagConditionUtils.isIntType(cols.get(i).getSourceDataType())){
-					kk.add(i+j);
-				}else if (TagConditionUtils.isStringType(cols.get(i).getSourceDataType())){
-					kk.add(RandomStringUtils.random(4,true,false).toUpperCase());
-				}else {
-					kk.add(null);
-				}
+				colStr[i] = cols.get(i).getShowCol();
 			}
-			data.add(kk);
+			LjdpHttpClient client = new LjdpHttpClient();
+			BaseUserInfo userInfo  = (BaseUserInfo) SsoContext.getUser();
+			client.setHeader("authority-token",SsoContext.getToken());
+			client.setHeader("User-Agent",userInfo.getUserAgent());
+			DataSetReqDTO req = new DataSetReqDTO();
+			req.setColumnList(colStr);
+			req.setPage(pageable.getPageNumber());
+			req.setSize(pageable.getPageSize());
+			System.out.println( JSONObject.toJSONString(req));
+			HttpResponse resp = client.postJSON("http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
+			String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
+			if (resp.getStatusLine().getStatusCode()==200) {
+				DataSetRspDTO result = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
+				return result.getData().getData();
+			}else {
+				logger.info("");
+			}
+		}catch (Exception e){
+			e.printStackTrace();
 		}
+//		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//		for (int j = 0; j < pageable.getPageSize(); j++) {
+//			List<Object> kk = new LinkedList<>();
+//			for (int i = 0; i < cols.size(); i++) {
+//				if (TagConditionUtils.isDateType(cols.get(i).getSourceDataType())) {
+//					kk.add(f.format(new Date()));
+//				}else if(TagConditionUtils.isIntType(cols.get(i).getSourceDataType())){
+//					kk.add(i+j);
+//				}else if (TagConditionUtils.isStringType(cols.get(i).getSourceDataType())){
+//					kk.add(RandomStringUtils.random(4,true,false).toUpperCase());
+//				}else {
+//					kk.add(null);
+//				}
+//			}
+//			data.add(kk);
+//		}
 		return data;
 	}
 
