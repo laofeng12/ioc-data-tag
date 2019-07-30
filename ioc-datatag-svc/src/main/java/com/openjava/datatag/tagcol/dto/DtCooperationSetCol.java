@@ -78,9 +78,12 @@ public class DtCooperationSetCol {
 
 	@ApiModelProperty("协作用户名")
 	private String cooUserName;
+	@ApiModelProperty("规定使用的标签组ID")
+	private Long useTagGroup;
 	@ApiModelProperty("创建用户名")
 	private String createUserName;
 	@ApiModelProperty("修改用户名")
 	private String modifyUserName;
+
     
 }
