@@ -27,6 +27,7 @@ import lombok.Data;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ljdp.common.bean.MyBeanUtils;
@@ -34,6 +35,7 @@ import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -438,24 +440,48 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 //		Map<Long, List<DtSetCol>> colGroup = cols.stream().collect(Collectors.groupingBy(DtSetCol::getColId));
 		//第一步、若存在删表
 		MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();
+		mppUtil.setTableName(tagModel.getDataTableName());//表名
 		mppUtil.dropTable();//删表
 		//第二步、建表
-		mppUtil.setTableName(tagModel.getDataTableName());//表名
 		mppUtil.setTableKey(tagModel.getPkey());//主键
 		Map<String,String> colmap  = new LinkedHashMap<>();//字段，注释
 		Map<String,String> cloTypeMap  = new LinkedHashMap<>();//字段，字段类型
 		mppUtil.setTableName(tagModel.getDataTableName());
 		cols.forEach(record->{
 			colmap.put(record.getShowCol(),"");
-			cloTypeMap.put(record.getShowCol(),record.getSourceDataType());
+			if (TagConditionUtils.isDateType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())) {
+				cloTypeMap.put(record.getShowCol(),"date");
+			}else if(TagConditionUtils.isIntType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())){
+				cloTypeMap.put(record.getShowCol(),"bigint");
+			}else{
+				cloTypeMap.put(record.getShowCol(),"varchar");
+			}
 		});
 		mppUtil.createTable(colmap,cloTypeMap);
 		//第三步、获取数据集数据并同步到mpp
-		List<Map<String,String>> colList = new LinkedList<>();
-		colList = JSONObject.parseObject(colJson,List.class);//字段
-		List<Array> valueList = JSONObject.parseObject(valueJson,List.class);//值
-		//第四步update数据（计算再mpp里面,用sql去计算）
-		logger.info(String.format("模型：{%s}打标成功",taggingModelId));
+		Date begin = new Date();
+		int successCount = 0;
+		try	{
+			for (int i = 0; i < 10; i++) {
+				++successCount;
+				logger.info("第"+successCount+"次");
+				List<Object> data = new LinkedList<>();
+				Pageable pageable = PageRequest.of(i,100000);
+				data.addAll((Collection<?>) getDataFromDataSet(taggingModelId,pageable));
+				mppUtil.setDataList(data);
+				mppUtil.insertDataList();
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		Date end = new Date();
+		//第四步update数据（传sql进mpp,在mpp计算）
+		List<String> markingSql = getMarkingSQL(taggingModelId);
+		if (CollectionUtils.isNotEmpty(markingSql)){
+			mppUtil.setUpdateSqlList(markingSql);
+			mppUtil.updateDataList();
+		}
+		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},总耗时:{%s}毫秒",taggingModelId,10000*successCount,end.getTime()-begin.getTime()));
 	}
 
 
@@ -464,17 +490,19 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	 */
 	public Object getDataFromDataSet(Long taggingModelId,Pageable pageable){
 		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
-		List<String[]> data = new LinkedList<>();
+		List<List<Object>> data = new LinkedList<>();
 		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		for (int j = 0; j < pageable.getPageSize(); j++) {
-			String[] kk = new String[cols.size()];
+			List<Object> kk = new LinkedList<>();
 			for (int i = 0; i < cols.size(); i++) {
 				if (TagConditionUtils.isDateType(cols.get(i).getSourceDataType())) {
-					kk[i] = f.format(new Date());
+					kk.add(f.format(new Date()));
 				}else if(TagConditionUtils.isIntType(cols.get(i).getSourceDataType())){
-					kk[i] = i+j+"";
-				}else{
-					kk[i] =RandomStringUtils.random(4,true,false).toUpperCase();
+					kk.add(i+j);
+				}else if (TagConditionUtils.isStringType(cols.get(i).getSourceDataType())){
+					kk.add(RandomStringUtils.random(4,true,false).toUpperCase());
+				}else {
+					kk.add(null);
 				}
 			}
 			data.add(kk);
@@ -513,14 +541,18 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		Map<Long, List<DtTag>> tagGroup = dtTags.stream().collect(Collectors.groupingBy(DtTag::getId));
 		List<String> markingSQL = new ArrayList<>();
 		for (DtTagCondition condition:conditions) {
+			if (StringUtils.isBlank(condition.getFilterExpression()) ) {
+				continue;
+			}
 			StringBuilder updateBuff = new StringBuilder();
-			updateBuff.append(" UPDATE ");
+			updateBuff.append(" UPDATE \"");
 			updateBuff.append(tagModel.getDataTableName());
+			updateBuff.append("\" ");
 			updateBuff.append(" SET ");
 			updateBuff.append(condition.getShowCol());
-			updateBuff.append(" = ");
+			updateBuff.append(" = '");
 			updateBuff.append(tagGroup.get(condition.getTagId()).get(0).getTagName());
-			updateBuff.append(" where ");
+			updateBuff.append("' where ");
 			updateBuff.append(condition.getFilterExpression());
 			markingSQL.add(updateBuff.toString());
 		}
