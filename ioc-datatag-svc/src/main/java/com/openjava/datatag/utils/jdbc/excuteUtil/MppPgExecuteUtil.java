@@ -240,17 +240,17 @@ public class MppPgExecuteUtil extends ExecuteUtil {
         String sqlPre = insertDataSqlSb.toString();
         //分批插入
 //        this.getDataList().remove(0);
-        List<List<Object>> partitionList = Lists.partition(this.getDataList(), 300);
+        List<List<Object>> partitionList = Lists.partition(this.getDataList(), 10000);
         for (List<Object> objectList : partitionList) {
             StringBuilder dataInsertSqlSb = new StringBuilder();
             dataInsertSqlSb.append(sqlPre);
             List<String> valueList = new LinkedList<>();
             for (Object object : objectList) {
                 StringBuilder valuesSb = new StringBuilder();
-                List<String> item = (List<String>) object;
-                for (String v : item) {
+                List<Object> item = (List<Object>) object;
+                for (Object v : item) {
                     valuesSb.append("'");
-                    valuesSb.append(v);
+                    valuesSb.append(String.valueOf(v));
                     valuesSb.append("',");
                 }
                 String values = valuesSb.toString();

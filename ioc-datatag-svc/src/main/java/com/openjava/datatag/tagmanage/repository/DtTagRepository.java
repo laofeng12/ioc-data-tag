@@ -39,6 +39,6 @@ public interface DtTagRepository extends DynamicJpaRepository<DtTag, Long>, DtTa
 
     List<DtTag> findByPreaTagIdAndIsDeleted(Long preaTagId,Long isDeteled);
 
-    @Query("from DtTag t where t.isDeleted = 0 and t.tagsId in(:tagIds)")
-    List<DtTag> findByTagIds(@Param("tagIds") List<Long> tagIds);
+    @Query("from DtTag t where t.isDeleted = 0 and t.id in(:ids)")
+    List<DtTag> findByTagIds(@Param("ids") List<Long> ids);
 }

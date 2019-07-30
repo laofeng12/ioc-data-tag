@@ -16,9 +16,9 @@ import java.util.List;
 public class CooperationSaveDTO {
     @ApiModelProperty("协作表主键:非必填,当为空或0时为添加操作")
     private Long id;
-    @ApiModelProperty("协作用户")
+    @ApiModelProperty("协作用户Id")
     private Long cooUser;
-    @ApiModelProperty("标签模型主键")
+    @ApiModelProperty("标签模型主键Id")
     private Long taggmId;
 
 

@@ -89,12 +89,12 @@ public class TagConditionUtils {
 
     /**
      * 是否字符串类型
-     * @param dateTypes
+     * @param type
      * @return
      */
-    public static boolean isDateType(String dateTypes){
+    public static boolean isDateType(String type){
         List<String> list = Arrays.asList(dateTypes);
-        if (list.contains(dateTypes)){
+        if (list.contains(type)){
             return true;
         }else {
             return false;

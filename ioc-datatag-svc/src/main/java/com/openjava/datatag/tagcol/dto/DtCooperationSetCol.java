@@ -24,7 +24,7 @@ import java.util.Date;
 @Data
 public class DtCooperationSetCol {
 	
-	@ApiModelProperty("字段表主键")
+	@ApiModelProperty("字段表主键Id")
 	private Long colId;
 	
 	@ApiModelProperty("标签模型编号")
@@ -66,7 +66,10 @@ public class DtCooperationSetCol {
 	
 	@ApiModelProperty("是否源字段")
 	private Long isSource;
-
+	@ApiModelProperty("协作表主键Id")
+	private Long id;
+	@ApiModelProperty("协作字段表主键Id")
+	private Long cooFieldId;
 	@ApiModelProperty("是否协作打标字段")
 	private Long isCooField;
 
