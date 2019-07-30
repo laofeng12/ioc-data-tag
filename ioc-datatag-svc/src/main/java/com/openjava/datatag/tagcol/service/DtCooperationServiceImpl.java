@@ -181,6 +181,8 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             dto.setIsMarking(VoUtils.toLong(map.get("IS_MARKING")));
             dto.setIsPKey(VoUtils.toLong(map.get("IS_P_KEY")));
             dto.setIsSource(VoUtils.toLong(map.get("IS_SOURCE")));
+            dto.setId(VoUtils.toLong(map.get("ID")));
+            dto.setCooFieldId(VoUtils.toLong(map.get("COOFIELDID")));
             dto.setShowCol(map.get("SHOW_COL"));
             dto.setSourceCol(map.get("SOURCE_COL"));
             dto.setSourceDataType(map.get("SOURCE_DATA_TYPE"));
