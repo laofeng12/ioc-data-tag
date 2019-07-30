@@ -32,7 +32,8 @@ public interface DtSetColRepository extends DynamicJpaRepository<DtSetCol, Long>
      * @param taggingModelId
      * @return
      */
-    List<DtSetCol> getByTaggingModelIdAndIsDeleted(Long taggingModelId,Long isDeleted);
+    @Query("from DtSetCol t where t.isDeleted=:isDeleted and t.taggingModelId = :taggingModelId order by t.colSort")
+    List<DtSetCol> getByTaggingModelIdAndIsDeleted(@Param("taggingModelId")Long taggingModelId,@Param("isDeleted")Long isDeleted);
     /**
     *根据源表数据获取字段
     */
