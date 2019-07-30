@@ -267,18 +267,20 @@ public class DtTaggingModelAction {
 	@ApiOperation(value = "获取数据集数据", nickname="getDataSetData")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "taggingModelId", value = "模型主键编码", dataType ="String", paramType = "path"),
+			@ApiImplicitParam(name = "type", value = "数据结构类型：1返回key:value，0返回value", dataType ="String", paramType = "path"),
 			@ApiImplicitParam(name = "size", value = "每页显示数量", dataType = "String", paramType = "path"),
 			@ApiImplicitParam(name = "page", value = "页码", dataType = "String", paramType = "path"),
 	})
 	@Security(session=true)
-	@RequestMapping(value="/{taggingModelId}/{page}/{size}",method=RequestMethod.POST)
-	public DataApiResponse<String> getDataSetData(
+	@RequestMapping(value="/{taggingModelId}/{page}/{size}/{type}",method=RequestMethod.POST)
+	public DataApiResponse<Object> getDataSetData(
 			@PathVariable(value="taggingModelId")Long taggingModelId,
+			@PathVariable(value="type")int type,
 			@PathVariable(value="page")int page,
-			@PathVariable(value="size")int size) throws APIException {
+			@PathVariable(value="size")int size) throws Exception {
 		DataApiResponse response = new DataApiResponse();
 		Pageable pageable = PageRequest.of(page,size);
-		Object  data= dtTaggingModelService.getDataFromDataSet(taggingModelId,pageable);
+		Object  data= dtTaggingModelService.getDataFromDataSet(taggingModelId,type,pageable);
 		response.setData(data);
 		return response;
 	}

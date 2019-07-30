@@ -487,7 +487,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				logger.info("第"+successCount+"次");
 				List<Object> data = new LinkedList<>();
 				Pageable pageable = PageRequest.of(i,100000);
-				data.addAll((Collection<?>) getDataFromDataSet(taggingModelId,pageable));
+				data.addAll((Collection<?>) getDataFromDataSet(taggingModelId,0,pageable));
 				mppUtil.setDataList(data);
 				mppUtil.insertDataList();
 			}
@@ -510,35 +510,51 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	/**
 	 * 获取数据集数据（核心方法）
 	 */
-	public Object getDataFromDataSet(Long taggingModelId,Pageable pageable){
+	public Object getDataFromDataSet(Long taggingModelId,int type,Pageable pageable)throws Exception{
 		List<List<Object>> data = new LinkedList<>();//最终返回的数据
-		try{
-			List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
-			DtTaggingModel taggingModel = get(taggingModelId);
-			String colStr[]= new String[cols.size()];
-			for (int i = 0; i < cols.size(); i++) {
-				colStr[i] = cols.get(i).getShowCol();
-			}
-			LjdpHttpClient client = new LjdpHttpClient();
-			BaseUserInfo userInfo  = (BaseUserInfo) SsoContext.getUser();
+		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
+		DtTaggingModel taggingModel = get(taggingModelId);
+		String colStr[]= new String[cols.size()];
+		for (int i = 0; i < cols.size(); i++) {
+			colStr[i] = cols.get(i).getShowCol();
+		}
+		LjdpHttpClient client = new LjdpHttpClient();
+		BaseUserInfo userInfo  = (BaseUserInfo) SsoContext.getUser();
+		if (userInfo!=null) {
 			client.setHeader("authority-token",SsoContext.getToken());
 			client.setHeader("User-Agent",userInfo.getUserAgent());
-			DataSetReqDTO req = new DataSetReqDTO();
-			req.setColumnList(colStr);
-			req.setPage(pageable.getPageNumber());
-			req.setSize(pageable.getPageSize());
-			System.out.println( JSONObject.toJSONString(req));
-			HttpResponse resp = client.postJSON("http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
-//			HttpResponse resp = client.postJSON("http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
-			String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
-			if (resp.getStatusLine().getStatusCode()==200) {
-				DataSetRspDTO result = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
-				return result.getData().getData();
+		}else{
+			client.setHeader("authority-token",SsoContext.getToken());
+			client.setHeader("User-Agent","platform-schedule-job");
+		}
+		DataSetReqDTO req = new DataSetReqDTO();
+		req.setColumnList(colStr);
+		req.setPage(pageable.getPageNumber());
+		req.setSize(pageable.getPageSize());
+		System.out.println( JSONObject.toJSONString(req));
+		HttpResponse resp = client.postJSON("http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
+//		HttpResponse resp = client.postJSON("http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
+		String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
+		if (resp.getStatusLine().getStatusCode()==200) {
+			DataSetRspDTO result = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
+			if (type==1) {
+				List<List<Object>> listData =result.getData().getData();
+				List<Object> tempData =new LinkedList<>();
+				for (int i = 0; i < listData.size(); i++) {
+					String ob = "";
+					for (int j = 0; j < listData.get(i).size(); j++) {
+						ob += "\""+cols.get(j).getShowCol()+"\":\""+listData.get(i).get(j)+"\",";
+					}
+					ob="{"+ob.substring(0,ob.length()-1)+"}";
+					System.out.println(ob);
+					tempData.add(JSONObject.parseObject(ob,Object.class));
+				}
+				return tempData;
 			}else {
-				logger.info("");
+				return result.getData().getData();
 			}
-		}catch (Exception e){
-			e.printStackTrace();
+		}else {
+			logger.info("");
 		}
 //		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //		for (int j = 0; j < pageable.getPageSize(); j++) {
