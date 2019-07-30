@@ -38,8 +38,8 @@ public interface DtCooperationRepository extends DynamicJpaRepository<DtCooperat
     /**
      *根据模型Id查找该用户要协作的字段记录集
      */
-    @Query(value ="select t.*,o.COO_USER ,(case when o.COO_USER=:userId and t.SOURCE_COL=o.TAG_COL_NAME then '1' else '0' end ) IsCooField from\n" +
-            "DT_SET_COL t left JOIN (select o.*,l.TAG_COL_NAME from DT_COOPERATION o left join DT_COO_TAGCOL_LIMIT l on o.ID=l.COO_ID) o \n" +
+    @Query(value ="select t.*,o.ID,o.COO_USER,o.cooFieldId,(case when o.COO_USER=:userId and t.SOURCE_COL=o.TAG_COL_NAME then '1' else '0' end ) IsCooField from\n" +
+            "DT_SET_COL t left JOIN (select o.*,l.ID as cooFieldId,l.TAG_COL_NAME from DT_COOPERATION o left join DT_COO_TAGCOL_LIMIT l on o.ID=l.COO_ID) o \n" +
             "on t.TAGGING_MODEL_ID=o.TAGGM_ID and t.SOURCE_COL=o.TAG_COL_NAME\n" +
             "where TAGGING_MODEL_ID=:modelId"
             ,nativeQuery = true)

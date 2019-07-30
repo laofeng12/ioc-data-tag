@@ -36,6 +36,7 @@ import org.ljdp.ui.bootstrap.TablePageImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -96,6 +97,7 @@ public class DtCooperationAction {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "eq_createUser", value = "（不传时默认当前用户）发起者=", required = false, dataType = "Long", paramType = "query"),
             @ApiImplicitParam(name = "eq_taggmId", value = "（非必填）标签模型主键=", required = false, dataType = "Long", paramType = "query"),
+            @ApiImplicitParam(name = "eq_cooUser", value = "（非必填）协作用户=", required = false, dataType = "Long", paramType = "query"),
             @ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
     })
@@ -197,8 +199,25 @@ public class DtCooperationAction {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public SuccessMessage doSave(@RequestBody CooperationSaveDTO body
     ) throws Exception {
+        if(body.getTaggmId()==null)
+        {
+            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "taggmId参数不能为空");
+        }
+        if(body.getCooUser()==null)
+        {
+            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooUser参数不能为空");
+        }
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         Long currentuserId = Long.valueOf(userInfo.getUserId());
+        DtCooperationDBParam params=new DtCooperationDBParam();
+        params.setEq_cooUser(body.getCooUser());
+        params.setEq_taggmId(body.getTaggmId());
+        Pageable pageable = PageRequest.of(0, 20000);//限制只能导出2w，防止内存溢出
+        Page<DtCooperation> result = dtCooperationService.query(params, pageable);
+        if(result.getTotalElements()>0)
+        {
+            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "该协作成员已存在");
+        }
         DtCooperation db=new DtCooperation();
         if (body.getId() == null || body.getId() == 0) {
 

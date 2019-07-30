@@ -15,7 +15,7 @@ public class DtCooperationDBParam extends RoDBQueryParam {
 	
 	private Long eq_createUser;//(不传时默认当前用户)发起者 = ?
 	private Long eq_taggmId;//标签模型主键 = ?
-
+	private Long eq_cooUser;//协作用户 = ?
 	public Long getEq_taggmId() {
 		return eq_taggmId;
 	}
@@ -38,5 +38,11 @@ public class DtCooperationDBParam extends RoDBQueryParam {
 		this.eq_createUser = createUser;
 	}
 
+	public Long getEq_cooUser() {
+		return eq_cooUser;
+	}
 
+	public void setEq_cooUser(Long eq_cooUser) {
+		this.eq_cooUser = eq_cooUser;
+	}
 }
