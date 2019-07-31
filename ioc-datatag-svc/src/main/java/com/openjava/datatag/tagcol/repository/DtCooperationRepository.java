@@ -52,4 +52,10 @@ public interface DtCooperationRepository extends DynamicJpaRepository<DtCooperat
             "where l.TAG_COL_NAME=:colField and o.COO_USER=:userId and o.TAGGM_ID=:modelId)"
             ,nativeQuery = true)
     List<Map<String, String>> findCurrentUserTagGroup(@Param("userId")Long userId, @Param("modelId") Long modelId, @Param("colField") String colField);
+
+    @Query(value ="select count(*) from DT_COOPERATION o left join DT_COO_TAGCOL_LIMIT l on o.ID=l.COO_ID\n" +
+            "where o.COO_USER=:userId and l.USE_TAG_GROUP=:tagGroupId"
+            ,nativeQuery = true)
+    Long findCooUserTagGroup(@Param("userId")Long userId, @Param("tagGroupId") Long tagGroupId);
+
 }
