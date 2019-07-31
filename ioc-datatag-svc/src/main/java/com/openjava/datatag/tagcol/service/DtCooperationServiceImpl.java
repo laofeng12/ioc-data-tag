@@ -327,6 +327,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                     newcolLimit.setUseTagGroup(record.getUseTagGroup());
                     newcolLimit.setTagColName(record.getTagColName());
                     newcolLimit.setCooId(col.getId());
+                    newcolLimit.setTagColId(record.getTagColId());
                     newcolLimit.setIsNew(false);
                     newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
                 } else {
@@ -335,6 +336,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                     newcolLimit.setUseTagGroup(record.getUseTagGroup());
                     newcolLimit.setTagColName(record.getTagColName());
                     newcolLimit.setCooId(col.getId());
+                    newcolLimit.setTagColId(record.getTagColId());
                     newcolLimit.setId(ConcurrentSequence.getInstance().getSequence());
                     newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
                 }
