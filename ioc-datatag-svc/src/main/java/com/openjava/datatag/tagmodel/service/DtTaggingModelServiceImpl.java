@@ -11,10 +11,7 @@ import com.openjava.datatag.schedule.domain.TaskInfo;
 import com.openjava.datatag.schedule.service.TaskService;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.service.DtTagService;
-import com.openjava.datatag.tagmodel.domain.DtFilterExpression;
-import com.openjava.datatag.tagmodel.domain.DtSetCol;
-import com.openjava.datatag.tagmodel.domain.DtTagCondition;
-import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
+import com.openjava.datatag.tagmodel.domain.*;
 import com.openjava.datatag.tagmodel.dto.*;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
@@ -85,6 +82,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DtTagConditionService dtTagConditionService;
 	@Resource
 	private TokenGenerator tokenGenerator;
+	@Resource
+    private  DtWaitUpdateIndexService dtWaitUpdateIndexService;
 	@Resource
 	private RedisTemplate<String, Object> redisTemplate;
 	@Value("${dataSet.resourceDataUrl}")
@@ -511,7 +510,13 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			mppUtil.updateDataList();
 		}
 		//第五步，记录更新结果
-
+        DtWaitUpdateIndex waitUpdateIndex = new DtWaitUpdateIndex();
+        waitUpdateIndex.setIsNew(true);
+        waitUpdateIndex.setCreateTime(new Date());
+        waitUpdateIndex.setRunState(0L);
+        waitUpdateIndex.setTableName(tagModel.getDataTableName());
+        waitUpdateIndex.setTaggingModelId(taggingModelId);
+        dtWaitUpdateIndexService.doSave(waitUpdateIndex);
 		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},总耗时:{%s}毫秒",taggingModelId,10000*successCount,end.getTime()-begin.getTime()));
 	}
 

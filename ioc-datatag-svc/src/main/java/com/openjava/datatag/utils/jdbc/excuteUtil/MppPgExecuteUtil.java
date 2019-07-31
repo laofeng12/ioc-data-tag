@@ -71,6 +71,11 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     private List<String> updateSqlList;
 
     /**
+     * SQL
+     */
+    private String SQL;
+
+    /**
      * 字符串类型
      */
     private String vechar = "";
@@ -302,6 +307,22 @@ public class MppPgExecuteUtil extends ExecuteUtil {
         return this.getUpdateSqlList();
     }
 
+    /**
+     * 查询数据
+     */
+    @Override
+    public String[][] getData(){
+        try {
+            Map<String, String> sqlMap = new HashMap<>(2);
+            sqlMap.put("sql", this.SQL);
+            initDataProvider(this.getValidDataSource(), sqlMap, false);
+            return dataProvider.getData2();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<Object> getDataList() {
         return dataList;
     }
@@ -343,18 +364,21 @@ public class MppPgExecuteUtil extends ExecuteUtil {
         u.createTable(map,mapType);//建表
         List<Object> dataList = new ArrayList<>();
         List<String> values = new ArrayList<>();
-        values.add("111112222233333444");
+        values.add("1");
         values.add("名字1");
         values.add("2018-07-09 00:00:00");
         dataList.add(values);
         List<String> values2 = new ArrayList<>();
-        values2.add("111112222233333445");
+        values2.add("2");
         values2.add("名字2");
         values2.add("2018-07-09 00:00:00");
         dataList.add(values2);
         u.setDataList(dataList);
         u.insertDataList();//load数据
 //        u.dropTable();//删表
+//        u.setSQL("select * from \"DT_1\"  t ");
+//        String[][] data = u.getData();
+//        System.out.println(data.length);
     }
 
 
