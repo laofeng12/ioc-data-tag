@@ -92,3 +92,5 @@ schedulejob: #定时任务组件
   jobName: scanjob
   queue: 0 0/1 * * * ? * #扫描新建模型频率
 
+dataSet: #数据集相关
+  resourceDataUrl: http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/

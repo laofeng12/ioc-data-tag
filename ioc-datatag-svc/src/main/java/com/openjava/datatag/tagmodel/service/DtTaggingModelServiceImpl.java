@@ -40,9 +40,12 @@ import org.ljdp.common.http.LjdpHttpClient;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.BoundValueOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,7 +85,10 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DtTagConditionService dtTagConditionService;
 	@Resource
 	private TokenGenerator tokenGenerator;
-
+	@Resource
+	private RedisTemplate<String, Object> redisTemplate;
+	@Value("${dataSet.resourceDataUrl}")
+	private String resourceDataUrl;
 	public void copy(Long id,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTaggingModel model = get(id);
@@ -513,6 +519,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	/**
 	 * 获取数据集数据（核心方法）
 	 */
+	private String  authorityToken = "";
 	public Object getDataFromDataSet(Long taggingModelId,int type,Pageable pageable)throws Exception{
 		List<List<Object>> data = new LinkedList<>();//最终返回的数据
 		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
@@ -527,7 +534,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			client.setHeader("authority-token",SsoContext.getToken());
 			client.setHeader("User-Agent",userInfo.getUserAgent());
 		}else{
-			client.setHeader("authority-token",tokenGenerator.createToken(392846190550001L));
+			String token = (String) redisTemplate.boundValueOps(this.authorityToken).get();
+			if (StringUtils.isBlank(token)) {
+				token = tokenGenerator.createToken(392846190550001L);
+			}
+			client.setHeader("authority-token",token);
 			client.setHeader("User-Agent","platform-schedule-job");
 		}
 		DataSetReqDTO req = new DataSetReqDTO();
@@ -535,8 +546,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		req.setPage(pageable.getPageNumber());
 		req.setSize(pageable.getPageSize());
 		System.out.println( JSONObject.toJSONString(req));
-		HttpResponse resp = client.postJSON("http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
-//		HttpResponse resp = client.postJSON("http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
+		HttpResponse resp = client.postJSON(resourceDataUrl+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
 		String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
 		if (resp.getStatusLine().getStatusCode()==200) {
 			DataSetRspDTO result = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
@@ -556,7 +566,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				return result.getData().getData();
 			}
 		}else {
-			logger.info("");
+			logger.info(jsontext);
 		}
 //		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //		for (int j = 0; j < pageable.getPageSize(); j++) {
