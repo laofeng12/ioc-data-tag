@@ -77,8 +77,8 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         Long currentuserId = Long.valueOf(userInfo.getUserId());
         //userId不传时默认查询当前用户
-        if(userId==null){
-            userId= currentuserId;
+        if (userId == null) {
+            userId = currentuserId;
         }
         List<Map<String, String>> result = dtCooperationRepository.findUserModelByUserId(userId);
         List<DtCooperationModelDTO> dtoList = new ArrayList<>();
@@ -140,8 +140,8 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         Long currentuserId = Long.valueOf(userInfo.getUserId());
         //userId不传时默认查询当前用户
-        if(userId==null){
-            userId= currentuserId;
+        if (userId == null) {
+            userId = currentuserId;
         }
         List<Map<String, String>> result = dtCooperationRepository.findUserModelCooField(userId, modelId);
         List<DtCooperationSetCol> dtoList = new ArrayList<>();
@@ -231,6 +231,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         }
         return lst;
     }
+
     /**
      * 描述：根据协作用户Id和标签组Id查询  协作限制打标字段表 存在记录总数
      */
@@ -238,6 +239,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         return dtCooperationRepository.findCooUserTagGroup(userId, tagGroupId);
 
     }
+
     public DtCooperation get(Long id) {
         Optional<DtCooperation> o = dtCooperationRepository.findById(id);
         if (o.isPresent()) {
@@ -255,20 +257,21 @@ public class DtCooperationServiceImpl implements DtCooperationService {
     /**
      * 描述：新增、修改协作用户
      */
-    public void doCoolListSave(DtCooperationListDTO list) throws Exception {
+    public void doCoolListSave(List<DtCooperationListDTO> list) throws Exception {
         String reqParams = JSONObject.toJSONString(list);
         DtTagmCooLog log = new DtTagmCooLog();
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         Long userId = Long.valueOf(userInfo.getUserId());
-        if (list.getTaggmId() == null) {
-            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "taggmId参数不能为空");
-        }
-        Long taggmId = list.getTaggmId();
-        for (CooperationDTO req : list.getCooperaList()) {
-            if (req.getCooUser() == null) {
+        for (DtCooperationListDTO dtos : list) {
+            if (dtos.getTaggmId() == null) {
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "taggmId参数不能为空");
+            }
+            Long taggmId = dtos.getTaggmId();
+
+            if (dtos.getCooUser() == null) {
                 throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooUser参数不能为空");
             }
-            List<DtCooTagcolLimitDTO> colLimit = req.getCooTagcolLimitList();
+            List<DtCooTagcolLimitDTO> colLimit = dtos.getCooTagcolLimitList();
             DtTaggingModel tag = dtTaggingModelService.get(taggmId);
 
             if (CollectionUtils.isEmpty(colLimit)) {
@@ -277,30 +280,30 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             if (tag == null) {
                 throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数不能为空");
             }
-            DtCooperationDBParam params=new DtCooperationDBParam();
-            params.setEq_cooUser(req.getCooUser());
+            /*DtCooperationDBParam params = new DtCooperationDBParam();
+            params.setEq_cooUser(dtos.getCooUser());
             params.setEq_taggmId(taggmId);
             Pageable pageable = PageRequest.of(0, 20000);//限制只能导出2w，防止内存溢出
             Page<DtCooperation> result = query(params, pageable);
-            if(result.getTotalElements()>0)
-            {
+            if (result.getTotalElements() > 0) {
                 throw new APIException(MyErrorConstants.PUBLIC_ERROE, "该协作成员已存在");
-            }
+            }*/
             //新增和修改
-            DtCooperation col = get(req.getId());
-            if (col != null) {
+            DtCooperation col = new DtCooperation();
+
+            if (dtos.getId() != null) {
+                col = get(dtos.getId());
                 col.setTaggmId(taggmId);
-                col.setCooUser(req.getCooUser());
+                col.setCooUser(dtos.getCooUser());
                 col.setIsNew(false);
                 col.setModifyTime(new Date());
                 //MyBeanUtils.copyPropertiesNotNull(col,req);
                 //EntityClassUtil.dealModifyInfo(col,userInfo);
                 col = dtCooperationRepository.save(col);
             } else {
-                col = new DtCooperation();
 
                 col.setTaggmId(taggmId);
-                col.setCooUser(req.getCooUser());
+                col.setCooUser(dtos.getCooUser());
                 col.setCreateUser(userId);
                 col.setIsNew(true);
                 col.setModifyTime(new Date());
@@ -312,21 +315,22 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             }
             for (int i = 0; i < colLimit.size(); i++) {
                 DtCooTagcolLimitDTO record = colLimit.get(i);
-                DtCooTagcolLimit newcolLimit = dtCooTagcolLimitService.get(record.getId());
+                DtCooTagcolLimit newcolLimit = new DtCooTagcolLimit();
                 if (record.getCooId() == null) {
                     throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数的cooId为空或查无此标签");
                 }
-                if (!record.getCooId().equals(req.getId())) {
+                if (!record.getCooId().equals(dtos.getId())) {
                     throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数的cooId错误");
                 }
-                if (newcolLimit != null) {
+                if (record.getId() != null) {
+                    newcolLimit = dtCooTagcolLimitService.get(record.getId());
                     newcolLimit.setUseTagGroup(record.getUseTagGroup());
                     newcolLimit.setTagColName(record.getTagColName());
                     newcolLimit.setCooId(col.getId());
                     newcolLimit.setIsNew(false);
                     newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
                 } else {
-                    newcolLimit = new DtCooTagcolLimit();
+
                     newcolLimit.setIsNew(true);
                     newcolLimit.setUseTagGroup(record.getUseTagGroup());
                     newcolLimit.setTagColName(record.getTagColName());
@@ -336,6 +340,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 }
 
             }
+
         }
     }
 

@@ -253,7 +253,7 @@ public class DtCooperationAction {
     @ApiOperation(value = "保存协作成员", nickname = "save", notes = "报文格式：content-type=application/json")
     @Security(session = true)
     @RequestMapping(value = "/dosave", method = RequestMethod.POST)
-    public SuccessMessage doCoolSave(@RequestBody DtCooperationListDTO body) throws Exception {
+    public SuccessMessage doCoolSave(@RequestBody List<DtCooperationListDTO> body) throws Exception {
         dtCooperationService.doCoolListSave(body);
         //没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
         return new SuccessMessage("保存成功");
