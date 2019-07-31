@@ -17,10 +17,15 @@ import java.util.List;
  */
 @Data
 public class DtCooperationListDTO {
+    @ApiModelProperty("协作表主键")
+    private Long id;
     @ApiModelProperty("标签模型主键Id")
     private Long taggmId;
-    @ApiModelProperty("协作用户及对应协作字段记录集")
-    private List<CooperationDTO> cooperaList=new ArrayList<>();
+    @ApiModelProperty("协作用户Id")
+    private Long cooUser;
+
+    @ApiModelProperty("协作成员限制的打标字段")
+    private List<DtCooTagcolLimitDTO> cooTagcolLimitList=new ArrayList<>();
 
 
 }

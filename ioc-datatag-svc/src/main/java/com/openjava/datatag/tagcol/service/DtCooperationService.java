@@ -33,7 +33,7 @@ public interface DtCooperationService {
 	Long findCooUserTagGroup(Long userId,Long tagGroupId);
 	DtCooperation doSave(DtCooperation m);
 	void doCoolSave(DtCooperationDTO m)throws Exception;
-	void doCoolListSave(DtCooperationListDTO list)throws Exception;
+	void doCoolListSave(List<DtCooperationListDTO> list)throws Exception;
 	void doDelete(Long id);
 	void doRemove(String ids);
 
