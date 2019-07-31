@@ -30,7 +30,7 @@ public interface DtCooperationService {
 	List<DtCooperationSetCol> findUserModelCooField(Long userId,Long modelId);
 	List<DtTagGroup>findCurrentUserTagGroup(Long modelId,String colField);
 	DtCooperation get(Long id);
-	
+	Long findCooUserTagGroup(Long userId,Long tagGroupId);
 	DtCooperation doSave(DtCooperation m);
 	void doCoolSave(DtCooperationDTO m)throws Exception;
 	void doCoolListSave(DtCooperationListDTO list)throws Exception;
