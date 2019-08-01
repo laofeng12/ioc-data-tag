@@ -44,7 +44,6 @@ const user = {
           user.avatar = user.headImg ? user.headImg : defaultAvatar
           dispatch('SetToken', token)
           dispatch('SetUserInfo', user)
-
           resolve()
         }).catch(error => {
           reject(error)
