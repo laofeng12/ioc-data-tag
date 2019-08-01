@@ -100,6 +100,10 @@ public class Constants {
     public static final String DT_SCHEDULE_CORE_JOB_CLASS = "com.openjava.datatag.schedule.job.DtTaggingModelCalculationJob";//模型调度核心job
     public static final String DT_SCHEDULE_GROUP = "datatag_job_group";//模型调度任务组名称
 
+    //=======  索引更新状态=================
+    public static final Long DT_INDEX_RUN_STATUS_WAIT = 0L;//未开始
+    public static final Long DT_INDEX_RUN_STATUS_RUNNING = 1L;//已开始
+
     /**
      * 数据库类型(0:Oracle;1:MySql高版本;2;Mysql低版本;3:PostgreSql)
      */

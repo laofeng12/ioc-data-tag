@@ -121,6 +121,12 @@ export default new Router({
       component: () => import('@/views/taggedImage/creatModel.vue')
     },
     {
+      path: '/editModel/:id',
+      name: 'editModel',
+      meta: {title: '编辑模型'},
+      component: () => import('@/views/taggedImage/creatModel.vue')
+    },
+    {
       path: '/marking',
       name: 'marking',
       meta: {title: '协作打标'},

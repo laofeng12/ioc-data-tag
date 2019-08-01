@@ -60,7 +60,7 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                   <span class="operationIcona">
-                    <router-link :to="`/modelEdit/123`">
+                    <router-link :to="{ path: `editModel/${scope.row.taggingModelId}`}">
                       <i class="el-icon-edit-outline iconLogo"></i>
                     </router-link>
                   </span>

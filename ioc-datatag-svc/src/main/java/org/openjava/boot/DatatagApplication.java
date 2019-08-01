@@ -47,6 +47,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 				"com.openjava.**.api",
 				"org.openjava.boot.conf",
 				"com.openjava.datatag.user",
+				"com.openjava.datatag.utils.jdbc.excuteUtil"
 		})
 @ServletComponentScan(basePackages= {
 		"org.ljdp.support.web.listener2"})

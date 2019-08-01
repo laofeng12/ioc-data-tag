@@ -1,12 +1,12 @@
 <template>
-  <div class="aside treeCode">
+  <div class="aside">
     <el-input placeholder="输入关键词搜索" v-model="filterText" class="search"   size="small" suffix-icon="el-icon-search"></el-input>
-    <div   class="tree">
-      <el-tree icon-class="el-icon-folder"  class="tree" :props="props" :filter-node-method="filterNode" ref="tree"  :load="loadNode" lazy>
+    <div   class="tree-box">
+      <el-tree icon-class="el-icon-folder" class="tree" :props="props" :filter-node-method="filterNode" ref="tree"  :load="loadNode" lazy>
         <span class="custom-tree-node" slot-scope="{ node, data }">
-        <div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>
-          <el-button  class="set-btn" type="text" size="mini" v-if="node.level>1"  @click.stop="setTags(node,data)">
-            <i class="el-icon-setting settingIcon"></i>
+        <span class="cus-node-title">{{ data.orgName }}</span>
+          <el-button  class="set-btn" type="text" size="mini" v-if="data.isTable===true"  @click.stop="setTags(node,data)">
+            <i class="el-icon-setting"></i>
           </el-button>
         </span>
       </el-tree>
@@ -20,12 +20,23 @@
             <h3>选择字段</h3>
             <el-input placeholder="输入关键词搜索列表" v-model="searchText" size="small" suffix-icon="el-icon-search"></el-input>
             <div class="h4">
-              <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">东城区高考成绩数据</el-checkbox>
+              <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">{{resourceName}}</el-checkbox>
             </div>
             <ul>
-              <li v-for="city in cities">
-                <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
-                  <el-checkbox  :label="city" :key="city">{{city}}</el-checkbox>
+              <li v-for="(item,index) in columnData"  >
+                <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
+                  <el-checkbox  :label="item.name":key="item.id" >
+                   <span v-if="item.type==='string'" class="blue">
+                     Str.
+                   </span>
+                    <span v-else-if="item.type==='number'" class="green">
+                     No.
+                   </span>
+                    <span v-else="item.type==='date'" class="orange">
+                     Date.
+                   </span>
+                    {{item.name}}
+                  </el-checkbox>
                 </el-checkbox-group>
               </li>
             </ul>
@@ -33,15 +44,19 @@
           <div class="right">
             <h3>已择字段</h3>
             <div>
-              选择主键
-              <el-select v-model="value" filterable placeholder="请选择" size="small">
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
+              <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+                <el-form-item label="选择主键"  prop="pkey">
+                  <el-select v-model="ruleForm.pkey" filterable placeholder="请选择主键" size="small">
+                    <el-option
+                      v-for="(item,index) in columnData"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.name">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+
               <el-table class="my-table"  border style="width: 100%"
                 :data="tableData"
                 tooltip-effect="dark">
@@ -50,21 +65,28 @@
                     <i class="el-icon-delete"></i>
                   </template>
                   <template slot-scope="scope">
-                    <i class="el-icon-delete"></i>
+                    <el-button  v-if="scope.row.name===ruleForm.pkey"  class="set-btn" type="text" :disabled="true">
+                      <i  class="el-icon-delete"></i>
+                    </el-button>
+                    <el-button  v-else class="set-btn" type="text">
+                      <i  class="el-icon-delete" @click="delCol(scope.$index)"></i>
+                    </el-button>
+
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="字段"  prop="colName">
+                  label="字段"  prop="name">
                 </el-table-column>
                 <el-table-column
-                  prop="colNameType"
+                  prop="type"
                   label="类型"
                   width="100">
                 </el-table-column>
                 <el-table-column
                   label="选择打标字段" width="120">
                   <template slot-scope="scope">
-                    <el-checkbox></el-checkbox>
+                    <el-checkbox  v-if="scope.row.name===ruleForm.pkey" disabled></el-checkbox>
+                    <el-checkbox  v-else @change="getCheckChange(scope.row,$event)"></el-checkbox>
                   </template>
                 </el-table-column>
               </el-table>
@@ -74,7 +96,7 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认选择</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="setCols">确认选择</el-button>
         </div>
       </div>
     </el-dialog>
@@ -82,14 +104,19 @@
 </template>
 
 <script>
-import {getOneZtreeData,getChildZtreeData,getResourceListData} from '@/api/creatModel'
-const cityOptions = ['上海', '北京', '广州', '深圳'];
+import {getOneZtreeData,getChildZtreeData,getResourceListData,getResourceInfoData,setColsData,getModelData} from '@/api/creatModel'
+const colsOptions = [];
 export default {
   name: 'datasetAside',
   props: {
+    modelData: {
+      type: Object,
+      default: Object
+    }
   },
   data () {
     return {
+      isNew:true,
       dataLakeDirectoryTree:[],
       dataSetDirectoryTree:[],
       dataLakeDirectoryName:'',
@@ -104,10 +131,9 @@ export default {
         isLeaf: 'leaf'
       },
       searchText:'',
-      checkList: ['选中且禁用','复选框 A'],
       checkAll: false,
-      checkedCities: [],
-      cities: cityOptions,
+      checkedCols: [],
+      cols: colsOptions,
       isIndeterminate: true,
       options: [{
         value: '选项1',
@@ -125,33 +151,79 @@ export default {
         value: '选项5',
         label: '北京烤鸭'
       }],
-      value: '',
       tableData: [{
         colName: '2016-05-03',
         colNameType: '王小虎'
       }],
       resData:[],
       treeData:[],
-      multipleSelection: []
+      multipleSelection: [],
+      resourceName:'',
+      resourceId:0,
+      resourceType:0,
+      columnData:[],
+      checkTags:false,
+      ruleForm: {
+        pkey: '',
+      },
+      rules: {
+        pkey: [
+          { required: true, message: '请选择主键', trigger: 'change' }
+        ]
+      },
+      taggingModelId:0,
+      routerName:'creatModel'
     }
   },
   watch: {
     filterText(val) {
       this.$refs.tree.filter(val)
+    },
+    modelData: function (val,newVal) {
+    //  console.log(val.colList)
+    //  this.modelData=newVal
+      this.ruleForm.pkey=val.pkey
+      const markCol= val.colList.filter((item,index)=>{
+         return item.isMarking===1
+      })
+     // console.log('markCol',markCol)
+
     }
   },
   methods: {
     //全选
     handleCheckAllChange(val) {
-      this.checkedCities = val ? cityOptions : [];
+      this.checkedCols = val ? colsOptions : [];
       this.isIndeterminate = false;
-    },
-    handleCheckedCitiesChange(value) {
-      let checkedCount = value.length;
-      this.checkAll = checkedCount === this.cities.length;
       console.log(this.checkAll)
-      this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
-      console.log(this.checkedCities)
+      if(this.checkAll===true){
+        this.tableData= this.columnData
+        this.tableData.forEach((item,index)=>{
+          //item.isChecked=false
+          item.isMarking=0
+        })
+      }else {
+        this.tableData=[]
+      }
+    },
+    handleCheckedColsChange(value) {
+      let checkedCount = value.length;
+      this.checkAll = checkedCount === this.cols.length;
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
+      //console.log(this.checkedCols)
+      this.tableData=[]
+      this.checkedCols.forEach((citem)=>{
+       this.columnData.map((item)=>{
+         if(item.name == citem){
+           this.tableData.push(item)
+         }
+        })
+      })
+      this.tableData.forEach((item,index)=>{
+         //item.isChecked=false
+         item.isMarking=0
+      })
+      console.log(this.tableData)
     },
     close(){
 
@@ -176,12 +248,13 @@ export default {
       }
       else {
        // this.getTreeChild(node.data,resolve)
-        this.getChildTreeData(node.data,resolve)
+          this.getChildTreeData(node.data,resolve)
+          //console.log(node.data)
       }
     },
     //获取4级树子节点
     getChildTreeData(data,resolve){
-      console.log('点击当前的数据',data)
+     // console.log('点击当前的数据',data)
       this.getChildtreeData(data,resolve)
     },
     //获取3级树子节点
@@ -196,15 +269,25 @@ export default {
       }
     },
     //对字段进行选择确认
-    setTags(node,data){
-     console.log(data)
+   async setTags(node,data){
+     // console.log(data)
       this.colSetDialog=true
+      const colsData=await getResourceInfoData(data.resourceId,data.type)
+     console.log(colsData)
+     this.resourceName=colsData.data.resourceName
+     this.columnData=colsData.data.column
+     this.columnData.forEach((item,index)=>{
+       colsOptions.push(item.name)
+     })
+     this.resourceId=colsData.data.resourceId
+     this.resourceType=colsData.data.type
+     this.tableData=[]
     },
     // 获取1-3级树数据
     async getOneZtreeData() {
       try {
         const data = await getOneZtreeData()
-        console.log(data)
+        //console.log(data)
         this.oneNodeData=data.data
         this.dataLakeDirectoryName=this.oneNodeData.dataLakeDirectoryName
         this.dataSetDirectoryName=this.oneNodeData.dataSetDirectoryName
@@ -217,42 +300,114 @@ export default {
     // 获取4级树数据
     async getChildtreeData(data,resolve) {
       try {
+        let allData=[]
         //获取资源树
-       const treeData = await getChildZtreeData(data.orgId,data.databaseType)
-        this.treeData=treeData.data
+      // console.log('data',data)
+        if(data.hasOwnProperty('orgId')){
+          const treeData = await getChildZtreeData(data.orgId,data.databaseType)
+          this.treeData=treeData.data
+        }
       //  console.log('获取树treeData',this.treeData)
         //获取资源树里面表
-        const resData = await getResourceListData(data.orgId,data.type,data.databaseType)
-        const resAlldata=resData.data
-       // console.log('资源树所有值',resAlldata)
-        resAlldata.forEach((item,index)=>{
-          this.resData.push({orgName:item.resourceName,resourceId:item.resourceId})
-        })
-        //console.log('resData',this.resData)
-        const allData=this.treeData.concat(this.resData)
-        console.log('allData',allData)
-         resolve(allData)
-        if(this.resData.length===0){
-         resolve(this.treeData)
+        if(data.hasOwnProperty('orgId')) {
+          const resData = await getResourceListData(data.orgId, data.type, data.databaseType)
+          const resAlldata = resData.data
+          //console.log('资源树所有值',resAlldata)
+          resAlldata.forEach((item,index)=>{
+            this.resData.push({orgName:item.resourceName,resourceId:item.resourceId,type:data.type,isTable:item.isTable})
+          })
+          //console.log('resData',this.resData)
+          allData=this.treeData.concat(this.resData)
         }
+
+       // console.log('allData',allData)
+         resolve(allData)
 
       } catch (e) {
 
       }
     },
+    //确认选择
+    setCols(){
+     // console.log('resourceId',this.resourceId)
+     // console.log('pkey',this.pkey)
+      this.$refs['ruleForm'].validate((valid) => {
+        if (valid) {
+          const colList=[]
+          this.tableData.map((item,index)=>{
+            colList.push({sourceCol:item.name,sourceDataType:item.type,isMarking:item.isMarking})
+          })
+          console.log('colList',colList)
+          if(colList.length===1){
+            this.$message({
+              message: '单个字段的数据集不能进行数据打标，请选择其它数据集',
+              type: 'error'
+            });
+          }else {
+            if(this.routerName==='editModel'){
+              this.isNew=false
+            }
+            const params={
+              'resourceId':this.resourceId,
+              'resourceName': this.resourceName,
+              'resourceType':this.resourceType,
+              'pkey':this.ruleForm.pkey,
+              'isNew':this.isNew,
+              'colList':colList
+            }
+            //debugger
+            this.setColData(params)
+          }
+
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+    },
     // 获取所有树表的数据
-    async getResourceListData(orgId,type,databaseType) {
-      try {
-
-
-      } catch (e) {
+    async   setColData(params) {
+      console.log(params)
+        const setColumnData=await setColsData(params)
+        console.log(setColumnData)
+      if(setColumnData.code=200){
+          this.colSetDialog=false
+          this.taggingModelId=setColumnData.taggingModelId
+          //console.log('taggingModelId', this.taggingModelId)
+          const Id= this.taggingModelId
+         // this.$router.push({ name: 'editModel', query: {Id}})
+        this.$router.push({path: `editModel/${Id}`})
+      }else {
 
       }
+
+    },
+    //选择打标字段
+    getCheckChange(row,$event){
+     // console.log(row)
+    if(row.isMarking===0){
+        row.isMarking=1
+      }else {
+        row.isMarking=0
+      }
+    },
+    delCol(index){
+      console.log(index)
+      this.tableData.splice(index,1)
+
     }
   },
   created() {
     this.getOneZtreeData()
+
   },
+  mounted(){
+    this.routerName=this.$route.name
+   // console.log('this.modelData',this.modelData)
+    if(this.routerName==='editModel'){
+      this.ruleForm.pkey=this.modelData.pkey
+    }
+  }
 }
 </script>
 
@@ -269,9 +424,17 @@ export default {
     padding: 10px;
     box-sizing: border-box;
     z-index: 2;
+    .tree-box{
+/*      overflow-y: hidden;
+      overflow-x: scroll;
+      width:80px;
+      height: 500px;*/
+    }
     .tree{
-      height: calc(100vh - 130px);
+    height: calc(100vh - 130px);
       overflow: auto;
+/*      min-width: 100%;
+      display:inline-block !important;*/
     }
     .search {
       margin-bottom: 20px;
@@ -302,6 +465,7 @@ export default {
         padding: 5px 10px;
         background-color:#f4f9fb;
         border: 1px solid #eee;
+        font-weight: bold;
       }
       ul{
         margin: 0;
@@ -311,6 +475,15 @@ export default {
           padding: 5px 10px;
           border: 1px solid #eee;
           border-top: none;
+          .blue{
+            color:#0486fe;
+          }
+          .green{
+            color: green;
+          }
+          .orange{
+            color: orange;
+          }
         }
       }
     }
@@ -319,16 +492,11 @@ export default {
       padding: 0 10px;
     }
     .my-table{
-      i{
+ /*     .el-icon-delete{
         cursor: pointer;
-      }
+      }*/
     }
   }
-.settingIcon{
-  margin-left: 5px;
-  vertical-align: text-top;
-  margin-top: -2px;
-}
 </style>
 <style lang="stylus" scoped>
   .my-table >>>
