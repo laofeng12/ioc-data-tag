@@ -28,6 +28,10 @@ public class TagDTOTreeNodeShow {
 
     private String synopsis;
 
+    private Boolean isLeaf;
+
+    private Boolean isLeafParent;
+
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     private Date createTime;
@@ -49,6 +53,8 @@ public class TagDTOTreeNodeShow {
         createTime = tree.getTag().getCreateTime();
         modifyTime = tree.getTag().getModifyTime();
         lvl = tree.getTag().getLvl();
+        isLeaf = tree.isLeaf();
+        isLeafParent = tree.isLeafParent();
         childrenNode = new ArrayList<>();
         for (TagDTOTreeNode ctree: tree.getChildrenNode()){
             TagDTOTreeNodeShow ctreeShow = new TagDTOTreeNodeShow(ctree);
@@ -126,5 +132,21 @@ public class TagDTOTreeNodeShow {
 
     public void setChildrenNode(List<TagDTOTreeNodeShow> childrenNode) {
         this.childrenNode = childrenNode;
+    }
+
+    public Boolean getLeaf() {
+        return isLeaf;
+    }
+
+    public void setLeaf(Boolean leaf) {
+        isLeaf = leaf;
+    }
+
+    public Boolean getLeafParent() {
+        return isLeafParent;
+    }
+
+    public void setLeafParent(Boolean leafParent) {
+        isLeafParent = leafParent;
     }
 }
