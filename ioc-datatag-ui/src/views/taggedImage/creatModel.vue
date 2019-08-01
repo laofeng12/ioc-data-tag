@@ -8,7 +8,8 @@
         <div class="name">
           <div class="img"></div>
           <div class="text">
-            <el-input size="small" v-model="modelName" placeholder="请输入内容"></el-input>
+            <el-input  v-if="routerName==='editModel'" v-model="modelName" placeholder="请输入内容"></el-input>
+            <span v-else>未命名</span>
           </div>
         </div>
       </div>
@@ -16,21 +17,24 @@
         <div>
           <div class="img" @click="saveAs"></div>
         </div>
-        <el-button class="button" type="info" size="small" @click="runModel">模型调度</el-button>
+        <el-button class="button" type="primary" size="small" @click="runModel">模型调度</el-button>
+ <!--       <el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
       </div>
     </div>
     <div class="content">
       <!--左边数据树目录结构-->
-      <Aside/>
+      <Aside  :modelData="modelData"/>
       <div class="components">
         <div class="top">
-          <div class="left">南城区高考成绩数据</div>
+          <div class="left">
+            {{modelData.resourceName}}
+          </div>
           <div class="right">
             <span class="iconPeople"><i class="el-icon-user"></i></span>
             <span class="cooperation">协作人员:</span>
             <img class="imgPeople" src="../../assets/img/u163.png" height="25" width="25"/>
             <span class="multiply">x</span>
-            <span class="num">{{peopleLength+1}}</span>
+            <span class="num">3</span>
             <span class="handlePeople"><i class="el-icon-arrow-down" @click="showIt"></i></span>
           </div>
           <div class="card" v-show="show">
@@ -56,8 +60,12 @@
             </div>
           </div>
 
+
         </div>
-        <EditTable></EditTable>
+        <div  v-if="routerName==='editModel'">
+          <EditTable :theadData="headColList" :tableData="tableData"></EditTable>
+        </div>
+
       </div>
     </div>
 
@@ -86,8 +94,8 @@
         </div>
       </div>
     </el-dialog>
-    <!--模型调度-->
-    <el-dialog class="creat" title="模型调度" :visible.sync="runDialog" width="530px" center :close-on-click-modal="false"
+    <!--运行-->
+    <el-dialog class="creat" title="运行模型" :visible.sync="runDialog" width="530px" center :close-on-click-modal="false"
                @close="closeRun">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px">
@@ -115,7 +123,7 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定运行</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" >确定运行</el-button>
         </div>
       </div>
     </el-dialog>
@@ -185,26 +193,33 @@
         </div>
       </div>
     </el-dialog>
+
+    <!--添加-->
   </div>
 </template>
 
 <script>
   import EditTable from '../../components/ModeleEdit/EditTable'
   import Aside from '../../components/ModeleEdit/Aside'
+  import {getModelData,getModelColsData} from '@/api/creatModel'
   import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave} from '@/api/creatModel.js'
 
   export default {
     name: 'creatModel',
-    data() {
+    data () {
       return {
-        modelName: '未命名',
-        show: false,
-        editDialog: false,
-        saveLoading: false,
-        runDialog: false,
-        saveDialog: false,
-        value1: '',
-        value: '',
+        headColList:[],//打标字段头部数据
+        modelData:{},//获取模型数据
+        taggingModelId:0,//模型id
+        routerName:'creatModel',
+        modelName:'未命名',
+        show:false,
+        editDialog:false,
+        saveLoading:false,
+        runDialog:false,
+        saveDialog:false,
+        value1:'',
+        value:'',
         tableBoxWidth: 800,
         tableBoxHeight: 800,
         tableWidth: 800,
@@ -243,21 +258,44 @@
         }],
         rules: {
           name: [
-            {required: true, message: '请填写', trigger: 'blur'}
+            {required: true, message: '请填写',trigger: 'blur'}
           ],
           textarea2: [
-            {required: true, message: '请填写', trigger: 'blur'}
+            {required: true, message: '请填写',trigger: 'blur'}
           ],
-          date: [{required: true, message: '请选择时间', trigger: 'blur'}],
-          date2: [{required: true, message: '请选择', trigger: 'change'}]
+          date:[{required: true, message: '请选择时间',trigger: 'blur'}],
+          date2:[{required: true, message: '请选择',trigger: 'change'}]
         },
-        theadData: [],
-        datasetId: '',
-        updateAsideForce: true
+        tableData: []
       }
     },
-    components: {EditTable, Aside},
+    components: { EditTable, Aside },
+    watch: {
+      theadData: function (val) {
+        this.tableWidth = val.length * 149
+      }
+    },
+    created () {
+      this.datasetId = this.$route.params.id
+    },
+    mounted () {
+      //this.getDatasetDetails()
+    },
     methods: {
+      // 获取模型数据
+      async getModelList(modelId) {
+        try {
+          const params = {
+            taggingModelId: modelId
+          }
+          const data = await getModelData(params)
+          this.modelData = data
+          this.modelName = data.modelName
+          this.headColList = data.colList
+          // console.log(data)
+        } catch (e) {
+        }
+      },
       addPeople() {
         this.addSetDialog = true
         this.cooperatioUser()
@@ -265,25 +303,37 @@
       close() {
         this.addSetDialog = false
       },
-      showIt() {
+      // 获取模型数据
+      async getModelColsList(modelId,page,size,type) {
+       // console.log(modelId,page,size)
+        try {
+          const data = await getModelColsData(modelId,page,size,type)
+          console.log(data)
+          this.tableData=data.data
+        } catch (e) {
+
+        }
+      },
+      //
+      showIt(){
         this.show = !this.show
       },
-      saveAs() {
+      saveAs(){
         this.editDialog = true
       },
-      closeSaveas() {
+      closeSaveas(){
         this.editDialog = false
       },
-      runModel() {
+      runModel(){
         this.runDialog = true
       },
-      closeRun() {
+      closeRun(){
         this.runDialog = false
       },
-      saveModel() {
+      saveModel(){
         this.saveDialog = true
       },
-      closeSave() {
+      closeSave(){
         this.saveDialog = false
       },
       // 选择协作用户列表
@@ -502,6 +552,317 @@
 </script>
 
 <style scoped lang="scss">
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    color: #ffffff;
+    background: rgba(22, 38, 59, 1);
+    .left {
+      display: flex;
+      align-items: center;
+      .return {
+        width: 60px;
+        border-right: 1px solid #999;
+        text-align: center;
+        font-size: 30px;
+        margin-right: 20px;
+      }
+      .name {
+        display: flex;
+        text-align: center;
+        .img {
+          width: 25px;
+          height: 25px;
+          margin-right: 10px;
+          background: url("../../assets/img/u71.png");
+          background-repeat: no-repeat;
+          background-size: 100% 100%;
+        }
+        .text {
+          line-height: 25px;
+        }
+      }
+    }
+    .right {
+      display: flex;
+      align-items: center;
+      padding-right: 20px;
+      box-sizing: border-box;
+      .img {
+        width: 25px;
+        height: 25px;
+        margin-right: 20px;
+        background: url("../../assets/img/save.png");
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+      .button {
+        width: 80px;
+      }
+    }
+  }
+  .content {
+    display: flex;
+    .aside {
+      width: 250px;
+      flex-shrink: 0;
+      position: fixed;
+      top: 60px;
+      bottom: 0;
+      left: 0;
+      color: #ffffff;
+      background: rgba(62, 71, 96, 1);
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 2;
+      .top {
+        height: 45px;
+        line-height: 45px;
+      }
+      .search {
+        margin-bottom: 20px;
+      }
+      .con {
+        color: #cccccc;
+        .box {
+          margin-bottom: 25px;
+          .title {
+            color: #ffffff;
+          }
+          .line {
+            display: flex;
+            justify-content: space-between;
+            height: 30px;
+            line-height: 30px;
+            position: relative;
+            .type {
+              width: 20%;
+            }
+            .name {
+              flex-shrink: 0;
+              width: 60%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+            .icon {
+              cursor: pointer;
+            }
+            .menu {
+              width: 150px;
+              position: absolute;
+              right: -170px;
+              top: -50px;
+              background: #ffffff;
+              color: #333;
+              font-size: 14px;
+              box-shadow: #999 0 0 4px;
+              padding: 10px;
+              border-radius: 5px;
+              box-sizing: border-box;
+              z-index: 2;
+              cursor: pointer;
+              .menu-con {
+                position: relative;
+                .menu-line {
+                  display: flex;
+                  height: 30px;
+                  line-height: 30px;
+                  .menu-icon {
+                    width: 25px;
+                    height: 25px;
+                    color: #999;
+                    font-size: 18px;
+                    margin-right: 5px;
+                    background-repeat: no-repeat;
+                    background-size: 100% 100%;
+                  }
+                  .menu-name {
+                    flex-grow: 1;
+                    border-bottom: 1px #ddd solid;
+                  }
+                }
+                .del {
+                  width: 15px;
+                  height: 15px;
+                  position: absolute;
+                  top: -10px;
+                  right: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .components {
+      width: 100%;
+      position: absolute;
+      top: 60px;
+      bottom: 0;
+      padding: 10px 10px 10px 260px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      .top {
+        display: flex;
+        justify-content: space-between;
+        .left {
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+          font-size: 14px;
+          .box {
+            width: 50%;
+            cursor: pointer;
+            .icon {
+              width: 25px;
+              height: 25px;
+              margin: 0 auto;
+              background-size: 100% 100%;
+              background-repeat: no-repeat;
+            }
+          }
+          .right-line {
+            border-right: 1px #ddd solid;
+          }
+        }
+      }
+    }
+  }
+
+  .cooperation,.multiply,.num{
+    font-size: 12px;
+    color: #999999;
+    margin-left: 4px;
+  }
+  .cooperation{
+    margin-right: 5px;
+  }
+  .iconPeople{
+    font-size: 15px;
+    margin-right: 2px;
+    margin-top: -5px;
+  }
+  .handlePeople{
+    font-size: 15px;
+    margin-left: 5px;
+  }
+  .right{
+    display: flex;
+    align-items: center;
+  }
+  .card{
+    width: 200px;
+    border: 1px solid #dedede;
+    position: absolute;
+    right: 15px;
+    z-index: 33;
+    margin-top: 35px;
+    background-color: #fff;
+    border-radius: 8px;
+  }
+  .peopleList,.addPeople{
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .peopleList{
+    float: left;
+    margin-left: 15px;
+  }
+  .addPeople{
+    float: right;
+    margin-right: 15px;
+  }
+  .peopleContent{
+    margin-top: 15px;
+    height: 280px;
+    overflow-y: auto;
+  }
+  .imgPeople2,.listName{
+    float: left;
+  }
+  .imgPeople2{
+    margin-top: 6px;
+    margin-left: 8px;
+  }
+  .listName{
+    font-size: 12px;
+    width: 105px;
+    margin-left: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .head{
+    font-size: 14px;
+    float: right;
+    margin-right: 8px;
+  }
+  .contentA{
+    height: 40px;
+    line-height: 40px;
+  }
+  .dateInp,.controlChoose{
+    width: 340px;
+  }
+  .clearfix:after{
+    content: '';
+    display: block;
+    clear: both;
+  }
+
+  .addCreat {
+    .col-set-box {
+      .left {
+        border-right: 1px solid #eee;
+        padding: 0 10px;
+        color: #000000;
+      }
+      h3 {
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 32px;
+        border-bottom: 1px solid #eee;
+      }
+    }
+    .right2 {
+      width: 100%;
+      padding: 0 10px;
+    }
+    .my-table {
+      i {
+        cursor: pointer;
+      }
+    }
+    .my-table > > >
+    thead {
+      color: #222222;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f4f9fb;
+      padding: 5px 0;
+    }
+    // hover
+    tr:hover > td {
+      background-color: #f4f9fb;
+    }
+  }
+
+  .controlChoose2 {
+    width: 180px !important;
+  }
+
+  .zxhh {
+    background-color: chartreuse;
+  }
+  .tableHeight{
+    /*height: 320px;*/
+    /*overflow: auto;*/
+  }
   .header {
     display: flex;
     justify-content: space-between;
@@ -779,5 +1140,6 @@
     /*height: 320px;*/
     /*overflow: auto;*/
   }
-</style>
 
+
+</style>
