@@ -70,4 +70,10 @@ public abstract class ExecuteUtil {
      * 获取更新语句sql
      */
     public abstract  List<String> getUpdateDataList();
+
+    /**
+     * 查询数据
+     */
+    public abstract String[][] getData();
+
 }

@@ -91,3 +91,14 @@ schedulejob: #定时任务组件
   jobGroup: scanjob
   jobName: scanjob
   queue: 0 0/1 * * * ? * #扫描新建模型频率
+
+dataSet: #数据集相关
+  resourceDataUrl: http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/
+
+pgconfig:
+  username: mppuser
+  password: ioc123456
+  ip: 183.6.55.26
+  port: 5432
+  dataBaseName: postgres
+  pooled: true

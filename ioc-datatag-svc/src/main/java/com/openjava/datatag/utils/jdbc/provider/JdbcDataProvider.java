@@ -42,7 +42,7 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
     private static final Logger LOG = LoggerFactory.getLogger(JdbcDataProvider.class);
 
     @Value("${dataprovider.resultLimit:300000}")
-    protected int resultLimit;
+    protected int resultLimit = 300000;
 
     @DatasourceParameter(label = "{{'DATAPROVIDER.JDBC.DRIVER'|translate}} *",
             type = DatasourceParameter.Type.Input,
@@ -187,6 +187,71 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
         stopwatch.stop();
         LOG.info("getData() using time: {} ms", stopwatch.elapsed(TimeUnit.MILLISECONDS));
         return null;
+    }
+
+    /**
+     * add by zmk
+     * @return
+     * @throws Exception
+     */
+    public String[][] getData2() throws Exception {
+        final int batchSize = 100000;
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        LOG.debug("Execute JdbcDataProvider.getData() Start!");
+        String sql = getAsSubQuery(query.get(SQL));
+        List<String[]> list = null;
+        LOG.info("SQL String: " + sql);
+        try (Connection con = getConnection();
+             Statement ps = con.createStatement();
+             ResultSet rs = ps.executeQuery(sql)) {
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            list = new LinkedList<>();
+            String[] row = new String[columnCount];
+            for (int i = 0; i < columnCount; i++) {
+                row[i] = metaData.getColumnLabel(i + 1);
+            }
+
+            String[] header = row;
+            list.add(header);
+//            getInnerAggregator().beforeLoad(header);
+
+            int resultCount = 0;
+            int threadId = 0;
+            ExecutorService executor = Executors.newFixedThreadPool(5);
+            while (rs.next()) {
+                resultCount++;
+                row = new String[columnCount];
+                for (int j = 0; j < columnCount; j++) {
+                    row[j] = rs.getString(j + 1);
+                }
+                list.add(row);
+
+                if (resultCount % batchSize == 0) {
+                    LOG.info("JDBC load batch {}", resultCount);
+                    final String[][] batchData = list.toArray(new String[][]{});
+                    Thread loadThread = new Thread(() -> {
+//                        getInnerAggregator().loadBatch(header, batchData);
+                    }, threadId++ + "");
+                    executor.execute(loadThread);
+                    list.clear();
+                }
+                if (resultCount > resultLimit) {
+                    throw new CBoardException("Cube result count " + resultCount + ", is greater than limit " + resultLimit);
+                }
+            }
+            executor.shutdown();
+//            while (!executor.awaitTermination(10, TimeUnit.SECONDS));
+//            final String[][] batchData = list.toArray(new String[][]{});
+//            getInnerAggregator().loadBatch(header, batchData);
+        } catch (Exception e) {
+            LOG.error("ERROR:" + e.getMessage());
+            throw new Exception("ERROR:" + e.getMessage(), e);
+        }
+//        getInnerAggregator().afterLoad();
+        stopwatch.stop();
+        LOG.info("getData() using time: {} ms", stopwatch.elapsed(TimeUnit.MILLISECONDS));
+        return list.toArray(new String[][]{});
     }
 
     @Override

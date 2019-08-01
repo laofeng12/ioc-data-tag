@@ -11,10 +11,7 @@ import com.openjava.datatag.schedule.domain.TaskInfo;
 import com.openjava.datatag.schedule.service.TaskService;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.service.DtTagService;
-import com.openjava.datatag.tagmodel.domain.DtFilterExpression;
-import com.openjava.datatag.tagmodel.domain.DtSetCol;
-import com.openjava.datatag.tagmodel.domain.DtTagCondition;
-import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
+import com.openjava.datatag.tagmodel.domain.*;
 import com.openjava.datatag.tagmodel.dto.*;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
@@ -40,9 +37,12 @@ import org.ljdp.common.http.LjdpHttpClient;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.BoundValueOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +61,10 @@ import java.util.stream.Collectors;
 @Transactional
 @Data
 public class DtTaggingModelServiceImpl implements DtTaggingModelService {
+	@Value("${dataSet.resourceDataUrl}")
+	private String resourceDataUrl;
 	Logger logger = LogManager.getLogger(getClass());
+
 	@Resource
 	private DtTaggingModelRepository dtTaggingModelRepository;
 	@Resource
@@ -82,6 +85,12 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DtTagConditionService dtTagConditionService;
 	@Resource
 	private TokenGenerator tokenGenerator;
+	@Resource
+    private  DtWaitUpdateIndexService dtWaitUpdateIndexService;
+	@Resource
+	private RedisTemplate<String, Object> redisTemplate;
+	@Resource
+	private MppPgExecuteUtil mppPgExecuteUtil;
 
 	public void copy(Long id,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -458,14 +467,13 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		}
 //		Map<Long, List<DtSetCol>> colGroup = cols.stream().collect(Collectors.groupingBy(DtSetCol::getColId));
 		//第一步、若存在删表
-		MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();
-		mppUtil.setTableName(tagModel.getDataTableName());//表名
-		mppUtil.dropTable();//删表
+		mppPgExecuteUtil.setTableName(tagModel.getDataTableName());//表名
+		mppPgExecuteUtil.dropTable();//删表
 		//第二步、建表
-		mppUtil.setTableKey(tagModel.getPkey());//主键
+		mppPgExecuteUtil.setTableKey(tagModel.getPkey());//主键
 		Map<String,String> colmap  = new LinkedHashMap<>();//字段，注释
 		Map<String,String> cloTypeMap  = new LinkedHashMap<>();//字段，字段类型
-		mppUtil.setTableName(tagModel.getDataTableName());
+		mppPgExecuteUtil.setTableName(tagModel.getDataTableName());
 		cols.forEach(record->{
 			colmap.put(record.getShowCol(),"");
 			if (TagConditionUtils.isDateType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())) {
@@ -480,7 +488,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				cloTypeMap.put(record.getShowCol(),"varchar");
 			}
 		});
-		mppUtil.createTable(colmap,cloTypeMap);
+		mppPgExecuteUtil.createTable(colmap,cloTypeMap);
 		//第三步、获取数据集数据并同步到mpp
 		Date begin = new Date();
 		int successCount = 0;
@@ -491,8 +499,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				List<Object> data = new LinkedList<>();
 				Pageable pageable = PageRequest.of(i,100000);
 				data.addAll((Collection<?>) getDataFromDataSet(taggingModelId,0,pageable));
-				mppUtil.setDataList(data);
-				mppUtil.insertDataList();
+				mppPgExecuteUtil.setDataList(data);
+				mppPgExecuteUtil.insertDataList();
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -501,11 +509,17 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		//第四步update数据（传sql进mpp,在mpp计算）
 		List<String> markingSql = getMarkingSQL(taggingModelId);
 		if (CollectionUtils.isNotEmpty(markingSql)){
-			mppUtil.setUpdateSqlList(markingSql);
-			mppUtil.updateDataList();
+			mppPgExecuteUtil.setUpdateSqlList(markingSql);
+			mppPgExecuteUtil.updateDataList();
 		}
 		//第五步，记录更新结果
-
+        DtWaitUpdateIndex waitUpdateIndex = new DtWaitUpdateIndex();
+        waitUpdateIndex.setIsNew(true);
+        waitUpdateIndex.setCreateTime(new Date());
+        waitUpdateIndex.setRunState(0L);
+        waitUpdateIndex.setTableName(tagModel.getDataTableName());
+        waitUpdateIndex.setTaggingModelId(taggingModelId);
+        dtWaitUpdateIndexService.doSave(waitUpdateIndex);
 		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},总耗时:{%s}毫秒",taggingModelId,10000*successCount,end.getTime()-begin.getTime()));
 	}
 
@@ -513,6 +527,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	/**
 	 * 获取数据集数据（核心方法）
 	 */
+	private String  authorityToken = "";
 	public Object getDataFromDataSet(Long taggingModelId,int type,Pageable pageable)throws Exception{
 		List<List<Object>> data = new LinkedList<>();//最终返回的数据
 		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
@@ -527,7 +542,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			client.setHeader("authority-token",SsoContext.getToken());
 			client.setHeader("User-Agent",userInfo.getUserAgent());
 		}else{
-			client.setHeader("authority-token",tokenGenerator.createToken(392846190550001L));
+			String token = (String) redisTemplate.boundValueOps(this.authorityToken).get();
+			if (StringUtils.isBlank(token)) {
+				token = tokenGenerator.createToken(392846190550001L);
+			}
+			client.setHeader("authority-token",token);
 			client.setHeader("User-Agent","platform-schedule-job");
 		}
 		DataSetReqDTO req = new DataSetReqDTO();
@@ -535,8 +554,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		req.setPage(pageable.getPageNumber());
 		req.setSize(pageable.getPageSize());
 		System.out.println( JSONObject.toJSONString(req));
-		HttpResponse resp = client.postJSON("http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
-//		HttpResponse resp = client.postJSON("http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
+		HttpResponse resp = client.postJSON(resourceDataUrl+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
 		String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
 		if (resp.getStatusLine().getStatusCode()==200) {
 			DataSetRspDTO result = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
@@ -556,7 +574,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				return result.getData().getData();
 			}
 		}else {
-			logger.info("");
+			logger.info(jsontext);
 		}
 //		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //		for (int j = 0; j < pageable.getPageSize(); j++) {
