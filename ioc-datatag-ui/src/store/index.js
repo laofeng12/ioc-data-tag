@@ -5,6 +5,7 @@ import user from './modules/user'
 import dictionary from './modules/dictionary'
 import getters from './getters'
 import tagPanel from './modules/tagPanel'
+import image from './modules/image'
 
 Vue.use(Vuex)
 
@@ -13,7 +14,8 @@ const store = new Vuex.Store({
     app,
     user,
     dictionary,
-    tagPanel
+    tagPanel,
+    image
   },
   getters
 })
