@@ -98,7 +98,7 @@ dataSet: #数据集相关
 pgconfig:
   password: ioc123456
   username: mppuser
-  ip: 183.6.55.26
+  ip: 192.168.6.101
   port: 5432
   dataBaseName: postgres
   pooled: true
