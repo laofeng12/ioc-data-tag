@@ -36,3 +36,25 @@ export function getDelete(params) {
     params
   })
 }
+
+/**
+ *
+ * @param data
+ */
+export function getImage(id) {
+  return fetch ({
+    url:'/datatag/portrayal/search/'+id,
+    method:'get'
+  })
+}
+
+/**
+ *
+ * @param data
+ */
+export function getImagelist(detailId) {
+  return fetch ({
+    url:'/datatag/portrayal/getCoolDetail/'+detailId,
+    method:'get'
+  })
+}

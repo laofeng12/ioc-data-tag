@@ -292,6 +292,7 @@ export default {
 
   },
   mounted () {
+    console.log('dddd')
   },
   methods: {
     //深度克隆

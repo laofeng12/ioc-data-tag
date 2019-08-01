@@ -1,44 +1,87 @@
 <template>
-  <div class="app-container container">
-    <p class="numDetail"><span>9527</span><span>的画像详情</span></p>
-    <div class="circularContent">
-      <div class="circular">
-        <div class="circularOne">
-          <div>
-            <el-button class="peopleDetail" size="mini" round><span>ID：</span><span>7298</span></el-button>
-            <el-button class="peopleDetail2" size="mini" round>张晓非</el-button>
-            <el-button class="peopleDetail3" size="mini" round>女</el-button>
-            <el-button class="peopleDetail4" size="mini" round>28岁</el-button>
-          </div>
-          <div class="circularTwo">
-            <img class="line" src="../../assets/img/line.png" height="44" width="120"/>
-            <div class="circulartwoSmall">
-              <div class="circulartwoSmall2"></div>
+  <!--<div class="app-container container">-->
+  <div class="app-container">
+    <div class="result">
+      <div class="queryTitle">画像查询</div>
+      <div class="queryIt">
+        <el-input
+          class="zxinp moduleOne"
+          size="small"
+          placeholder="请输入内容"
+          prefix-icon="el-icon-search"
+          v-model="input2">
+        </el-input>
+        <el-button class="zxlistBtn" size="small" type="primary" @click="goback">查询</el-button>
+      </div>
+    </div>
+    <div>
+      <p class="numDetail"><span>{{titleId}}</span><span>的画像详情</span></p>
+      <div class="circularContent">
+        <div class="circular">
+          <div class="circularOne">
+            <div v-for="(item,index) in listArr.property" :key="index">
+              <el-button class="peopleDetail" size="mini" round><span>ID：</span><span>{{titleId}}</span></el-button>
+              <el-button :class='"peopleDetail"+(2+index)' size="mini" round>{{item}}</el-button>
+              <!--<el-button class="peopleDetail2" size="mini" round>张晓非</el-button>-->
+              <!--<el-button class="peopleDetail3" size="mini" round>女</el-button>-->
+              <!--<el-button class="peopleDetail4" size="mini" round>28岁</el-button>-->
             </div>
-            <div class="circularThree">
-              <div class="dataImage">数据画像</div>
+            <div class="circularTwo">
+              <img class="line" src="../../assets/img/line.png" height="44" width="120"/>
+              <div class="circulartwoSmall">
+                <div class="circulartwoSmall2"></div>
+              </div>
+              <div class="circularThree">
+                <div class="dataImage">数据画像</div>
+              </div>
             </div>
-          </div>
-          <div>
-            <el-button class="contentDetail" size="mini" round>美容顾问</el-button>
-            <el-button class="contentDetai2" size="mini" round>租房</el-button>
-            <el-button class="contentDetai3" size="mini" round>工作5年</el-button>
-            <el-button class="contentDetai4" size="mini" round>乐观派</el-button>
-
-            <el-button class="contentDetai5" size="mini" round>月收入2000元</el-button>
-            <el-button class="contentDetai6" size="mini" round>未婚</el-button>
-            <el-button class="contentDetai7" size="mini" round>单身</el-button>
+            <div v-for="(item,index) in listArr.lists" :key="'info2-'+index">
+              <el-button :class='"contentDetai"+(1+index)' size="mini" round>{{item}}</el-button>
+              <!--<el-button class="contentDetai1" size="mini" round>美容顾问</el-button>-->
+              <!--<el-button class="contentDetai2" size="mini" round>租房</el-button>-->
+              <!--<el-button class="contentDetai3" size="mini" round>工作5年</el-button>-->
+              <!--<el-button class="contentDetai4" size="mini" round>乐观派</el-button>-->
+              <!--<el-button class="contentDetai5" size="mini" round>月收入2000元</el-button>-->
+              <!--<el-button class="contentDetai6" size="mini" round>未婚</el-button>-->
+              <!--<el-button class="contentDetai7" size="mini" round>单身</el-button>-->
+            </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
 <script>
+  import {mapActions, mapState, mapGetters} from 'vuex'
+
   export default {
-    name: "detailImage"
+    name: "detailImage",
+    data() {
+      return {
+        input2: '',
+        titleId:'',
+        arr:[]
+      }
+    },
+    methods: {
+      ...mapActions('tagPanel', ['getimageList', 'getarrList']),
+      goback() {
+        this.$router.go(-1)
+      }
+    },
+    created() {
+      this.titleId = this.$route.query.detailId
+      this.input2 = this.$route.query.id
+      this.getarrList()
+    },
+    computed: {
+      ...mapState({
+        ...mapState('tagPanel', ['contentArr', 'listArr'])
+      })
+    },
+    watch: {},
+    mounted() {}
   }
 </script>
 
@@ -116,6 +159,7 @@
 
   .circularContent {
     margin-top: 50px;
+    margin-bottom: 135px;
   }
 
   .peopleDetail, .peopleDetail2, .peopleDetail3, .peopleDetail4 {
@@ -124,34 +168,35 @@
     border: 1px solid #fff;
     box-shadow: 0 0 0 6px #e9fcff30;
     position: absolute;
+    padding: 7px 27px;
   }
 
   .peopleDetail {
     top: 30px;
-    left: -145px;
+    left: -172px;
   }
 
   .peopleDetail2 {
     top: 80px;
-    left: -145px;
+    left: -167px;
   }
 
   .peopleDetail3 {
     top: 130px;
-    left: -129px;
+    left: -138px;
   }
 
   .peopleDetail4 {
     top: 180px;
-    left: -117px;
+    left: -140px;
   }
 
-  .contentDetail {
+  .contentDetai1 {
     color: #fff;
     background-color: rgba(0, 204, 204, 1);
     position: absolute;
     top: 15px;
-    right: 0px;
+    right: -29px;
     border: 1px solid #fff;
   }
 
@@ -160,7 +205,7 @@
     background-color: rgba(255, 0, 51, 1);
     position: absolute;
     top: 45px;
-    right: -135px;
+    right: -140px;
     border: 1px solid #fff;
   }
 
@@ -169,7 +214,7 @@
     background-color: rgba(90, 225, 192, 1);
     position: absolute;
     top: 75px;
-    right: -55px;
+    right: -67px;
     border: 1px solid #fff;
   }
 
@@ -178,7 +223,7 @@
     background-color: rgba(90, 225, 192, 1);
     position: absolute;
     top: 105px;
-    right: -170px;
+    right: -214px;
     border: 1px solid #fff;
   }
 
@@ -187,7 +232,7 @@
     background-color: rgba(0, 204, 204, 1);
     position: absolute;
     top: 135px;
-    right: -76px;
+    right: -127px;
     border: 1px solid #fff;
   }
 
@@ -207,5 +252,35 @@
     top: 252px;
     right: -55px;
     border: 1px solid #fff;
+  }
+
+  .contentDetail, .contentDetai2, .contentDetai3, .contentDetai4, .contentDetai5, .contentDetai6, .contentDetai7 {
+    padding: 7px 27px;
+  }
+
+  .zxinp {
+    width: 500px;
+  }
+
+  .zxlistBtn {
+    margin-left: 10px;
+  }
+
+  .queryTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #FF0000;
+    margin-right: 20px;
+  }
+
+  .result {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .back {
+    text-align: center;
+    margin-top: 20px;
   }
 </style>

@@ -63,7 +63,7 @@
 
         </div>
         <div  v-if="routerName==='editModel'">
-          <EditTable :theadData="headColList" :tableData="tableData"></EditTable>
+          <EditTable :theadData="headColList" :tableData="modelTableData"></EditTable>
         </div>
 
       </div>
@@ -201,8 +201,8 @@
 <script>
   import EditTable from '../../components/ModeleEdit/EditTable'
   import Aside from '../../components/ModeleEdit/Aside'
-  import {getModelData,getModelColsData} from '@/api/creatModel'
-  import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave} from '@/api/creatModel.js'
+/*  import {getModelData,getModelColsData} from '@/api/creatModel'*/
+  import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave,getModelData,getModelColsData} from '@/api/creatModel'
 
   export default {
     name: 'creatModel',
@@ -242,6 +242,7 @@
         isIndeterminate: true,
         addSetDialog: false,
         tableData: [],
+        modelTableData:[],
         options3: [],
         selectVal: '',
         changeRed: -1,
@@ -271,15 +272,18 @@
     },
     components: { EditTable, Aside },
     watch: {
-      theadData: function (val) {
-        this.tableWidth = val.length * 149
-      }
-    },
-    created () {
-      this.datasetId = this.$route.params.id
     },
     mounted () {
-      //this.getDatasetDetails()
+      this.routerName =this.$route.name
+      this.taggingModelId=this.$route.params.id
+      if(this.routerName==='creatModel'){
+      }else {
+        //进入编辑模型或者打标界面
+        //获取模型数据
+        this.getModelList(this.taggingModelId)
+        this.getModelColsList(this.taggingModelId,0,10,1)
+      }
+
     },
     methods: {
       // 获取模型数据
@@ -305,11 +309,11 @@
       },
       // 获取模型数据
       async getModelColsList(modelId,page,size,type) {
-       // console.log(modelId,page,size)
+       console.log(modelId,page,size)
         try {
           const data = await getModelColsData(modelId,page,size,type)
           console.log(data)
-          this.tableData=data.data
+          this.modelTableData=data.data
         } catch (e) {
 
         }
@@ -514,13 +518,9 @@
       }
     },
     watch: {
-      theadData: function (val) {
-        this.tableWidth = val.length * 149
-      },
 
     },
     created() {
-      this.datasetId = this.$route.params.id
       this.getpeopleList()
       this.groupList()
       this.markingTable()
@@ -544,9 +544,6 @@
         })
         return arr2
       }
-    },
-    mounted() {
-
     }
   }
 </script>
