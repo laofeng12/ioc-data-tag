@@ -1,25 +1,12 @@
-package com.openjava.datatag.portrayal.api;
+package com.openjava.datatag.userprofile.api;
 
-import com.openjava.datatag.portrayal.dto.PortrayalDetailDTO;
-import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.userprofile.dto.PortrayalDetailDTO;
 import com.openjava.datatag.user.service.SysUserService;
 import com.openjava.datatag.utils.VoUtils;
 import io.swagger.annotations.*;
-import org.apache.commons.lang3.StringUtils;
 import org.ljdp.component.result.DataApiResponse;
-import org.ljdp.component.result.SuccessMessage;
-import org.ljdp.component.sequence.ConcurrentSequence;
-import org.ljdp.component.sequence.SequenceService;
-import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.annotation.Security;
-import org.ljdp.secure.sso.SsoContext;
-import org.ljdp.ui.bootstrap.TablePage;
-import org.ljdp.ui.bootstrap.TablePageImpl;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -39,24 +26,24 @@ public class PortrayalAction {
 
     @ApiOperation(value = "查询画像记录集", notes = "结果对象数组")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "Id", value = "画像ID", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "id", value = "画像ID", required = false, dataType = "String", paramType = "path"),
     })
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效")
     })
     @Security(session = true)
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
-
-    public DataApiResponse<PortrayalDetailDTO> doSearchCool(@RequestParam(value = "Id") String Id) {
+    @RequestMapping(value = "/search/{id}", method = RequestMethod.GET)
+    public DataApiResponse<PortrayalDetailDTO> doSearchCool(@PathVariable(value = "id") String id) {
         List<PortrayalDetailDTO> result = new ArrayList<>();
         int i = 0;
-        if (Id.equals("") || Id == null) {
+        if (id.equals("") || id == null) {
             i = 2;
         }
         while (i <= 2) {
             String tag = VoUtils.toString(i);
             PortrayalDetailDTO por = new PortrayalDetailDTO();
             por.setId("9527" + tag);
+            por.setDetailId("100"+tag);
             por.setTitle("测试南城区公民信息数据" + tag);
             List<String> param = new ArrayList<>();
 
@@ -81,5 +68,37 @@ public class PortrayalAction {
         return resp;
     }
 
+    @ApiOperation(value = "查询画像详情", notes = "查询画像详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "detailId", value = "画像详情ID", required = false, dataType = "String", paramType = "path"),
+    })
+    @ApiResponses({
+            @io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效")
+    })
+    @Security(session = true)
+    @RequestMapping(value = "/getCoolDetail/{detailId}", method = RequestMethod.GET)
+    public DataApiResponse<PortrayalDetailDTO> getCoolDetail(@PathVariable(value = "detailId") String detailId) {
+        PortrayalDetailDTO por = new PortrayalDetailDTO();
+        por.setId("9527");
+        por.setDetailId("10001");
+        por.setTitle("测试南城区公民信息数据" );
+        List<String> param = new ArrayList<>();
+        param.add("张晓菲");
+        param.add("女");
+        param.add(17+"");
+        por.setProperty(param);
+        List<String> list = new ArrayList<>();
+        list.add("美容顾问");
+        list.add("租房");
+        list.add("工作5年");
+        list.add("乐观派");
+        list.add("月入20000元");
+        list.add("未婚");
+        list.add("单身");
+        por.setLists(list);
+        DataApiResponse<PortrayalDetailDTO> resp = new DataApiResponse<>();
+        resp.setData(por);
+        return resp;
+    }
 
 }
