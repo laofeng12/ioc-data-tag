@@ -75,6 +75,8 @@ public class DtCooperationSetCol {
 
 	@ApiModelProperty("协作用户Id")
 	private Long cooUser;
+	@ApiModelProperty("模型的字段Id")
+	private Long tagColId;
 
 	@ApiModelProperty("协作用户名")
 	private String cooUserName;

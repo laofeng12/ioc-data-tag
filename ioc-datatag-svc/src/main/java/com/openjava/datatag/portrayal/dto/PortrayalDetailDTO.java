@@ -18,7 +18,7 @@ public class PortrayalDetailDTO {
     @ApiModelProperty("画像标题")
     private  String title;
     @ApiModelProperty("画像属性1")
-    private Map<String,String> property;
+    private List<String> property;
     @ApiModelProperty("画像属性2")
     private List<String> lists;
 }

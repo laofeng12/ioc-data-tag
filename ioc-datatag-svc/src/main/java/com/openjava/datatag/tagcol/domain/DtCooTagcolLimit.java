@@ -52,7 +52,9 @@ public class DtCooTagcolLimit implements Persistable<Long>,Serializable {
 
 	@Column(name = "USE_TAG_GROUP")
 	private Long useTagGroup;
-	
+	@ApiModelProperty("模型的字段Id")
+	@Column(name = "TAG_COL_ID")
+	private Long tagColId;
 	
 	@ApiModelProperty("是否新增")
 	@Transient

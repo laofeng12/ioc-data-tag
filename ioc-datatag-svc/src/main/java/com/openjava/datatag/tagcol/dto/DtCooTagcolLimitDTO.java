@@ -28,5 +28,6 @@ public class DtCooTagcolLimitDTO {
 
     @ApiModelProperty("规定使用的标签组")
     private Long useTagGroup;
-
+    @ApiModelProperty("模型的字段Id")
+    private Long tagColId;
 }
