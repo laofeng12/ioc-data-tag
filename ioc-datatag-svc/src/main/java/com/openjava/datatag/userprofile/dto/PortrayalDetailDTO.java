@@ -1,10 +1,9 @@
-package com.openjava.datatag.portrayal.dto;
+package com.openjava.datatag.userprofile.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 作者：hyq
@@ -15,6 +14,8 @@ import java.util.Map;
 public class PortrayalDetailDTO {
     @ApiModelProperty("主键Id")
     private String id;
+    @ApiModelProperty("详情id")
+    private String detailId;
     @ApiModelProperty("画像标题")
     private  String title;
     @ApiModelProperty("画像属性1")
