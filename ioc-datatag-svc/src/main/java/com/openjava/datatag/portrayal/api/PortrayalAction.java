@@ -5,6 +5,7 @@ import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.user.service.SysUserService;
 import com.openjava.datatag.utils.VoUtils;
 import io.swagger.annotations.*;
+import org.apache.commons.lang3.StringUtils;
 import org.ljdp.component.result.DataApiResponse;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.ConcurrentSequence;
@@ -46,22 +47,22 @@ public class PortrayalAction {
     @Security(session = true)
     @RequestMapping(value = "/search", method = RequestMethod.POST)
 
-    public DataApiResponse<PortrayalDetailDTO> doSearchCool(@RequestParam(value = "Id") Long Id) {
+    public DataApiResponse<PortrayalDetailDTO> doSearchCool(@RequestParam(value = "Id") String Id) {
         List<PortrayalDetailDTO> result = new ArrayList<>();
         int i = 0;
-        if(Id!=null)
-        {
-            i=2;
+        if (Id.equals("") || Id == null) {
+            i = 2;
         }
         while (i <= 2) {
             String tag = VoUtils.toString(i);
             PortrayalDetailDTO por = new PortrayalDetailDTO();
             por.setId("9527" + tag);
             por.setTitle("测试南城区公民信息数据" + tag);
-            Map<String, String> param = new HashMap<>();
-            param.put("name", "张晓菲" + tag);
-            param.put("sex", "女" );
-            param.put("age", 17+ tag);
+            List<String> param = new ArrayList<>();
+
+            param.add("张晓菲" + tag);
+            param.add("女");
+            param.add(17 + tag);
             por.setProperty(param);
             List<String> list = new ArrayList<>();
             list.add("美容顾问" + tag);
