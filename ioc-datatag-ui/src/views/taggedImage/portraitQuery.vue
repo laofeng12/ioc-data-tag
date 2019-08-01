@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <div v-show="query">
+    <div>
       <div class="queryTitle">画像查询</div>
       <div class="queryIt">
         <el-input
@@ -13,34 +13,36 @@
         <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">查询</el-button>
       </div>
     </div>
-    <queryImage v-show="queryImage"></queryImage>
   </div>
 </template>
 
 <script>
-  import {mapActions, mapState, mapGetters} from 'vuex'
-  import queryImage from '@/components/image/queryImage'
-
   export default {
-    components: {
-      queryImage
-    },
+    components: {},
     name: "portraitQuery",
     data() {
       return {
         input2: '',
-        query: true,
-        queryImage:false
       }
     },
     methods: {
       queryDetail(){
-        this.queryImage = true
-        this.query = false
+        if(this.input2){
+          this.$router.push({
+            path:'/queryImage',
+            query:{
+              id:this.input2 ,
+            }
+          })
+        }else{
+          this.$message({
+            message: '请填写查询信息',
+            type: 'warning'
+          });
+        }
       }
     },
-    created() {
-    },
+    created() {},
     computed: {},
     watch: {},
     mounted() {

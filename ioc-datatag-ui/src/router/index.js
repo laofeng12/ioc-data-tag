@@ -100,6 +100,18 @@ export default new Router({
           meta: {title: '画像查询'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/portraitQuery.vue')
         },
+        {
+          path: '/queryImage',
+          name: 'queryImage',
+          meta: {title: '画像查询'},
+          component: () => import(/* webpackChunkName: "mysql" */ '@/components/image/queryImage.vue')
+        },
+        {
+          path: '/detailImage',
+          name: 'detailImage',
+          meta: {title: '画像查询'},
+          component: () => import(/* webpackChunkName: "mysql" */ '@/components/image/detailImage.vue')
+        },
       ]
     },
     {
