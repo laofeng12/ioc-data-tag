@@ -54,4 +54,13 @@ public interface DtTaggingModelService {
 	 */
 	void calculation(Long taggingModelId);
 
+	/**
+	 * 获取数据集数据（核心方法）
+	 */
+	Object getDataFromDataSet(Long taggingModelId,int type,Pageable pageable)throws Exception;
+
+	/**
+	 * 获取可执行执行的打标sql，用去mpp自动打标
+	 */
+	List<String> getMarkingSQL(Long taggingModelId);
 }

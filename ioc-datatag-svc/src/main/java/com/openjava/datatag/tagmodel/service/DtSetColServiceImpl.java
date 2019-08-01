@@ -146,8 +146,8 @@ public class DtSetColServiceImpl implements DtSetColService {
 			if (! taggingModel.getCreateUser().equals(Long.parseLong(userInfo.getUserId()))){
 				throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"无修改模型显示打标字段的权限");
 			}
-			if (!taggingModel.getDataSetId().equals(body.getDataSetId())) {
-				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选"+taggingModel.getDataSetName()+"进行字段选择");
+			if (!taggingModel.getResourceId().equals(body.getResourceId())) {
+				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选"+taggingModel.getResourceName()+"进行字段选择");
 			}
 			//记录以前的模样
 			oldColsContent = JSONObject.toJSONString(getByTaggingModelId(taggingModel.getTaggingModelId()));
@@ -216,6 +216,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 			String oldContent = "{\"model\":" + oldtagModelContent + ",\"setCol\":"+ oldColsContent +"}";
 			dtTagmUpdateLogService.loggingUpdate(content,oldContent,taggingModel,ip);
 		}
+		body.setTaggingModelId(taggingModel.getTaggingModelId());
 		return body;
 	}
 

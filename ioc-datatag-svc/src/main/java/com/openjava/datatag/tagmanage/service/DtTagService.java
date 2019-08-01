@@ -2,8 +2,10 @@ package com.openjava.datatag.tagmanage.service;
 
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.query.DtTagDBParam;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
 import java.util.List;
@@ -33,4 +35,11 @@ public interface DtTagService {
 	void doSoftDeleteByRootID(Long id,Date now);
 
 	void doSoftDeleteByDtTag(DtTag tag,Long userId,String ip);
+
+	/**
+	 * 根据主键批量获取标签
+	 * @param tagIds
+	 * @return
+	 */
+	List<DtTag> findByTagIds(List<Long> tagIds);
 }

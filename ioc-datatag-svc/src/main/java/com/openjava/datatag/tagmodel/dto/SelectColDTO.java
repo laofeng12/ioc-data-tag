@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import javax.persistence.Column;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,10 +21,16 @@ public class SelectColDTO {
     private Long taggingModelId;
     @Length(min=1, max=18)
     @ApiModelProperty("打标目标表id")
-    private String dataSetId;
+    private Long resourceId;
+
+    @ApiModelProperty("打标源表类型")
+    @Max(100)
+    private Long resourceType;
+
     @Length(min=1, max=200)
     @ApiModelProperty("打标源表名称")
-    private String dataSetName;
+    private String resourceName;
+
     @NotNull
     @ApiModelProperty("选择的字段")
     private List<DtSetCol> colList = new ArrayList<>();

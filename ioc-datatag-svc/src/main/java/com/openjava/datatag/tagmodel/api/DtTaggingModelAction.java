@@ -14,11 +14,12 @@ import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.service.DtSetColService;
 import com.openjava.datatag.utils.IpUtil;
-import com.openjava.datatag.utils.user.service.SysUserService;
+import com.openjava.datatag.user.service.SysUserService;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
 import org.ljdp.component.exception.APIException;
+import org.ljdp.component.result.DataApiResponse;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.annotation.Security;
@@ -27,11 +28,7 @@ import org.ljdp.ui.bootstrap.TablePage;
 import org.ljdp.ui.bootstrap.TablePageImpl;
 import org.ljdp.util.DateFormater;
 import org.springframework.data.domain.*;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -79,14 +76,14 @@ public class DtTaggingModelAction {
 	@RequestMapping(value="/getModel",method=RequestMethod.GET)
 	public DtTaggingModelDTO get(
 			@RequestParam(value="taggingModelId",required=true)Long taggingModelId,
-			@RequestParam(value="dataSetId",required=false)Long dataSetId) throws Exception{
+			@RequestParam(value="dataSetId",required=false)Long resourceId) throws Exception{
 		DtTaggingModel m = dtTaggingModelService.get(taggingModelId);
 		if (m == null || m.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"无此标签模型或已被删除");
 		}
-		if (dataSetId!=null) {
-			if (!dataSetId.equals(m.getDataSetId())) {
-				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选择："+m.getDataSetName()+"进行打标");
+		if (resourceId!=null) {
+			if (!resourceId.equals(m.getResourceId())) {
+				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选择："+m.getResourceName()+"进行打标");
 			}
 		}
 		DtTaggingModelDTO result = new DtTaggingModelDTO();
@@ -230,11 +227,11 @@ public class DtTaggingModelAction {
 	 */
 	@ApiOperation(value = "另存", nickname="clone", notes = "报文格式：content-type=application/json")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "id", value = "主键编码", required = true, paramType = "query"),
+		@ApiImplicitParam(name = "taggingModelId", value = "主键编码", required = true, paramType = "path"),
 	})
 	@Security(session=true)
-	@RequestMapping(value="/copy",method=RequestMethod.POST)
-	public SuccessMessage clone(@RequestParam(value="id",required=true)Long id,
+	@RequestMapping(value="/copy/{taggingModelId}",method=RequestMethod.POST)
+	public SuccessMessage clone(@PathVariable(value="taggingModelId")Long id,
 								HttpServletRequest request) throws Exception {
 		String ip = IpUtil.getRealIP(request);
 		dtTaggingModelService.copy(id,ip);
@@ -265,7 +262,29 @@ public class DtTaggingModelAction {
 		}
 		return new SuccessMessage("删除成功");
 	}
-	
+
+
+	@ApiOperation(value = "获取数据集数据", nickname="getDataSetData")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "taggingModelId", value = "模型主键编码", dataType ="String", paramType = "path"),
+			@ApiImplicitParam(name = "type", value = "数据结构类型：1返回key:value，0返回value", dataType ="String", paramType = "path"),
+			@ApiImplicitParam(name = "size", value = "每页显示数量", dataType = "String", paramType = "path"),
+			@ApiImplicitParam(name = "page", value = "页码", dataType = "String", paramType = "path"),
+	})
+	@Security(session=true)
+	@RequestMapping(value="/{taggingModelId}/{page}/{size}/{type}",method=RequestMethod.GET)
+	public DataApiResponse<Object> getDataSetData(
+			@PathVariable(value="taggingModelId")Long taggingModelId,
+			@PathVariable(value="type")int type,
+			@PathVariable(value="page")int page,
+			@PathVariable(value="size")int size) throws Exception {
+		DataApiResponse response = new DataApiResponse();
+		Pageable pageable = PageRequest.of(page,size);
+		Object  data= dtTaggingModelService.getDataFromDataSet(taggingModelId,type,pageable);
+		response.setData(data);
+		return response;
+	}
+
 	/**
 	 * 导出Excel文件
 	 */

@@ -9,23 +9,25 @@ import com.commons.utils.VoUtils;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
 import com.openjava.datatag.tagcol.domain.DtTagmCooLog;
-import com.openjava.datatag.tagcol.dto.DtCooTagcolLimitDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationModelDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationSetCol;
+import com.openjava.datatag.tagcol.dto.*;
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
+import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
+import com.openjava.datatag.user.service.SysUserService;
 import com.openjava.datatag.utils.TimeUtil;
-import com.openjava.datatag.utils.user.service.SysUserService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import org.ljdp.util.DateFormater;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +57,9 @@ public class DtCooperationServiceImpl implements DtCooperationService {
     private DtTaggingModelService dtTaggingModelService;
     @Resource
     private SysUserService sysUserService;
+    @Resource
+    private DtTagGroupService dtTagGroupService;
+
 
     public Page<DtCooperation> query(DtCooperationDBParam params, Pageable pageable) {
         Page<DtCooperation> pageresult = dtCooperationRepository.query(params, pageable);
@@ -65,8 +70,16 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         return dtCooperationRepository.queryDataOnly(params, pageable);
     }
 
-
+    /**
+     * 描述：根据用户ID查找该用户的协作模型记录
+     */
     public List<DtCooperationModelDTO> findUserModelByUserId(Long userId) {
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        Long currentuserId = Long.valueOf(userInfo.getUserId());
+        //userId不传时默认查询当前用户
+        if (userId == null) {
+            userId = currentuserId;
+        }
         List<Map<String, String>> result = dtCooperationRepository.findUserModelByUserId(userId);
         List<DtCooperationModelDTO> dtoList = new ArrayList<>();
         for (Map<String, String> map : result) {
@@ -120,7 +133,16 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         return dtoList;
     }
 
+    /**
+     * 描述：根据用户ID及协作模型ID查找该用户所在的模型里配置的字段记录，并用IsCooField标注该字段是否该用户的协作打标字段
+     */
     public List<DtCooperationSetCol> findUserModelCooField(Long userId, Long modelId) {
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        Long currentuserId = Long.valueOf(userInfo.getUserId());
+        //userId不传时默认查询当前用户
+        if (userId == null) {
+            userId = currentuserId;
+        }
         List<Map<String, String>> result = dtCooperationRepository.findUserModelCooField(userId, modelId);
         List<DtCooperationSetCol> dtoList = new ArrayList<>();
         for (Map<String, String> map : result) {
@@ -160,13 +182,63 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             dto.setIsMarking(VoUtils.toLong(map.get("IS_MARKING")));
             dto.setIsPKey(VoUtils.toLong(map.get("IS_P_KEY")));
             dto.setIsSource(VoUtils.toLong(map.get("IS_SOURCE")));
+            dto.setId(VoUtils.toLong(map.get("ID")));
+            dto.setUseTagGroup(VoUtils.toLong(map.get("USE_TAG_GROUP")));
+            dto.setCooFieldId(VoUtils.toLong(map.get("COOFIELDID")));
             dto.setShowCol(map.get("SHOW_COL"));
             dto.setSourceCol(map.get("SOURCE_COL"));
             dto.setSourceDataType(map.get("SOURCE_DATA_TYPE"));
+            dto.setTagColId(VoUtils.toLong(map.get("TAG_COL_ID")));
             dto.setTaggingModelId(VoUtils.toLong(map.get("TAGGING_MODEL_ID")));
             dtoList.add(dto);
         }
         return dtoList;
+    }
+
+    /**
+     * 描述：根据协作模型Id及协作打标字段名称查询当前用户的协作打标的标签组记录
+     */
+    public List<DtTagGroup> findCurrentUserTagGroup(Long modelId, String colField) {
+        List<DtTagGroup> lst = new ArrayList<>();
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        Long userId = Long.valueOf(userInfo.getUserId());
+        DtTaggingModel model = dtTaggingModelService.get(modelId);
+        //如果模型的创建者是当前用户时，要拿该用户创建的所有标签组
+        if (model.getCreateUser().equals(userId)) {
+            lst = dtTagGroupService.getMyTagGroup(userId);
+        } else {
+            List<Map<String, String>> result = dtCooperationRepository.findCurrentUserTagGroup(userId, modelId, colField);
+            for (Map<String, String> map : result) {
+                DtTagGroup group = new DtTagGroup();
+                if (StringUtils.isNotBlank(map.get("CREATE_TIME"))) {
+                    Date createdate = TimeUtil.StrToDate(map.get("CREATE_TIME"));
+                    group.setCreateTime(createdate);
+                }
+                if (StringUtils.isNotBlank(map.get("MODIFY_TIME"))) {
+                    Date modifydate = TimeUtil.StrToDate(map.get("MODIFY_TIME"));
+                    group.setModifyTime(modifydate);
+                }
+                Long createuserId = VoUtils.toLong(map.get("CREATE_USER"));
+                group.setCreateUser(createuserId);
+                group.setIsDeleted(VoUtils.toLong(map.get("IS_DELETED")));
+                group.setPopularity(VoUtils.toLong(map.get("POPULARITY")));
+                group.setId(VoUtils.toLong(map.get("ID")));
+                group.setIsShare(VoUtils.toLong(map.get("IS_SHARE")));
+                group.setSynopsis(map.get("SYNOPSIS"));
+                group.setTagsName(map.get("TAGS_NAME"));
+
+                lst.add(group);
+            }
+        }
+        return lst;
+    }
+
+    /**
+     * 描述：根据协作用户Id和标签组Id查询  协作限制打标字段表 存在记录总数
+     */
+    public Long findCooUserTagGroup(Long userId, Long tagGroupId) {
+        return dtCooperationRepository.findCooUserTagGroup(userId, tagGroupId);
+
     }
 
     public DtCooperation get(Long id) {
@@ -186,6 +258,98 @@ public class DtCooperationServiceImpl implements DtCooperationService {
     /**
      * 描述：新增、修改协作用户
      */
+    public void doCoolListSave(List<DtCooperationListDTO> list) throws Exception {
+        String reqParams = JSONObject.toJSONString(list);
+        DtTagmCooLog log = new DtTagmCooLog();
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        Long userId = Long.valueOf(userInfo.getUserId());
+        for (DtCooperationListDTO dtos : list) {
+            if (dtos.getTaggmId() == null) {
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "taggmId参数不能为空");
+            }
+            Long taggmId = dtos.getTaggmId();
+
+            if (dtos.getCooUser() == null) {
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooUser参数不能为空");
+            }
+            List<DtCooTagcolLimitDTO> colLimit = dtos.getCooTagcolLimitList();
+            DtTaggingModel tag = dtTaggingModelService.get(taggmId);
+
+            if (CollectionUtils.isEmpty(colLimit)) {
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数必传");
+            }
+            if (tag == null) {
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数不能为空");
+            }
+            /*DtCooperationDBParam params = new DtCooperationDBParam();
+            params.setEq_cooUser(dtos.getCooUser());
+            params.setEq_taggmId(taggmId);
+            Pageable pageable = PageRequest.of(0, 20000);//限制只能导出2w，防止内存溢出
+            Page<DtCooperation> result = query(params, pageable);
+            if (result.getTotalElements() > 0) {
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "该协作成员已存在");
+            }*/
+            //新增和修改
+            DtCooperation col = new DtCooperation();
+
+            if (dtos.getId() != null) {
+                col = get(dtos.getId());
+                col.setTaggmId(taggmId);
+                col.setCooUser(dtos.getCooUser());
+                col.setIsNew(false);
+                col.setModifyTime(new Date());
+                //MyBeanUtils.copyPropertiesNotNull(col,req);
+                //EntityClassUtil.dealModifyInfo(col,userInfo);
+                col = dtCooperationRepository.save(col);
+            } else {
+
+                col.setTaggmId(taggmId);
+                col.setCooUser(dtos.getCooUser());
+                col.setCreateUser(userId);
+                col.setIsNew(true);
+                col.setModifyTime(new Date());
+                col.setCreateTime(new Date());
+                //MyBeanUtils.copyPropertiesNotNull(col,req);
+                //EntityClassUtil.dealCreateInfo(col,userInfo);
+                col.setId(ConcurrentSequence.getInstance().getSequence());
+                col = dtCooperationRepository.save(col);
+            }
+            for (int i = 0; i < colLimit.size(); i++) {
+                DtCooTagcolLimitDTO record = colLimit.get(i);
+                DtCooTagcolLimit newcolLimit = new DtCooTagcolLimit();
+                if (record.getCooId() == null) {
+                    throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数的cooId为空或查无此标签");
+                }
+                if (!record.getCooId().equals(dtos.getId())) {
+                    throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数的cooId错误");
+                }
+                if (record.getId() != null) {
+                    newcolLimit = dtCooTagcolLimitService.get(record.getId());
+                    newcolLimit.setUseTagGroup(record.getUseTagGroup());
+                    newcolLimit.setTagColName(record.getTagColName());
+                    newcolLimit.setCooId(col.getId());
+                    newcolLimit.setTagColId(record.getTagColId());
+                    newcolLimit.setIsNew(false);
+                    newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
+                } else {
+
+                    newcolLimit.setIsNew(true);
+                    newcolLimit.setUseTagGroup(record.getUseTagGroup());
+                    newcolLimit.setTagColName(record.getTagColName());
+                    newcolLimit.setCooId(col.getId());
+                    newcolLimit.setTagColId(record.getTagColId());
+                    newcolLimit.setId(ConcurrentSequence.getInstance().getSequence());
+                    newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
+                }
+
+            }
+
+        }
+    }
+
+    /**
+     * 描述：新增、修改协作用户
+     */
     public void doCoolSave(DtCooperationDTO req) throws Exception {
         String reqParams = JSONObject.toJSONString(req);
         DtTagmCooLog log = new DtTagmCooLog();
@@ -198,7 +362,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数必传");
         }
         if (tag == null) {
-            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数错误");
+            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数不能为空");
         }
         //新增和修改
         DtCooperation col = get(req.getId());

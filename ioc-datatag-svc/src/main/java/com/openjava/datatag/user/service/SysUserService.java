@@ -1,7 +1,7 @@
-package com.openjava.datatag.utils.user.service;
+package com.openjava.datatag.user.service;
 
 
-import com.openjava.datatag.utils.user.domain.SysUser;
+import com.openjava.datatag.user.domain.SysUser;
 
 /**
  * 业务层接口

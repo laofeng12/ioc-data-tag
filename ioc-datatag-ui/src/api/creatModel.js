@@ -24,6 +24,50 @@ export function getResourceListData (orgId,type,databaseType) {
   })
 }
 
+//选择协作用户
+export function choosePeople(userId) {
+  return request({
+    url: '/admin/org/sysOrg/doUserTopDepartmentUserList/' + userId,
+    method: 'get'
+  })
+}
+
+// 获取协作成员
+export function getPeople(params) {
+  return fetch({
+    url:'/datatag/tagcol/dtCooperation/search',
+    method:'get',
+    params
+  })
+}
+
+// add
+export function addPeople(data) {
+  return fetch({
+    url:'/datatag/tagcol/dtCooperation/save',
+    method:'post',
+    data
+  })
+}
+
+// 删除
+export function deletePeople(params) {
+  return fetch({
+    url:'/datatag/tagcol/dtCooperation',
+    method:'delete',
+    params
+  })
+}
+
+// 打标字段
+export function markingCheck(data) {
+  return fetch({
+    url:'/datatag/tagcol/dtCooperation/searchcoofield',
+    contentType: 'application/x-www-form-urlencoded',
+    method:'post',
+    data
+  })
+}
 
 // 创建模型--资源表对应字段
 export function getResourceInfoData (resourceId,type) {
@@ -90,6 +134,23 @@ export function saveMarkData (data) {
   return fetch({
     url: '/datatag/tagmodel/dtSetCol/saveCondition',
     method: 'post',
+    data
+  })
+}
+// 我的标签组
+export function labelGroup(params) {
+  return fetch({
+    url:'/datatag/tagmanage/myDtTagGroup',
+    method:'get',
+    params
+  })
+}
+
+// 保存协作用户
+export function dosave(data) {
+  return fetch({
+    url:'/datatag/tagcol/dtCooperation/dosave',
+    method:'post',
     data
   })
 }

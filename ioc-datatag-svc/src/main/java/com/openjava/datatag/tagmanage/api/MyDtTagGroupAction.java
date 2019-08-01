@@ -76,7 +76,7 @@ public class MyDtTagGroupAction {
 			@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
 	})
 	@Security(session=true)
-	@RequestMapping(value="/search",method=RequestMethod.GET)
+	@RequestMapping(method=RequestMethod.GET)
 	public TablePage<DtTagGroup> doSearch(@ApiIgnore() DtTagGroupDBParam params,
 										  @ApiIgnore() Pageable pageable,
 										  HttpServletRequest request){

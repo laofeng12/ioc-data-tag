@@ -25,6 +25,11 @@ public class TagConditionUtils {
             "STRING","VARCHAR","CHAR","VARCHAR2","CLOB",
             "string","varchar","char","varchar2","clob"
     };
+    //时间类型
+    private static String[] dateTypes={
+            "TIME","DATE","TIMESTAMP","DATETIME","time",
+            "date","timestamp","datetime","date"
+    };
 
     /**
      * 是否连接符
@@ -82,6 +87,20 @@ public class TagConditionUtils {
         }
     }
 
+    /**
+     * 是否字符串类型
+     * @param type
+     * @return
+     */
+    public static boolean isDateType(String type){
+        List<String> list = Arrays.asList(dateTypes);
+        if (list.contains(type)){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
     public static String toSqlSymbol(String symbol){
         switch (symbol) {
             case "≠":
@@ -95,12 +114,12 @@ public class TagConditionUtils {
         }
     }
     public static String initValues(String values,String valueType,String symbool){
-        if (isStringType(valueType)) {
+//        if (isStringType(valueType)) {
             if ("LIKE".equals(symbool)) {
                 values = "%"+values+"%";
             }
             values = "'"+values+"'";
-        }
+//        }
        return values;
     }
 

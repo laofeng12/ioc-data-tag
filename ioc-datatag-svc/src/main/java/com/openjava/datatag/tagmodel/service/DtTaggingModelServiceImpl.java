@@ -3,37 +3,52 @@ package com.openjava.datatag.tagmodel.service;
 import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.component.TokenGenerator;
+import com.openjava.datatag.demo.dto.BaseResp;
+import com.openjava.datatag.demo.dto.TopDepartmentReqReqDTO;
 import com.openjava.datatag.log.service.DtTagmUpdateLogService;
 import com.openjava.datatag.schedule.domain.TaskInfo;
 import com.openjava.datatag.schedule.service.TaskService;
+import com.openjava.datatag.tagmanage.domain.DtTag;
+import com.openjava.datatag.tagmanage.service.DtTagService;
+import com.openjava.datatag.tagmodel.domain.DtFilterExpression;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
-import com.openjava.datatag.tagmodel.dto.DtSetColDTO;
-import com.openjava.datatag.tagmodel.dto.DtTagConditionDTO;
-import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
-import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.dto.*;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
 import com.openjava.datatag.tagmodel.repository.DtTagConditionRepository;
 import com.openjava.datatag.tagmodel.repository.DtTaggingModelRepository;
 import com.openjava.datatag.utils.EntityClassUtil;
 import com.openjava.datatag.utils.MyTimeUtil;
+import com.openjava.datatag.utils.TagConditionUtils;
+import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
+import lombok.Data;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ljdp.common.bean.MyBeanUtils;
+import org.ljdp.common.http.HttpClientUtils;
+import org.ljdp.common.http.LjdpHttpClient;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,20 +59,29 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@Data
 public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	Logger logger = LogManager.getLogger(getClass());
 	@Resource
 	private DtTaggingModelRepository dtTaggingModelRepository;
 	@Resource
 	private DtSetColRepository dtSetColRepository;
-
+	@Resource
+	private DtTagService dtTagService;
 	@Resource
 	private DtTagConditionRepository dtTagConditionRepository;
-
+	@Resource
+	private DtFilterExpressionService dtFilterExpressionService;
 	@Resource
 	private DtTagmUpdateLogService dtTagmUpdateLogService;
 	@Resource
 	private TaskService taskService;
+	@Resource
+	private DtSetColService dtSetColService;
+	@Resource
+	private DtTagConditionService dtTagConditionService;
+	@Resource
+	private TokenGenerator tokenGenerator;
 
 	public void copy(Long id,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -70,11 +94,14 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		//克隆模型
 		DtTaggingModelDTO tempDTO = new DtTaggingModelDTO();
 		DtTaggingModel clone = new DtTaggingModel();
+		BeanUtilsBean.getInstance().getConvertUtils()
+				.register(new SqlDateConverter(null), Date.class);//解决时间空复制时出现异常
 		BeanUtils.copyProperties(tempDTO,model);
 		BeanUtils.copyProperties(clone,tempDTO);
 		clone.setTaggingModelId(null);
 		EntityClassUtil.dealCreateInfo(clone,userInfo);
 		clone = doSave(clone);
+		clone.setDataTableName("DT_"+clone.getTaggingModelId());//@TODO 这里要注意
 		//克隆字段
 		List<DtSetCol> cloList =
 				dtSetColRepository.getByTaggingModelIdAndIsDeleted(model.getTaggingModelId(),Constants.PUBLIC_NO);
@@ -99,7 +126,18 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				conditionClone.setTagConditionId(null);
 				conditionClone.setColId(colClone.getColId());
 				EntityClassUtil.dealCreateInfo(conditionClone,userInfo);
-				dtTagConditionRepository.save(conditionClone);
+				conditionClone = dtTagConditionRepository.save(conditionClone);
+				//克隆规制表达式
+				List<DtFilterExpression> expressions = dtFilterExpressionService.findByTagConditionId(condition.getTagConditionId());
+				for (DtFilterExpression expression: expressions) {
+					DtFilterExpression copyExpression = new DtFilterExpression();
+					CopyDtFilterExpressionDTO copyExpressionDTO = new CopyDtFilterExpressionDTO();
+					BeanUtils.copyProperties(copyExpressionDTO,expression);
+					BeanUtils.copyProperties(copyExpression,copyExpressionDTO);
+					copyExpression.setFilterExpressionID(null);
+					copyExpression.setTagConditionId(conditionClone.getTagConditionId());
+					dtFilterExpressionService.doSave(copyExpression);
+				}
 			}
 		}
 
@@ -167,9 +205,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		DtTaggingModel taggingModel = new DtTaggingModel();
 		MyBeanUtils.copyPropertiesNotNull(taggingModel,body);
 		EntityClassUtil.dealCreateInfo(taggingModel,userInfo);
-		taggingModel.setDataTableName("DT_"+ RandomStringUtils.random(27,true,false).toUpperCase());//生成随机表名
 		taggingModel = doSave(taggingModel);
-
+		taggingModel.setDataTableName("DT_"+ taggingModel.getTaggingModelId());//RandomStringUtils.random(27,true,false).toUpperCase()不合适，用模型id为后缀,这样比较有意义，表名就能看出是哪个模型的
+		taggingModel = doSave(taggingModel);
 		for (DtSetCol col :colList){
 			if ((!col.isNew()) || col.getColId() != null){
 				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"新建模型时选择字段必须为新");
@@ -413,8 +451,188 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	 * 获取打标数据并根据规制自动打标（核心方法）
 	 */
 	public void calculation(Long taggingModelId){
-		//组件已搭好，只需要写业务逻辑
-		System.out.println("查询画像并计算："+taggingModelId);
+		DtTaggingModel tagModel = get(taggingModelId);
+		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
+		if (CollectionUtils.isEmpty(cols)){
+			return ;
+		}
+//		Map<Long, List<DtSetCol>> colGroup = cols.stream().collect(Collectors.groupingBy(DtSetCol::getColId));
+		//第一步、若存在删表
+		MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();
+		mppUtil.setTableName(tagModel.getDataTableName());//表名
+		mppUtil.dropTable();//删表
+		//第二步、建表
+		mppUtil.setTableKey(tagModel.getPkey());//主键
+		Map<String,String> colmap  = new LinkedHashMap<>();//字段，注释
+		Map<String,String> cloTypeMap  = new LinkedHashMap<>();//字段，字段类型
+		mppUtil.setTableName(tagModel.getDataTableName());
+		cols.forEach(record->{
+			colmap.put(record.getShowCol(),"");
+			if (TagConditionUtils.isDateType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())) {
+				cloTypeMap.put(record.getShowCol(),"date");
+			}else if(TagConditionUtils.isIntType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())){
+				if (record.getSourceDataType().indexOf("，")==-1) {
+					cloTypeMap.put(record.getShowCol(),"decimal");
+				}else{
+					cloTypeMap.put(record.getShowCol(),"bigint");
+				}
+			}else{
+				cloTypeMap.put(record.getShowCol(),"varchar");
+			}
+		});
+		mppUtil.createTable(colmap,cloTypeMap);
+		//第三步、获取数据集数据并同步到mpp
+		Date begin = new Date();
+		int successCount = 0;
+		try	{
+			for (int i = 0; i < 1; i++) {
+				++successCount;
+				logger.info("第"+successCount+"次");
+				List<Object> data = new LinkedList<>();
+				Pageable pageable = PageRequest.of(i,100000);
+				data.addAll((Collection<?>) getDataFromDataSet(taggingModelId,0,pageable));
+				mppUtil.setDataList(data);
+				mppUtil.insertDataList();
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		Date end = new Date();
+		//第四步update数据（传sql进mpp,在mpp计算）
+		List<String> markingSql = getMarkingSQL(taggingModelId);
+		if (CollectionUtils.isNotEmpty(markingSql)){
+			mppUtil.setUpdateSqlList(markingSql);
+			mppUtil.updateDataList();
+		}
+		//第五步，记录更新结果
+
+		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},总耗时:{%s}毫秒",taggingModelId,10000*successCount,end.getTime()-begin.getTime()));
 	}
 
+
+	/**
+	 * 获取数据集数据（核心方法）
+	 */
+	public Object getDataFromDataSet(Long taggingModelId,int type,Pageable pageable)throws Exception{
+		List<List<Object>> data = new LinkedList<>();//最终返回的数据
+		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
+		DtTaggingModel taggingModel = get(taggingModelId);
+		String colStr[]= new String[cols.size()];
+		for (int i = 0; i < cols.size(); i++) {
+			colStr[i] = cols.get(i).getShowCol();
+		}
+		LjdpHttpClient client = new LjdpHttpClient();
+		BaseUserInfo userInfo  = (BaseUserInfo) SsoContext.getUser();
+		if (userInfo!=null) {
+			client.setHeader("authority-token",SsoContext.getToken());
+			client.setHeader("User-Agent",userInfo.getUserAgent());
+		}else{
+			client.setHeader("authority-token",tokenGenerator.createToken(392846190550001L));
+			client.setHeader("User-Agent","platform-schedule-job");
+		}
+		DataSetReqDTO req = new DataSetReqDTO();
+		req.setColumnList(colStr);
+		req.setPage(pageable.getPageNumber());
+		req.setSize(pageable.getPageSize());
+		System.out.println( JSONObject.toJSONString(req));
+		HttpResponse resp = client.postJSON("http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
+//		HttpResponse resp = client.postJSON("http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/"+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
+		String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
+		if (resp.getStatusLine().getStatusCode()==200) {
+			DataSetRspDTO result = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
+			if (type==1) {
+				List<List<Object>> listData =result.getData().getData();
+				List<Object> tempData =new LinkedList<>();
+				for (int i = 0; i < listData.size(); i++) {
+					String ob = "";
+					for (int j = 0; j < listData.get(i).size(); j++) {
+						ob += "\""+cols.get(j).getShowCol()+"\":\""+listData.get(i).get(j)+"\",";
+					}
+					ob="{"+ob.substring(0,ob.length()-1)+"}";
+					tempData.add(JSONObject.parseObject(ob,Object.class));
+				}
+				return tempData;
+			}else {
+				return result.getData().getData();
+			}
+		}else {
+			logger.info("");
+		}
+//		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//		for (int j = 0; j < pageable.getPageSize(); j++) {
+//			List<Object> kk = new LinkedList<>();
+//			for (int i = 0; i < cols.size(); i++) {
+//				if (TagConditionUtils.isDateType(cols.get(i).getSourceDataType())) {
+//					kk.add(f.format(new Date()));
+//				}else if(TagConditionUtils.isIntType(cols.get(i).getSourceDataType())){
+//					kk.add(i+j);
+//				}else if (TagConditionUtils.isStringType(cols.get(i).getSourceDataType())){
+//					kk.add(RandomStringUtils.random(4,true,false).toUpperCase());
+//				}else {
+//					kk.add(null);
+//				}
+//			}
+//			data.add(kk);
+//		}
+		return data;
+	}
+
+	/**
+	 * 获取可执行执行的打标sql，用去mpp自动打标(核心方法)
+	 */
+	public List<String> getMarkingSQL(Long taggingModelId){
+		DtTaggingModel tagModel = get(taggingModelId);//模型
+		if (tagModel==null) {
+			return null;
+		}
+		List<DtSetCol> cols = dtSetColService.getByTaggingModelId(taggingModelId);//模型字段列表
+		if (CollectionUtils.isEmpty(cols)){
+			return null;
+		}
+		List<Long> colIds = new ArrayList<>();
+		cols.forEach(record->{
+			colIds.add(record.getColId());
+		});
+		List<DtTagCondition>  conditions =  dtTagConditionService.findByColIds(colIds);//条件设置
+		if (CollectionUtils.isEmpty(conditions)) {
+			return null;
+		}
+		List<Long> tagIds = new ArrayList<>();
+		conditions.forEach(record->{
+			tagIds.add(record.getTagId());
+		});
+		List<DtTag> dtTags = dtTagService.findByTagIds(tagIds);//标签
+		if (CollectionUtils.isEmpty(dtTags)){
+			return null;
+		}
+		Map<Long, List<DtTag>> tagGroup = dtTags.stream().collect(Collectors.groupingBy(DtTag::getId));
+		List<String> markingSQL = new ArrayList<>();
+		for (DtTagCondition condition:conditions) {
+			if (StringUtils.isBlank(condition.getFilterExpression()) ) {
+				continue;
+			}
+			StringBuilder updateBuff = new StringBuilder();
+			updateBuff.append(" UPDATE \"");
+			updateBuff.append(tagModel.getDataTableName());
+			updateBuff.append("\" ");
+			updateBuff.append(" SET ");
+			updateBuff.append(condition.getShowCol());
+			updateBuff.append(" = '");
+			updateBuff.append(tagGroup.get(condition.getTagId()).get(0).getTagName());
+			updateBuff.append("' where ");
+			updateBuff.append(condition.getFilterExpression());
+			markingSQL.add(updateBuff.toString());
+		}
+		return markingSQL;
+	}
+
+	public static void main(String[] args) {
+		String colJson = "[{\"index\":0,\"aggType\":null,\"name\":\"tb_0_MODIFY_ID\"},{\"index\":1,\"aggType\":null,\"name\":\"tb_0_CREATE_NAME\"},{\"index\":2,\"aggType\":null,\"name\":\"tb_0_SOURCE_NAME\"}]";
+		List<Map<String,String>> colList = new LinkedList<>();
+		colList = JSONObject.parseObject(colJson,List.class);
+		String vauleJson  = "[[\"2\",\"1\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"本地测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"]]";
+		List<Array> valueList = JSONObject.parseObject(vauleJson,List.class);
+		Map<String,String> values =  new LinkedHashMap<>();
+
+	}
 }

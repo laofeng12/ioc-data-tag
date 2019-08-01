@@ -13,6 +13,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.ljdp.component.result.GeneralResult;
 import org.ljdp.component.result.Result;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -23,6 +24,7 @@ import java.util.*;
  * @Date: 2019/7/22
  */
 @Data
+@Component
 public class MppPgExecuteUtil extends ExecuteUtil {
 
     /**
@@ -46,7 +48,12 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     /**
      * map<列名, 列备注>
      */
-    private Map<String, String> columnMap = new HashMap<>(16);
+    private Map<String, String> columnMap = new LinkedHashMap<>(16);
+
+    /**
+     * map<列名, 列类型>
+     */
+    private Map<String, String> columnTypeMap = new LinkedHashMap<>(16);
 
     /**
      * 表主键
@@ -58,6 +65,15 @@ public class MppPgExecuteUtil extends ExecuteUtil {
      */
     private List<Object> dataList;
 
+    /**
+     * 更新语句
+     */
+    private List<String> updateSqlList;
+
+    /**
+     * 字符串类型
+     */
+    private String vechar = "";
     private DsDataSource dsDataSource;
 
     private PostgreSqlDataProvider dataProvider= new PostgreSqlDataProvider();
@@ -67,17 +83,17 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     }
 
     @Override
-    protected Result createTable(Map<String,String> map) {
+    public Result createTable(Map<String,String> columnMap,Map<String,String> columnTypeMap) {
         Result result = new GeneralResult();
         result.setSuccess(true);
-        if (CollectionUtils.isEmpty(map)) {
+        if (CollectionUtils.isEmpty(columnMap)) {
             result.setSuccess(false);
             result.setMsg("表数据列不能为空！");
             return result;
         }
 //        columnList = new LinkedList();
-        columnMap = map;
-
+        this.columnMap = columnMap;
+        this.columnTypeMap = columnTypeMap;
         List<String> createTableSqlList = getCreateTableSqlList();
         for (String createTableSql : createTableSqlList) {
             Map<String, String> sqlMap = new HashMap<>(2);
@@ -96,7 +112,7 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     }
 
     @Override
-    protected List<String> getCreateTableSqlList() {
+    public List<String> getCreateTableSqlList() {
         List<String> sqlList = new LinkedList<>();
         String schema = "public";
 
@@ -113,9 +129,9 @@ public class MppPgExecuteUtil extends ExecuteUtil {
             createTableSql.append("\"");
             createTableSql.append(entry.getKey());
             if (entry.getKey().equals(getTableKey())) {
-                createTableSql.append("\" varchar primary key,");
+                createTableSql.append("\" "+ columnTypeMap.get(entry.getKey()) +" primary key,");
             }else {
-                createTableSql.append("\" varchar,");
+                createTableSql.append("\" "+ columnTypeMap.get(entry.getKey()) +",");
             }
         }
         String tableSql0 = createTableSql.toString();
@@ -154,7 +170,7 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     }
 
     @Override
-    protected Result dropTable() {
+    public Result dropTable() {
         Result result = new GeneralResult();
         String dropTableSql = this.getDropTableSql();
         Map<String, String> sqlMap = new HashMap<>(2);
@@ -172,7 +188,7 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     }
 
     @Override
-    protected String getDropTableSql() {
+    public String getDropTableSql() {
         StringBuilder dropTableSqlSb = new StringBuilder();
         dropTableSqlSb.append("DROP TABLE if exists \"");
         dropTableSqlSb.append(tableName);
@@ -182,7 +198,7 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     }
 
     @Override
-    protected Result insertDataList() {
+    public Result insertDataList() {
         Result result = new GeneralResult();
         List<String> insertDataSqlList = this.getInsertDataSqlList();
         Map<String, String> sqlMap = new HashMap<>(2);
@@ -202,7 +218,7 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     }
 
     @Override
-    protected List<String> getInsertDataSqlList() {
+    public List<String> getInsertDataSqlList() {
         List sqlList = new LinkedList();
         StringBuilder insertDataSqlSb = new StringBuilder();
         insertDataSqlSb.append("INSERT INTO \"");
@@ -224,18 +240,23 @@ public class MppPgExecuteUtil extends ExecuteUtil {
         String sqlPre = insertDataSqlSb.toString();
         //分批插入
 //        this.getDataList().remove(0);
-        List<List<Object>> partitionList = Lists.partition(this.getDataList(), 300);
+        List<List<Object>> partitionList = Lists.partition(this.getDataList(), 10000);
         for (List<Object> objectList : partitionList) {
             StringBuilder dataInsertSqlSb = new StringBuilder();
             dataInsertSqlSb.append(sqlPre);
             List<String> valueList = new LinkedList<>();
             for (Object object : objectList) {
                 StringBuilder valuesSb = new StringBuilder();
-                List<String> item = (List<String>) object;
-                for (String v : item) {
-                    valuesSb.append("'");
-                    valuesSb.append(v);
-                    valuesSb.append("',");
+                List<Object> item = (List<Object>) object;
+                for (Object v : item) {
+                    if (StringUtils.isBlank(String.valueOf(v))){
+                        valuesSb.append("null");
+                        valuesSb.append(",");
+                    }else{
+                        valuesSb.append("'");
+                        valuesSb.append(String.valueOf(v));
+                        valuesSb.append("',");
+                    }
                 }
                 String values = valuesSb.toString();
                 values = values.substring(0, values.length() - 1);
@@ -249,6 +270,36 @@ public class MppPgExecuteUtil extends ExecuteUtil {
         }
 
         return sqlList;
+    }
+
+    @Override
+    public Result updateDataList(){
+        Result result = new GeneralResult();
+        result.setSuccess(false);
+        List<String> updateSqlList = getUpdateDataList();
+        Map<String, String> sqlMap = new HashMap<>(2);
+        for (String updateSql : updateSqlList) {
+            sqlMap.put("sql", updateSql);
+            result.setSuccess(false);
+            try {
+                initDataProvider(this.getValidDataSource(), sqlMap, false);
+                boolean createTableResult = dataProvider.executeUpdate();
+                result.setSuccess(createTableResult);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 获取更新语句sql
+     */
+    @Override
+    public List<String> getUpdateDataList(){
+        //分批更新
+//        List<List<String>> updateList = Lists.partition(this.getUpdateSqlList(), 300);
+        return this.getUpdateSqlList();
     }
 
     public List<Object> getDataList() {
@@ -279,23 +330,33 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     public static void main(String[] args) {
         MppPgExecuteUtil u= new MppPgExecuteUtil();
         u.setTableName("zmk_test");//表名
-        u.setTableKey("name");//主键
+        u.setTableKey("id");//主键
         u.dropTable();//删表
-        Map<String,String> map  = new HashMap<>();
+        Map<String,String> map  = new LinkedHashMap<>();
+        Map<String,String> mapType  = new LinkedHashMap<>();
         map.put("id","主键");
         map.put("name","名字");
-        u.createTable(map);//建表
+        map.put("create_time","创建时间");
+        mapType.put("id","bigint");
+        mapType.put("name","varchar");
+        mapType.put("create_time","date");
+        u.createTable(map,mapType);//建表
         List<Object> dataList = new ArrayList<>();
         List<String> values = new ArrayList<>();
-        values.add("1");
+        values.add("111112222233333444");
         values.add("名字1");
+        values.add("2018-07-09 00:00:00");
         dataList.add(values);
         List<String> values2 = new ArrayList<>();
-        values2.add("2");
+        values2.add("111112222233333445");
         values2.add("名字2");
+        values2.add("2018-07-09 00:00:00");
         dataList.add(values2);
         u.setDataList(dataList);
         u.insertDataList();//load数据
-        u.dropTable();//删表
+//        u.dropTable();//删表
     }
+
+
+
 }
