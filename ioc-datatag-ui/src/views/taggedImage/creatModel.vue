@@ -8,7 +8,8 @@
         <div class="name">
           <div class="img"></div>
           <div class="text">
-            <el-input v-model="modelName" placeholder="请输入内容"></el-input>
+            <el-input  v-if="routerName==='editModel'" v-model="modelName" placeholder="请输入内容"></el-input>
+            <span v-else>未命名</span>
           </div>
         </div>
       </div>
@@ -16,17 +17,17 @@
         <div>
           <div class="img" @click="saveAs"></div>
         </div>
-        <el-button class="button" type="info" size="small" @click="runModel">模型调度</el-button>
+        <el-button class="button" type="primary" size="small" @click="runModel">模型调度</el-button>
  <!--       <el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
       </div>
     </div>
     <div class="content">
       <!--左边数据树目录结构-->
-      <Aside/>
+      <Aside  :modelData="modelData"/>
       <div class="components">
         <div class="top">
           <div class="left">
-            南城区高考成绩数据
+            {{modelData.resourceName}}
           </div>
           <div class="right">
             <span class="iconPeople"><i class="el-icon-user"></i></span>
@@ -81,7 +82,10 @@
           </div>
 
         </div>
-        <EditTable></EditTable>
+        <div  v-if="routerName==='editModel'">
+          <EditTable :theadData="headColList" :tableData="tableData"></EditTable>
+        </div>
+
       </div>
     </div>
 
@@ -176,11 +180,16 @@
 <script>
   import EditTable from '../../components/ModeleEdit/EditTable'
   import Aside from '../../components/ModeleEdit/Aside'
+  import {getModelData,getModelColsData} from '@/api/creatModel'
 
   export default {
     name: 'creatModel',
     data () {
       return {
+        headColList:[],//打标字段头部数据
+        modelData:{},//获取模型数据
+        taggingModelId:0,//模型id
+        routerName:'creatModel',
         modelName:'未命名',
         show:false,
         editDialog:false,
@@ -217,85 +226,55 @@
           date:[{required: true, message: '请选择时间',trigger: 'blur'}],
           date2:[{required: true, message: '请选择',trigger: 'change'}]
         },
-        tableData: [],
-        theadData: [],
-        dimensionList: [],
-        measureList: [],
-        componentsSwitch: true,
-        datasetId: '',
-        updateAsideForce: true
+        tableData: []
       }
     },
     components: { EditTable, Aside },
     watch: {
-      theadData: function (val) {
-        this.tableWidth = val.length * 149
-      }
     },
     created () {
-      this.datasetId = this.$route.params.id
+     // this.datasetId = this.$route.params.id
+
     },
     mounted () {
-      //this.getDatasetDetails()
+      console.log(this.$route)
+      this.routerName =this.$route.name
+      this.taggingModelId=this.$route.params.id
+      if(this.routerName==='creatModel'){
+      }else {
+        //进入编辑模型或者打标界面
+        //获取模型数据
+        this.getModelList(this.taggingModelId)
+        this.getModelColsList(this.taggingModelId,0,10,1)
+      }
+
     },
     methods: {
-      updateAside (type, val) {
-        if (type === 'measure') {
-          this.measureList = val
-        } else {
-          this.dimensionList = val
+      // 获取模型数据
+      async getModelList(modelId) {
+        try {
+          const  params={
+            taggingModelId: modelId
+          }
+          const data = await getModelData(params)
+          this.modelData=data
+          this.modelName=data.modelName
+          this.headColList=data.colList
+         // console.log(data)
+        } catch (e) {
+
         }
-        this.updateAsideForce = false
-        this.$nextTick(() => (this.updateAsideForce = true))
-        // this.getTableDetails()
       },
-      async getDatasetDetails () {
-        const { data: { dimensionList, measureList } } = await datasetWordDetailsApi(this.datasetId)
-        this.dimensionList = dimensionList
-        this.measureList = measureList
-        const newDimensionList = this.dimensionList.map(item => ({ columnName: item.columnName, values: [] }))
-        const newMeasureList = this.measureList.map(item => ({ columnName: item.columnName, values: [] }))
-        let cfgObj = {
-          rows: [],
-          filters: [],
-          values: [],
-          columns: []
+      // 获取模型数据
+      async getModelColsList(modelId,page,size,type) {
+       // console.log(modelId,page,size)
+        try {
+          const data = await getModelColsData(modelId,page,size,type)
+          console.log(data)
+          this.tableData=data.data
+        } catch (e) {
+
         }
-        cfgObj.columns = [...newDimensionList, ...newMeasureList]
-        let cfgStr = JSON.stringify(cfgObj)
-        const detailsParams = {
-          cfg: cfgStr,
-          dsDataSetId: this.datasetId,
-          dsDataSourceId: '',
-          query: '{}',
-          reload: true
-        }
-        const { data: { columnList: column, data: tableList } } = await datasetDetailsApi(detailsParams)
-        const theadData = column.map(item => ({ label: item.name }))
-        this.theadData = theadData
-        const tableData = tableList.map(item => {
-          const objItem = {}
-          item.forEach((v, i) => {
-            const key = `column${i + 1}`
-            objItem[key] = v
-          })
-          return objItem
-        })
-        this.tableData = tableData
-        this.componentsSwitch = false
-        this.$nextTick(() => (this.componentsSwitch = true))
-      },
-      // async previewTable () {
-      //   const columnList = [{index: 0, aggType: null, name: "SOURCE_NAME"}]
-      // },
-      async datasetSave () {
-        const data = {
-          dsDataSetId: Number(this.datasetId),
-          dimensionJson: JSON.stringify(this.dimensionList),
-          measureJson: JSON.stringify(this.measureList),
-          isNew: false
-        }
-        const res = await datasetChangeApi(data)
       },
       //
       showIt(){

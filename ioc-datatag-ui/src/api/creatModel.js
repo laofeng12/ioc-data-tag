@@ -1,5 +1,5 @@
 import { fetch } from '@/utils/fetch'
-// 标签管理--资源数列表
+// 创建模型--资源树
 export function getOneZtreeData (params) {
   return fetch({
     url: '/pds/datalake/dataLake/allResourceTree',
@@ -8,7 +8,7 @@ export function getOneZtreeData (params) {
   })
 }
 
-// 标签管理--资源数列表
+// 创建模型--资源树多级数据
 export function getChildZtreeData (orgId,databaseType) {
   return fetch({
     url: `/pds/datalake/dataLake/dataLakeResourceTree/${orgId}-${databaseType}`,
@@ -16,7 +16,7 @@ export function getChildZtreeData (orgId,databaseType) {
   })
 }
 
-// 标签管理--查询资源目录表列表
+// 创建模型--查询资源表列表
 export function getResourceListData (orgId,type,databaseType) {
   return fetch({
     url: `/pds/datalake/dataLake/resourceList/${orgId}-${type}-${databaseType}`,
@@ -25,3 +25,71 @@ export function getResourceListData (orgId,type,databaseType) {
 }
 
 
+// 创建模型--资源表对应字段
+export function getResourceInfoData (resourceId,type) {
+  return fetch({
+    url: `/pds/datalake/dataLake/resourceInfo/${resourceId}-${type}`,
+    method: 'get'
+  })
+}
+
+
+// 创建模型--字段设置确认选择
+export function setColsData (data) {
+  console.log(data)
+  return fetch({
+    url: '/datatag/tagmodel/dtSetCol/selectCol',
+    method: 'post',
+    data
+  })
+}
+
+//获取标签模型数据
+export function getModelData (params) {
+  return fetch({
+    url: '/datatag/tagmodel/dtTaggingModel/getModel',
+    method: 'get',
+    params
+  })
+}
+
+
+export function getModelColsData (taggingModelId,page,size,type) {
+  return fetch({
+    url: `/datatag/tagmodel/dtTaggingModel/${taggingModelId}/${page}/${size}/${type}`,
+    method: 'get'
+  })
+}
+// 打标--选择标签组
+export function getMyTagGroupData (params) {
+  return fetch({
+    url: '/datatag/tagmanage/myDtTagGroup',
+    method: 'get',
+    params
+  })
+}
+
+// 打标--选择标签组
+export function getTagLevData(id) {
+  return fetch({
+    url: `/datatag/tagmanage/dtTag/${id}`,
+    method: 'get'
+  })
+}
+// 打标--打标设置
+export function getHistoryColData(params) {
+  return fetch({
+    url: '/datatag/tagmodel/dtSetCol/getHistoryCol',
+    method: 'get',
+    params
+  })
+}
+// 字段打标--打标确认
+export function saveMarkData (data) {
+  //console.log(data)
+  return fetch({
+    url: '/datatag/tagmodel/dtSetCol/saveCondition',
+    method: 'post',
+    data
+  })
+}

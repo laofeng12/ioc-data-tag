@@ -1,14 +1,11 @@
 <template>
   <div>
-    <el-table border class="my-table"
-      :data="tableDataOne"
-      style="width: 100%">
-      <el-table-column
-       v-for="(item,index) in theadDataOne" :prop="item.prop" :key="index">
+    <el-table border class="my-table" :data="tableData" style="width: 100%">
+      <el-table-column v-for="(item,index) in theadData" :prop="item.sourceCol" :key="index">
         <template slot="header" slot-scope="scope">
-          <el-dropdown @command="handleCommandTags($event,item)"  v-if="item.isTag===true">
+          <el-dropdown @command="handleCommandTags($event,item)"  v-if="item.isMarking===1">
               <span class="el-dropdown-link">
-                {{item.lable}} <i class="el-icon-setting"></i>
+                {{item.showCol}} <i class="el-icon-setting"></i>
               </span>
                         <el-dropdown-menu slot="dropdown">
                           <el-dropdown-item command="0" icon="el-icon-document-copy">克隆字段</el-dropdown-item>
@@ -17,7 +14,7 @@
                         </el-dropdown-menu>
           </el-dropdown>
           <span v-else>
-            {{item.lable}}
+            {{item.showCol}}
           </span>
       </template>
       </el-table-column>
@@ -25,55 +22,156 @@
     <!--字段设置-->
     <el-dialog class="creat" title="数据打标"  :visible.sync="setTagsDialog" width="630px" center :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="选择标签组" prop="region">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" @click="closePanel">
+        <el-form-item label="选择标签组:" prop="tagTeam">
           <el-col :span="11">
-          <el-select v-model="ruleForm.tagTeam" filterable placeholder="请选择" size="small">
+          <el-select v-model="ruleForm.tagTeam" filterable placeholder="请选择标签组" size="small" @change="chooseTagTeam">
             <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              v-for="item in tagTeamList"
+              :key="item.id"
+              :label="item.tagsName"
+              :value="item.id">
             </el-option>
           </el-select>
           </el-col>
           <el-col :span="11">
-            <el-link type="primary">编辑标签组</el-link>
+            <el-link type="primary" :underline="false">编辑标签组</el-link>
           </el-col>
         </el-form-item>
-        <el-form-item label="选择标签层" prop="region">
+        <el-form-item label="选择标签层:" prop="tagLev">
           <el-col :span="11">
-            <el-select v-model="ruleForm.tagTeam" filterable placeholder="请选择" size="small">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+          <div class="allTree">
+            <div class="sel">
+              <el-input
+                size="small"
+                placeholder="请输入内容"
+                v-model="ruleForm.tagLev">
+                <i slot="suffix" class="el-input__icon el-icon-arrow-down" @click="showTree()"></i>
+              </el-input>
+              <div class="treeBoder" v-show="showLevTree">
+                <el-tree
+                  class="filter-tree"
+                  :data="treeLevdata"
+                  :props="defaultProps"
+                  default-expand-all
+                  :filter-node-method="filterNode"
+                  :expand-on-click-node="false"
+                  @node-click="clickTreeItem"
+                  ref="tree">
+                      <span class="custom-tree-node" slot-scope="{ node, data }">
+                        <span> <el-radio :disabled="data.leaf" v-model="radio" :label="data">{{data.tagName}}</el-radio></span>
+                      </span>
+                </el-tree>
+              </div>
+            </div>
+          </div>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="打标设置:" prop="tagSet">
+          <el-col :span="11">
+            <el-select v-model="ruleForm.tagSet" filterable placeholder="请选择" size="small">
+              <el-option v-for="(item ,index) in tagSetList" :key="item.id" :label="item.tagName" :value="item.id">
               </el-option>
             </el-select>
           </el-col>
-        </el-form-item>
-        <el-form-item label="打标设置" prop="region">
           <el-col :span="11">
-            <el-select v-model="ruleForm.tagTeam" filterable placeholder="请选择" size="small">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-          </el-col>
-          <el-col :span="11">
-            <el-row>
-              <el-button type="primary" size="small">自动打标</el-button>
-              <el-button type="primary" size="small">人工打标</el-button>
+            <el-row >
+              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="selfMark">自动打标</el-button>
+              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="handleMark">人工打标</el-button>
             </el-row>
           </el-col>
         </el-form-item>
+
+
+        <div class="lookContent" v-if="ruleForm.tagSet!==''" >
+          <div class="contentTop" v-show="isHandle===0">
+            <div class="connect-smbol-box">
+              <div class="topOne" :class="{'no-arrow':conditionSetting.length===0}"
+                   v-for="(item,index) in connectSymbolList"
+                   :key="'con'+item.id"  @click="chooseConnectSymbo(item)">{{item.symolName}}</div>
+             </div>
+            <div class="count-smbol-box">
+              <div class="topOne"
+                   v-for="(item,index) in countSymbolList"
+                   :key="'count'+item.id"  @click="chooseCountSymbol(item)">{{item.symolName}}</div>
+             </div>
+          </div>
+          <!--自动打标不可操作-->
+          <div class="contentTop" v-show="isHandle===1">
+            <div class="connect-smbol-box">
+              <div class="topOne" :class="{'no-arrow':isHandle===1}"
+                   v-for="(item,index) in connectSymbolList"
+                   :key="'con'+item.id">{{item.symolName}}</div>
+            </div>
+            <div class="count-smbol-box">
+              <div class="topOne" :class="{'no-arrow':isHandle===1}"
+                   v-for="(item,index) in countSymbolList"
+                   :key="'count'+item.id">{{item.symolName}}</div>
+            </div>
+          </div>
+          <!--自动打标不可操作-->
+
+
+          <div class="makingContent">
+            <!--打标开始-->
+            <div class="card" v-for="(item,index) in selfMarkList" :key="index" @click="chooseMark(item,index)" :class="{acitve:curIndex===index}">
+              <el-card class="box-card">
+                <!--人工打标结构-->
+                <div class="card-handle" v-if="item.isHandle===0">
+                  <i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i>
+                  <el-input style="width:100px" size="small" v-model="item.tagSetName" placeholder="请输入内容" readonly></el-input>
+                  <span class="chinese">{{item.sourceCol}}</span>
+                  <div class="conditions">
+                  <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
+                    <div class="count-symbol" v-if="conItem.isConnectSymbol===0">
+                      <span class="smbol">{{conItem.symbol}}</span>
+                      <el-input style="width:100px" size="small" v-model="conItem.theValues" placeholder="请输入内容"></el-input>
+                    </div>
+                    <div class="connect-symbol" v-else>
+                      <span class="smbol">{{conItem.symbol}}</span>
+                    </div>
+                  </div>
+                </div>
+                </div>
+                <!--自动打标结构-->
+                <div class="card2" v-else>
+                  <div><i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i></div>
+                  <div><el-input style="width:100px" size="small" v-model="item.tagSetName" placeholder="请输入内容" readonly></el-input></div>
+                  <div class="chinese">{{item.sourceCol}}</div>
+                  <div class="self-mark-choose-box">
+                    <div class="chooseNum" @click="showSelf(item,$event)">
+                      <span>已选</span>
+                      <span class="num">{{item.checkList.length}}</span>
+                      <span>条</span>
+                    </div>
+                    <div class="self-mark-list" v-show="item.showSelfMark">
+                      <el-input
+                        size="small"
+                        placeholder="请输入内容"
+                        v-model="searchWord">
+                        <i slot="suffix" class="el-input__icon el-icon-search" @click="search"></i>
+                      </el-input>
+                      <div class="checkIt">
+                        <div class="checkOne">
+                          <el-checkbox-group v-model="item.checkList"  @change="checkMarkChange(item)">
+                            <el-checkbox v-for="(colItem,cIndex) in  colList" :key='cIndex' :label="colItem.markName"></el-checkbox>
+                          </el-checkbox-group>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </el-card>
+            </div>
+            <!--打标结束-->
+          </div>
+        </div>
+
       </el-form>
       <div slot="footer" class="dialog-footer device">
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认打标</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="saveMark">确认打标</el-button>
       </div>
     </el-dialog>
   </div>
@@ -81,76 +179,409 @@
 </template>
 
 <script>
+  import {getMyTagGroupData,getTagLevData,getHistoryColData,saveMarkData} from '@/api/creatModel'
 export default {
   name: 'datasetEditable',
   props: {
+    theadData: {
+      type: Array,
+      default: Array
+    },
+    tableData:{
+      type: Array,
+      default: Array
+    }
   },
   data () {
     return {
-      saveLoading:false,
-      ruleForm:{
-        tagTeam:''
+      curIndex:0,
+      connectSymbolList:[
+        {symolName:'AND',id:1},
+        {symolName:'OR',id:2},
+        {symolName:'LIKE',id:3},
+        {symolName:'NOT',id:4}
+        ],
+      countSymbolList:[
+        {symolName:'(',id:1},
+        {symolName:')',id:2},
+        {symolName:'<',id:3},
+        {symolName:'>',id:4},
+        {symolName:'=',id:5},
+        {symolName:'≠',id:6},
+        {symolName:'≤',id:7},
+        {symolName:'≥',id:8},
+        {symolName:'+',id:9}
+      ],
+      mineStatus: '',
+      mineStatusValue: [],
+      treeLevdata: [],
+      defaultProps: {
+        children: 'childrenNode', // 子集的属性
+        label: 'tagName',
+        disabled:'leaf'// 是否可以选择
       },
-      rules:{
-
+      saveLoading: false,
+      ruleForm: {
+        tagTeam: '',
+        tagLev: '',
+        tagSet: ''
       },
-      options:[],
-      setTagsDialog:false,
-      theadDataOne:[{
-        prop:'date',
-        lable:'日期',
-        isTag:true
-      },{
-        prop:'name',
-        lable:'名称',
-        isTag:true
-      }],
-      tableDataOne: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }]
+      rules: {
+        tagTeam: [
+          {required: true, message: '请选择标签组', trigger: 'change'}
+        ],
+        tagLev: [
+          {required: true, message: '请选择标签层', trigger: 'change'}
+        ],
+        tagSet: [
+          {required: true, message: '请选择', trigger: 'change'}
+        ]
+      },
+      options: [],
+      tagTeamList: [],
+      tagSetList: [],
+      setTagsDialog: false,
+      searchKeyword: '',
+      colId: 0,
+      filterText: '',
+      check: '',
+      changevalue: '',
+      showLevTree: false,
+      showSelfMark: false,
+      valuesType: '',
+      sourceCol: '',//打标字段名称
+      searchWord: '',// 搜索自动打标值
+      colList: [],//对应字段列内容
+      checkList: [],
+      selfMarkList: [],//所有自动打标数据
+      condition: [],
+      conditionSetting:[],
+      isHandle:1,
+      radio:'1',
+      childrenNode:[]
     }
   },
   watch: {
+    filterText(val) {
+
+    },
+    'ruleForm.tagLev': {
+      handler: function (newValue, oldValue) {
+        this.$refs.tree.filter(newValue)
+      }
+    },
+    'tagSetList':{
+      handler:function(newValue,oldValue){
+       // console.log('tagSetlist',newValue)
+        this.tagSetList=newValue
+      },
+      deep:true
+    },
+    'tableData':{
+      handler:function(newValue,oldValue){
+        //console.log('表格内容数据',newValue)
+        this.tableData=newValue
+      },
+      deep:true
+    }
   },
   created () {
+    //获取标签组
+    this.getMyTagGroupList()
+
+
   },
   mounted () {
   },
   methods: {
+    //深度克隆
+    deepClone (obj) {
+      let newObj = Array.isArray(obj) ? [] : {}
+
+      if (obj && typeof obj === 'object') {
+        for (let key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            newObj[key] = (obj && typeof obj[key] === 'object') ? this.deepClone(obj[key]) : obj[key]
+          }
+        }
+      }
+      return newObj
+    },
+    //选择标签层拿树
+    clickTreeItem(data,node){
+      console.log('data',data)
+      this.childrenNode=data.childrenNode
+      this.tagSetList=[]
+      this.childrenNode.forEach((item,index)=>{
+         if(item.leafParent===false){
+           this.tagSetList.push(item)
+         }
+      })
+      this.ruleForm.tagLev=data.tagName
+      this.showLevTree=false
+    },
+    //选择连接符号
+    chooseConnectSymbo(item){
+      const conditionObj={
+        isConnectSymbol:1,//是否有连接符号
+        symbol:item.symolName,//连接符名或者>,=
+        theValues:'',
+        valuesType:this.valuesType,
+      }
+      const consLen=this.selfMarkList[this.curIndex].conditionSetting.length
+      if(consLen===1){
+        this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+      }else if(consLen===2){
+        this.selfMarkList[this.curIndex].conditionSetting.splice(1,1)
+        this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+      }
+      this.conditionSetting=this.selfMarkList[this.curIndex].conditionSetting
+    },
+    //选择运算符号
+    chooseCountSymbol(item){
+      //console.log(item)
+      const conditionObj={
+        isConnectSymbol:0,//是否有连接符号
+        symbol:item.symolName,//连接符名或者>,=
+        theValues:'',
+        valuesType:this.valuesType,
+      }
+      //console.log('this.selfMarkList',this.selfMarkList)
+      const consLen=this.selfMarkList[this.curIndex].conditionSetting.length
+      if(consLen===0){
+        this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+      }else if(consLen===1){
+        this.selfMarkList[this.curIndex].conditionSetting=[]
+        this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+      }else if(consLen===2){
+        this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+      }
+      this.conditionSetting=this.selfMarkList[this.curIndex].conditionSetting
+
+    },
+    closePanel(){
+
+    },
+    //点击自动打标按钮
+    selfMark(){
+      let tagSetName=''
+      this.tagSetList.forEach((item)=>{
+        if(item.id===this.ruleForm.tagSet){
+          return  tagSetName=item.tagName
+        }
+      })
+      const conditionSetting=[{
+        isConnectSymbol:0,//是否有连接符号
+        symbol:'IN',
+        theValues:'',
+        valuesType:this.valuesType,
+      }]
+     const markObj=   {
+        tagId:this.ruleForm.tagSet,
+        tagSetName:tagSetName,
+        sourceCol:this.sourceCol,
+        checkList:[],
+        showSelfMark:false,
+        isHandle:1,//自动打标
+        conditionSetting:conditionSetting
+      }
+      this.selfMarkList.push(markObj)
+      this.curIndex=this.selfMarkList.length-1
+      this.isHandle=1
+    },
+    //人工打标
+    handleMark(){
+      let tagSetName=''
+      //console.log('this.ruleForm.tagSet',this.ruleForm.tagSet)
+      //console.log('this.tagSetList', this.tagSetList)
+      this.tagSetList.forEach((item)=>{
+        if(item.id===this.ruleForm.tagSet){
+          return  tagSetName=item.tagName
+        }
+      })
+      const markObj=   {
+        tagId:this.ruleForm.tagSet,
+        tagSetName:tagSetName,
+        sourceCol:this.sourceCol,
+        checkList:[],
+        showSelfMark:false,
+        isHandle:0,//人工打标
+        conditionSetting:[]
+      }
+      this.selfMarkList.push(markObj)
+      this.curIndex=this.selfMarkList.length-1
+      this.isHandle=0
+    },
+    //选中自动打标内容
+    checkMarkChange(item){
+     // console.log(value)
+      console.log(item)
+      this.checkList=item.checkList
+      item.conditionSetting[0].theValues=this.checkList.join(",")
+    },
+    //显示标签层
+    showTree(){
+      this.showLevTree = !this.showLevTree
+    },
+   //显示自动打标内容
+    showSelf(itemObj){
+      itemObj.showSelfMark = !itemObj.showSelfMark
+      this.colList=[]
+      const name=this.sourceCol
+      this.tableData.forEach((item,index)=>{
+        //console.log(item[name])
+        const markName=item[name]
+        this.colList.push({markName:markName})
+      })
+      this.colList= [...new Set(this.colList )]
+      console.log('自动打标选择内容',this.colList)
+    },
+    delSelfMark(index){
+     // console.log(index)
+      this.selfMarkList.splice(index,1)
+    },
+    search(){
+      console.log("查询");
+    },
+    ///过滤树
+    filterNode (value, data) {
+      if (!value) return true
+      return data.tagName.indexOf(value) !== -1
+    },
+/*    handleCheckChange () {
+      let res = this.$refs.tree.getCheckedNodes(true,true)//这里两个true，1. 是否只是叶子节点 2. 是否包含半选节点（就是使得选择的时候不包含父节点）
+      let arrLabel = []
+      let arr = [];
+      res.forEach((item) => {
+        arrLabel.push(item.tagName)
+        arr.push(item);
+      })
+      this.mineStatusValue = arr
+      this.ruleForm.tagLev = arrLabel
+    },*/
     //字段打标
-    colSetTags(){
+    colSetTags(data){
       this.setTagsDialog=true
+       //console.log(colId)
+      this.valuesType=data.sourceDataType
+      this.sourceCol=data.sourceCol
+      this.colId=data.colId
+     // this.getHistoryColList(data.colId)
     },
     //下拉菜单处理
     handleCommandTags(dropIndex,data) {
+      console.log('下拉菜单数据',data)
       switch (dropIndex) {
         case '0': // 克隆字段
          // this.renameTreeItem(node, data, 1)
           break
         case '1': // 字段打标
-          this.colSetTags()
+          this.colSetTags(data)
           break
         case '2': // 清除字段
          // this.moveTreeItem(data, 1)
       }
     },
+    //选择标签组
+    chooseTagTeam(id){
+     // console.log(id)
+      this.getTagLevList(id)
+
+    },
     //关闭打标
     close(){
+       this.showSelfMark=false
+       this.colList=[]
+    },
+    // 选择标签组
+    async getMyTagGroupList() {
+      try {
+        const  params={
+          keyword:'',
+          page: 0,
+          size:200
+        }
+        const data = await getMyTagGroupData(params)
+        //console.log(data)
+        this.tagTeamList=data.rows
+      } catch (e) {
 
+      }
+    },
+    // 标签层数据
+    async getTagLevList(id) {
+      try {
+        const data = await getTagLevData(id)
+      //  console.log(data.childrenNode)
+        this.treeLevdata=data.childrenNode
+       // console.log(' this.treeLevdata', this.treeLevdata)
+      } catch (e) {
+
+      }
+    },
+    // 标签层数据
+    async getHistoryColList(colId) {
+     // console.log('colId',colId)
+   const params={
+     colId:colId
+   }
+      try {
+        const data = await getHistoryColData(params)
+        console.log('data', data)
+        this.tagSetList=data.tagGroups
+      } catch (e) {
+
+      }
+    },
+    //确认打标按钮
+    saveMark(){
+      this.getSaveMarkList()
+    },
+    //打标确认保存
+    async getSaveMarkList() {
+      console.log('this.selfMarkList',this.selfMarkList)
+      try {
+        if(this.valuesType==='number'){
+          //字段为number类型的打标
+          const  params={
+
+          }
+        }
+        else if(this.valuesType==='string'){
+          console.log('this.colId',this.colId)
+          //字段为string类型的打标
+          let conditions=this.deepClone(this.selfMarkList)
+           conditions.forEach((obj,index)=>{
+             delete obj.checkList
+             delete obj.sourceCol
+             delete obj.tagSetName
+             delete obj.showSelfMark
+             obj.colId=this.colId
+             return obj
+          })
+          console.log('conditions',conditions)
+          const  params={
+            colId:this.colId,
+            condtion:conditions
+          }
+          const data = await saveMarkData(params)
+          console.log('确认打标',data)
+        }else {
+          const  params={
+
+          }
+        }
+        //this.tagTeamList=data.rows
+      } catch (e) {
+
+      }
+    },
+    //选中要打标条件修改
+    chooseMark(item,index){
+      this.curIndex=index
+      //console.log('选中要打标的项',item)
+      this.isHandle=item.isHandle
+     this.conditionSetting=item.conditionSetting
     }
   }
 }
@@ -163,4 +594,167 @@ export default {
     cursor: pointer;
   }
 }
+label{
+      font-weight: normal;
+}
+.allTree{
+  position: relative;
+  i{
+    cursor: pointer;
+  }
+
+}
+.filter-tree{
+  height: 200px;
+  overflow: auto;
+}
+.treeBoder{
+  width: 100%;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  padding: 15px 10px;
+  background-color: #fff;
+  position: absolute;
+  z-index: 55;
+}
+
+.lookContent {
+  border: 1px solid #dcdfe6;
+  padding: 0px 10px;
+  border-radius: 4px;
+}
+  .contentTop{
+    display: flex;
+    border-bottom: 1px solid #dcdfe6;
+    .connect-smbol-box{
+      display: flex;
+    }
+    .count-smbol-box{
+      display: flex;
+    }
+  }
+  .topOne{
+    width: 40px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    font-size: 12px;
+    color:#0486fe;
+    cursor: pointer;
+    &.no-arrow{
+      cursor: not-allowed;
+      color: #cccccc;
+    }
+  }
+  .deleteContent{
+    font-size: 18px;
+    padding: 0px 10px 0px 0px;
+    color:#0486fe;
+  }
+  .chinese,.chinese2{
+    font-size: 14px;
+    padding: 0px 10px;
+  }
+  .chinese2{
+    color:#0486fe;
+  }
+  .makingContent{
+    margin-top: 20px;
+    min-height: 100px;
+  }
+  .card{
+    margin-bottom: 10px;
+    cursor: pointer;
+    &.acitve{
+/*      box-shadow: 0 2px 12px 0 #0486fe;
+      box-shadow: 0 2px 12px 0 #86fe00;*/
+    /*  border: 1px solid #0486fe;*/
+
+  }
+  }
+  .chooseNum{
+    width: 200px;
+    height: 32px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .no-handle{
+    .no-arrow{
+      color: #cccccc;
+    }
+  }
+.self-mark-choose-box{
+/*  position: relative;*/
+  position: absolute;
+  right: 100px;
+
+}
+.self-mark-list{
+  width: 200px;
+  position: absolute;
+  right: 0px;
+/*  margin-top: 10px;*/
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  padding: 5px 10px;
+  background-color: #fff;
+  z-index: 9999;
+}
+  .num{
+    color:#0486fe;
+    padding: 0px 3px;
+  }
+  .card2{
+    display: flex;
+    align-items: center;
+  }
+  .checkIt{
+    padding: 10px;
+    height: 130px;
+    overflow: auto;
+
+  }
+  .checkOne{
+    padding-top: 5px;
+  }
+  .clearfix:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+  .deleteContent{
+    cursor: pointer;
+  }
+  .card-handle{
+    display: flex;
+    align-items:center;/*垂直居中*/
+  }
+  .conditions{
+    display: flex;
+    align-items:center;/*垂直居中*/
+    .condition{
+     /* display: flex;*/
+      position: relative;
+      .connect-symbol{
+        .smbol{
+          padding: 0 10px;
+          color: #409EFF;
+        }
+      }
+      .count-symbol{
+        .smbol{
+          position: absolute;
+          z-index: 8;
+          top: 8px;
+          left:2px;
+        }
+      }
+
+    }
+  }
 </style>

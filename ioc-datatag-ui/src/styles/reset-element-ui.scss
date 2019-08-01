@@ -87,10 +87,13 @@
     }
   }
 .el-tree {
+/*  overflow: auto;*/
+/*  min-width: 100%;
+  display:inline-block !important;*/
   .el-tree-node__expand-icon.expanded {
     transform: none;
   }
-  .el-tree-node__expand-icon.expanded:before {
+  .el-tree-node__expand-icon.expanded.el-icon-folder:before {
     content: "\e784";
   }
   .el-tree-node__expand-icon {
@@ -103,4 +106,21 @@
   }
 
 }
+.checkOne{
+  .el-checkbox{
+    display: block;
+  }
+}
 
+.card{
+  &.acitve{
+    /*      box-shadow: 0 2px 12px 0 #0486fe;
+          box-shadow: 0 2px 12px 0 #86fe00;*/
+    /*  border: 1px solid #0486fe;*/
+    .el-card{
+      //border: 1px solid #0486fe;
+      background-color: #f5f7fa;
+    }
+
+  }
+}
