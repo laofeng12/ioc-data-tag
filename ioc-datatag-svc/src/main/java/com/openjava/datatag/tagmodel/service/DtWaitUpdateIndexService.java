@@ -24,4 +24,8 @@ public interface DtWaitUpdateIndexService {
 	
 	void doDelete(Long id);
 	void doRemove(String ids);
+	/**
+	 * 更新模型打标临时表的索引
+	 */
+	void updateModelIndex();
 }

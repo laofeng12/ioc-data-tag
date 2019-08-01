@@ -327,7 +327,7 @@ public class MppPgExecuteUtil extends ExecuteUtil {
         return dataList;
     }
 
-    private DsDataSource getValidDataSource() {
+    public DsDataSource getValidDataSource() {
         if (this.dsDataSource == null) {
             DsDataSource dataSource = new DsDataSource();
             dataSource.setDbType(3L);
