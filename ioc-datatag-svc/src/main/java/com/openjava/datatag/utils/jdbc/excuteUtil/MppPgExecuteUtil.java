@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Functions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.openjava.datatag.component.PostgreSqlConfig;
 import com.openjava.datatag.utils.jdbc.dataprovider.DataProvider;
 import com.openjava.datatag.utils.jdbc.dataprovider.DataProviderManager;
 import com.openjava.datatag.utils.jdbc.dataprovider.DsDataSource;
@@ -13,9 +14,11 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.ljdp.component.result.GeneralResult;
 import org.ljdp.component.result.Result;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -26,6 +29,9 @@ import java.util.*;
 @Data
 @Component
 public class MppPgExecuteUtil extends ExecuteUtil {
+
+    @Resource
+    private PostgreSqlConfig PostgreSqlConfig;
 
     /**
      * 表名
@@ -331,7 +337,8 @@ public class MppPgExecuteUtil extends ExecuteUtil {
         if (this.dsDataSource == null) {
             DsDataSource dataSource = new DsDataSource();
             dataSource.setDbType(3L);
-            dataSource.setConfigJson("{\"password\":\"ioc123456\",\"username\":\"mppuser\",\"ip\":\"183.6.55.26\",\"port\":\"5432\",\"dataBaseName\":\"postgres\",\"pooled\":true}");
+//            dataSource.setConfigJson("{\"password\":\"ioc123456\",\"username\":\"mppuser\",\"ip\":\"183.6.55.26\",\"port\":\"5432\",\"dataBaseName\":\"postgres\",\"pooled\":true}");
+            dataSource.setConfigJson(JSONObject.toJSONString(PostgreSqlConfig));
             this.dsDataSource = dataSource;
         }
 
@@ -347,40 +354,4 @@ public class MppPgExecuteUtil extends ExecuteUtil {
             ((Initializing) dataProvider).afterPropertiesSet();
         }
     }
-
-    public static void main(String[] args) {
-        MppPgExecuteUtil u= new MppPgExecuteUtil();
-        u.setTableName("zmk_test");//表名
-        u.setTableKey("id");//主键
-        u.dropTable();//删表
-        Map<String,String> map  = new LinkedHashMap<>();
-        Map<String,String> mapType  = new LinkedHashMap<>();
-        map.put("id","主键");
-        map.put("name","名字");
-        map.put("create_time","创建时间");
-        mapType.put("id","bigint");
-        mapType.put("name","varchar");
-        mapType.put("create_time","date");
-        u.createTable(map,mapType);//建表
-        List<Object> dataList = new ArrayList<>();
-        List<String> values = new ArrayList<>();
-        values.add("1");
-        values.add("名字1");
-        values.add("2018-07-09 00:00:00");
-        dataList.add(values);
-        List<String> values2 = new ArrayList<>();
-        values2.add("2");
-        values2.add("名字2");
-        values2.add("2018-07-09 00:00:00");
-        dataList.add(values2);
-        u.setDataList(dataList);
-        u.insertDataList();//load数据
-//        u.dropTable();//删表
-//        u.setSQL("select * from \"DT_1\"  t ");
-//        String[][] data = u.getData();
-//        System.out.println(data.length);
-    }
-
-
-
 }

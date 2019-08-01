@@ -66,7 +66,7 @@ public class DtWaitUpdateIndexServiceImpl implements DtWaitUpdateIndexService {
 		}
 	}
 	public void updateModelIndex(){
-		List<DtWaitUpdateIndex> waitList =  dtWaitUpdateIndexRepository.finaByRunState(Constants.DT_INDEX_RUN_STATUS_WAIT);
+		List<DtWaitUpdateIndex> waitList =  dtWaitUpdateIndexRepository.getByRunState(Constants.DT_INDEX_RUN_STATUS_WAIT);
 		MppPgExecuteUtil pg = new MppPgExecuteUtil();
 		if (CollectionUtils.isNotEmpty(waitList)) {
 			for (int i = 0; i < waitList.size() ; i++) {

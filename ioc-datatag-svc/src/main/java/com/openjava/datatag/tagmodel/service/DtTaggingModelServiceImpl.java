@@ -61,7 +61,10 @@ import java.util.stream.Collectors;
 @Transactional
 @Data
 public class DtTaggingModelServiceImpl implements DtTaggingModelService {
+	@Value("${dataSet.resourceDataUrl}")
+	private String resourceDataUrl;
 	Logger logger = LogManager.getLogger(getClass());
+
 	@Resource
 	private DtTaggingModelRepository dtTaggingModelRepository;
 	@Resource
@@ -86,8 +89,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
     private  DtWaitUpdateIndexService dtWaitUpdateIndexService;
 	@Resource
 	private RedisTemplate<String, Object> redisTemplate;
-	@Value("${dataSet.resourceDataUrl}")
-	private String resourceDataUrl;
+	@Resource
+	private MppPgExecuteUtil mppPgExecuteUtil;
+
 	public void copy(Long id,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTaggingModel model = get(id);
@@ -463,14 +467,13 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		}
 //		Map<Long, List<DtSetCol>> colGroup = cols.stream().collect(Collectors.groupingBy(DtSetCol::getColId));
 		//第一步、若存在删表
-		MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();
-		mppUtil.setTableName(tagModel.getDataTableName());//表名
-		mppUtil.dropTable();//删表
+		mppPgExecuteUtil.setTableName(tagModel.getDataTableName());//表名
+		mppPgExecuteUtil.dropTable();//删表
 		//第二步、建表
-		mppUtil.setTableKey(tagModel.getPkey());//主键
+		mppPgExecuteUtil.setTableKey(tagModel.getPkey());//主键
 		Map<String,String> colmap  = new LinkedHashMap<>();//字段，注释
 		Map<String,String> cloTypeMap  = new LinkedHashMap<>();//字段，字段类型
-		mppUtil.setTableName(tagModel.getDataTableName());
+		mppPgExecuteUtil.setTableName(tagModel.getDataTableName());
 		cols.forEach(record->{
 			colmap.put(record.getShowCol(),"");
 			if (TagConditionUtils.isDateType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())) {
@@ -485,7 +488,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				cloTypeMap.put(record.getShowCol(),"varchar");
 			}
 		});
-		mppUtil.createTable(colmap,cloTypeMap);
+		mppPgExecuteUtil.createTable(colmap,cloTypeMap);
 		//第三步、获取数据集数据并同步到mpp
 		Date begin = new Date();
 		int successCount = 0;
@@ -496,8 +499,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				List<Object> data = new LinkedList<>();
 				Pageable pageable = PageRequest.of(i,100000);
 				data.addAll((Collection<?>) getDataFromDataSet(taggingModelId,0,pageable));
-				mppUtil.setDataList(data);
-				mppUtil.insertDataList();
+				mppPgExecuteUtil.setDataList(data);
+				mppPgExecuteUtil.insertDataList();
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -506,8 +509,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		//第四步update数据（传sql进mpp,在mpp计算）
 		List<String> markingSql = getMarkingSQL(taggingModelId);
 		if (CollectionUtils.isNotEmpty(markingSql)){
-			mppUtil.setUpdateSqlList(markingSql);
-			mppUtil.updateDataList();
+			mppPgExecuteUtil.setUpdateSqlList(markingSql);
+			mppPgExecuteUtil.updateDataList();
 		}
 		//第五步，记录更新结果
         DtWaitUpdateIndex waitUpdateIndex = new DtWaitUpdateIndex();

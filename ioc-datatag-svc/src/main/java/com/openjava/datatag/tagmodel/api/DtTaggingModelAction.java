@@ -1,8 +1,6 @@
 package com.openjava.datatag.tagmodel.api;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +13,7 @@ import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.service.DtSetColService;
 import com.openjava.datatag.utils.IpUtil;
 import com.openjava.datatag.user.service.SysUserService;
+import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
@@ -60,6 +59,8 @@ public class DtTaggingModelAction {
 
 	@Resource
 	private SysUserService sysUserService;
+	@Resource
+	private MppPgExecuteUtil mppPgExecuteUtil;
 	/**
 	 * 用主键获取数据
 	 * @return
@@ -219,9 +220,6 @@ public class DtTaggingModelAction {
 		return dto;
 	}
 
-
-
-
 	/**
 	 * 另存
 	 */
@@ -323,5 +321,42 @@ public class DtTaggingModelAction {
 			} catch (Exception e2) {
 			}
 		}
+	}
+
+	@ApiOperation(value = "PG测试", nickname="PG测试")
+	@Security(session=false)
+	@RequestMapping(value="/test",method=RequestMethod.GET)
+	public DataApiResponse<Object> test() throws Exception {
+		DataApiResponse response = new DataApiResponse();
+		mppPgExecuteUtil.setTableName("zmk_test");//表名
+		mppPgExecuteUtil.setTableKey("id");//主键
+		mppPgExecuteUtil.dropTable();//删表
+        Map<String,String> map  = new LinkedHashMap<>();
+        Map<String,String> mapType  = new LinkedHashMap<>();
+        map.put("id","主键");
+        map.put("name","名字");
+        map.put("create_time","创建时间");
+        mapType.put("id","bigint");
+        mapType.put("name","varchar");
+        mapType.put("create_time","date");
+		mppPgExecuteUtil.createTable(map,mapType);//建表
+        List<Object> dataList = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        values.add("1");
+        values.add("名字1");
+        values.add("2018-07-09 00:00:00");
+        dataList.add(values);
+        List<String> values2 = new ArrayList<>();
+        values2.add("2");
+        values2.add("名字2");
+        values2.add("2018-07-09 00:00:00");
+        dataList.add(values2);
+		mppPgExecuteUtil.setDataList(dataList);
+		mppPgExecuteUtil.insertDataList();//load数据
+		mppPgExecuteUtil.dropTable();//删表
+		mppPgExecuteUtil.setSQL("select * from \"DT_1\"  t ");
+        String[][] data = mppPgExecuteUtil.getData();
+        System.out.println(data.length);
+		return response;
 	}
 }

@@ -16,5 +16,5 @@ import java.util.List;
  */
 public interface DtWaitUpdateIndexRepository extends DynamicJpaRepository<DtWaitUpdateIndex, Long>, DtWaitUpdateIndexRepositoryCustom{
 
-    List<DtWaitUpdateIndex> finaByRunState(Long runState);
+    List<DtWaitUpdateIndex> getByRunState(Long runState);
 }

@@ -94,3 +94,11 @@ schedulejob: #定时任务组件
 
 dataSet: #数据集相关
   resourceDataUrl: http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/
+
+pgconfig:
+  password: ioc123456
+  username: mppuser
+  ip: 183.6.55.26
+  port: 5432
+  dataBaseName: postgres
+  pooled: true
