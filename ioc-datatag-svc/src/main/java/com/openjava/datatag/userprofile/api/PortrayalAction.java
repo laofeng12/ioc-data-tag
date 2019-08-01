@@ -100,5 +100,4 @@ public class PortrayalAction {
         resp.setData(por);
         return resp;
     }
-
 }
