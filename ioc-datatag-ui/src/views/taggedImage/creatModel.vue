@@ -8,7 +8,7 @@
         <div class="name">
           <div class="img"></div>
           <div class="text">
-            <el-input v-model="modelName" placeholder="请输入内容"></el-input>
+            <el-input size="small" v-model="modelName" placeholder="请输入内容"></el-input>
           </div>
         </div>
       </div>
@@ -24,15 +24,13 @@
       <Aside/>
       <div class="components">
         <div class="top">
-          <div class="left">
-            南城区高考成绩数据
-          </div>
+          <div class="left">南城区高考成绩数据</div>
           <div class="right">
             <span class="iconPeople"><i class="el-icon-user"></i></span>
             <span class="cooperation">协作人员:</span>
             <img class="imgPeople" src="../../assets/img/u163.png" height="25" width="25"/>
             <span class="multiply">x</span>
-            <span class="num">3</span>
+            <span class="num">{{peopleLength+1}}</span>
             <span class="handlePeople"><i class="el-icon-arrow-down" @click="showIt"></i></span>
           </div>
           <div class="card" v-show="show">
@@ -45,39 +43,16 @@
                 <div>
                   <img class="imgPeople2" src="../../assets/img/Uadmin.png" height="16" width="16"/>
                   <img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName" title="数据搬运工">数据搬运工</div>
-                <!--<div class="head"><i class="el-icon-delete"></i></div>-->
+                <div class="listName" :title="this.$store.state.user.userInfo.userName">
+                  {{this.$store.state.user.userInfo.userName}}
+                </div>
               </div>
-              <div class="contentB clearfix">
+              <div class="contentB clearfix" v-for="(item,index) in showPeoplelist" :key="index">
                 <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName" title="数据搬运工数据搬运工2">数据搬运工数据搬运工2</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
+                <div class="listName" :title="item.cooUserName">{{item.cooUserName}}</div>
+                <div class="head"><i class="el-icon-delete" @click="deleteList(item.id)"></i></div>
               </div>
-              <div class="contentB clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
-              <div class="contentB clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
-              <div class="contentB clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
-              <div class="contentB clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
-              <div class="contentB clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
+
             </div>
           </div>
 
@@ -145,66 +120,57 @@
       </div>
     </el-dialog>
     <!--协作添加-->
-    <el-dialog class="creat addCreat" title="添加成员" :visible.sync="addSetDialog" width="950px" center
+    <el-dialog class="creat addCreat" title="添加成员" :visible.sync="addSetDialog" width="1100px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close">
       <div class="col-set-box">
         <el-container class="">
           <el-aside width="250px" class="left">
             <h3>选择协作用户</h3>
-            <el-input placeholder="输入关键词搜索列表" v-model="searchText" size="small" suffix-icon="el-icon-search"></el-input>
+            <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small" suffix-icon="el-icon-search"
+            ></el-input>
             <div class="allPeople">
-              <div class="userContent clearfix">
-                <div class="peopleName">大雄1</div>
-                <div><i class="el-icon-circle-plus-outline addIcon"></i></div>
-              </div>
-              <div class="userContent clearfix">
-                <div class="peopleName">大雄2</div>
-                <div><i class="el-icon-circle-plus-outline addIcon"></i></div>
-              </div>
-              <div class="userContent clearfix">
-                <div class="peopleName">大雄3</div>
-                <div><i class="el-icon-circle-plus-outline addIcon"></i></div>
+              <div class="userContent clearfix" v-for="(item,index) in list" :key="index">
+                <div class="peopleName" ref="people" :title="item.FULLNAME">{{item.FULLNAME}}</div>
+                <div><i class="el-icon-circle-plus-outline addIcon" @click="getaddPeople(item.USERID)"></i></div>
               </div>
             </div>
           </el-aside>
           <el-aside width="250px" class="left">
             <h3>已选用户</h3>
-            <el-input placeholder="输入关键词搜索列表" v-model="searchText" size="small" suffix-icon="el-icon-search"></el-input>
+            <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText2" size="small"
+                      suffix-icon="el-icon-search"></el-input>
             <div class="allPeople">
-              <div class="userContent clearfix">
-                <div class="peopleName">大雄1</div>
-                <div><i class="el-icon-delete addIcon"></i></div>
-              </div>
-              <div class="userContent clearfix">
-                <div class="peopleName">大雄2</div>
-                <div><i class="el-icon-delete addIcon"></i></div>
-              </div>
-              <div class="userContent clearfix">
-                <div class="peopleName">大雄3</div>
-                <div><i class="el-icon-delete addIcon"></i></div>
+              <div class="userContent clearfix" v-for="(item,index) in list2" :key="index"
+                   :class="{zxhh:changeRed == index}">
+                <div class="peopleName" :title="item.cooUserName" @click="markingPeople(item.cooUser,item.id,item.colId,index)">
+                  {{item.cooUserName}}
+                </div>
+                <div><i class="el-icon-delete addIcon" @click="deleteList(item.id)"></i></div>
               </div>
             </div>
           </el-aside>
           <div class="right2">
             <h3>选择协作打标字段</h3>
-            <div>
-              <el-table class="my-table" border style="width: 100%"
-                        :data="tableData"
-                        tooltip-effect="dark">
-
+            <div class="marking">
+              <el-table class="my-table tableHeight" ref="multipleTable" :data="tableData" border stripe tooltip-effect="dark"
+                        style="width: 100%;"
+                        :header-cell-style="{background:'#f0f2f5'}">
+                <el-table-column label="字段" prop="showCol"></el-table-column>
+                <el-table-column prop="sourceDataType" label="类型" width="100"></el-table-column>
                 <el-table-column
-                  label="字段" prop="colName">
-                </el-table-column>
-                <el-table-column
-                  prop="colNameType"
-                  label="类型"
-                  width="100">
-                </el-table-column>
-                <el-table-column
-                  label="选择打标字段" width="120">
+                  label="选择打标字段">
                   <template slot-scope="scope">
-                    <el-checkbox></el-checkbox>
+                    <el-checkbox v-show="false"></el-checkbox>
+                    <el-select class="controlChoose2" size="small" v-model="scope.row.useTagGroup" placeholder="请选择"
+                               @change="chooseSelect(scope.row)" :disabled="(!helpId || (scope.row.cooUser && scope.row.cooUser !== helpId))">
+                      <el-option
+                        v-for="item in options3"
+                        :key="item.id"
+                        :label="item.tagsName"
+                        :value="item.id">
+                      </el-option>
+                    </el-select>
                   </template>
                 </el-table-column>
               </el-table>
@@ -214,7 +180,8 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认添加</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="getdosave">确认添加
+          </el-button>
         </div>
       </div>
     </el-dialog>
@@ -224,6 +191,8 @@
 <script>
   import EditTable from '../../components/ModeleEdit/EditTable'
   import Aside from '../../components/ModeleEdit/Aside'
+  import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave} from '@/api/creatModel.js'
+
   export default {
     name: 'creatModel',
     data() {
@@ -241,6 +210,12 @@
         tableWidth: 800,
         tableHeight: 800,
         search: '',
+        chooseList: [],
+        showPeoplelist: [],
+        arrlist: [],
+        peopleLength: 0,
+        // modeId: 1639943, // 模型ID
+        modeId: 1640046, // 模型ID
         ruleForm: {
           name: '',
           textarea2: '',
@@ -248,15 +223,17 @@
           date: ''
         },
         searchText: '',
+        searchText2: '',
         isIndeterminate: true,
         addSetDialog: false,
-        tableData: [{
-          colName: 'std',
-          colNameType: 'number'
-        },{
-          colName: 'std2',
-          colNameType: 'number'
-        }],
+        tableData: [],
+        options3: [],
+        selectVal: '',
+        changeRed: -1,
+        startDisable: true,
+        helpId: '',  // 协作用户id
+        cooId:'',
+        zcolId:'',
         options2: [{
           value: '选项1',
           label: '停止运行'
@@ -280,20 +257,10 @@
       }
     },
     components: {EditTable, Aside},
-    watch: {
-      theadData: function (val) {
-        this.tableWidth = val.length * 149
-      }
-    },
-    created() {
-      this.datasetId = this.$route.params.id
-    },
-    mounted() {
-
-    },
     methods: {
       addPeople() {
         this.addSetDialog = true
+        this.cooperatioUser()
       },
       close() {
         this.addSetDialog = false
@@ -319,6 +286,217 @@
       closeSave() {
         this.saveDialog = false
       },
+      // 选择协作用户列表
+      async cooperatioUser() {
+        const userId = this.$store.state.user.userInfo.userId
+        try {
+          const user = await choosePeople(userId)
+          this.chooseList = user.data
+        } catch (e) {
+          console.log(e);
+        }
+
+      },
+      // 成员列表
+      async getpeopleList() {
+        const params = {
+          eq_createUser: '',
+          eq_taggmId: this.modeId,
+          page: '',
+          size: 1000
+        }
+        try {
+          const peopleList = await getPeople(params)
+          if (peopleList.rows && peopleList.rows.length >= 0) {
+            this.showPeoplelist = peopleList.rows
+            this.peopleLength = peopleList.rows.length
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      },
+      // 单个协作成员添加
+      async getaddPeople(userId) {
+        const param = {
+          "cooUser": userId,
+          "id": 0,
+          "taggmId": this.modeId
+        }
+        try {
+          const addRes = await addPeople(param)
+          this.$message({
+            // message: addRes.message,
+            message: '添加成功',
+            type: 'success'
+          });
+          this.getpeopleList()
+        } catch (e) {
+          console.log(e);
+        }
+      },
+      // 删除
+      async deleteList(id) {
+        try {
+          const res = await deletePeople({
+            id: id,
+            ids: ''
+          })
+          this.$message({
+            message: res.message,
+            type: 'success'
+          });
+          this.getpeopleList()
+        } catch (e) {
+          console.log(e);
+        }
+      },
+      // 点击用户
+      async markingPeople(zuserid,id,colId,index) {
+        this.changeRed = index
+        this.helpId = zuserid
+        this.cooId = id
+        this.zcolId = colId
+        this.startDisable = false
+
+      },
+      // table列表
+      async markingTable(id) {
+        this.helpId = id
+        this.tableData = []
+        try {
+          const markingRes = await markingCheck({
+            modelId: this.modeId,
+            userId: id
+          })
+          if (markingRes.rows && markingRes.rows.length > 0) {
+            markingRes.rows.map(item => {
+              if (item.isMarking == 1) {
+                item.ischecked = false
+                item.select = ''      // 标签组id
+                item.helpuserId = ''  // 协作用户id
+                item.ztagColName = ''  //打标字段
+                if (item.isCooField == 0) {
+                  item.isCooField = false  // checkbox 为false
+                } else {
+                  item.isCooField = true
+                }
+                this.tableData.push(item)
+              }
+            })
+          }
+        } catch (e) {
+
+        }
+      },
+      // 我的标签组下拉
+      async groupList() {
+        const params = {
+          eq_isShare: '',
+          keyword: '',
+          page: '',
+          size: ''
+        }
+        try {
+          const groupRes = await labelGroup(params)
+          if(groupRes.rows && groupRes.rows.length >0){
+            this.options3 = groupRes.rows
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      },
+      //checkbox
+      getRow(row) {
+        if (row.isCooField == false) {
+          row.isCooField = true
+          if (row.isCooField = true) {
+            row.cooUser = this.helpId
+          }
+        } else {
+          row.isCooField = false
+          row.helpuserId = ''
+        }
+      },
+      // 下拉选中
+      chooseSelect(row, item) {
+        row.cooUser = this.helpId
+        row.id = this.cooId
+        row.tagColId = this.zcolId
+      },
+      // save
+      async getdosave() {
+        this.saveLoading = true
+        const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser}) => {
+          return {
+            "cooId": id, //id
+            "id": cooFieldId,  //  cooFieldId
+            "tagColName": showCol, // 打标字段
+            useTagGroup,  // 标签组ID
+            isCooField,//是否选中
+            cooUser //协作用户ID
+          }
+        })
+        tmp.forEach(item => {
+          if (item.useTagGroup) {
+            item.isCooField = true
+          }
+        })
+        for (let i = 0; i < tmp.length; i++) {
+          for (let j = 0; j < this.showPeoplelist.length; j++) {
+            if (this.showPeoplelist[j].cooUser == tmp[i].cooUser) {
+              this.showPeoplelist[j].cooTagcolLimitList = []
+              this.showPeoplelist[j].cooTagcolLimitList.push(tmp[i])
+            }
+          }
+        }
+        // console.log('创建',JSON.stringify(this.showPeoplelist));
+        try{
+          const saveRes = await dosave(this.showPeoplelist)
+          this.$message({
+            message: saveRes.message,
+            type: 'success'
+          });
+          this.saveLoading = false
+          this.addSetDialog = false
+        }catch (e) {
+          this.saveLoading = false
+        }
+      }
+    },
+    watch: {
+      theadData: function (val) {
+        this.tableWidth = val.length * 149
+      },
+
+    },
+    created() {
+      this.datasetId = this.$route.params.id
+      this.getpeopleList()
+      this.groupList()
+      this.markingTable()
+    },
+    computed: {
+      list() {
+        let arr = [];
+        this.chooseList.map(item => {
+          if (item.FULLNAME.indexOf(this.searchText) >= 0) {
+            arr.push(item)
+          }
+        })
+        return arr
+      },
+      list2() {
+        let arr2 = [];
+        this.showPeoplelist.map(item => {
+          if (item.cooUserName.indexOf(this.searchText2) >= 0) {
+            arr2.push(item)
+          }
+        })
+        return arr2
+      }
+    },
+    mounted() {
+
     }
   }
 </script>
@@ -529,13 +707,14 @@
   }
 
   .peopleName {
-    width: 180px;
+    width: 170px;
     font-size: 14px;
     color: #606266;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     float: left;
+    cursor: pointer;
   }
 
   .addIcon {
@@ -565,7 +744,7 @@
       }
     }
     .right2 {
-      min-width: 400px;
+      width: 100%;
       padding: 0 10px;
     }
     .my-table {
@@ -587,7 +766,18 @@
     tr:hover > td {
       background-color: #f4f9fb;
     }
+  }
 
+  .controlChoose2 {
+    width: 180px !important;
+  }
+
+  .zxhh {
+    background-color: chartreuse;
+  }
+  .tableHeight{
+    /*height: 320px;*/
+    /*overflow: auto;*/
   }
 </style>
 
