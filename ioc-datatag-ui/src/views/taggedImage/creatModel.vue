@@ -40,46 +40,26 @@
           <div class="card" v-show="show">
             <div class="clearfix">
               <div class="peopleList">成员列表</div>
-              <div class="addPeople"><i class="el-icon-plus"></i></div>
+              <div class="addPeople"><i class="el-icon-plus" @click="addPeople"></i></div>
             </div>
             <div class="peopleContent">
               <div class="contentA clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
+                <div>
+                  <img class="imgPeople2" src="../../assets/img/Uadmin.png" height="16" width="16"/>
+                  <img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName" :title="this.$store.state.user.userInfo.userName">
+                  {{this.$store.state.user.userInfo.userName}}
+                </div>
               </div>
-              <div class="contentA clearfix">
+              <div class="contentB clearfix" v-for="(item,index) in showPeoplelist" :key="index">
                 <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工数据搬运工2</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
+                <div class="listName" :title="item.cooUserName">{{item.cooUserName}}</div>
+                <div class="head"><i class="el-icon-delete" @click="deleteList(item.id)"></i></div>
               </div>
-              <div class="contentA clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
-              <div class="contentA clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
-              <div class="contentA clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
-              <div class="contentA clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
-              <div class="contentA clearfix">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName">数据搬运工</div>
-                <div class="head"><i class="el-icon-delete"></i></div>
-              </div>
+
             </div>
           </div>
+
 
         </div>
         <div  v-if="routerName==='editModel'">
@@ -305,17 +285,17 @@
       // 获取模型数据
       async getModelList(modelId) {
         try {
-          const  params={
+          const params = {
             taggingModelId: modelId
           }
           const data = await getModelData(params)
-          this.modelData=data
-          this.modelName=data.modelName
-          this.headColList=data.colList
-         // console.log(data)
+          this.modelData = data
+          this.modelName = data.modelName
+          this.headColList = data.colList
+          // console.log(data)
         } catch (e) {
-
         }
+      },
       addPeople() {
         this.addSetDialog = true
         this.cooperatioUser()
@@ -832,4 +812,334 @@
     display: block;
     clear: both;
   }
+
+  .addCreat {
+    .col-set-box {
+      .left {
+        border-right: 1px solid #eee;
+        padding: 0 10px;
+        color: #000000;
+      }
+      h3 {
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 32px;
+        border-bottom: 1px solid #eee;
+      }
+    }
+    .right2 {
+      width: 100%;
+      padding: 0 10px;
+    }
+    .my-table {
+      i {
+        cursor: pointer;
+      }
+    }
+    .my-table > > >
+    thead {
+      color: #222222;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f4f9fb;
+      padding: 5px 0;
+    }
+    // hover
+    tr:hover > td {
+      background-color: #f4f9fb;
+    }
+  }
+
+  .controlChoose2 {
+    width: 180px !important;
+  }
+
+  .zxhh {
+    background-color: chartreuse;
+  }
+  .tableHeight{
+    /*height: 320px;*/
+    /*overflow: auto;*/
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    color: #ffffff;
+    background: rgba(22, 38, 59, 1);
+    .left {
+      display: flex;
+      align-items: center;
+      .return {
+        width: 60px;
+        border-right: 1px solid #999;
+        text-align: center;
+        font-size: 30px;
+        margin-right: 20px;
+      }
+      .name {
+        display: flex;
+        text-align: center;
+        .img {
+          width: 25px;
+          height: 25px;
+          margin-right: 10px;
+          background: url("../../assets/img/u71.png");
+          background-repeat: no-repeat;
+          background-size: 100% 100%;
+        }
+        .text {
+          line-height: 25px;
+        }
+      }
+    }
+    .right {
+      display: flex;
+      align-items: center;
+      padding-right: 20px;
+      box-sizing: border-box;
+      .img {
+        width: 25px;
+        height: 25px;
+        margin-right: 20px;
+        background: url("../../assets/img/save.png");
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+      .button {
+        width: 80px;
+      }
+    }
+  }
+
+  .content {
+    display: flex;
+    .aside {
+      width: 250px;
+      flex-shrink: 0;
+      position: fixed;
+      top: 60px;
+      bottom: 0;
+      left: 0;
+      color: #ffffff;
+      background: rgba(62, 71, 96, 1);
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 2;
+      .top {
+        height: 45px;
+        line-height: 45px;
+      }
+      .search {
+        margin-bottom: 20px;
+      }
+
+    }
+    .components {
+      width: 100%;
+      position: absolute;
+      top: 60px;
+      bottom: 0;
+      padding: 10px 10px 10px 260px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      .top {
+        display: flex;
+        justify-content: space-between;
+        .left {
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+          font-size: 14px;
+
+        }
+      }
+    }
+  }
+
+  .cooperation, .multiply, .num {
+    font-size: 12px;
+    color: #999999;
+    margin-left: 4px;
+  }
+
+  .cooperation {
+    margin-right: 5px;
+  }
+
+  .iconPeople {
+    font-size: 15px;
+    margin-right: 2px;
+    margin-top: -5px;
+  }
+
+  .handlePeople {
+    font-size: 15px;
+    margin-left: 5px;
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+  }
+
+  .card {
+    width: 220px;
+    border: 1px solid #dedede;
+    position: absolute;
+    right: 15px;
+    z-index: 33;
+    margin-top: 35px;
+    background-color: #fff;
+    border-radius: 8px;
+  }
+
+  .peopleList, .addPeople {
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  .peopleList {
+    float: left;
+    margin-left: 15px;
+  }
+
+  .addPeople {
+    float: right;
+    margin-right: 15px;
+  }
+
+  .peopleContent {
+    margin-top: 15px;
+    height: 280px;
+    overflow-y: auto;
+  }
+
+  .imgPeople2, .listName {
+    float: left;
+  }
+
+  .imgPeople2 {
+    margin-top: 6px;
+    margin-left: 8px;
+  }
+
+  .listName {
+    font-size: 12px;
+    width: 105px;
+    margin-left: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .head {
+    font-size: 14px;
+    float: right;
+    margin-right: 8px;
+  }
+
+  .contentA, .contentB {
+    height: 40px;
+    line-height: 40px;
+  }
+
+  .contentB {
+    margin-left: 24px;
+  }
+
+  .dateInp, .controlChoose {
+    width: 340px;
+  }
+
+  .allPeople {
+    height: 300px;
+    overflow: auto;
+  }
+
+  .userContent {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: rgba(242, 242, 242, 1);
+    border-radius: 3px;
+  }
+
+  .peopleName {
+    width: 170px;
+    font-size: 14px;
+    color: #606266;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    float: left;
+    cursor: pointer;
+  }
+
+  .addIcon {
+    font-size: 16px;
+    float: right;
+    cursor: pointer;
+  }
+
+  .clearfix:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+
+  .addCreat {
+    .col-set-box {
+      .left {
+        border-right: 1px solid #eee;
+        padding: 0 10px;
+        color: #000000;
+      }
+      h3 {
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 32px;
+        border-bottom: 1px solid #eee;
+      }
+    }
+    .right2 {
+      width: 100%;
+      padding: 0 10px;
+    }
+    .my-table {
+      i {
+        cursor: pointer;
+      }
+    }
+    .my-table > > >
+    thead {
+      color: #222222;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f4f9fb;
+      padding: 5px 0;
+    }
+    // hover
+    tr:hover > td {
+      background-color: #f4f9fb;
+    }
+  }
+
+  .controlChoose2 {
+    width: 180px !important;
+  }
+
+  .zxhh {
+    background-color: chartreuse;
+  }
+  .tableHeight{
+    /*height: 320px;*/
+    /*overflow: auto;*/
+  }
+
+
 </style>
