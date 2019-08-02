@@ -520,6 +520,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
         waitUpdateIndex.setTableName(tagModel.getDataTableName());
         waitUpdateIndex.setTaggingModelId(taggingModelId);
         dtWaitUpdateIndexService.doSave(waitUpdateIndex);
+		tagModel.setRunState(Constants.TG_MODEL_SUCCESS);
+		doSave(tagModel);
 		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},总耗时:{%s}毫秒",taggingModelId,10000*successCount,end.getTime()-begin.getTime()));
 	}
 
