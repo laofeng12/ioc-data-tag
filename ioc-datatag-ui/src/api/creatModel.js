@@ -1,4 +1,6 @@
 import { fetch } from '@/utils/fetch'
+import {request} from "../utils/request";
+
 // 创建模型--资源树
 export function getOneZtreeData (params) {
   return fetch({
