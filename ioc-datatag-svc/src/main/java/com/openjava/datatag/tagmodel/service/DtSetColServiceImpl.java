@@ -438,10 +438,11 @@ public class DtSetColServiceImpl implements DtSetColService {
 						}
 						if (TagConditionUtils.isIntType(expression.getValuesType())) {
 							checkSql += " TAG_CONDITION_ID "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
+							resultSql += " cast（"+col.getShowCol() +"as integer) "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
 						}else{
 							checkSql += " SHOW_COL "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
+							resultSql += " "+col.getShowCol() +" "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
 						}
-						resultSql += " "+col.getShowCol() +" "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
 					}
 					if (StringUtils.isBlank(expression.getTheValues())) {
 						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"值不能为空");
