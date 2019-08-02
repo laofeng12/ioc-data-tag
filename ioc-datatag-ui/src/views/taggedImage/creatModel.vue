@@ -34,7 +34,7 @@
             <span class="cooperation">协作人员:</span>
             <img class="imgPeople" src="../../assets/img/u163.png" height="25" width="25"/>
             <span class="multiply">x</span>
-            <span class="num">3</span>
+            <span class="num">{{peopleLength+1}}</span>
             <span class="handlePeople"><i class="el-icon-arrow-down" @click="showIt"></i></span>
           </div>
           <div class="card" v-show="show">
@@ -310,9 +310,20 @@
         } catch (e) {
         }
       },
+      // addPeople() {
+      //   this.addSetDialog = true
+      //   this.cooperatioUser()
+      //   this.markingTable()
+      // },
       addPeople() {
-        this.addSetDialog = true
-        this.cooperatioUser()
+        if(this.taggingModelId){
+          this.addSetDialog = true
+          this.cooperatioUser()
+          this.markingTable()
+        }else {
+          this.$message.error('请先进行字段设置操作！');
+        }
+
       },
       close() {
         this.addSetDialog = false
@@ -365,7 +376,7 @@
       async getpeopleList() {
         const params = {
           eq_createUser: '',
-          eq_taggmId: this.modeId,
+          eq_taggmId: this.taggingModelId,  //模型ID
           page: '',
           size: 1000
         }
@@ -384,7 +395,7 @@
         const param = {
           "cooUser": userId,
           "id": 0,
-          "taggmId": this.modeId
+          "taggmId": this.taggingModelId,  //模型ID
         }
         try {
           const addRes = await addPeople(param)
@@ -429,7 +440,7 @@
         this.tableData = []
         try {
           const markingRes = await markingCheck({
-            modelId: this.modeId,
+            modelId: this.taggingModelId,  //模型ID
             userId: id
           })
           if (markingRes.rows && markingRes.rows.length > 0) {
@@ -530,7 +541,7 @@
     created() {
       this.getpeopleList()
       this.groupList()
-      this.markingTable()
+      // this.markingTable()
     },
     computed: {
       list() {
