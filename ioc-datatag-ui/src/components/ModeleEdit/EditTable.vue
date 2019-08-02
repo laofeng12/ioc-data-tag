@@ -42,7 +42,7 @@
           <el-col :span="11">
           <div class="allTree">
             <div class="sel">
-              <el-input
+              <el-input style="width: 210px"
                 size="small"
                 placeholder="请输入内容"
                 v-model="ruleForm.tagLev">
@@ -76,8 +76,8 @@
           </el-col>
           <el-col :span="11">
             <el-row >
-              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="selfMark">自动打标</el-button>
-              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="handleMark">人工打标</el-button>
+              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="handleMark">自动打标</el-button>
+              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="selfMark">人工打标</el-button>
             </el-row>
           </el-col>
         </el-form-item>
@@ -292,7 +292,6 @@ export default {
 
   },
   mounted () {
-    console.log('dddd')
   },
   methods: {
     //深度克隆
@@ -442,25 +441,13 @@ export default {
       this.selfMarkList.splice(index,1)
     },
     search(){
-      console.log("查询");
+     // console.log("查询");
     },
     ///过滤树
     filterNode (value, data) {
       if (!value) return true
       return data.tagName.indexOf(value) !== -1
     },
-/*    handleCheckChange () {
-      let res = this.$refs.tree.getCheckedNodes(true,true)//这里两个true，1. 是否只是叶子节点 2. 是否包含半选节点（就是使得选择的时候不包含父节点）
-      let arrLabel = []
-      let arr = [];
-      res.forEach((item) => {
-        arrLabel.push(item.tagName)
-        arr.push(item);
-      })
-      this.mineStatusValue = arr
-      this.ruleForm.tagLev = arrLabel
-    },*/
-    //字段打标
     colSetTags(data){
       this.setTagsDialog=true
        //console.log(colId)
@@ -513,9 +500,7 @@ export default {
     async getTagLevList(id) {
       try {
         const data = await getTagLevData(id)
-      //  console.log(data.childrenNode)
         this.treeLevdata=data.childrenNode
-       // console.log(' this.treeLevdata', this.treeLevdata)
       } catch (e) {
 
       }
@@ -540,39 +525,32 @@ export default {
     },
     //打标确认保存
     async getSaveMarkList() {
-      console.log('this.selfMarkList',this.selfMarkList)
+     // console.log('this.selfMarkList',this.selfMarkList)
+      //console.log('this.valuesType',this.valuesType)
       try {
-        if(this.valuesType==='number'){
-          //字段为number类型的打标
-          const  params={
-
-          }
+        let conditions=this.deepClone(this.selfMarkList)
+        conditions.forEach((obj,index)=>{
+          delete obj.checkList
+          delete obj.sourceCol
+          delete obj.tagSetName
+          delete obj.showSelfMark
+          obj.colId=this.colId
+          return obj
+        })
+        const  params={
+          colId:this.colId,
+          condtion:conditions
         }
-        else if(this.valuesType==='string'){
-          console.log('this.colId',this.colId)
-          //字段为string类型的打标
-          let conditions=this.deepClone(this.selfMarkList)
-           conditions.forEach((obj,index)=>{
-             delete obj.checkList
-             delete obj.sourceCol
-             delete obj.tagSetName
-             delete obj.showSelfMark
-             obj.colId=this.colId
-             return obj
-          })
-          console.log('conditions',conditions)
-          const  params={
-            colId:this.colId,
-            condtion:conditions
-          }
-          const data = await saveMarkData(params)
-          console.log('确认打标',data)
-        }else {
-          const  params={
+        const data = await saveMarkData(params)
+        this.$message({
+          showClose: true,
+          message:'打标成功' ,
+          duration:2000,
+          type: 'success'
+        })
+        this.setTagsDialog=false
+        this.selfMarkList=[]
 
-          }
-        }
-        //this.tagTeamList=data.rows
       } catch (e) {
 
       }

@@ -272,6 +272,16 @@
     },
     components: { EditTable, Aside },
     watch: {
+      '$route' (to, from) {
+        //console.log(to)
+        this.routerName = to.name
+        if (to.name === 'editModel') {
+          this.taggingModelId=to.params.id
+         // console.log('this.taggingModelId', this.taggingModelId)
+          this.getModelList(this.taggingModelId)
+          this.getModelColsList(this.taggingModelId,0,10,1)
+        }
+      }
     },
     mounted () {
       this.routerName =this.$route.name
@@ -456,7 +466,7 @@
             this.options3 = groupRes.rows
           }
         } catch (e) {
-          console.log(e);
+          //console.log(e)
         }
       },
       //checkbox
@@ -516,9 +526,6 @@
           this.saveLoading = false
         }
       }
-    },
-    watch: {
-
     },
     created() {
       this.getpeopleList()
