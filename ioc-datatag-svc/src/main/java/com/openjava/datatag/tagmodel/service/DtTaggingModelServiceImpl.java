@@ -497,7 +497,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				++successCount;
 				logger.info("第"+successCount+"次");
 				List<Object> data = new LinkedList<>();
-				Pageable pageable = PageRequest.of(i,100000);
+				Pageable pageable = PageRequest.of(i,10);
 				data.addAll((Collection<?>) getDataFromDataSet(taggingModelId,0,pageable));
 				mppPgExecuteUtil.setDataList(data);
 				mppPgExecuteUtil.insertDataList();
