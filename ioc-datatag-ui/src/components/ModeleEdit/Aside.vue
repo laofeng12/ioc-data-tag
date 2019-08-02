@@ -367,19 +367,19 @@ export default {
     },
     // 获取所有树表的数据
     async   setColData(params) {
-      console.log(params)
-        const setColumnData=await setColsData(params)
-        console.log(setColumnData)
-      if(setColumnData.code=200){
+        const data=await setColsData(params)
           this.colSetDialog=false
-          this.taggingModelId=setColumnData.taggingModelId
-          //console.log('taggingModelId', this.taggingModelId)
+          this.taggingModelId=data.taggingModelId
           const Id= this.taggingModelId
-         // this.$router.push({ name: 'editModel', query: {Id}})
-        this.$router.push({path: `editModel/${Id}`})
-      }else {
-
-      }
+          this.$message({
+                showClose: true,
+                message:data.message ,
+                duration:2000,
+                type: 'success'
+              })
+          if (this.routerName === 'creatModel') {
+            this.$router.push({path: `editModel/${Id}`})
+          }
 
     },
     //选择打标字段
