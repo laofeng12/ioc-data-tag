@@ -20,11 +20,11 @@
       </el-table-column>
     </el-table>
     <!--字段设置-->
-    <el-dialog class="creat" title="数据打标"  :visible.sync="setTagsDialog" width="630px" center :modal-append-to-body="false" :close-on-click-modal="false"
+    <el-dialog class="creat" title="数据打标"  :visible.sync="setTagsDialog" width="800px" center :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" @click="closePanel">
         <el-form-item label="选择标签组:" prop="tagTeam">
-          <el-col :span="11">
+          <el-col :span="9">
           <el-select v-model="ruleForm.tagTeam" filterable placeholder="请选择标签组" size="small" @change="chooseTagTeam">
             <el-option
               v-for="item in tagTeamList"
@@ -34,8 +34,8 @@
             </el-option>
           </el-select>
           </el-col>
-          <el-col :span="11">
-            <el-link type="primary" :underline="false">编辑标签组</el-link>
+          <el-col :span="9">
+            <el-link type="primary" :underline="false" @click="editLabelgroup">编辑标签组</el-link>
           </el-col>
         </el-form-item>
         <el-form-item label="选择标签层:" prop="tagLev">
@@ -68,13 +68,13 @@
           </el-col>
         </el-form-item>
         <el-form-item label="打标设置:" prop="tagSet">
-          <el-col :span="11">
+          <el-col :span="9">
             <el-select v-model="ruleForm.tagSet" filterable placeholder="请选择" size="small">
               <el-option v-for="(item ,index) in tagSetList" :key="item.id" :label="item.tagName" :value="item.id">
               </el-option>
             </el-select>
           </el-col>
-          <el-col :span="11">
+          <el-col :span="9">
             <el-row >
               <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="handleMark">自动打标</el-button>
               <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="selfMark">人工打标</el-button>
@@ -258,7 +258,8 @@ export default {
       conditionSetting:[],
       isHandle:1,
       radio:'1',
-      childrenNode:[]
+      childrenNode:[],
+      chooseTagTeamid:''
     }
   },
   watch: {
@@ -473,9 +474,20 @@ export default {
     //选择标签组
     chooseTagTeam(id){
      // console.log(id)
+      this.chooseTagTeamid = id
       this.getTagLevList(id)
-
     },
+    // 编辑标签组
+    editLabelgroup() {
+      if (this.chooseTagTeamid) {
+        this.$router.push({
+          path: '/editTree/' + this.chooseTagTeamid,
+        })
+      } else {
+        this.$message.error('请先选择标签组！');
+      }
+    },
+
     //关闭打标
     close(){
        this.showSelfMark=false
@@ -520,8 +532,16 @@ export default {
       }
     },
     //确认打标按钮
-    saveMark(){
-      this.getSaveMarkList()
+    saveMark() {
+      this.saveLoading = true
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.getSaveMarkList()
+          this.saveLoading = false
+        } else {
+          this.saveLoading = false
+        }
+      });
     },
     //打标确认保存
     async getSaveMarkList() {
