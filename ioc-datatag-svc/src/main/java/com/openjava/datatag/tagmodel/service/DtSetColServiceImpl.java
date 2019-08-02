@@ -438,7 +438,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 						}
 						if (TagConditionUtils.isIntType(expression.getValuesType())) {
 							checkSql += " TAG_CONDITION_ID "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
-							resultSql += " cast（"+col.getShowCol() +" as bigint) "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
+							resultSql += " cast ("+col.getShowCol() +" as bigint) "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
 						}else{
 							checkSql += " SHOW_COL "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
 							resultSql += " "+col.getShowCol() +" "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
