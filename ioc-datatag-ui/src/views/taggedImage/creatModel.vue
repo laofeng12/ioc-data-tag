@@ -310,16 +310,12 @@
         } catch (e) {
         }
       },
-      // addPeople() {
-      //   this.addSetDialog = true
-      //   this.cooperatioUser()
-      //   this.markingTable()
-      // },
       addPeople() {
         if(this.taggingModelId){
           this.addSetDialog = true
           this.cooperatioUser()
           this.markingTable()
+          this.getpeopleList()
         }else {
           this.$message.error('请先进行字段设置操作！');
         }
@@ -539,9 +535,7 @@
       }
     },
     created() {
-      this.getpeopleList()
       this.groupList()
-      // this.markingTable()
     },
     computed: {
       list() {
@@ -870,14 +864,6 @@
   .controlChoose2 {
     width: 180px !important;
   }
-
-  .zxhh {
-    background-color: chartreuse;
-  }
-  .tableHeight{
-    /*height: 320px;*/
-    /*overflow: auto;*/
-  }
   .header {
     display: flex;
     justify-content: space-between;
@@ -1149,12 +1135,7 @@
   }
 
   .zxhh {
-    background-color: chartreuse;
+    background-color: #58ea6a;
   }
-  .tableHeight{
-    /*height: 320px;*/
-    /*overflow: auto;*/
-  }
-
 
 </style>
