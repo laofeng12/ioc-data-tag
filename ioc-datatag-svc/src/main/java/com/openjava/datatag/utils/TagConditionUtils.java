@@ -30,6 +30,9 @@ public class TagConditionUtils {
             "TIME","DATE","TIMESTAMP","DATETIME","time",
             "date","timestamp","datetime","date"
     };
+    //数据库类型
+    public static String DB_TYPE_ORACLE = "oracle";
+    public static String DB_TYPE_PG = "postgresql";
 
     /**
      * 是否连接符
@@ -109,16 +112,26 @@ public class TagConditionUtils {
                 return ">=";
             case "≤":
                 return "<=";
+            case "NOT":
+                    return "NOT LIKE";
             default:
                 return symbol;
         }
     }
-    public static String initValues(String values,String valueType,String symbool){
-        if (isStringType(valueType)) {
-            if ("LIKE".equals(symbool)) {
+    public static String initValues(String values,String valueType,String symbool,String dbType){
+        if (isStringType(valueType)||isDateType(valueType)) {
+            if ("LIKE".equals(symbool) || "NOT".equals(symbool)) {
                 values = "%"+values+"%";
             }
-            values = "'"+values+"'";
+            if (isDateType(valueType)) {
+                if (DB_TYPE_ORACLE.equals(dbType)){
+                    values = "TO_DATE('"+values+"','YYYY-MM-DD HH24:MI:SS')";
+                }else {
+                    values = "timestamp '"+values+"'";
+                }
+            }else{
+                values = "'"+values+"'";
+            }
         }
        return values;
     }

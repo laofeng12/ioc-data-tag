@@ -20,6 +20,7 @@ import com.openjava.framework.sys.service.SysCodeService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
@@ -406,7 +407,9 @@ public class DtSetColServiceImpl implements DtSetColService {
 			if (condtion.getIsHandle()!=null&&condtion.getIsHandle().equals(Constants.PUBLIC_YES)) {
 				if (TagConditionUtils.isIntType(expression.getValuesType())) {
 					checkSql += " TAG_CONDITION_ID "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
-				}else{
+				}else if (TagConditionUtils.isDateType(expression.getValuesType())){
+					checkSql += " CREATE_TIME "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
+				}else {
 					checkSql += " SHOW_COL "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
 				}
 				resultSql += col.getShowCol() +" "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
@@ -417,8 +420,8 @@ public class DtSetColServiceImpl implements DtSetColService {
 				resultSql+=" ( ";
 				String values[] = expression.getTheValues().split(",");
 				for (int k = 0; k < values.length; k++) {
-					checkSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol())+" ";
-					resultSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol())+" ";
+					checkSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol(),TagConditionUtils.DB_TYPE_ORACLE)+" ";
+					resultSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol(),TagConditionUtils.DB_TYPE_PG)+" ";
 					if (k!=values.length-1) {
 						checkSql+=",";
 						resultSql+=",";
@@ -438,19 +441,20 @@ public class DtSetColServiceImpl implements DtSetColService {
 						}
 						if (TagConditionUtils.isIntType(expression.getValuesType())) {
 							checkSql += " TAG_CONDITION_ID "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
-							resultSql += " cast ("+col.getShowCol() +" as bigint) "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
-						}else{
-							checkSql += " SHOW_COL "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
-							resultSql += " "+col.getShowCol() +" "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
+						} else if (TagConditionUtils.isDateType(expression.getValuesType())) {
+							checkSql += " CREATE_TIME "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
+						} else {
+							checkSql += " SHOW_COL " + TagConditionUtils.toSqlSymbol(expression.getSymbol()) + " ";
 						}
+						resultSql += " "+col.getShowCol() +" "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
 					}
 					if (StringUtils.isBlank(expression.getTheValues())) {
 						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"值不能为空");
 					}
 					String values[] = expression.getTheValues().split(",");
 					for (int k = 0; k < values.length; k++) {
-						checkSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol())+" ";
-						resultSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol())+" ";
+						checkSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol(),TagConditionUtils.DB_TYPE_ORACLE)+" ";
+						resultSql += " "+TagConditionUtils.initValues(values[k],expression.getValuesType(),expression.getSymbol(),TagConditionUtils.DB_TYPE_PG)+" ";
 					}
 				}
 			}
