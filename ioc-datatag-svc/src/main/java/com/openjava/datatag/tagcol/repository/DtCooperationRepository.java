@@ -36,6 +36,12 @@ public interface DtCooperationRepository extends DynamicJpaRepository<DtCooperat
             ,nativeQuery = true)
     List<Map<String,String>> findUserModelByUserId(@Param("userId")Long userId);
     /**
+     *分页根据用户Id查找该用户要协作的模型记录集
+     */
+    @Query(value =" select t,o from DtTaggingModel t, DtCooperation o where t.taggingModelId=o.taggmId and o.cooUser=:userId and t.modelName like:modelName"
+            )
+    Page<?> findPageUserModelByUserId(@Param("userId")Long userId ,@Param("modelName")String modelName, Pageable pageable);
+    /**
      *根据模型Id查找该用户要协作的字段记录集
      */
     @Query(value ="select t.*,o.ID,o.COO_USER,o.cooFieldId,o.USE_TAG_GROUP,o.TAG_COL_ID,(case when o.COO_USER=:userId and t.SOURCE_COL=o.TAG_COL_NAME then '1' else '0' end ) IsCooField from\n" +

@@ -11,11 +11,11 @@ import org.springframework.format.annotation.DateTimeFormat;
  *
  */
 public class DtCooperationDBParam extends RoDBQueryParam {
+	private String keyWord;//(非必填)关键字查询 ?
 	private Long eq_id;//协作表主键 --主键查询
-	
 	private Long eq_createUser;//(不传时默认当前用户)发起者 = ?
 	private Long eq_taggmId;//标签模型主键 = ?
-	private Long eq_cooUser;//协作用户 = ?
+	private Long eq_cooUser;//(不传时默认当前用户)协作用户 = ?
 	public Long getEq_taggmId() {
 		return eq_taggmId;
 	}
@@ -44,5 +44,13 @@ public class DtCooperationDBParam extends RoDBQueryParam {
 
 	public void setEq_cooUser(Long eq_cooUser) {
 		this.eq_cooUser = eq_cooUser;
+	}
+
+	public String getKeyWord() {
+		return keyWord;
+	}
+
+	public void setKeyWord(String keyWord) {
+		this.keyWord = keyWord;
 	}
 }
