@@ -1,5 +1,5 @@
 <template>
-  <div class="aside">
+  <div class="aside treeCode">
     <el-input placeholder="输入关键词搜索" v-model="filterText" class="search"   size="small" suffix-icon="el-icon-search"></el-input>
     <div   class="tree-box">
       <el-tree icon-class="el-icon-folder" class="tree" :props="props" :filter-node-method="filterNode" ref="tree"  :load="loadNode" lazy>

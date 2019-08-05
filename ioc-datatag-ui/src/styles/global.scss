@@ -79,10 +79,10 @@ p {
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+// 树结构横向滚动条
 .treeCode .el-tree-node>.el-tree-node__children{
   overflow: inherit !important;
 }
-
 //.marking .el-table--scrollable-x .el-table__body-wrapper{
 //  height: 320px !important;
 //  overflow: scroll !important;

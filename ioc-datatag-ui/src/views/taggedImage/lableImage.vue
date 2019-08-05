@@ -350,7 +350,7 @@
         this.deleteDialog = true
         this.deleteName = name
         this.deleteId = id
-        console.log(id);
+        // console.log(id);
       },
       closedelete() {
         this.deleteDialog = false
