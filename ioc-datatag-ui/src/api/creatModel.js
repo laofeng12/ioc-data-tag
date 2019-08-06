@@ -82,13 +82,42 @@ export function getResourceInfoData (resourceId,type) {
 
 // 创建模型--字段设置确认选择
 export function setColsData (data) {
-  console.log(data)
+ // console.log(data)
   return fetch({
     url: '/datatag/tagmodel/dtSetCol/selectCol',
     method: 'post',
     data
   })
 }
+
+// 模型-清除字段
+export function  delCol( id) {
+  return fetch({
+    url:'/datatag/tagmodel/dtSetCol/delete',
+    method:'delete',
+    id
+  })
+}
+
+// 模型-字段克隆
+export function  cloneCol( data) {
+  return fetch({
+    url:'/datatag/tagmodel/dtSetCol/clone',
+    contentType: 'application/x-www-form-urlencoded',
+    method:'post',
+    data
+  })
+}
+
+// 获取字典符号
+export function getSymolsData(params) {
+  return fetch({
+    url:'/framework/sys/code/list2',
+    method:'get',
+    params
+  })
+}
+
 
 //获取标签模型数据
 export function getModelData (params) {
@@ -122,7 +151,7 @@ export function getTagLevData(id) {
     method: 'get'
   })
 }
-// 打标--打标设置
+// 打标--确认打标-查询打标历史接口
 export function getHistoryColData(params) {
   return fetch({
     url: '/datatag/tagmodel/dtSetCol/getHistoryCol',

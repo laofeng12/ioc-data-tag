@@ -25,6 +25,11 @@ module.exports = {
         pathRewrite: { '^/datatagweb/pds': '/pds' },
         changeOrigin: true
       },
+      '/datatagweb/framework': {
+        target: 'http://183.6.55.26:30003', // test
+        changeOrigin: true,
+        pathRewrite: { '^/datatagweb/framework': '/datatagweb/framework' },
+      }
     }
   },
   chainWebpack: config => {
