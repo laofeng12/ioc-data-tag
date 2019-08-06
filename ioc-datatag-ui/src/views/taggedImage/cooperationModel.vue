@@ -33,7 +33,7 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="cooUserName" label="名称"></el-table-column>
+          <el-table-column prop="modelName" label="名称"></el-table-column>
           <el-table-column prop="people" label="修改人/修改时间">
             <template slot-scope="scope">
               <div>
@@ -62,6 +62,7 @@
           </el-table-column>
         </el-table>
       </div>
+      <element-pagination :pageSize="size"  :total="totalnum"  @handleCurrentChange="handleCurrentChange" @sureClick="goPage"></element-pagination>
     </div>
     <el-dialog class="creat" title="创建标签组" :visible.sync="labelcreatDialog" width="530px" center
                :close-on-click-modal="false"
@@ -100,14 +101,17 @@
 </template>
 
 <script>
-  import {mapActions, mapState, mapGetters} from 'vuex'
-  import {getcooperationList} from '@/api/cooperation.js'
+  import {getcooperationList,cooperationQuery} from '@/api/cooperation.js'
   import { getDtTagGroupData } from '@/api/tagManage'
+  import ElementPagination from '@/components/ElementPagination'
   export default {
-    components: {},
+    components: {ElementPagination},
     name: "cooperationModel",
     data() {
       return {
+        page: 0,
+        size: 10,
+        totalnum: 0,
         input2: '',
         Loading: true,
         saveLoading2: true,
@@ -202,7 +206,40 @@
         }
       },
       //
-      modelQuery() {
+      async modelQuery() {
+        const params = {
+          eq_cooUser:'',
+          eq_taggmId:'',
+          keyWord:this.input2,
+          runState:this.value,
+          page:this.page,
+          size:this.size
+        }
+        try{
+          const resQuery = await cooperationQuery(params)
+          console.log('resQuery',resQuery);
+          if(resQuery.rows && resQuery.rows.length > 0){
+            resQuery.rows.forEach(item => {
+              if (item.runState == 0) {
+                item.runState = '未运行'
+              } else if (item.runState == 1) {
+                item.runState = '运行中'
+              } else if (item.runState == 2) {
+                item.runState = '运行出错'
+              } else {
+                item.runState = '运行结束'
+              }
+            })
+            this.ztableShowList = resQuery.rows
+            this.totalnum = resQuery.total
+          }else{
+            this.ztableShowList = []
+            this.Loading = false
+          }
+
+        }catch (e) {
+
+        }
 
       },
       sureCreat() {
@@ -233,9 +270,15 @@
           console.log(e);
         }
       },
+      handleCurrentChange(page){
+        this.page = page-1
+        this.datamodelList()
+      },
+      goPage(){},
     },
     created() {
       this.getList()
+      this.modelQuery()
     },
     computed: {},
     watch: {},

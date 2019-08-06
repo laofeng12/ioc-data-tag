@@ -8,4 +8,10 @@ export function getcooperationList(data) {
   })
 }
 
-
+export function cooperationQuery(params){
+  return fetch({
+    url:'/datatag/tagcol/dtCooperation/pagesearch',
+    method:'get',
+    params
+  })
+}

@@ -213,7 +213,6 @@
 </template>
 
 <script>
-  import {mapActions, mapState, mapGetters} from 'vuex'
   import {getmodelList,getDispatch,getDelete} from '@/api/lableImage.js'
   import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
