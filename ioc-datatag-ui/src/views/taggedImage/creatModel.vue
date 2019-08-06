@@ -63,7 +63,7 @@
 
         </div>
         <div  v-if="routerName==='editModel'">
-          <EditTable :theadData="headColList" :tableData="modelTableData"></EditTable>
+          <EditTable :theadData="headColList" :tableData="modelTableData"  :modelId="taggingModelId"></EditTable>
         </div>
 
       </div>
@@ -279,7 +279,7 @@
           this.taggingModelId=to.params.id
          // console.log('this.taggingModelId', this.taggingModelId)
           this.getModelList(this.taggingModelId)
-          this.getModelColsList(this.taggingModelId,0,10,1)
+          this.getModelColsList(this.taggingModelId,0,100,1)
         }
       }
     },
@@ -291,7 +291,7 @@
         //进入编辑模型或者打标界面
         //获取模型数据
         this.getModelList(this.taggingModelId)
-        this.getModelColsList(this.taggingModelId,0,10,1)
+        this.getModelColsList(this.taggingModelId,0,100,1)
       }
 
     },
@@ -326,10 +326,10 @@
       },
       // 获取模型数据
       async getModelColsList(modelId,page,size,type) {
-       console.log(modelId,page,size)
+       //console.log(modelId,page,size)
         try {
           const data = await getModelColsData(modelId,page,size,type)
-          console.log(data)
+          console.log('表格数据',data)
           this.modelTableData=data.data
         } catch (e) {
 

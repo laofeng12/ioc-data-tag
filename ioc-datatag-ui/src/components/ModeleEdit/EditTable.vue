@@ -19,6 +19,8 @@
       </template>
       </el-table-column>
     </el-table>
+<!--    <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
+                        @sureClick="goPage"></element-pagination>-->
     <!--字段设置-->
     <el-dialog class="creat" title="数据打标"  :visible.sync="setTagsDialog" width="800px" center :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close">
@@ -88,12 +90,12 @@
             <div class="connect-smbol-box">
               <div class="topOne" :class="{'no-arrow':conditionSetting.length===0}"
                    v-for="(item,index) in connectSymbolList"
-                   :key="'con'+item.id"  @click="chooseConnectSymbo(item)">{{item.symolName}}</div>
+                   :key="'con'+index"  @click="chooseConnectSymbo(item)">{{item.codename}}</div>
              </div>
             <div class="count-smbol-box">
               <div class="topOne"
                    v-for="(item,index) in countSymbolList"
-                   :key="'count'+item.id"  @click="chooseCountSymbol(item)">{{item.symolName}}</div>
+                   :key="'count'+index"  @click="chooseCountSymbol(item)">{{item.codename}}</div>
              </div>
           </div>
           <!--自动打标不可操作-->
@@ -101,12 +103,12 @@
             <div class="connect-smbol-box">
               <div class="topOne" :class="{'no-arrow':isHandle===1}"
                    v-for="(item,index) in connectSymbolList"
-                   :key="'con'+item.id">{{item.symolName}}</div>
+                   :key="'con'+index">{{item.codename}}</div>
             </div>
             <div class="count-smbol-box">
               <div class="topOne" :class="{'no-arrow':isHandle===1}"
                    v-for="(item,index) in countSymbolList"
-                   :key="'count'+item.id">{{item.symolName}}</div>
+                   :key="'count'+index">{{item.codename}}</div>
             </div>
           </div>
           <!--自动打标不可操作-->
@@ -179,13 +181,19 @@
 </template>
 
 <script>
-  import {getMyTagGroupData,getTagLevData,getHistoryColData,saveMarkData} from '@/api/creatModel'
+  import ElementPagination from '@/components/ElementPagination'
+  import {getMyTagGroupData,getTagLevData,getHistoryColData,saveMarkData,delCol,cloneCol,getSymolsData} from '@/api/creatModel'
 export default {
+  components: {ElementPagination},
   name: 'datasetEditable',
   props: {
     theadData: {
       type: Array,
       default: Array
+    },
+    modelId:{
+      type:String,
+      default:''
     },
     tableData:{
       type: Array,
@@ -194,24 +202,11 @@ export default {
   },
   data () {
     return {
+      totalnum:20,
+      size:10,
       curIndex:0,
-      connectSymbolList:[
-        {symolName:'AND',id:1},
-        {symolName:'OR',id:2},
-        {symolName:'LIKE',id:3},
-        {symolName:'NOT',id:4}
-        ],
-      countSymbolList:[
-        {symolName:'(',id:1},
-        {symolName:')',id:2},
-        {symolName:'<',id:3},
-        {symolName:'>',id:4},
-        {symolName:'=',id:5},
-        {symolName:'≠',id:6},
-        {symolName:'≤',id:7},
-        {symolName:'≥',id:8},
-        {symolName:'+',id:9}
-      ],
+      connectSymbolList:[],
+      countSymbolList:[],
       mineStatus: '',
       mineStatusValue: [],
       treeLevdata: [],
@@ -266,6 +261,16 @@ export default {
     filterText(val) {
 
     },
+    'connectSymbolList': {
+      handler: function (newValue, oldValue) {
+        this.connectSymbolList = newValue
+      }
+    },
+      'countSymbolList': {
+        handler: function (newValue, oldValue) {
+          this.countSymbolList = newValue
+        }
+      },
     'ruleForm.tagLev': {
       handler: function (newValue, oldValue) {
         this.$refs.tree.filter(newValue)
@@ -289,12 +294,21 @@ export default {
   created () {
     //获取标签组
     this.getMyTagGroupList()
-
-
+    this.getConnectList('dt.tag.conditions.connect')
+    this.getCountList('dt.tag.conditions.noconnect')
   },
   mounted () {
   },
   methods: {
+    //点击分页跳转
+    handleCurrentChange(page) {
+      this.page = page - 1
+      //this.getTagsData()
+    },
+    //点击分页确认
+    goPage() {
+
+    },
     //深度克隆
     deepClone (obj) {
       let newObj = Array.isArray(obj) ? [] : {}
@@ -310,7 +324,7 @@ export default {
     },
     //选择标签层拿树
     clickTreeItem(data,node){
-      console.log('data',data)
+     // console.log('data',data)
       this.childrenNode=data.childrenNode
       this.tagSetList=[]
       this.childrenNode.forEach((item,index)=>{
@@ -325,7 +339,7 @@ export default {
     chooseConnectSymbo(item){
       const conditionObj={
         isConnectSymbol:1,//是否有连接符号
-        symbol:item.symolName,//连接符名或者>,=
+        symbol:item.codename,//连接符名或者>,=
         theValues:'',
         valuesType:this.valuesType,
       }
@@ -343,7 +357,7 @@ export default {
       //console.log(item)
       const conditionObj={
         isConnectSymbol:0,//是否有连接符号
-        symbol:item.symolName,//连接符名或者>,=
+        symbol:item.codename,//连接符名或者>,=
         theValues:'',
         valuesType:this.valuesType,
       }
@@ -416,7 +430,7 @@ export default {
     //选中自动打标内容
     checkMarkChange(item){
      // console.log(value)
-      console.log(item)
+     // console.log(item)
       this.checkList=item.checkList
       item.conditionSetting[0].theValues=this.checkList.join(",")
     },
@@ -435,7 +449,7 @@ export default {
         this.colList.push({markName:markName})
       })
       this.colList= [...new Set(this.colList )]
-      console.log('自动打标选择内容',this.colList)
+      //console.log('自动打标选择内容',this.colList)
     },
     delSelfMark(index){
      // console.log(index)
@@ -455,20 +469,72 @@ export default {
       this.valuesType=data.sourceDataType
       this.sourceCol=data.sourceCol
       this.colId=data.colId
-     // this.getHistoryColList(data.colId)
+      this.getHistoryColList(data.colId)
     },
     //下拉菜单处理
     handleCommandTags(dropIndex,data) {
-      console.log('下拉菜单数据',data)
+     // console.log('下拉菜单数据',data)
       switch (dropIndex) {
         case '0': // 克隆字段
-         // this.renameTreeItem(node, data, 1)
+        this.cloneCol(data)
           break
         case '1': // 字段打标
           this.colSetTags(data)
           break
         case '2': // 清除字段
-         // this.moveTreeItem(data, 1)
+         this.delCol(data)
+      }
+    },
+    // 清除字段
+    async delCol(data) {
+      // console.log('colId',colId)
+      const params={
+        id:data.colId
+      }
+      try {
+        const data = await delCol(params)
+       // console.log('data', data)
+       // console.log('this.modelId',this.modelId)
+        this.$message.success(data.message)
+        this.$parent.getModelColsList(this.modelId,0,100,1)
+      } catch (e) {
+
+      }
+    },
+    // 克隆字段
+    async cloneCol(data) {
+     console.log('colId',data.colId)
+      const params={
+        colId:data.colId
+      }
+      try {
+        const data = await cloneCol(params)
+        this.$message.success(data.message)
+        this.$parent.getModelColsList(this.modelId,0,100,1)
+      } catch (e) {
+
+      }
+    },
+    // 连接
+    async getConnectList(codetype) {
+      const params={
+        codetype:codetype
+      }
+      try {
+        const data = await getSymolsData(params)
+        this.connectSymbolList=data.rows
+      } catch (e) {
+      }
+    },
+    // 计算符合
+    async getCountList(codetype) {
+      const params={
+        codetype:codetype
+      }
+      try {
+        const data = await getSymolsData(params)
+        this.countSymbolList=data.rows
+      } catch (e) {
       }
     },
     //选择标签组
@@ -517,7 +583,7 @@ export default {
 
       }
     },
-    // 标签层数据
+    // 查询打标历史接口
     async getHistoryColList(colId) {
      // console.log('colId',colId)
    const params={
@@ -525,8 +591,8 @@ export default {
    }
       try {
         const data = await getHistoryColData(params)
-        console.log('data', data)
-        this.tagSetList=data.tagGroups
+       // console.log('打标历史接口data', data)
+        //this.tagSetList=data.tagGroups
       } catch (e) {
 
       }
