@@ -296,7 +296,7 @@
         },
         rules: {
           date: [
-            {required: true, message: '请选择时间',trigger: 'change'}
+            {required: true, message: '请选择时间',trigger: 'blur'}
           ],
           region: [
             { required: true, message: '请选择周期', trigger: 'change' }

@@ -157,3 +157,28 @@ export function dosave(data) {
   })
 }
 
+// 名称保存
+export function saveName(data) {
+  return fetch({
+    url:'/datatag/tagmodel/dtTaggingModel/rename',
+    method:'post',
+    data
+  })
+}
+
+// 模型另存
+export function saveAs(taggingModelId) {
+  return fetch({
+    url:'/datatag/tagmodel/dtTaggingModel/copy/'+taggingModelId,
+    method:'post',
+  })
+}
+
+// 设置调度
+export function goDispatch(data) {
+  return fetch({
+    url:'/datatag/tagmodel/dtTaggingModel/Dispatch',
+    method:'post',
+    data
+  })
+}
