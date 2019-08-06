@@ -12,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 public class DtCooperationDBParam extends RoDBQueryParam {
 	private String keyWord;//(非必填)关键字查询 ?
+    private Long runState;//运行状态:未运行/运行中/运行出错/运行结束 =?
 	private Long eq_id;//协作表主键 --主键查询
 	private Long eq_createUser;//(不传时默认当前用户)发起者 = ?
 	private Long eq_taggmId;//标签模型主键 = ?
@@ -53,4 +54,12 @@ public class DtCooperationDBParam extends RoDBQueryParam {
 	public void setKeyWord(String keyWord) {
 		this.keyWord = keyWord;
 	}
+
+    public Long getRunState() {
+        return runState;
+    }
+
+    public void setRunState(Long runState) {
+        this.runState = runState;
+    }
 }

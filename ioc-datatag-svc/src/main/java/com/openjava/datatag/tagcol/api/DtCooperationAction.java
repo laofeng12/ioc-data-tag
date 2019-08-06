@@ -97,6 +97,7 @@ public class DtCooperationAction {
     @ApiOperation(value = "分页根据用户ID获取该用户的协作模型记录", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname = "search")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "keyWord", value = "(非必填)关键字(模型名称)查询", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "runState", value = "(非必填)运行状态:未运行/运行中/运行出错/运行结束 =", required = false, dataType = "Long", paramType = "query"),
             @ApiImplicitParam(name = "eq_taggmId", value = "（非必填）标签模型主键=", required = false, dataType = "Long", paramType = "query"),
             @ApiImplicitParam(name = "eq_cooUser", value = "（不传时默认当前用户）协作用户=", required = false, dataType = "Long", paramType = "query"),
             @ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
@@ -116,6 +117,10 @@ public class DtCooperationAction {
         {
             itemParams.setLike_modelName(params.getKeyWord());
 
+        }
+        if(params.getRunState()!=null)
+        {
+            itemParams.setEq_runState(params.getRunState());
         }
         List<DtCooperationModelDTO> dtoList = new ArrayList<>();
         Page<?> result = dtCooperationService.queryShopItemAndProd(params,itemParams,pageable);
