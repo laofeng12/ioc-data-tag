@@ -233,12 +233,14 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	}
 
 
-	public DtTaggingModel doUpdate(DtTaggingModel body,DtTaggingModel db,BaseUserInfo userInfo,String ip){
+	public DtTaggingModel doRename(DtTaggingModelRenameDTO body,DtTaggingModel db,BaseUserInfo userInfo,String ip){
 		String oldContent = JSONObject.toJSONString(db);
 		String modifyContent = JSONObject.toJSONString(body);
 		EntityClassUtil.dealModifyInfo(db,userInfo);
-		MyBeanUtils.copyPropertiesNotBlank(db, body);
+		//MyBeanUtils.copyPropertiesNotBlank(db, body);
 		db.setIsNew(false);//执行update
+		db.setTaggingModelId(body.getTaggingModelId());
+		db.setModelName(body.getModelName());
 		DtTaggingModel dbObj =dtTaggingModelRepository.save(db);
 
 		//日志记录

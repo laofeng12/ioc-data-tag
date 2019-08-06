@@ -10,6 +10,7 @@ import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.dto.DtTaggingModelRenameDTO;
 import com.openjava.datatag.tagmodel.service.DtSetColService;
 import com.openjava.datatag.utils.IpUtil;
 import com.openjava.datatag.user.service.SysUserService;
@@ -125,36 +126,30 @@ public class DtTaggingModelAction {
 		Page<DtTaggingModelDTO> showResult = new PageImpl<>(showList,pageable,showList.size());
 		return new TablePageImpl<>(showResult);
 	}
-	
+
+
+
+
+
 	/**
 	 * 保存
 	 */
-	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
+	@ApiOperation(value = "重命名", nickname="rename", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
-	@RequestMapping(value="/save",method=RequestMethod.POST)
-	public DtTaggingModel doSave(@RequestBody DtTaggingModel body,
+	@RequestMapping(value="/rename",method=RequestMethod.POST)
+	public SuccessMessage doSave(@RequestBody DtTaggingModelRenameDTO body,
 								 HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		String ip = IpUtil.getRealIP(request);
-		Date now = new Date();
-		DtTaggingModel dbObj=null;
-		if(body.isNew()) {
-			//新增，记录创建时间等
-			dtTaggingModelService.doNew(body,userInfo,ip);
-		} else {
-			//修改，记录更新时间等
-			DtTaggingModel db = dtTaggingModelService.get(body.getTaggingModelId());
-			if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
-				throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"找不到该模型或模型已经被删除");
-			}
-			if(body.getIsDeleted().equals(Constants.PUBLIC_YES)){
-				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"本接口不可用来删除");
-			}
-			dtTaggingModelService.doUpdate(body,dbObj,userInfo,ip);
+		//修改，记录更新时间等
+		DtTaggingModel db = dtTaggingModelService.get(body.getTaggingModelId());
+		if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
+			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"找不到该模型或模型已经被删除");
 		}
-		
+		dtTaggingModelService.doRename(body,db,userInfo,ip);
+
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
-		return dbObj;
+		return new SuccessMessage("重命名成功");
 	}
 
 	/**
