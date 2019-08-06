@@ -32,10 +32,10 @@ public class DtCooperationModelDTO {
 	private String modelDesc;
 
 	@ApiModelProperty("打标目标表id")
-	private Long dataSetId;
+	private Long resourceId;
 	
 	@ApiModelProperty("打标源表名称")
-	private String dataSetName;
+	private String resourceName;
 
 	@ApiModelProperty("打标目的表名")
 	private String dataTableName;

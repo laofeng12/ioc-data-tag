@@ -18,6 +18,8 @@ import com.openjava.datatag.tagcol.service.DtCooTagcolLimitService;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 
 
+import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
+import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.user.service.SysUserService;
 import org.ljdp.common.bean.MyBeanUtils;
 
@@ -92,7 +94,64 @@ public class DtCooperationAction {
         DtCooperation m = dtCooperationService.get(id);
         return m;
     }
+    @ApiOperation(value = "分页根据用户ID获取该用户的协作模型记录", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname = "search")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "keyWord", value = "(非必填)关键字(模型名称)查询", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "eq_taggmId", value = "（非必填）标签模型主键=", required = false, dataType = "Long", paramType = "query"),
+            @ApiImplicitParam(name = "eq_cooUser", value = "（不传时默认当前用户）协作用户=", required = false, dataType = "Long", paramType = "query"),
+            @ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
+    })
+    @Security(session = true)
+    @RequestMapping(value = "/pagesearch", method = RequestMethod.GET)
+    public TablePage<DtCooperationModelDTO> doPageSearch(@ApiIgnore() DtCooperationDBParam params, @ApiIgnore() Pageable pageable) {
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        Long currentuserId = Long.valueOf(userInfo.getUserId());
+        DtTaggingModelDBParam itemParams=new DtTaggingModelDBParam();
+        if (params.getEq_cooUser() == null) {
+            params.setEq_cooUser(currentuserId);
 
+        }
+        if(params.getKeyWord()!=null)
+        {
+            itemParams.setLike_modelName(params.getKeyWord());
+
+        }
+        List<DtCooperationModelDTO> dtoList = new ArrayList<>();
+        Page<?> result = dtCooperationService.queryShopItemAndProd(params,itemParams,pageable);
+        //Page<?> result = dtCooperationService.findPageUserModelByUserId(params.getEq_cooUser(),params.getKeyWord(),pageable);
+
+        for(int i=0;i<result.getContent().size();i++){
+            DtCooperationModelDTO dto=new DtCooperationModelDTO();
+            Object[] obj=(Object[])result.getContent().get(i);
+            //System.out.println(obj);
+            DtTaggingModel model=(DtTaggingModel)obj[0];
+            DtCooperation coo=(DtCooperation)obj[1];
+            MyBeanUtils.copyPropertiesNotBlank(dto, model);
+            dto.setCooUser(coo.getCooUser());
+            if (dto.getCreateUser() != null) {
+                if (sysUserService.get(dto.getCreateUser()) != null) {
+                    dto.setCreateUserName(sysUserService.get(dto.getCreateUser()).getFullname());
+                }
+            }
+            if (dto.getModifyUser() != null) {
+                if (sysUserService.get(dto.getModifyUser()) != null) {
+                    dto.setModifyUserName(sysUserService.get(dto.getModifyUser()).getFullname());
+                }
+            }
+            if (dto.getCooUser() != null) {
+                if (sysUserService.get(dto.getCooUser()) != null) {
+                    dto.setCooUserName(sysUserService.get(dto.getCooUser()).getFullname());
+                }
+            }
+
+            dtoList.add(dto);
+        }
+        Page<DtCooperationModelDTO> showResult = new PageImpl<>(dtoList, pageable, dtoList.size());
+        return new TablePageImpl<>(showResult);
+
+
+    }
     @ApiOperation(value = "列表分页查询协作成员记录", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname = "search")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "eq_createUser", value = "（不传时默认当前用户）发起者=", required = false, dataType = "Long", paramType = "query"),
@@ -254,6 +313,9 @@ public class DtCooperationAction {
     @Security(session = true)
     @RequestMapping(value = "/dosave", method = RequestMethod.POST)
     public SuccessMessage doCoolSave(@RequestBody List<DtCooperationListDTO> body) throws Exception {
+        if(null == body || body.size() ==0 ){
+            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "参数不能为空");
+        }
         dtCooperationService.doCoolListSave(body);
         //没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
         return new SuccessMessage("保存成功");
