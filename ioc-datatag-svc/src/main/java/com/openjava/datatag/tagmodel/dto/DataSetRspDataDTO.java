@@ -8,4 +8,8 @@ import java.util.List;
 public class DataSetRspDataDTO {
     private List<Object> columnList;
     private List<List<Object>> data;
+    private long page;
+    private long size;
+    private long total;
+    private long totalPage;
 }
