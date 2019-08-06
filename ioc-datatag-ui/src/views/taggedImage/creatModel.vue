@@ -8,7 +8,7 @@
         <div class="name">
           <div class="img"></div>
           <div class="text">
-            <el-input  v-if="routerName==='editModel'" v-model="modelName" placeholder="请输入内容"></el-input>
+            <el-input size="small"  v-if="routerName==='editModel'" v-model="modelName" placeholder="请输入内容"></el-input>
             <span v-else>未命名</span>
           </div>
         </div>
@@ -18,7 +18,7 @@
           <div class="img" @click="saveAs"></div>
         </div>
         <el-button class="button" type="primary" size="small" @click="runModel">模型调度</el-button>
- <!--       <el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
+ <!--<el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
       </div>
     </div>
     <div class="content">
@@ -99,7 +99,7 @@
                @close="closeRun">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px">
-          <el-form-item label="模型名称:" prop="modelName" class="nameOne">教育体系标签</el-form-item>
+          <el-form-item label="模型名称:" prop="zmodelName" class="nameOne">教育体系标签</el-form-item>
           <el-form-item label="运行开始时间:" prop="date" class="nameOne">
             <el-date-picker
               size="small"
@@ -304,9 +304,8 @@
           }
           const data = await getModelData(params)
           this.modelData = data
-          this.modelName = data.modelName
+          this.modelName = data.resourceName
           this.headColList = data.colList
-          // console.log(data)
         } catch (e) {
         }
       },

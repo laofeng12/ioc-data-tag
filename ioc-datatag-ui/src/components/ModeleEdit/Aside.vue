@@ -350,6 +350,7 @@ export default {
             const params={
               'resourceId':this.resourceId,
               'resourceName': this.resourceName,
+              'modelName':this.resourceName,
               'resourceType':this.resourceType,
               'pkey':this.ruleForm.pkey,
               'isNew':this.isNew,
