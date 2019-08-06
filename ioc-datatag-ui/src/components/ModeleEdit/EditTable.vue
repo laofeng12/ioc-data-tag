@@ -593,6 +593,7 @@ export default {
         const data = await getHistoryColData(params)
        // console.log('打标历史接口data', data)
         //this.tagSetList=data.tagGroups
+       // this.ruleForm.tagTeam=this.selectTagGroup
       } catch (e) {
 
       }
