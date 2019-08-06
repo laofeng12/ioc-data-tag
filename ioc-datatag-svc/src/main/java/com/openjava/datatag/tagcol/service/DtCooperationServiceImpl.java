@@ -3,6 +3,8 @@ package com.openjava.datatag.tagcol.service;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.annotation.Resource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import com.alibaba.fastjson.JSONObject;
 import com.commons.utils.VoUtils;
@@ -15,6 +17,7 @@ import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
 import com.openjava.datatag.user.service.SysUserService;
 import com.openjava.datatag.utils.TimeUtil;
@@ -24,6 +27,8 @@ import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
+import org.ljdp.core.db.DBQueryParam;
+import org.ljdp.core.spring.data.JpaMultiDynamicQueryDAO;
 import org.ljdp.secure.sso.SsoContext;
 import org.ljdp.util.DateFormater;
 import org.springframework.data.domain.Page;
@@ -59,7 +64,33 @@ public class DtCooperationServiceImpl implements DtCooperationService {
     private SysUserService sysUserService;
     @Resource
     private DtTagGroupService dtTagGroupService;
+    //首先初始化JpaMultiDynamicQueryDAO对象。(暂时只支持JPA)
+    private EntityManager em;
+    private JpaMultiDynamicQueryDAO dao;
 
+    @PersistenceContext
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
+        dao = new JpaMultiDynamicQueryDAO(em);
+    }
+    public Page<?>findPageUserModelByUserId(Long userId,String modelName, Pageable pageable){
+        return dtCooperationRepository.findPageUserModelByUserId(userId,modelName,pageable);
+    }
+    /**
+     * 描述：注意Sql与Hql是不一样的，传的查询语句是Hql的
+     */
+    public Page<?> queryShopItemAndProd(DtCooperationDBParam itemParams, DtTaggingModelDBParam prodPrams, Pageable pageable) {
+        //先定义查询对象关联的表
+        prodPrams.setTableAlias("t");
+        itemParams.setTableAlias("o");
+
+        //params.addQueryCondition(fieldB, "_gt_", value1);
+        //编写查询HQL的主部分（不用写查询条件）
+        //执行查询
+        String multiHql = "select t,o from DtTaggingModel t, DtCooperation o where t.taggingModelId=o.taggmId";
+        Page<?> dbresult = dao.query(multiHql, pageable, prodPrams, itemParams);
+        return dbresult;
+    }
 
     public Page<DtCooperation> query(DtCooperationDBParam params, Pageable pageable) {
         Page<DtCooperation> pageresult = dtCooperationRepository.query(params, pageable);
@@ -119,8 +150,8 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             }
             dto.setCycle(map.get("CYCLE"));
             dto.setCycleEnum(VoUtils.toLong(map.get("CYCLE_ENUM")));
-            dto.setDataSetId(VoUtils.toLong(map.get("DATA_SET_ID")));
-            dto.setDataSetName(map.get("DATA_SET_NAME"));
+            dto.setResourceId(VoUtils.toLong(map.get("DATA_SET_ID")));
+            dto.setResourceName(map.get("DATA_SET_NAME"));
             dto.setDataTableName(map.get("TAGGING_TABLE_NAME"));
             dto.setIsDeleted(VoUtils.toLong(map.get("IS_DELETED")));
             dto.setModelDesc(map.get("MODEL_DESC"));

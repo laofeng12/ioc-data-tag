@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ljdp.common.spring.SpringContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,6 +16,8 @@ import javax.annotation.Resource;
 
 public class DatatagRunner implements ApplicationRunner {
 	private Logger logger = LogManager.getLogger(getClass());
+	@Value("${debug}")
+	private boolean environmental;
 	@Autowired
 	private SpringContext springContext;
 	@Resource
@@ -25,15 +28,20 @@ public class DatatagRunner implements ApplicationRunner {
 	SchedulejobCompent schedulejobCompent;
 
 	public void run(ApplicationArguments args) throws Exception {
-		TaskInfo taskInfo = new TaskInfo();
-		taskInfo.setJobGroup(schedulejobCompent.getJobGroup());
-		taskInfo.setJobName(schedulejobCompent.getJobName());
-		taskInfo.setCronExpression(schedulejobCompent.getQueue());
-		taskInfo.setJobMethod(schedulejobCompent.getJobMethod());
-		taskInfo.setId(1);
-		taskService.addJob(taskInfo);
-		logger.info("定时任务：新建模型扫描任务已启动");
-		logger.info("数据标签与画像组件启动成功");
+		System.out.println(environmental);
+		if (!environmental){
+			TaskInfo taskInfo = new TaskInfo();
+			taskInfo.setJobGroup(schedulejobCompent.getJobGroup());
+			taskInfo.setJobName(schedulejobCompent.getJobName());
+			taskInfo.setCronExpression(schedulejobCompent.getQueue());
+			taskInfo.setJobMethod(schedulejobCompent.getJobMethod());
+			taskInfo.setId(1);
+			taskService.addJob(taskInfo);
+			logger.info("定时任务：新建模型扫描任务已启动");
+			logger.info("数据标签与画像组件启动成功");
+		}else{
+			logger.info("开发环境，不跑定时任务。需要时请改DatatagRunner的environmental参数");
+		}
 	}
 
 }

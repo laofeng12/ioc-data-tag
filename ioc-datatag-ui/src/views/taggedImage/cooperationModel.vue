@@ -1,28 +1,26 @@
 <template>
   <div class="app-container">
     <div class="actionBar">
-        <el-input
-          class="zxinp moduleOne"
-          size="small"
-          placeholder="请输入内容"
-          prefix-icon="el-icon-search"
-          v-model="input2">
-        </el-input>
-        <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-        <el-button class="zxlistBtn" size="small" type="primary">查询</el-button>
-        <router-link  to="/tree">
-          <el-button  class="zxlistBtn" size="small" type="primary">创建标签</el-button>
-        </router-link>
-        <router-link  to="/lableImage">
-          <el-button size="small" type="primary">我的模型</el-button>
-        </router-link>
+      <el-input
+        class="zxinp moduleOne"
+        size="small"
+        placeholder="请输入内容"
+        prefix-icon="el-icon-search"
+        v-model="input2">
+      </el-input>
+      <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button size="small" type="primary" @click="modelQuery">查询</el-button>
+      <el-button class="zxlistBtn" size="small" type="primary" @click="createLabel">创建标签</el-button>
+      <router-link to="/lableImage">
+        <el-button size="small" type="primary">我的模型</el-button>
+      </router-link>
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -31,28 +29,25 @@
                   :header-cell-style="{background:'#f0f2f5'}">
           <template slot="empty">
             <div v-if="Loading">
-              <div v-loading="saveLoading2" ></div>
+              <div v-loading="saveLoading2"></div>
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="name" label="名称">
-            <template slot-scope="scope">
-              <span>教育体系标签</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="people" label="修改人/修改时间" >
+          <el-table-column prop="cooUserName" label="名称"></el-table-column>
+          <el-table-column prop="people" label="修改人/修改时间">
             <template slot-scope="scope">
               <div>
-                <div>数据搬运工</div>
-                <div>2019/4/19  16:12:13</div>
+                <div>{{scope.row.modifyUserName}}</div>
+                <div>{{scope.row.modifyTime}}</div>
               </div>
             </template>
           </el-table-column>
           <el-table-column prop="efficiency" label="完成效率"></el-table-column>
-          <el-table-column prop="state" label="状态" >
+          <el-table-column prop="runState" label="状态">
             <template slot-scope="scope">
               <div class="state">
-                <div class="stateName" :style="stateColor(scope.row.state)">{{scope.row.state}}</div>
+                <!--<div class="stateName" :style="stateColor(scope.row.runState)">{{scope.row.runState}}</div>-->
+                <div class="stateName" :style="stateColor(scope.row.runState)">{{scope.row.runState}}</div>
               </div>
             </template>
           </el-table-column>
@@ -68,95 +63,182 @@
         </el-table>
       </div>
     </div>
+    <el-dialog class="creat" title="创建标签组" :visible.sync="labelcreatDialog" width="530px" center
+               :close-on-click-modal="false"
+               @close="closeCreat">
+      <div class="del-dialog-cnt">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+          <el-form-item label="标签组名称:" prop="tagsName" class="nameOne">
+            <el-input
+              class="zxinp moduleOne"
+              size="small"
+              placeholder="请输入内容"
+              v-model="ruleForm.tagsName" style="width: 360px">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="标签组简介:" prop="synopsis" class="nameOne">
+            <el-input
+              class="area"
+              type="textarea"
+              :autosize="{ minRows: 2, maxRows: 4}"
+              placeholder="请输入内容"
+              v-model="ruleForm.synopsis">
+            </el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer device">
+        <div>
+          <el-button size="small" plain class="btn-group" @click="cancleCreat">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="creatsaveLoading" @click="sureCreat">
+            确认并编辑
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
+  import {getcooperationList} from '@/api/cooperation.js'
+  import { getDtTagGroupData } from '@/api/tagManage'
   export default {
-    components: {
-
-    },
+    components: {},
     name: "cooperationModel",
     data() {
       return {
         input2: '',
-        Loading:true,
-        saveLoading2:true,
-        saveLoading:false,
-        value:'',
-        options:[
+        Loading: true,
+        saveLoading2: true,
+        saveLoading: false,
+        labelcreatDialog: false,
+        creatsaveLoading: false,
+        value: '',
+        options: [
           {
-            value: '选项1',
+            value: '',
             label: '全部'
           }, {
-            value: '选项2',
+            value: '0',
+            label: '未运行'
+          }, {
+            value: '1',
             label: '运行中'
           }, {
-            value: '选项3',
+            value: '2',
             label: '运行出错'
-          },{
-            value: '选项4',
+          }, {
+            value: '3',
             label: '运行结束'
           }
         ],
-        ztableShowList:[{
-          name:'教育',
-          overTime:'2019/4/19  16:17:22',
-          efficiency:'优',
-          people:'数据搬运工',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多',
-          state:'进行中',
-        },{
-          name:'教育22',
-          overTime:'2019/4/19  16:17:22',
-          efficiency:'-',
-          people:'数据搬运工22',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多22',
-          state:'已完成',
-        },{
-          name:'教育22',
-          overTime:'2019/4/19  16:17:22',
-          efficiency:'-',
-          people:'数据搬运工22',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多22',
-          state:'已超时',
-        }],
-        ruleForm:{
-          name:'',
-          introduction:'',
-          date:''
+        ztableShowList: [],
+        ruleForm: {
+          tagsName: '',
+          synopsis: ''
+        },
+        rules: {
+          labelName: [
+            {required: true, message: '请填写名称', trigger: 'blur'}
+          ],
+          tagsName: [
+            {required: true, message: '请填写名称', trigger: 'blur'}
+          ],
         },
       }
     },
     methods: {
       stateColor(name) {
-        if (name == '进行中') {
+        if (name == '未运行' || name == '运行结束'){
           return "color:#999999";
-        } else if (name == '已完成') {
+        } else if (name == '运行中') {
           return "color:#00CC33";
         } else {
           return "color:#FF3333";
         }
       },
-      createModel(){
-        this.$router.push('creatModel')
-      },
-      marking(){
+      marking() {
         this.$router.push('marking')
-      }
+      },
+      createLabel() {
+        this.labelcreatDialog = true
+      },
+      closeCreat() {
+        this.$refs.ruleForm.resetFields();
+        this.labelcreatDialog = false
+      },
+      cancleCreat() {
+        this.$refs.ruleForm.resetFields();
+        this.labelcreatDialog = false
+      },
+      //
+      async getList() {
+        const userId = this.$store.state.user.userInfo.userId
+        try{
+          const resList = await getcooperationList({
+            userId: userId
+          })
+          console.log('resList', resList);
+          if(resList.rows && resList.rows.length >0){
+            resList.rows.forEach(item => {
+              if (item.runState == 0) {
+                item.runState = '未运行'
+              } else if (item.runState == 1) {
+                item.runState = '运行中'
+              } else if (item.runState == 2) {
+                item.runState = '运行出错'
+              } else {
+                item.runState = '运行结束'
+              }
+            })
+            this.ztableShowList = resList.rows
+          }else{
+            this.ztableShowList = []
+            this.Loading = false
+          }
+        }catch (e) {
+          console.log(e);
+        }
+      },
+      //
+      modelQuery() {
+
+      },
+      sureCreat() {
+        try {
+          this.creatsaveLoading = true
+          this.$refs.ruleForm.validate(async (valid) => {
+            if (valid) {
+              try {
+                const data = await getDtTagGroupData({
+                  id: '',
+                  isNew: true,
+                  isShare: '',
+                  synopsis: this.ruleForm.synopsis,
+                  tagsName: this.ruleForm.tagsName
+                })
+                this.creatsaveLoading = false
+                this.$router.push('/labelcreatTree/' + data.id)
+              } catch (e) {
+                this.creatsaveLoading = false
+                console.log(e);
+              }
+            } else {
+              this.creatsaveLoading = false
+            }
+          });
+        } catch (e) {
+          this.creatsaveLoading = false
+          console.log(e);
+        }
+      },
     },
     created() {
+      this.getList()
     },
-    computed: {
-
-    },
-    watch: {
-
-    },
+    computed: {},
+    watch: {},
     mounted() {
     }
   }
@@ -166,26 +248,32 @@
   .zxinp {
     width: 240px;
   }
+
   .zxlistBtn {
     margin-right: 10px;
   }
-  .actionBar{
+
+  .actionBar {
     display: flex;
     justify-content: flex-end;
   }
-  .tagSelect{
+
+  .tagSelect {
     margin-left: 10px;
     margin-right: 10px;
   }
+
   .iconLogo {
     font-size: 18px;
     margin-left: 10px;
     cursor: pointer;
   }
-  .controlChoose,.dateInp{
+
+  .controlChoose, .dateInp {
     width: 340px;
   }
-  .spot{
+
+  .spot {
     width: 10px;
     height: 10px;
     background: #00CC33;
@@ -193,7 +281,8 @@
     margin-right: 5px;
     margin-top: -1px;
   }
-  .state{
+
+  .state {
     display: flex;
     align-items: center;
   }
