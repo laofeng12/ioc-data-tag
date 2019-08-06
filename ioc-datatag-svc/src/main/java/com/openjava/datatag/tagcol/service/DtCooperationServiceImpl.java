@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import com.alibaba.fastjson.JSONObject;
+import com.commons.utils.QueryParamsUtil;
 import com.commons.utils.VoUtils;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
@@ -88,6 +89,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         //编写查询HQL的主部分（不用写查询条件）
         //执行查询
         String multiHql = "select t,o from DtTaggingModel t, DtCooperation o where t.taggingModelId=o.taggmId";
+        QueryParamsUtil.dealLike(prodPrams);//要用些方法转化like的查询条件才可以模糊查询，不然只能全匹配查询
         Page<?> dbresult = dao.query(multiHql, pageable, prodPrams, itemParams);
         return dbresult;
     }
