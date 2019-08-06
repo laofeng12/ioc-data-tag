@@ -132,12 +132,10 @@ public class DtTaggingModelAction {
 	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true)
 	@RequestMapping(value="/save",method=RequestMethod.POST)
-	public DtTaggingModel doSave(@RequestBody DtTaggingModel body,
+	public SuccessMessage doSave(@RequestBody DtTaggingModel body,
 								 HttpServletRequest request) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		String ip = IpUtil.getRealIP(request);
-		Date now = new Date();
-		DtTaggingModel dbObj=null;
 		if(body.isNew()) {
 			//新增，记录创建时间等
 			dtTaggingModelService.doNew(body,userInfo,ip);
@@ -150,11 +148,11 @@ public class DtTaggingModelAction {
 			if(body.getIsDeleted().equals(Constants.PUBLIC_YES)){
 				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"本接口不可用来删除");
 			}
-			dtTaggingModelService.doUpdate(body,dbObj,userInfo,ip);
+			dtTaggingModelService.doUpdate(body,db,userInfo,ip);
 		}
 		
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
-		return dbObj;
+		return new SuccessMessage("保存成功");
 	}
 
 	/**

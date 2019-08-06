@@ -95,13 +95,11 @@ public class DtSetColAction {
 	@RequestMapping(value="/delete",method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
-			@RequestParam(value="ids",required=false)String ids,
+			//@RequestParam(value="ids",required=false)String ids,
 			HttpServletRequest request) throws Exception{
 		String ip = IpUtil.getRealIP(request);
 		if(id != null) {
 			dtSetColService.doDelete(id,ip);
-		} else if(ids != null) {
-			dtSetColService.doRemove(ids);
 		}
 		return new SuccessMessage("清除字段成功");
 	}
