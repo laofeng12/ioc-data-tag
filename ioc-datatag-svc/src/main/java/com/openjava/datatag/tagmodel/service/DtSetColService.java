@@ -29,6 +29,11 @@ public interface DtSetColService {
 	void doRemove(String ids)throws Exception;
 	List<DtSetCol> getByTaggingModelId(Long taggingModelId);
 	/**
+	 * 根据taggingModelId获取源字段（非删除）
+	 */
+	List<DtSetCol> getSourceColByTaggingModelId(Long taggingModelId);
+
+	/**
 	 * 字段设置-确认选择
 	 */
 	DtTaggingModelDTO selectCol(DtTaggingModelDTO body,String id)throws Exception;
@@ -56,4 +61,12 @@ public interface DtSetColService {
 	 *  确认打标保存接口
 	 */
 	void saveCondition(SaveConditionDTO req)throws Exception;
+
+	/**
+	 * 获取字段源字段+克隆字段的所有历史数量
+	 * @param sourceCol
+	 * @param taggingModelId
+	 * @return
+	 */
+	Long countBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId);
 }

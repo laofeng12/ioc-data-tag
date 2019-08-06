@@ -30,8 +30,7 @@ import java.util.*;
 @Component
 public class MppPgExecuteUtil extends ExecuteUtil {
 
-    @Resource
-    private PostgreSqlConfig PostgreSqlConfig;
+    private PostgreSqlConfig postgreSqlConfig;
 
     /**
      * 表名
@@ -333,15 +332,18 @@ public class MppPgExecuteUtil extends ExecuteUtil {
         return dataList;
     }
 
+    public void initValidDataSource (PostgreSqlConfig postgreSqlConfig){
+        this.postgreSqlConfig = postgreSqlConfig;
+    }
+
     public DsDataSource getValidDataSource() {
         if (this.dsDataSource == null) {
             DsDataSource dataSource = new DsDataSource();
             dataSource.setDbType(3L);
 //            dataSource.setConfigJson("{\"password\":\"ioc123456\",\"username\":\"mppuser\",\"ip\":\"183.6.55.26\",\"port\":\"5432\",\"dataBaseName\":\"postgres\",\"pooled\":true}");
-            dataSource.setConfigJson(JSONObject.toJSONString(PostgreSqlConfig));
+            dataSource.setConfigJson(JSONObject.toJSONString(postgreSqlConfig));
             this.dsDataSource = dataSource;
         }
-
         return this.dsDataSource;
     }
     private void initDataProvider(DsDataSource dataSource,Map<String, String> sqlMap,Boolean isUserForTest )throws Exception{
