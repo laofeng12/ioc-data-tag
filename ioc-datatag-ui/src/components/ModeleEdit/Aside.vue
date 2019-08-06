@@ -135,22 +135,6 @@ export default {
       checkedCols: [],
       cols: colsOptions,
       isIndeterminate: true,
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }, {
-        value: '选项3',
-        label: '蚵仔煎'
-      }, {
-        value: '选项4',
-        label: '龙须面'
-      }, {
-        value: '选项5',
-        label: '北京烤鸭'
-      }],
       tableData: [{
         colName: '2016-05-03',
         colNameType: '王小虎'
@@ -350,6 +334,7 @@ export default {
             const params={
               'resourceId':this.resourceId,
               'resourceName': this.resourceName,
+              'modelName':this.resourceName,
               'resourceType':this.resourceType,
               'pkey':this.ruleForm.pkey,
               'isNew':this.isNew,

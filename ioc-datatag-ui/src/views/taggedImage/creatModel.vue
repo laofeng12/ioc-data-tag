@@ -8,17 +8,17 @@
         <div class="name">
           <div class="img"></div>
           <div class="text">
-            <el-input  v-if="routerName==='editModel'" v-model="modelName" placeholder="请输入内容"></el-input>
+            <el-input size="small"  v-if="routerName==='editModel'" v-model="modelName" placeholder="请输入内容" @blur="getsaveName"></el-input>
             <span v-else>未命名</span>
           </div>
         </div>
       </div>
-      <div class="right">
+      <div class="right" v-show="routerName==='editModel'">
         <div>
-          <div class="img" @click="saveAs"></div>
+          <div class="img" @click="saveAsto"></div>
         </div>
         <el-button class="button" type="primary" size="small" @click="runModel">模型调度</el-button>
- <!--       <el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
+ <!--<el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
       </div>
     </div>
     <div class="content">
@@ -63,7 +63,7 @@
 
         </div>
         <div  v-if="routerName==='editModel'">
-          <EditTable :theadData="headColList" :tableData="modelTableData"></EditTable>
+          <EditTable :theadData="headColList" :tableData="modelTableData"  :modelId="taggingModelId"></EditTable>
         </div>
 
       </div>
@@ -90,27 +90,29 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确认另存</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveasLoading" @click="saveAsmodel">确认另存</el-button>
         </div>
       </div>
     </el-dialog>
     <!--运行-->
-    <el-dialog class="creat" title="运行模型" :visible.sync="runDialog" width="530px" center :close-on-click-modal="false"
+    <el-dialog class="creat" title="模型调度" :visible.sync="runDialog" width="530px" center :close-on-click-modal="false"
                @close="closeRun">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px">
-          <el-form-item label="模型名称:" prop="modelName" class="nameOne">教育体系标签</el-form-item>
+          <el-form-item label="模型名称:" prop="zmodelName" class="nameOne">{{runModelname}}</el-form-item>
           <el-form-item label="运行开始时间:" prop="date" class="nameOne">
             <el-date-picker
               size="small"
               class="dateInp"
-              v-model="value1"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              format="yyyy-MM-dd HH:mm:ss"
+              v-model="ruleForm.date"
               type="datetime"
               placeholder="选择日期时间">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="运行时间周期:" prop="date2" class="nameOne">
-            <el-select class="controlChoose" size="small" v-model="value" placeholder="请选择">
+          <el-form-item label="运行时间周期:" prop="region" class="nameOne">
+            <el-select class="controlChoose" size="small" v-model="ruleForm.region" placeholder="请选择">
               <el-option
                 v-for="item in options2"
                 :key="item.value"
@@ -123,7 +125,7 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" >确定运行</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="savedispatchLoading" @click="goDispatchto">确定调度</el-button>
         </div>
       </div>
     </el-dialog>
@@ -201,8 +203,7 @@
 <script>
   import EditTable from '../../components/ModeleEdit/EditTable'
   import Aside from '../../components/ModeleEdit/Aside'
-/*  import {getModelData,getModelColsData} from '@/api/creatModel'*/
-  import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave,getModelData,getModelColsData} from '@/api/creatModel'
+  import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave,getModelData,getModelColsData,saveName,saveAs,goDispatch} from '@/api/creatModel'
 
   export default {
     name: 'creatModel',
@@ -216,6 +217,8 @@
         show:false,
         editDialog:false,
         saveLoading:false,
+        saveasLoading:false,
+        savedispatchLoading:false,
         runDialog:false,
         saveDialog:false,
         value1:'',
@@ -235,8 +238,10 @@
           name: '',
           textarea2: '',
           modelName: '',
-          date: ''
+          date: '',
+          region:''
         },
+        runModelname:'',
         searchText: '',
         searchText2: '',
         isIndeterminate: true,
@@ -251,11 +256,23 @@
         cooId:'',
         zcolId:'',
         options2: [{
-          value: '选项1',
+          value: '0',
           label: '停止运行'
-        }, {
-          value: '选项2',
+        },{
+          value: '1',
           label: '运行一次'
+        },{
+          value: '2',
+          label: '每天一次'
+        },{
+          value: '3',
+          label: '每周一次'
+        },{
+          value: '4',
+          label: '每月一次'
+        },{
+          value: '5',
+          label: '每年一次'
         }],
         rules: {
           name: [
@@ -265,7 +282,7 @@
             {required: true, message: '请填写',trigger: 'blur'}
           ],
           date:[{required: true, message: '请选择时间',trigger: 'blur'}],
-          date2:[{required: true, message: '请选择',trigger: 'change'}]
+          region:[{required: true, message: '请选择时间周期',trigger: 'change'}]
         },
         tableData: []
       }
@@ -279,7 +296,7 @@
           this.taggingModelId=to.params.id
          // console.log('this.taggingModelId', this.taggingModelId)
           this.getModelList(this.taggingModelId)
-          this.getModelColsList(this.taggingModelId,0,10,1)
+          this.getModelColsList(this.taggingModelId,0,100,1)
         }
       }
     },
@@ -291,7 +308,7 @@
         //进入编辑模型或者打标界面
         //获取模型数据
         this.getModelList(this.taggingModelId)
-        this.getModelColsList(this.taggingModelId,0,10,1)
+        this.getModelColsList(this.taggingModelId,0,100,1)
       }
 
     },
@@ -304,9 +321,9 @@
           }
           const data = await getModelData(params)
           this.modelData = data
-          this.modelName = data.modelName
+          this.modelName = data.resourceName
+          this.runModelname = data.modelName
           this.headColList = data.colList
-          // console.log(data)
         } catch (e) {
         }
       },
@@ -326,10 +343,10 @@
       },
       // 获取模型数据
       async getModelColsList(modelId,page,size,type) {
-       console.log(modelId,page,size)
+       //console.log(modelId,page,size)
         try {
           const data = await getModelColsData(modelId,page,size,type)
-          console.log(data)
+          console.log('表格数据',data)
           this.modelTableData=data.data
         } catch (e) {
 
@@ -339,7 +356,7 @@
       showIt(){
         this.show = !this.show
       },
-      saveAs(){
+      saveAsto(){
         this.editDialog = true
       },
       closeSaveas(){
@@ -532,6 +549,61 @@
         }catch (e) {
           this.saveLoading = false
         }
+      },
+      //名称保存
+      async getsaveName(){
+        try{
+          const resName = await saveName({
+            taggingModelId:this.taggingModelId,
+            modelName:this.modelName
+          })
+          console.log('resName',resName);
+        }catch (e) {
+          console.log(e);
+        }
+
+      },
+      // 另存
+      async saveAsmodel(){
+        this.saveasLoading = true
+        try{
+          const res = await saveAs(this.taggingModelId)
+          this.$message({
+            message: res.message,
+            type: 'success'
+          });
+          this.saveasLoading = false
+          this.editDialog = false
+        }catch (e) {
+          console.log(e);
+          this.saveasLoading = false
+        }
+      },
+      async goDispatchto(){
+        this.savedispatchLoading = true
+        this.$refs.ruleForm.validate(async(valid) => {
+          if (valid) {
+            try {
+              const param = {
+                "cycleEnum": this.ruleForm.region,
+                "id": this.taggingModelId,
+                "startTime": this.ruleForm.date
+              }
+              const resto = await goDispatch(param)
+              this.$message({
+                message: resto.message,
+                type: 'success'
+              });
+              this.savedispatchLoading = false
+              this.runDialog = false
+            } catch (e) {
+              console.log(e);
+              this.savedispatchLoading = false
+            }
+          } else {
+            this.savedispatchLoading = false
+          }
+        });
       }
     },
     created() {

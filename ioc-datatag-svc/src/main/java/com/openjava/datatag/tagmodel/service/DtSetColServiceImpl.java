@@ -122,6 +122,9 @@ public class DtSetColServiceImpl implements DtSetColService {
 	public List<DtSetCol> getByTaggingModelId(Long taggingModelId){
 		return dtSetColRepository.getByTaggingModelIdAndIsDeleted(taggingModelId,Constants.PUBLIC_NO);
 	}
+	public List<DtSetCol> getSourceColByTaggingModelId(Long taggingModelId){
+		return dtSetColRepository.getSourceColByTaggingModelId(taggingModelId,Constants.PUBLIC_NO);
+	}
 	/**
 	 * 字段设置-确认选择
 	 */
@@ -253,17 +256,13 @@ public class DtSetColServiceImpl implements DtSetColService {
 		if (col==null) {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此字段，colId无效");
 		}
-		List<DtSetCol> cols = getSourceSetColBySourceColAndTaggingModelId(col.getSourceCol(),col.getTaggingModelId());
+		Long cloneCount= countBySourceColAndTaggingModelId(col.getSourceCol(),col.getTaggingModelId());
 		MyBeanUtils.copyProperties(clone,col);
 		EntityClassUtil.dealCreateInfo(clone,userInfo);
 		clone.setColId(null);
 		clone.setIsNew(true);
 		clone.setIsSource(Constants.PUBLIC_NO);//非源字段
-		if (CollectionUtils.isNotEmpty(cols)) {
-			clone.setShowCol("copy"+col.getSourceCol()+(cols.size()+1));
-		}else{
-			clone.setShowCol("copy"+col.getSourceCol()+"1");
-		}
+		clone.setShowCol(Constants.DT_COL_COPY + col.getSourceCol()+"_"+String.valueOf(cloneCount));
 		doSave(clone);
 
 		//日志记录
@@ -462,6 +461,12 @@ public class DtSetColServiceImpl implements DtSetColService {
 		dtSetColRepository.check(checkSql);
 		return resultSql;
 	}
+
+	public Long countBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId){
+		return dtSetColRepository
+				.countBySourceColAndTaggingModelId(sourceCol, taggingModelId);
+	}
+
 	public static void main(String[] args) {
 		System.out.println(RandomStringUtils.random(27,true,false).toUpperCase());
 		String kk = null;

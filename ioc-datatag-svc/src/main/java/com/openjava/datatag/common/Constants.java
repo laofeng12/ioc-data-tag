@@ -70,12 +70,17 @@ public class Constants {
 
     //===========标签模型运行状态=========
     public static final String DT_TGMODEL_STATUS="dt.tgmode.status";//共享数据字典
-    public static final Long TG_MODEL_NO_BEGIN = 0L;//未开始
-    public static final Long TG_MODEL_WAIT = 1L;//等待运行
-    public static final Long TG_MODEL_RUNNING = 2L;//运行中
-    public static final Long TG_MODEL_SUCCESS = 3L;//运行成功
-    public static final Long TG_MODEL_ERROR = 4L;//运行失败
-    public static final Long TG_MODEL_END = -1L;//运行结束
+    public static final Long DT_MODEL_NO_BEGIN = 0L;//未开始
+    public static final Long DT_MODEL_WAIT = 1L;//等待运行
+    public static final Long DT_MODEL_RUNNING = 2L;//运行中
+    public static final Long DT_MODEL_SUCCESS = 3L;//运行成功
+    public static final Long DT_MODEL_ERROR = 4L;//运行失败
+    public static final Long DT_MODEL_END = -1L;//运行结束
+
+    //===========  模型（临时表、打标字段前缀）=====================
+    public static final String DT_TABLE_PREFIX="DT_";//临时表前缀
+    public static final String DT_COL_PREFIX="TAG_";//打标字段前缀
+    public static final String DT_COL_COPY="copy_";//字段克隆前缀
 
 
 

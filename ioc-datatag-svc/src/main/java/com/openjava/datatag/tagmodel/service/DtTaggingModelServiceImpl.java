@@ -3,6 +3,7 @@ package com.openjava.datatag.tagmodel.service;
 import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.component.PostgreSqlConfig;
 import com.openjava.datatag.component.TokenGenerator;
 import com.openjava.datatag.demo.dto.BaseResp;
 import com.openjava.datatag.demo.dto.TopDepartmentReqReqDTO;
@@ -39,6 +40,7 @@ import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.BoundValueOperations;
@@ -90,7 +92,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	@Resource
 	private RedisTemplate<String, Object> redisTemplate;
 	@Resource
-	private MppPgExecuteUtil mppPgExecuteUtil;
+	private PostgreSqlConfig postgreSqlConfig;
 
 	public void copy(Long id,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -188,7 +190,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		if (body.getModelDesc() == null){
 			body.setModelDesc("新建模型");
 		}
-		body.setRunState(Constants.TG_MODEL_NO_BEGIN);//未开始
+		body.setRunState(Constants.DT_MODEL_NO_BEGIN);//未开始
 		body.setIsNew(true);//执行insert
 		body.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
 		DtTaggingModel dbObj = dtTaggingModelRepository.save(body);
@@ -208,7 +210,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		if (body.getModelDesc() == null){
 			body.setModelDesc("新建模型");
 		}
-		body.setRunState(Constants.TG_MODEL_NO_BEGIN);//未开始
+		body.setRunState(Constants.DT_MODEL_NO_BEGIN);//未开始
 		body.setIsNew(true);//执行insert
 		body.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
 		DtTaggingModel taggingModel = new DtTaggingModel();
@@ -233,12 +235,14 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	}
 
 
-	public DtTaggingModel doUpdate(DtTaggingModel body,DtTaggingModel db,BaseUserInfo userInfo,String ip){
+	public DtTaggingModel doRename(DtTaggingModelRenameDTO body,DtTaggingModel db,BaseUserInfo userInfo,String ip){
 		String oldContent = JSONObject.toJSONString(db);
 		String modifyContent = JSONObject.toJSONString(body);
 		EntityClassUtil.dealModifyInfo(db,userInfo);
-		MyBeanUtils.copyPropertiesNotBlank(db, body);
+		//MyBeanUtils.copyPropertiesNotBlank(db, body);
 		db.setIsNew(false);//执行update
+		db.setTaggingModelId(body.getTaggingModelId());
+		db.setModelName(body.getModelName());
 		DtTaggingModel dbObj =dtTaggingModelRepository.save(db);
 
 		//日志记录
@@ -259,7 +263,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		//检查Cycle 字段是否合理
 		if(checkCycle(body.getCycleEnum())){
 			if (body.getCycleEnum().equals(Constants.DT_DISPATCH_STOP)){
-				db.setRunState(Constants.TG_MODEL_END);
+				db.setRunState(Constants.DT_MODEL_END);
 				db.setStartTime(null);
 				db.setCycle(null);
 				db.setCycleEnum(null);
@@ -267,7 +271,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				if (body.getStartTime() == null){
 					throw new APIException(MyErrorConstants.TAGM_DISPATCH_NONE_START_TIME,"未设置开始时间");
 				}
-				db.setRunState(Constants.TG_MODEL_WAIT);
+				db.setRunState(Constants.DT_MODEL_WAIT);
 				db.setStartTime(body.getStartTime());
 				db.setCycle(toCron(body.getCycleEnum(),body.getStartTime()));
 				db.setCycleEnum(body.getCycleEnum());
@@ -372,15 +376,15 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	 */
 	public void setToJob(){
 		List<Long> allRunState = new ArrayList<>();
-		allRunState.add(Constants.TG_MODEL_WAIT);
-		allRunState.add(Constants.TG_MODEL_RUNNING);
-		allRunState.add(Constants.TG_MODEL_SUCCESS);
-		allRunState.add(Constants.TG_MODEL_ERROR);
-		allRunState.add(Constants.TG_MODEL_END);
+		allRunState.add(Constants.DT_MODEL_WAIT);
+		allRunState.add(Constants.DT_MODEL_RUNNING);
+		allRunState.add(Constants.DT_MODEL_SUCCESS);
+		allRunState.add(Constants.DT_MODEL_ERROR);
+		allRunState.add(Constants.DT_MODEL_END);
 		List<DtTaggingModel> allModels =  getModelByRunStates(allRunState);
 		Map<Long, List<DtTaggingModel>> modelGroup = allModels.stream().collect(Collectors.groupingBy(DtTaggingModel::getRunState));
 		//等待执行调度的任务
-		List<DtTaggingModel> waitModels =  modelGroup.get(Constants.TG_MODEL_WAIT);
+		List<DtTaggingModel> waitModels =  modelGroup.get(Constants.DT_MODEL_WAIT);
 		if (CollectionUtils.isNotEmpty(waitModels)) {
 			for (DtTaggingModel model:waitModels) {
 				try {
@@ -411,7 +415,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			}
 		}
 		//要删除的任务
-		List<DtTaggingModel> deleteModels = modelGroup.get(Constants.TG_MODEL_END);
+		List<DtTaggingModel> deleteModels = modelGroup.get(Constants.DT_MODEL_END);
 		if (CollectionUtils.isNotEmpty(deleteModels)) {
 			for (DtTaggingModel model:deleteModels) {
 				try {
@@ -424,8 +428,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			}
 		}
 		//要重新启动的任务（服务器重启时要重新设置：2运行中、3运行成功状态的定时任务）
-		List<DtTaggingModel> reRunModels =  modelGroup.get(Constants.TG_MODEL_RUNNING);
-		List<DtTaggingModel> successModels =  modelGroup.get(Constants.TG_MODEL_SUCCESS);
+		List<DtTaggingModel> reRunModels =  modelGroup.get(Constants.DT_MODEL_RUNNING);
+		List<DtTaggingModel> successModels =  modelGroup.get(Constants.DT_MODEL_SUCCESS);
 		if (CollectionUtils.isEmpty(reRunModels)) {
 			reRunModels = successModels;
 			if (CollectionUtils.isEmpty(reRunModels)){
@@ -467,43 +471,73 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		}
 //		Map<Long, List<DtSetCol>> colGroup = cols.stream().collect(Collectors.groupingBy(DtSetCol::getColId));
 		//第一步、若存在删表
+		MppPgExecuteUtil mppPgExecuteUtil = new MppPgExecuteUtil();
+		mppPgExecuteUtil.initValidDataSource(postgreSqlConfig);//初始化数据库
 		mppPgExecuteUtil.setTableName(tagModel.getDataTableName());//表名
 		mppPgExecuteUtil.dropTable();//删表
 		//第二步、建表
 		mppPgExecuteUtil.setTableKey(tagModel.getPkey());//主键
-		Map<String,String> colmap  = new LinkedHashMap<>();//字段，注释
-		Map<String,String> cloTypeMap  = new LinkedHashMap<>();//字段，字段类型
+		Map<String,String> colmap  = new LinkedHashMap<>();//字段，注释(用于建表)
+		Map<String,String> insertColmap  = new LinkedHashMap<>();//字段，注释(用于插入数据)
+		Map<String,String> cloTypeMap  = new LinkedHashMap<>();//字段，字段类型(用于建表)
+		Map<String,String> insertCloTypeMap  = new LinkedHashMap<>();//字段，字段类型(用于插入数据)
 		mppPgExecuteUtil.setTableName(tagModel.getDataTableName());
 		cols.forEach(record->{
-			colmap.put(record.getShowCol(),"");
-			if (TagConditionUtils.isDateType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())) {
+			colmap.put(record.getShowCol(),"");//源字段
+			insertColmap.put(record.getShowCol(),"");
+			if (TagConditionUtils.isDateType(record.getSourceDataType())) {
 				cloTypeMap.put(record.getShowCol(),"date");
+				insertCloTypeMap.put(record.getShowCol(),"date");
 			}else if(TagConditionUtils.isIntType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())){
-				if (record.getSourceDataType().indexOf("，")==-1) {
+				if (record.getSourceDataType().indexOf(",")==-1) {
 					cloTypeMap.put(record.getShowCol(),"decimal");
+					insertCloTypeMap.put(record.getShowCol(),"decimal");
 				}else{
 					cloTypeMap.put(record.getShowCol(),"bigint");
+					insertCloTypeMap.put(record.getShowCol(),"bigint");
 				}
 			}else{
+				cloTypeMap.put(record.getShowCol(),"varchar");
+				insertCloTypeMap.put(record.getShowCol(),"varchar");
+			}
+			if (Constants.PUBLIC_YES.equals(record.getIsMarking())) {
+				colmap.put(Constants.DT_COL_PREFIX+record.getShowCol(),"");//打标结果字段
 				cloTypeMap.put(record.getShowCol(),"varchar");
 			}
 		});
 		mppPgExecuteUtil.createTable(colmap,cloTypeMap);
 		//第三步、获取数据集数据并同步到mpp
+		mppPgExecuteUtil.setColumnMap(insertCloTypeMap);
+		mppPgExecuteUtil.setColumnTypeMap(insertCloTypeMap);
 		Date begin = new Date();
-		int successCount = 0;
+		long totalCount = 0;//更新总数
+		long successCount = 0;//成功数
+		long totalPage = 0;
+		int size = 3000;
 		try	{
-			for (int i = 0; i < 1; i++) {
-				++successCount;
-				logger.info("第"+successCount+"次");
-				List<Object> data = new LinkedList<>();
-				Pageable pageable = PageRequest.of(i,10);
-				data.addAll((Collection<?>) getDataFromDataSet(taggingModelId,0,pageable));
-				mppPgExecuteUtil.setDataList(data);
-				mppPgExecuteUtil.insertDataList();
+			List<Object> data = new LinkedList<>();
+			Pageable pageable = PageRequest.of(0,size);
+			Page<Object> result  = (Page<Object>) getDataFromDataSet(taggingModelId,0,pageable);
+			data.addAll(result.getContent());
+			mppPgExecuteUtil.setDataList(data);
+			mppPgExecuteUtil.insertDataList();
+			totalPage = result.getTotalPages();
+			totalCount = result.getTotalElements();
+			successCount+=size;
+			if (totalPage>1){
+				for (int i = 1; i <totalPage ; i++) {
+					pageable = PageRequest.of(i,size);
+					Page<Object> nextResult  = (Page<Object>) getDataFromDataSet(taggingModelId,0,pageable);
+					List<Object> nextData = new LinkedList<>();
+					nextData.addAll(nextResult.getContent());
+					mppPgExecuteUtil.setDataList(data);
+					mppPgExecuteUtil.insertDataList();
+					successCount+=size;
+				}
 			}
 		}catch (Exception e){
 			e.printStackTrace();
+			logger.info(e.getMessage());
 		}
 		Date end = new Date();
 		//第四步update数据（传sql进mpp,在mpp计算）
@@ -513,16 +547,16 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			mppPgExecuteUtil.updateDataList();
 		}
 		//第五步，记录更新结果
-        DtWaitUpdateIndex waitUpdateIndex = new DtWaitUpdateIndex();
-        waitUpdateIndex.setIsNew(true);
-        waitUpdateIndex.setCreateTime(new Date());
-        waitUpdateIndex.setRunState(0L);
-        waitUpdateIndex.setTableName(tagModel.getDataTableName());
-        waitUpdateIndex.setTaggingModelId(taggingModelId);
-        dtWaitUpdateIndexService.doSave(waitUpdateIndex);
-		tagModel.setRunState(Constants.TG_MODEL_SUCCESS);
+		DtWaitUpdateIndex waitUpdateIndex = new DtWaitUpdateIndex();
+		waitUpdateIndex.setIsNew(true);
+		waitUpdateIndex.setCreateTime(new Date());
+		waitUpdateIndex.setRunState(0L);
+		waitUpdateIndex.setTableName(tagModel.getDataTableName());
+		waitUpdateIndex.setTaggingModelId(taggingModelId);
+		dtWaitUpdateIndexService.doSave(waitUpdateIndex);
+		tagModel.setRunState(Constants.DT_MODEL_SUCCESS);
 		doSave(tagModel);
-		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},总耗时:{%s}毫秒",taggingModelId,10000*successCount,end.getTime()-begin.getTime()));
+		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},成功数{%s},总耗时:{%s}毫秒",taggingModelId,totalCount,successCount,end.getTime()-begin.getTime()));
 	}
 
 
@@ -531,12 +565,12 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	 */
 	private String  authorityToken = "";
 	public Object getDataFromDataSet(Long taggingModelId,int type,Pageable pageable)throws Exception{
-		List<List<Object>> data = new LinkedList<>();//最终返回的数据
-		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
+//		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
+		List<DtSetCol> SourceCols= dtSetColService.getSourceColByTaggingModelId(taggingModelId);
 		DtTaggingModel taggingModel = get(taggingModelId);
-		String colStr[]= new String[cols.size()];
-		for (int i = 0; i < cols.size(); i++) {
-			colStr[i] = cols.get(i).getShowCol();
+		String colStr[]= new String[SourceCols.size()];
+		for (int i = 0; i < SourceCols.size(); i++) {
+			colStr[i] = SourceCols.get(i).getShowCol();
 		}
 		LjdpHttpClient client = new LjdpHttpClient();
 		BaseUserInfo userInfo  = (BaseUserInfo) SsoContext.getUser();
@@ -555,28 +589,29 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		req.setColumnList(colStr);
 		req.setPage(pageable.getPageNumber());
 		req.setSize(pageable.getPageSize());
-		System.out.println( JSONObject.toJSONString(req));
+//		System.out.println( JSONObject.toJSONString(req));
 		HttpResponse resp = client.postJSON(resourceDataUrl+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
 		String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
-		if (resp.getStatusLine().getStatusCode()==200) {
-			DataSetRspDTO result = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
+		DataSetRspDTO result = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
+		if (resp.getStatusLine().getStatusCode()==200 && result.getCode()==200) {
+			//type=1返回key+Value
 			if (type==1) {
 				List<List<Object>> listData =result.getData().getData();
 				List<Object> tempData =new LinkedList<>();
 				for (int i = 0; i < listData.size(); i++) {
 					String ob = "";
 					for (int j = 0; j < listData.get(i).size(); j++) {
-						ob += "\""+cols.get(j).getShowCol()+"\":\""+listData.get(i).get(j)+"\",";
+						ob += "\""+SourceCols.get(j).getShowCol()+"\":\""+listData.get(i).get(j)+"\",";
 					}
 					ob="{"+ob.substring(0,ob.length()-1)+"}";
 					tempData.add(JSONObject.parseObject(ob,Object.class));
 				}
-				return tempData;
+				return new PageImpl<>(tempData, pageable, result.getData().getTotalPage());
 			}else {
-				return result.getData().getData();
+				return new PageImpl<>(result.getData().getData(), pageable, result.getData().getTotalPage());
 			}
 		}else {
-			logger.info(jsontext);
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,result.getMessage());
 		}
 //		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //		for (int j = 0; j < pageable.getPageSize(); j++) {
@@ -594,7 +629,6 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 //			}
 //			data.add(kk);
 //		}
-		return data;
 	}
 
 	/**

@@ -35,6 +35,12 @@ public interface DtSetColRepository extends DynamicJpaRepository<DtSetCol, Long>
     @Query("from DtSetCol t where t.isDeleted=:isDeleted and t.taggingModelId = :taggingModelId order by t.colSort")
     List<DtSetCol> getByTaggingModelIdAndIsDeleted(@Param("taggingModelId")Long taggingModelId,@Param("isDeleted")Long isDeleted);
     /**
+     * 根据taggingModelId获取源字段（非删除）
+     */
+    @Query("from DtSetCol t where t.isSource=1 and  t.isDeleted=:isDeleted and t.taggingModelId = :taggingModelId order by t.colSort")
+    List<DtSetCol> getSourceColByTaggingModelId(@Param("taggingModelId")Long taggingModelId,@Param("isDeleted")Long isDeleted);
+
+    /**
     *根据源表数据获取字段
     */
     List<DtSetCol>  getByTaggingModelIdAndSourceColAndIsDeleted(Long TaggingModelId,String sourceCol,Long isDeleted);
@@ -54,4 +60,16 @@ public interface DtSetColRepository extends DynamicJpaRepository<DtSetCol, Long>
     @Modifying
     @Query("update DtSetCol set isDeleted = 1, modifyTime = :now, modifyUser= :user where taggingModelId = :id")
     void doSoftDeleteByTaggingModelId(@Param("id") Long id,@Param("now") Date now,@Param("user") Long user);
+
+    /**
+
+     /**
+     * 获取字段源字段+克隆的所有历史数量
+     * @param sourceCol
+     * @param taggingModelId
+     * @return
+     */
+    @Query(value = "select  count(t.taggingModelId) from DtSetCol t where t.sourceCol=:sourceCol and t.taggingModelId=:taggingModelId")
+    Long countBySourceColAndTaggingModelId(String sourceCol,Long taggingModelId);
+
 }

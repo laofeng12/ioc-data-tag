@@ -213,7 +213,6 @@
 </template>
 
 <script>
-  import {mapActions, mapState, mapGetters} from 'vuex'
   import {getmodelList,getDispatch,getDelete} from '@/api/lableImage.js'
   import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
@@ -297,7 +296,7 @@
         },
         rules: {
           date: [
-            {required: true, message: '请选择时间',trigger: 'change'}
+            {required: true, message: '请选择时间',trigger: 'blur'}
           ],
           region: [
             { required: true, message: '请选择周期', trigger: 'change' }
