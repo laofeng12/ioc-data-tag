@@ -8,7 +8,7 @@
         <div class="name">
           <div class="img"></div>
           <div class="text">
-            <el-input size="small"  v-if="routerName==='editModel'" v-model="modelName" placeholder="请输入内容" @blur="getsaveName"></el-input>
+            <el-input size="small"  v-if="routerName==='editModel'" v-model="runModelname" placeholder="请输入内容" @blur="getsaveName"></el-input>
             <span v-else>未命名</span>
           </div>
         </div>
@@ -213,7 +213,7 @@
         modelData:{},//获取模型数据
         taggingModelId:0,//模型id
         routerName:'creatModel',
-        modelName:'未命名',
+        runModelname:'未命名',
         show:false,
         editDialog:false,
         saveLoading:false,
@@ -364,6 +364,7 @@
       },
       runModel(){
         this.runDialog = true
+
       },
       closeRun(){
         this.runDialog = false
@@ -555,9 +556,12 @@
         try{
           const resName = await saveName({
             taggingModelId:this.taggingModelId,
-            modelName:this.modelName
+            modelName:this.runModelname
           })
-          console.log('resName',resName);
+          this.$message({
+            message: resName.message,
+            type: 'success'
+          });
         }catch (e) {
           console.log(e);
         }
