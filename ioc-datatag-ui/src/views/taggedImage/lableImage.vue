@@ -213,7 +213,7 @@
 </template>
 
 <script>
-  import {getmodelList,getDispatch,getDelete} from '@/api/lableImage.js'
+  import {getmodelList,getDispatch,getDelete,getDispatchdetail} from '@/api/lableImage.js'
   import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
 
@@ -289,8 +289,8 @@
         value: '',
         ztableShowList: [],
         ruleForm: {
-          region: '',
-          date: '',
+          region: null,
+          date: null,
           tagsName: '',
           synopsis: ''
         },
@@ -329,10 +329,37 @@
           return "backgroundColor:#ee0320";
         }
       },
-      handleControl(name,id) {
+      async handleControl(name,id) {
         this.controlDialog = true
         this.dispatchName = name
         this.dispatchId = id
+          try{
+            const resOk = await getDispatchdetail({
+              taggingModelId:id
+            })
+            if(resOk.cycleEnum == 0){
+              resOk.cycleEnum = '停止运行'
+            }
+            if(resOk.cycleEnum == 1){
+              resOk.cycleEnum = '运行一次'
+            }
+            if(resOk.cycleEnum == 2){
+              resOk.cycleEnum = '每天一次'
+            }
+            if(resOk.cycleEnum == 3){
+              resOk.cycleEnum = '每周一次'
+            }
+            if(resOk.cycleEnum == 4){
+              resOk.cycleEnum = '每月一次'
+            }
+            if(resOk.cycleEnum == 5){
+              resOk.cycleEnum = '每年一次'
+            }
+            this.ruleForm.date = resOk.startTime
+            this.ruleForm.region = resOk.cycleEnum
+          }catch (e) {
+            console.log(e);
+          }
       },
       closeControl() {
         this.controlDialog = false
@@ -349,7 +376,6 @@
         this.deleteDialog = true
         this.deleteName = name
         this.deleteId = id
-        // console.log(id);
       },
       closedelete() {
         this.deleteDialog = false
@@ -359,7 +385,6 @@
       },
       createLabel() {
         this.labelcreatDialog = true
-        // this.$router.push('tree')
       },
       createModel() {
         this.$router.push('creatModel')

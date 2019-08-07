@@ -203,7 +203,7 @@
 <script>
   import EditTable from '../../components/ModeleEdit/EditTable'
   import Aside from '../../components/ModeleEdit/Aside'
-  import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave,getModelData,getModelColsData,saveName,saveAs,goDispatch} from '@/api/creatModel'
+  import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave,getModelData,getModelColsData,saveName,saveAs,goDispatch,getmodelDispatchdetail} from '@/api/creatModel'
 
   export default {
     name: 'creatModel',
@@ -238,8 +238,8 @@
           name: '',
           textarea2: '',
           modelName: '',
-          date: '',
-          region:''
+          date: null,
+          region:null
         },
         runModelname:'',
         searchText: '',
@@ -362,9 +362,35 @@
       closeSaveas(){
         this.editDialog = false
       },
-      runModel(){
+      async runModel(){
         this.runDialog = true
-
+        try{
+          const resOk = await getmodelDispatchdetail({
+            taggingModelId:this.taggingModelId
+          })
+          if(resOk.cycleEnum == 0){
+            resOk.cycleEnum = '停止运行'
+          }
+          if(resOk.cycleEnum == 1){
+            resOk.cycleEnum = '运行一次'
+          }
+          if(resOk.cycleEnum == 2){
+            resOk.cycleEnum = '每天一次'
+          }
+          if(resOk.cycleEnum == 3){
+            resOk.cycleEnum = '每周一次'
+          }
+          if(resOk.cycleEnum == 4){
+            resOk.cycleEnum = '每月一次'
+          }
+          if(resOk.cycleEnum == 5){
+            resOk.cycleEnum = '每年一次'
+          }
+          this.ruleForm.date = resOk.startTime
+          this.ruleForm.region = resOk.cycleEnum
+        }catch (e) {
+          console.log(e);
+        }
       },
       closeRun(){
         this.runDialog = false
