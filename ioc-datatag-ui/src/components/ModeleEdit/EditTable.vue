@@ -85,7 +85,7 @@
         </el-form-item>
 
 
-        <div class="lookContent" v-if="ruleForm.tagSet!==''" >
+        <div class="lookContent">
           <div class="contentTop" v-show="isHandle===0">
             <div class="connect-smbol-box">
               <div class="topOne" :class="{'no-arrow':conditionSetting.length===0}"
@@ -503,7 +503,7 @@ export default {
     },
     // 克隆字段
     async cloneCol(data) {
-     console.log('colId',data.colId)
+     //console.log('colId',data.colId)
       const params={
         colId:data.colId
       }
@@ -592,8 +592,20 @@ export default {
       try {
         const data = await getHistoryColData(params)
        // console.log('打标历史接口data', data)
-        //this.tagSetList=data.tagGroups
-       // this.ruleForm.tagTeam=this.selectTagGroup
+        //被选标签组
+       this.ruleForm.tagTeam=data.selectTagGroup.id
+        //标签层数树
+       this.getTagLevList(this.ruleForm.tagTeam)
+        //打标相关字段
+        this.selfMarkList=this.deepClone(data.condtion)
+        this.selfMarkList.map((item,index)=>{
+          item.showSelfMark=false
+          item.checkList=item.conditionSetting[0].theValues.split(',')
+        })
+        this.curIndex=this.selfMarkList.length-1
+        console.log('this.selfMarkList',this.selfMarkList)
+        this.conditionSetting=this.selfMarkList[this.curIndex].conditionSetting
+        console.log('this.conditionSetting',this.conditionSetting)
       } catch (e) {
 
       }
