@@ -411,7 +411,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 				}else {
 					checkSql += " SHOW_COL "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
 				}
-				resultSql += col.getShowCol() +" "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
+				resultSql += "\""+col.getShowCol() +"\" "+TagConditionUtils.toSqlSymbol(expression.getSymbol())+" ";
 				if (StringUtils.isBlank(expression.getTheValues())) {
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"值不能为空");
 				}
@@ -445,7 +445,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 						} else {
 							checkSql += " SHOW_COL " + TagConditionUtils.toSqlSymbol(expression.getSymbol()) + " ";
 						}
-						resultSql += " "+col.getShowCol() +" "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
+						resultSql += " \""+col.getShowCol() +"\" "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
 					}
 					if (StringUtils.isBlank(expression.getTheValues())) {
 						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"值不能为空");

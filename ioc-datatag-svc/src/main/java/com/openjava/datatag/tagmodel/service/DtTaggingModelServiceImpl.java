@@ -488,7 +488,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			if (TagConditionUtils.isDateType(record.getSourceDataType())) {
 				cloTypeMap.put(record.getShowCol(),"date");
 				insertCloTypeMap.put(record.getShowCol(),"date");
-			}else if(TagConditionUtils.isIntType(record.getSourceDataType()) && !Constants.PUBLIC_YES.equals(record.getIsMarking())){
+			}else if(TagConditionUtils.isIntType(record.getSourceDataType())){
 				if (record.getSourceDataType().indexOf(",")==-1) {
 					cloTypeMap.put(record.getShowCol(),"decimal");
 					insertCloTypeMap.put(record.getShowCol(),"decimal");
@@ -502,7 +502,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			}
 			if (Constants.PUBLIC_YES.equals(record.getIsMarking())) {
 				colmap.put(Constants.DT_COL_PREFIX+record.getShowCol(),"");//打标结果字段
-				cloTypeMap.put(record.getShowCol(),"varchar");
+				cloTypeMap.put(Constants.DT_COL_PREFIX+record.getShowCol(),"varchar");
 			}
 		});
 		mppPgExecuteUtil.createTable(colmap,cloTypeMap);
@@ -681,8 +681,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			updateBuff.append(" UPDATE \"");
 			updateBuff.append(tagModel.getDataTableName());
 			updateBuff.append("\" ");
-			updateBuff.append(" SET ");
-			updateBuff.append(condition.getShowCol());
+			updateBuff.append(" SET \"");
+			updateBuff.append(Constants.DT_COL_PREFIX+condition.getShowCol());
+			updateBuff.append("\" ");
 			updateBuff.append(" = '");
 			updateBuff.append(tagGroup.get(condition.getTagId()).get(0).getTagName());
 			updateBuff.append("' where ");
