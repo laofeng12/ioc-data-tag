@@ -211,3 +211,14 @@ export function goDispatch(data) {
     data
   })
 }
+/**
+ * 获取调度详情
+ * @param detailId
+ */
+export function getmodelDispatchdetail(params) {
+  return fetch ({
+    url:'/datatag/tagmodel/dtTaggingModel/Dispatch',
+    method:'get',
+    params
+  })
+}
