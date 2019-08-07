@@ -1,6 +1,7 @@
 package com.openjava.datatag.tagmodel.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.support.odps.udf.CodecCheck;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.component.PostgreSqlConfig;
@@ -27,6 +28,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.bag.SynchronizedSortedBag;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -563,12 +565,13 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	 */
 	private String  authorityToken = "";
 	public Object getDataFromDataSet(Long taggingModelId,int type,Pageable pageable)throws Exception{
-//		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
-		List<DtSetCol> SourceCols= dtSetColService.getSourceColByTaggingModelId(taggingModelId);
+		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
+		Map<String,Object> sourceMap  = new LinkedHashMap<>();//表头
 		DtTaggingModel taggingModel = get(taggingModelId);
-		String colStr[]= new String[SourceCols.size()];
-		for (int i = 0; i < SourceCols.size(); i++) {
-			colStr[i] = SourceCols.get(i).getShowCol();
+		for (int i = 0; i < cols.size(); i++) {
+			if (cols.get(i).getIsSource()==1) {
+				sourceMap.put(cols.get(i).getSourceCol(),cols.get(i).getSourceCol());
+			}
 		}
 		LjdpHttpClient client = new LjdpHttpClient();
 		BaseUserInfo userInfo  = (BaseUserInfo) SsoContext.getUser();
@@ -584,32 +587,43 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			client.setHeader("User-Agent","platform-schedule-job");
 		}
 		DataSetReqDTO req = new DataSetReqDTO();
-		req.setColumnList(colStr);
+		req.setColumnList(sourceMap.keySet().stream().toArray());
 		req.setPage(pageable.getPageNumber());
 		req.setSize(pageable.getPageSize());
-//		System.out.println( JSONObject.toJSONString(req));
+		System.out.println( JSONObject.toJSONString(req));
 		HttpResponse resp = client.postJSON(resourceDataUrl+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
 		String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
-		DataSetRspDTO result = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
-		if (resp.getStatusLine().getStatusCode()==200 && result.getCode()==200) {
+		DataSetRspDTO data = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
+		if (resp.getStatusLine().getStatusCode()==200 && data.getCode()==200) {
+			//重组数据
+			List<List<Object>> dataList =data.getData().getData();//原始数据
+			List<List<Object>> resultList = new LinkedList<>();//重组后的数据
+			Object[] columnList =  req.getColumnList();//表头
+			for (int i = 0; i < dataList.size(); i++) {
+				List<Object> result = new LinkedList<>();//单表数据
+				for (int k = 0; k < cols.size(); k++) {
+					int index = Arrays.asList(columnList).indexOf(cols.get(k).getSourceCol());
+					result.add(dataList.get(i).get(index));
+				}
+				resultList.add(result);
+			}
 			//type=1返回key+Value
 			if (type==1) {
-				List<List<Object>> listData =result.getData().getData();
 				List<Object> tempData =new LinkedList<>();
-				for (int i = 0; i < listData.size(); i++) {
+				for (int i = 0; i < resultList.size(); i++) {
 					String ob = "";
-					for (int j = 0; j < listData.get(i).size(); j++) {
-						ob += "\""+SourceCols.get(j).getShowCol()+"\":\""+listData.get(i).get(j)+"\",";
+					for (int j = 0; j < resultList.get(i).size(); j++) {
+						ob += "\""+cols.get(j).getShowCol()+"\":\""+resultList.get(i).get(j)+"\",";
 					}
 					ob="{"+ob.substring(0,ob.length()-1)+"}";
 					tempData.add(JSONObject.parseObject(ob,Object.class));
 				}
-				return new PageImpl<>(tempData, pageable, result.getData().getTotalPage());
+				return new PageImpl<>(tempData, pageable, data.getData().getTotalPage());
 			}else {
-				return new PageImpl<>(result.getData().getData(), pageable, result.getData().getTotalPage());
+				return new PageImpl<>(resultList, pageable, data.getData().getTotalPage());
 			}
 		}else {
-			throw new APIException(MyErrorConstants.PUBLIC_ERROE,result.getMessage());
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,data.getMessage());
 		}
 //		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //		for (int j = 0; j < pageable.getPageSize(); j++) {
@@ -679,12 +693,21 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	}
 
 	public static void main(String[] args) {
-		String colJson = "[{\"index\":0,\"aggType\":null,\"name\":\"tb_0_MODIFY_ID\"},{\"index\":1,\"aggType\":null,\"name\":\"tb_0_CREATE_NAME\"},{\"index\":2,\"aggType\":null,\"name\":\"tb_0_SOURCE_NAME\"}]";
+		/*String colJson = "[{\"index\":0,\"aggType\":null,\"name\":\"tb_0_MODIFY_ID\"},{\"index\":1,\"aggType\":null,\"name\":\"tb_0_CREATE_NAME\"},{\"index\":2,\"aggType\":null,\"name\":\"tb_0_SOURCE_NAME\"}]";
 		List<Map<String,String>> colList = new LinkedList<>();
 		colList = JSONObject.parseObject(colJson,List.class);
 		String vauleJson  = "[[\"2\",\"1\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"本地测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-OracleBigData\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"],[\"#NULL\",\"#NULL\",\"服务器测试用-数据湖-postgres\"]]";
 		List<Array> valueList = JSONObject.parseObject(vauleJson,List.class);
-		Map<String,String> values =  new LinkedHashMap<>();
-
+		Map<String,String> values =  new LinkedHashMap<>();*/
+		String[] columnList = new String[6];
+		columnList[0]="tb_0_book_name";
+		columnList[1]="tb_0_covers";
+		columnList[2]="tb_0_registration_id";
+		columnList[3]="tb_0_exam_manager_id";
+		columnList[4]="tb_0_exam_paper_id";
+		columnList[5]="tb_0_id";
+		List<String> list = Arrays.asList(columnList);
+		System.out.println(Arrays.binarySearch(columnList,0,6,"tb_0_id"));
+		System.out.println(list.indexOf("tb_0_id"));
 	}
 }
