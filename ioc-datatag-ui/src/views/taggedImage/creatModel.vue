@@ -23,11 +23,14 @@
     </div>
     <div class="content">
       <!--左边数据树目录结构-->
-      <Aside  :modelData="modelData"/>
+      <Aside  :modelData="modelData" ref="tree"/>
       <div class="components">
         <div class="top">
           <div class="left">
             {{modelData.resourceName}}
+            <el-button  v-if="routerName==='editModel'" class="set-btn" type="text" size="mini" @click.stop="editSetTags(1)">
+              <i class="el-icon-setting"></i>
+            </el-button>
           </div>
           <div class="right">
             <span class="iconPeople"><i class="el-icon-user"></i></span>
@@ -313,6 +316,11 @@
 
     },
     methods: {
+      //type=0,新增，type=1编辑
+      editSetTags(type){
+        //调用子组件里面的方法
+        this.$refs['tree'].setTags(type)
+      },
       // 获取模型数据
       async getModelList(modelId) {
         try {
@@ -346,7 +354,7 @@
        //console.log(modelId,page,size)
         try {
           const data = await getModelColsData(modelId,page,size,type)
-          console.log('表格数据',data)
+         // console.log('表格数据',data)
           this.modelTableData=data.data.content
         } catch (e) {
 
