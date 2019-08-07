@@ -5,14 +5,14 @@
       <el-tree icon-class="el-icon-folder" class="tree" :props="props" :filter-node-method="filterNode" ref="tree"  :load="loadNode" lazy>
         <span class="custom-tree-node" slot-scope="{ node, data }">
         <span class="cus-node-title">{{ data.orgName }}</span>
-          <el-button  class="set-btn" type="text" size="mini" v-if="data.isTable===true"  @click.stop="setTags(node,data)">
+          <el-button  class="set-btn" type="text" size="mini" :disabled="routerName==='editModel'" v-if="data.isTable===true"  @click.stop="setTags(0,node,data)">
             <i class="el-icon-setting"></i>
           </el-button>
         </span>
       </el-tree>
     </div>
     <!--字段设置-->
-    <el-dialog class="creat" title="字段设置"  :visible.sync="colSetDialog" width="680px" center :modal-append-to-body="false" :close-on-click-modal="false"
+    <el-dialog class="creat" title="字段设置"  :visible.sync="colSetDialog" width="720px" center :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close">
       <div class="col-set-box">
         <el-container class="">
@@ -26,16 +26,14 @@
               <li v-for="(item,index) in columnData"  >
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                   <el-checkbox  :label="item.name":key="item.id" >
-                   <span v-if="item.type==='string'" class="blue">
-                     Str.
-                   </span>
-                    <span v-else-if="item.type==='number'" class="green">
-                     No.
-                   </span>
-                    <span v-else="item.type==='date'" class="orange">
-                     Date.
-                   </span>
+                    <span class="col-name-box">
+                      <span v-if="item.type==='string'" class="blue">Str.</span>
+                      <span v-else-if="item.type==='number'" class="green">No.</span>
+                      <span v-else="item.type==='date'" class="orange">Date.</span>
+                      <span class="col-name" :title="item.name">
                     {{item.name}}
+                    </span>
+                    </span>
                   </el-checkbox>
                 </el-checkbox-group>
               </li>
@@ -48,7 +46,7 @@
                 <el-form-item label="选择主键"  prop="pkey">
                   <el-select v-model="ruleForm.pkey" filterable placeholder="请选择主键" size="small">
                     <el-option
-                      v-for="(item,index) in columnData"
+                      v-for="(item,index) in tableData"
                       :key="item.id"
                       :label="item.name"
                       :value="item.name">
@@ -57,7 +55,7 @@
                 </el-form-item>
               </el-form>
 
-              <el-table class="my-table"  border style="width: 100%"
+              <el-table class="my-table"  border style="width: 100%" height="300"
                 :data="tableData"
                 tooltip-effect="dark">
                 <el-table-column width="40"  align="center">
@@ -75,18 +73,23 @@
                   </template>
                 </el-table-column>
                 <el-table-column
+                  label="排序" width="60">
+                  <template slot-scope="scope">
+                    <el-input v-model="scope.row.colSort" placeholder="请输入内容"></el-input>
+                  </template>
+                </el-table-column>
+                <el-table-column
                   label="字段"  prop="name">
                 </el-table-column>
                 <el-table-column
                   prop="type"
-                  label="类型"
-                  width="100">
+                  label="类型">
                 </el-table-column>
                 <el-table-column
-                  label="选择打标字段" width="120">
+                  label="选择打标字段" width="110">
                   <template slot-scope="scope">
-                    <el-checkbox  v-if="scope.row.name===ruleForm.pkey" disabled></el-checkbox>
-                    <el-checkbox  v-else @change="getCheckChange(scope.row,$event)"></el-checkbox>
+                    <el-checkbox  v-model="scope.row.isMarking===1" v-if="scope.row.name===ruleForm.pkey" disabled></el-checkbox>
+                    <el-checkbox  v-model="scope.row.isMarking===1" v-else @change="getCheckChange(scope.row,$event)"></el-checkbox>
                   </template>
                 </el-table-column>
               </el-table>
@@ -116,6 +119,7 @@ export default {
   },
   data () {
     return {
+      sortNum:'',
       isNew:true,
       dataLakeDirectoryTree:[],
       dataSetDirectoryTree:[],
@@ -160,21 +164,41 @@ export default {
     }
   },
   watch: {
+    '$route' (to, from) {
+      this.routerName = to.name
+      if (to.name === 'editModel') {
+        this.isNew=false
+      }
+    },
     filterText(val) {
       this.$refs.tree.filter(val)
     },
-    modelData: function (val,newVal) {
-    //  console.log(val.colList)
-    //  this.modelData=newVal
-      this.ruleForm.pkey=val.pkey
-      const markCol= val.colList.filter((item,index)=>{
-         return item.isMarking===1
-      })
-     // console.log('markCol',markCol)
-
-    }
+    modelData: function (newVal,oldVal) {
+        this.modelData=newVal
+      //console.log('新数据', this.modelData)
+    },
+    searchText(val) {
+      this.columnData=this.fuzzyQuery(this.columnData,val)
+    },
   },
   methods: {
+    /**
+     * 使用indexof方法实现模糊查询
+     * @param  {Array}  list     进行查询的数组
+     * @param  {String} keyWord  查询的关键词
+     * @return {Array}           查询的结果
+     */
+    fuzzyQuery(list, keyWord) {
+      const arr = []
+      list.map(item => {
+        if (item.name &&
+          (item.name.toLowerCase().includes(keyWord) ||
+            item.name.toUpperCase().includes(keyWord))) {
+          arr.push(item)
+        }
+      })
+      return arr
+    },
     //全选
     handleCheckAllChange(val) {
       this.checkedCols = val ? colsOptions : [];
@@ -196,18 +220,22 @@ export default {
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
       //console.log(this.checkedCols)
       this.tableData=[]
+      console.log(value)
       this.checkedCols.forEach((citem)=>{
-       this.columnData.map((item)=>{
+       this.columnData.map((item,index)=>{
+         item.isMarking=0
+         item.colSort=''
          if(item.name == citem){
            this.tableData.push(item)
          }
         })
       })
-      this.tableData.forEach((item,index)=>{
-         //item.isChecked=false
-         item.isMarking=0
-      })
-      console.log(this.tableData)
+        this.tableData.forEach((item,index)=>{
+          if(item.colSort===''){
+            item.colSort=index+1
+          }
+          })
+
     },
     close(){
 
@@ -252,20 +280,38 @@ export default {
         resolve(data)
       }
     },
-    //对字段进行选择确认
-   async setTags(node,data){
+    //对字段进行选择确认,type=0,新建模型，type=1编辑模型
+   async setTags(type,node,data){
      // console.log(data)
       this.colSetDialog=true
-      const colsData=await getResourceInfoData(data.resourceId,data.type)
-     console.log(colsData)
-     this.resourceName=colsData.data.resourceName
+     let colsData={}
+     if(type===0){
+        //新建模型字段确认获取数据
+        colsData=await getResourceInfoData(data.resourceId,data.type)
+     }else {
+       //编辑模型字段确认获取数据
+        const resourceId=this.modelData.resourceId
+        const type=this.modelData.resourceType
+        colsData=await getResourceInfoData(resourceId,type)
+     }
      this.columnData=colsData.data.column
-     this.columnData.forEach((item,index)=>{
-       colsOptions.push(item.name)
-     })
+     this.resourceName=colsData.data.resourceName
      this.resourceId=colsData.data.resourceId
      this.resourceType=colsData.data.type
      this.tableData=[]
+     this.columnData.forEach((item,inde)=>{
+       colsOptions.push(item.name)
+     })
+     if(this.routerName==='editModel'){
+        //获取主键值
+       this.ruleForm.pkey=this.modelData.pkey
+       //获取选中的字段，从接口来
+       this.modelData.colList.forEach((item,index)=>{
+         this.checkedCols.push(item.sourceCol)
+         this.tableData.push({name:item.sourceCol,isMarking:item.isMarking,
+           colId:item.colId,type:item.sourceDataType,colSort:item.colSort})
+       })
+     }
     },
     // 获取1-3级树数据
     async getOneZtreeData() {
@@ -319,7 +365,12 @@ export default {
         if (valid) {
           const colList=[]
           this.tableData.map((item,index)=>{
-            colList.push({sourceCol:item.name,sourceDataType:item.type,isMarking:item.isMarking})
+            colList.push({sourceCol:item.name,
+              sourceDataType:item.type,
+              isMarking:item.isMarking,colId:item.colId,
+              colSort:item.colSort,
+              taggingModelId:this.modelData.taggingModelId
+            })
           })
           console.log('colList',colList)
           if(colList.length===1){
@@ -330,8 +381,13 @@ export default {
           }else {
             if(this.routerName==='editModel'){
               this.isNew=false
+              this.taggingModelId=this.modelData.taggingModelId
+            }else {
+              this.taggingModelId=''
             }
+
             const params={
+              'taggingModelId':this.taggingModelId,
               'resourceId':this.resourceId,
               'resourceName': this.resourceName,
               'modelName':this.resourceName,
@@ -388,15 +444,19 @@ export default {
   },
   mounted(){
     this.routerName=this.$route.name
-   // console.log('this.modelData',this.modelData)
-    if(this.routerName==='editModel'){
-      this.ruleForm.pkey=this.modelData.pkey
-    }
   }
 }
 </script>
 
 <style scoped lang="scss">
+ .col-name-box{
+   display: flex;
+   .col-name{
+     width: 150px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+   }
+  }
   .aside {
     width: 250px;
     flex-shrink: 0;
@@ -434,6 +494,8 @@ export default {
       font-size: 14px;
     }
     .col-set-box{
+/*      max-height: 350px;
+      overflow: hidden;*/
       .left{
         border-right: 1px solid #eee;
         padding: 0 10px;
