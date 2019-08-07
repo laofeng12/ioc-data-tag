@@ -330,7 +330,7 @@
         try {
           const data = await getModelColsData(modelId,page,size,type)
           console.log('表格数据',data)
-          this.modelTableData=data.data
+          this.modelTableData=data.data.content
         } catch (e) {
 
         }
