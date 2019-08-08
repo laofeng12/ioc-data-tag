@@ -60,6 +60,11 @@ public interface DtTaggingModelService {
 	Object getDataFromDataSet(Long taggingModelId,int type,Pageable pageable)throws Exception;
 
 	/**
+	 * 获取模型打标结果数据
+	 */
+	Object getTaggingResultData(Long taggingModelId,int type,Pageable pageable)throws Exception;
+
+	/**
 	 * 获取可执行执行的打标sql，用去mpp自动打标
 	 */
 	List<String> getMarkingSQL(Long taggingModelId);

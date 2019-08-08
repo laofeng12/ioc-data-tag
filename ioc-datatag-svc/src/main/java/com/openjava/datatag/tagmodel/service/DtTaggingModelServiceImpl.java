@@ -513,7 +513,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		long totalCount = 0;//更新总数
 		long successCount = 0;//成功数
 		long totalPage = 0;
-		int size = 3000;
+		int size = 10;
 		try	{
 			List<Object> data = new LinkedList<>();
 			Pageable pageable = PageRequest.of(0,size);
@@ -534,9 +534,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 					Page<Object> nextResult  = (Page<Object>) getDataFromDataSet(taggingModelId,0,pageable);
 					List<Object> nextData = new LinkedList<>();
 					nextData.addAll(nextResult.getContent());
-					mppPgExecuteUtil.setDataList(data);
+					mppPgExecuteUtil.setDataList(nextData);
 					mppPgExecuteUtil.insertDataList();
-					successCount+=nextResult.getTotalElements();
+					successCount+=nextResult.getNumberOfElements();
 				}
 			}
 		}catch (Exception e){
@@ -601,51 +601,49 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		if (resp.getStatusLine().getStatusCode()==200 && data.getCode()==200) {
 			//重组数据
 			List<List<Object>> dataList =data.getData().getData();//原始数据
-			List<List<Object>> resultList = new LinkedList<>();//重组后的数据
-			Object[] columnList =  req.getColumnList();//表头
-			for (int i = 0; i < dataList.size(); i++) {
-				List<Object> result = new LinkedList<>();//单表数据
-				for (int k = 0; k < cols.size(); k++) {
-					int index = Arrays.asList(columnList).indexOf(cols.get(k).getSourceCol());
-					result.add(dataList.get(i).get(index));
-				}
-				resultList.add(result);
-			}
-			//type=1返回key+Value
-			if (type==1) {
-				List<Object> tempData =new LinkedList<>();
-				for (int i = 0; i < resultList.size(); i++) {
-					String ob = "";
-					for (int j = 0; j < resultList.get(i).size(); j++) {
-						ob += "\""+cols.get(j).getShowCol()+"\":\""+resultList.get(i).get(j)+"\",";
-					}
-					ob="{"+ob.substring(0,ob.length()-1)+"}";
-					tempData.add(JSONObject.parseObject(ob,Object.class));
-				}
-				return new PageImpl<>(tempData, pageable, data.getData().getTotal());
-			}else {
-				return new PageImpl<>(resultList, pageable, data.getData().getTotal());
-			}
+			Object[] columnList =  sourceMap.keySet().stream().toArray();//表头
+            List result= rebuiltData(cols,dataList,columnList,type);//处理数据
+            return new PageImpl<>(result, pageable, data.getData().getTotal());
 		}else {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,data.getMessage());
 		}
-//		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//		for (int j = 0; j < pageable.getPageSize(); j++) {
-//			List<Object> kk = new LinkedList<>();
-//			for (int i = 0; i < cols.size(); i++) {
-//				if (TagConditionUtils.isDateType(cols.get(i).getSourceDataType())) {
-//					kk.add(f.format(new Date()));
-//				}else if(TagConditionUtils.isIntType(cols.get(i).getSourceDataType())){
-//					kk.add(i+j);
-//				}else if (TagConditionUtils.isStringType(cols.get(i).getSourceDataType())){
-//					kk.add(RandomStringUtils.random(4,true,false).toUpperCase());
-//				}else {
-//					kk.add(null);
-//				}
-//			}
-//			data.add(kk);
-//		}
 	}
+
+    /**
+     * 重组数据
+     * @param cols 字段表（包括克隆的）
+     * @param dataList 原始数据（不包括克隆的）
+     * @param columnList 源表头（不包括克隆的）
+     * @param type 重组类型，1：键值对的数据；其他：只返回值
+     * @return Object 包括克隆的
+     */
+	private List rebuiltData(List<DtSetCol> cols,List<List<Object>> dataList,Object[] columnList,int type){
+        //重组数据
+        List<List<Object>> resultList = new LinkedList<>();//重组后的数据
+        for (int i = 0; i < dataList.size(); i++) {
+            List<Object> result = new LinkedList<>();//单表数据
+            for (int k = 0; k < cols.size(); k++) {
+                int index = Arrays.asList(columnList).indexOf(cols.get(k).getSourceCol());
+                result.add(dataList.get(i).get(index));
+            }
+            resultList.add(result);
+        }
+        //type=1返回key+Value
+        if (type==1) {
+            List<Object> tempData =new LinkedList<>();
+            for (int i = 0; i < resultList.size(); i++) {
+                String ob = "";
+                for (int j = 0; j < resultList.get(i).size(); j++) {
+                    ob += "\""+cols.get(j).getShowCol()+"\":\""+resultList.get(i).get(j)+"\",";
+                }
+                ob="{"+ob.substring(0,ob.length()-1)+"}";
+                tempData.add(JSONObject.parseObject(ob,Object.class));
+            }
+            return tempData;
+        }else {
+            return resultList;
+        }
+    }
 
 	/**
 	 * 获取可执行执行的打标sql，用去mpp自动打标(核心方法)
@@ -696,6 +694,52 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		}
 		return markingSQL;
 	}
+    /**
+     * 获取模型打标结果数据列表
+	 * type=1时返回key和value
+     */
+    public Object getTaggingResultData(Long taggingModelId,int type,Pageable pageable)throws Exception{
+		DtTaggingModel taggingModel = get(taggingModelId);
+		String alias = "t";//别名
+		String tableName = Constants.DT_TABLE_PREFIX+taggingModel.getTaggingModelId();
+		MppPgExecuteUtil mppPgExecuteUtil = new MppPgExecuteUtil();
+		mppPgExecuteUtil.initValidDataSource(postgreSqlConfig);//初始化数据库
+		mppPgExecuteUtil.setSQL("select count(1) from \""+tableName+"\"");
+		String[][] count = mppPgExecuteUtil.getData2();
+		long totalCount = Long.valueOf(count[1][0]);
+		if (totalCount<=0) {
+			return pageable;
+		}
+		Map<String, String> tableNameForQuery = new LinkedHashMap<>(1);
+		tableNameForQuery.put(tableName,alias);
+		mppPgExecuteUtil.setTableNameForQuery(tableNameForQuery);
+		mppPgExecuteUtil.setPageable(pageable);
+		String[][] data = mppPgExecuteUtil.getData();//第一个为表头
+		List<List<Object>> dataList = new LinkedList<>();//表头
+		for (int i = 1; i < data.length; i++) {
+			List<Object> list = new LinkedList<>();
+			for (int j = 0; j < data[i].length; j++) {
+				list.add(data[i][j]);
+			}
+			dataList.add(list);
+		}
+		List<DtSetCol> cols = new LinkedList<>();
+		for (int i = 0; i < data[0].length; i++) {
+			DtSetCol col = new DtSetCol();
+			col.setSourceCol(data[0][i]);
+			col.setShowCol(data[0][i]);
+			cols.add(col);
+		}
+		List<Object> result = rebuiltData(cols,dataList,data[0],type);//重组数据
+		if (data!=null) {
+			return new PageImpl<>(result, pageable, totalCount);
+		}else{
+			return pageable;
+		}
+    }
+
+
+
 
 	public static void main(String[] args) {
 		/*String colJson = "[{\"index\":0,\"aggType\":null,\"name\":\"tb_0_MODIFY_ID\"},{\"index\":1,\"aggType\":null,\"name\":\"tb_0_CREATE_NAME\"},{\"index\":2,\"aggType\":null,\"name\":\"tb_0_SOURCE_NAME\"}]";

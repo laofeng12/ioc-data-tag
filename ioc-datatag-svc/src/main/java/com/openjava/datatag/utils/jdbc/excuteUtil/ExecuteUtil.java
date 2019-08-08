@@ -72,8 +72,16 @@ public abstract class ExecuteUtil {
     public abstract  List<String> getUpdateDataList();
 
     /**
-     * 查询数据
+     * 查询数据（分页）
      */
     public abstract String[][] getData();
+    /**
+     * 查询数据(不分页)
+     */
+    public abstract String[][] getData2();
 
+    /**
+     * 获取查询语句SQL
+     */
+    public abstract String getQuerySql();
 }

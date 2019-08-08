@@ -283,6 +283,25 @@ public class DtTaggingModelAction {
 		return response;
 	}
 
+	@ApiOperation(value = "查询模型打标结果列表", nickname="getDataSetData")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "taggingModelId", value = "模型主键编码", dataType ="String", paramType = "path"),
+			@ApiImplicitParam(name = "size", value = "每页显示数量", dataType = "String", paramType = "path"),
+			@ApiImplicitParam(name = "page", value = "页码", dataType = "String", paramType = "path"),
+	})
+	@Security(session=true)
+	@RequestMapping(value="/{taggingModelId}/{page}/{size}",method=RequestMethod.GET)
+	public DataApiResponse<Object> getTaggingResultData(
+			@PathVariable(value="taggingModelId")Long taggingModelId,
+			@PathVariable(value="page")int page,
+			@PathVariable(value="size")int size) throws Exception {
+		DataApiResponse response = new DataApiResponse();
+		Pageable pageable = PageRequest.of(page,size);
+		Object  data= dtTaggingModelService.getTaggingResultData(taggingModelId,1,pageable);
+		response.setData(data);
+		return response;
+	}
+
 	/**
 	 * 导出Excel文件
 	 */
