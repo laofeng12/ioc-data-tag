@@ -105,7 +105,7 @@ public class DtSetCol implements Persistable<Long>,Serializable {
 	private Long isSource;
 
 	@ApiModelProperty("排序")
-	@Max(4L)
+	@Max(9223372036854775806L)
 	@Column(name = "COL_SORT")
 	private Long colSort;
 	

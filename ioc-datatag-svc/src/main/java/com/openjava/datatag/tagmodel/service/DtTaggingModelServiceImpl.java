@@ -523,7 +523,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			mppPgExecuteUtil.insertDataList();
 			totalPage = result.getTotalPages();
 			totalCount = result.getTotalElements();
-			successCount+=size;
+			if (totalCount<size){
+				successCount+=totalCount;
+			}else {
+				successCount+=size;
+			}
 			if (totalPage>1){
 				for (int i = 1; i <totalPage ; i++) {
 					pageable = PageRequest.of(i,size);
@@ -532,7 +536,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 					nextData.addAll(nextResult.getContent());
 					mppPgExecuteUtil.setDataList(data);
 					mppPgExecuteUtil.insertDataList();
-					successCount+=size;
+					successCount+=nextResult.getTotalElements();
 				}
 			}
 		}catch (Exception e){
@@ -618,9 +622,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 					ob="{"+ob.substring(0,ob.length()-1)+"}";
 					tempData.add(JSONObject.parseObject(ob,Object.class));
 				}
-				return new PageImpl<>(tempData, pageable, data.getData().getTotalPage());
+				return new PageImpl<>(tempData, pageable, data.getData().getTotal());
 			}else {
-				return new PageImpl<>(resultList, pageable, data.getData().getTotalPage());
+				return new PageImpl<>(resultList, pageable, data.getData().getTotal());
 			}
 		}else {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,data.getMessage());
