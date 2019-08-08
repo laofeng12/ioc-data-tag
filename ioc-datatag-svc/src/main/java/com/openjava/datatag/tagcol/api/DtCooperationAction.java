@@ -109,6 +109,7 @@ public class DtCooperationAction {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         Long currentuserId = Long.valueOf(userInfo.getUserId());
         DtTaggingModelDBParam itemParams=new DtTaggingModelDBParam();
+        itemParams.setEq_isDeleted(0L);//过渡被删除的协作模型
         if (params.getEq_cooUser() == null) {
             params.setEq_cooUser(currentuserId);
 
