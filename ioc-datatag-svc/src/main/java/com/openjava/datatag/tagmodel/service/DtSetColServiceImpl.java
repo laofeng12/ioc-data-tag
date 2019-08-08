@@ -277,12 +277,13 @@ public class DtSetColServiceImpl implements DtSetColService {
 		GetHistoryColDTO result = new GetHistoryColDTO();
 		result.setColId(colId);
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		result.setTagGroups(dtTagGroupService.getMyTagGroup(Long.valueOf(userInfo.getUserId())));//默认展示的标签组
+		//result.setTagGroups(dtTagGroupService.getMyTagGroup(Long.valueOf(userInfo.getUserId())));//默认展示的标签组
 		List<DtTagCondition> conditions = dtTagConditionService.findByColId(colId);
 		List<DtTagConditionDTO> conditionsDTOs = new ArrayList<>();
 		conditions.forEach(record->{
 			DtTagConditionDTO dto = new DtTagConditionDTO();
 			MyBeanUtils.copyPropertiesNotNull(dto,record);
+			dto.setTagName(dtTagService.get(record.getTagId()).getTagName());
 			List<DtFilterExpression> conditionSetting = dtFilterExpressionService.findByTagConditionId(record.getTagConditionId());
 			List<SaveConditionDtFilterExpressionDTO> conditionSettingDTO = new ArrayList<>();
 			conditionSetting.forEach(setting->{
@@ -298,10 +299,10 @@ public class DtSetColServiceImpl implements DtSetColService {
 			DtTagCondition condition =conditions.get(0);
 			DtTag selectTag = dtTagService.get(condition.getTagId());//用于前端展示选中的（默认用第一个）
 			DtTagGroup selectTagGroups = dtTagGroupService.get(selectTag.getTagsId());//用于前端展示选中的
-			List<DtTag> tagList= dtTagService.findByTagsId(selectTagGroups.getId());//默认选中标签组的所有标签
+			//List<DtTag> tagList= dtTagService.findByTagsId(selectTagGroups.getId());//默认选中标签组的所有标签
 			result.setSelectTags(selectTag);
 			result.setSelectTagGroup(selectTagGroups);
-			result.setTags(tagList);
+			//result.setTags(tagList);
 		}
 		return result;
 	}

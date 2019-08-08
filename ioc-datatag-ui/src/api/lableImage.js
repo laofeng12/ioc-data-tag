@@ -58,3 +58,15 @@ export function getImagelist(detailId) {
     method:'get'
   })
 }
+
+/**
+ * 获取调度详情
+ * @param detailId
+ */
+export function getDispatchdetail(params) {
+  return fetch ({
+    url:'/datatag/tagmodel/dtTaggingModel/Dispatch',
+    method:'get',
+    params
+  })
+}

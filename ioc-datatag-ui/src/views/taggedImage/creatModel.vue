@@ -8,7 +8,7 @@
         <div class="name">
           <div class="img"></div>
           <div class="text">
-            <el-input size="small"  v-if="routerName==='editModel'" v-model="modelName" placeholder="请输入内容" @blur="getsaveName"></el-input>
+            <el-input size="small"  v-if="routerName==='editModel'" v-model="runModelname" placeholder="请输入内容" @blur="getsaveName"></el-input>
             <span v-else>未命名</span>
           </div>
         </div>
@@ -23,11 +23,14 @@
     </div>
     <div class="content">
       <!--左边数据树目录结构-->
-      <Aside  :modelData="modelData"/>
+      <Aside  :modelData="modelData" ref="tree"/>
       <div class="components">
         <div class="top">
           <div class="left">
             {{modelData.resourceName}}
+            <el-button  v-if="routerName==='editModel'" class="set-btn" type="text" size="mini" @click.stop="editSetTags(1)">
+              <i class="el-icon-setting"></i>
+            </el-button>
           </div>
           <div class="right">
             <span class="iconPeople"><i class="el-icon-user"></i></span>
@@ -203,7 +206,7 @@
 <script>
   import EditTable from '../../components/ModeleEdit/EditTable'
   import Aside from '../../components/ModeleEdit/Aside'
-  import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave,getModelData,getModelColsData,saveName,saveAs,goDispatch} from '@/api/creatModel'
+  import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave,getModelData,getModelColsData,saveName,saveAs,goDispatch,getmodelDispatchdetail} from '@/api/creatModel'
 
   export default {
     name: 'creatModel',
@@ -213,7 +216,7 @@
         modelData:{},//获取模型数据
         taggingModelId:0,//模型id
         routerName:'creatModel',
-        modelName:'未命名',
+        runModelname:'未命名',
         show:false,
         editDialog:false,
         saveLoading:false,
@@ -238,8 +241,8 @@
           name: '',
           textarea2: '',
           modelName: '',
-          date: '',
-          region:''
+          date: null,
+          region:null
         },
         runModelname:'',
         searchText: '',
@@ -313,6 +316,11 @@
 
     },
     methods: {
+      //type=0,新增，type=1编辑
+      editSetTags(type){
+        //调用子组件里面的方法
+        this.$refs['tree'].setTags(type)
+      },
       // 获取模型数据
       async getModelList(modelId) {
         try {
@@ -346,7 +354,7 @@
        //console.log(modelId,page,size)
         try {
           const data = await getModelColsData(modelId,page,size,type)
-          console.log('表格数据',data)
+         // console.log('表格数据',data)
           this.modelTableData=data.data.content
         } catch (e) {
 
@@ -362,8 +370,35 @@
       closeSaveas(){
         this.editDialog = false
       },
-      runModel(){
+      async runModel(){
         this.runDialog = true
+        try{
+          const resOk = await getmodelDispatchdetail({
+            taggingModelId:this.taggingModelId
+          })
+          if(resOk.cycleEnum == 0){
+            resOk.cycleEnum = '停止运行'
+          }
+          if(resOk.cycleEnum == 1){
+            resOk.cycleEnum = '运行一次'
+          }
+          if(resOk.cycleEnum == 2){
+            resOk.cycleEnum = '每天一次'
+          }
+          if(resOk.cycleEnum == 3){
+            resOk.cycleEnum = '每周一次'
+          }
+          if(resOk.cycleEnum == 4){
+            resOk.cycleEnum = '每月一次'
+          }
+          if(resOk.cycleEnum == 5){
+            resOk.cycleEnum = '每年一次'
+          }
+          this.ruleForm.date = resOk.startTime
+          this.ruleForm.region = resOk.cycleEnum
+        }catch (e) {
+          console.log(e);
+        }
       },
       closeRun(){
         this.runDialog = false
@@ -555,9 +590,12 @@
         try{
           const resName = await saveName({
             taggingModelId:this.taggingModelId,
-            modelName:this.modelName
+            modelName:this.runModelname
           })
-          console.log('resName',resName);
+          this.$message({
+            message: resName.message,
+            type: 'success'
+          });
         }catch (e) {
           console.log(e);
         }
