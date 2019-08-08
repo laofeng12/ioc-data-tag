@@ -123,7 +123,7 @@ public class DtTaggingModelAction {
 			dto.setModifyUserName(sysUserService.get(dto.getModifyUser()).getFullname());
 			showList.add(dto);
 		}
-		Page<DtTaggingModelDTO> showResult = new PageImpl<>(showList,pageable,showList.size());
+		Page<DtTaggingModelDTO> showResult = new PageImpl<>(showList,pageable,results.getTotalElements());
 		return new TablePageImpl<>(showResult);
 	}
 
