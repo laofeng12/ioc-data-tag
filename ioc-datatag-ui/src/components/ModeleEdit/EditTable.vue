@@ -23,8 +23,8 @@
                         @sureClick="goPage"></element-pagination>-->
     <!--字段设置-->
     <el-dialog class="creat" title="数据打标"  :visible.sync="setTagsDialog" width="800px" center :modal-append-to-body="false" :close-on-click-modal="false"
-               @close="close">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" @click="closePanel">
+               @close="$emit('update:show', false)"  @open="init">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
         <el-form-item label="选择标签组:" prop="tagTeam">
           <el-col :span="9">
           <el-select v-model="ruleForm.tagTeam" filterable placeholder="请选择标签组" size="small" @change="chooseTagTeam">
@@ -126,7 +126,8 @@
                   <div class="conditions">
                   <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
                     <div class="count-symbol" v-if="conItem.isConnectSymbol===0">
-                      <span class="smbol">{{conItem.symbol}}</span>
+                      <span class="smbol-len" v-show="conItem.symbol.length>2">{{conItem.symbol}}</span>
+                      <span class="smbol" v-show="conItem.symbol.length<3">{{conItem.symbol}}</span>
                       <el-input style="width:100px" size="small" v-model="conItem.theValues" placeholder="请输入内容"></el-input>
                     </div>
                     <div class="connect-symbol" v-else>
@@ -285,8 +286,15 @@ export default {
     },
     'tableData':{
       handler:function(newValue,oldValue){
-        //console.log('表格内容数据',newValue)
         this.tableData=newValue
+        this.$set(this.tableData)
+      },
+      deep:true
+    },
+    'theadData':{
+      handler:function(newValue,oldValue){
+        this.theadData=newValue
+        this.$set(this.theadData)
       },
       deep:true
     }
@@ -300,6 +308,16 @@ export default {
   mounted () {
   },
   methods: {
+    init(){
+      this.ruleForm.tagTeam=''
+      this.treeLevdata=[]
+      this.selfMarkList=[]
+      this.ruleForm.tagLev=''
+      this.ruleForm.tagSet=''
+      this.$nextTick(() => {
+        this.$refs['ruleForm'].clearValidate()
+      });
+    },
     //点击分页跳转
     handleCurrentChange(page) {
       this.page = page - 1
@@ -375,7 +393,9 @@ export default {
 
     },
     closePanel(){
-
+      this.refs['ruleForm'].resetFields()
+      this.ruleForm.tagTeam=''
+      this.selfMarkList=[]
     },
     //点击自动打标按钮
     selfMark(){
@@ -438,7 +458,12 @@ export default {
     showTree(){
       this.showLevTree = !this.showLevTree
     },
+    unique(arr) {
+      const res = new Map()
+      return arr.filter((markName) => !res.has(markName) && res.set(markName, 1))
+    },
    //显示自动打标内容
+
     showSelf(itemObj){
       itemObj.showSelfMark = !itemObj.showSelfMark
       this.colList=[]
@@ -447,9 +472,14 @@ export default {
         //console.log(item[name])
         const markName=item[name]
         this.colList.push({markName:markName})
+
       })
-      this.colList= [...new Set(this.colList )]
-      //console.log('自动打标选择内容',this.colList)
+      const obj = {}
+      //数组去重
+      this.colList = this.colList.reduce((item,next)=> {
+        obj[next.markName] ? '' : obj[next.markName] = true && item.push(next)
+        return item
+      }, [])
     },
     delSelfMark(index){
      // console.log(index)
@@ -487,7 +517,7 @@ export default {
     },
     // 清除字段
     async delCol(data) {
-      // console.log('colId',colId)
+      console.log(data.colId)
       const params={
         id:data.colId
       }
@@ -496,6 +526,7 @@ export default {
        // console.log('data', data)
        // console.log('this.modelId',this.modelId)
         this.$message.success(data.message)
+        this.$parent.getModelList(this.modelId)
         this.$parent.getModelColsList(this.modelId,0,100,1)
       } catch (e) {
 
@@ -510,6 +541,7 @@ export default {
       try {
         const data = await cloneCol(params)
         this.$message.success(data.message)
+        this.$parent.getModelList(this.modelId)
         this.$parent.getModelColsList(this.modelId,0,100,1)
       } catch (e) {
 
@@ -601,11 +633,12 @@ export default {
         this.selfMarkList.map((item,index)=>{
           item.showSelfMark=false
           item.checkList=item.conditionSetting[0].theValues.split(',')
+          item.tagSetName=item.tagName
         })
         this.curIndex=this.selfMarkList.length-1
-        console.log('this.selfMarkList',this.selfMarkList)
+        //console.log('this.selfMarkList',this.selfMarkList)
         this.conditionSetting=this.selfMarkList[this.curIndex].conditionSetting
-        console.log('this.conditionSetting',this.conditionSetting)
+       // console.log('this.conditionSetting',this.conditionSetting)
       } catch (e) {
 
       }
@@ -820,11 +853,15 @@ label{
       position: relative;
       .connect-symbol{
         .smbol{
-          padding: 0 10px;
           color: #409EFF;
+          margin: 0 20px;
         }
       }
       .count-symbol{
+        .smbol-len{
+          margin-left: 10px;
+          margin-right: 5px;
+        }
         .smbol{
           position: absolute;
           z-index: 8;
