@@ -91,11 +91,11 @@ export function setColsData (data) {
 }
 
 // 模型-清除字段
-export function  delCol( id) {
+export function  delCol( params) {
   return fetch({
     url:'/datatag/tagmodel/dtSetCol/delete',
     method:'delete',
-    id
+    params
   })
 }
 

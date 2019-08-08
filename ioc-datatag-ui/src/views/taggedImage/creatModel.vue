@@ -292,6 +292,12 @@
     },
     components: { EditTable, Aside },
     watch: {
+      'headColList':{
+        handler:function(newValue,oldValue){
+          this.headColList=newValue
+        },
+        deep:true
+      },
       '$route' (to, from) {
         //console.log(to)
         this.routerName = to.name

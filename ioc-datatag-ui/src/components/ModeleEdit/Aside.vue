@@ -13,7 +13,7 @@
     </div>
     <!--字段设置-->
     <el-dialog class="creat" title="字段设置"  :visible.sync="colSetDialog" width="720px" center :modal-append-to-body="false" :close-on-click-modal="false"
-               @close="close">
+               @close="close"  @open="init">
       <div class="col-set-box">
         <el-container class="">
           <el-aside width="250px" class="left">
@@ -182,6 +182,19 @@ export default {
     },
   },
   methods: {
+    //初始化弹窗清空数据
+    init(){
+      this.searchText=''
+      this.checkAll=false
+      this.columnData=[]
+      this.isIndeterminate=false
+      this.tableData=[]
+      this.ruleForm.pkey=''
+      this.checkedCols=[]
+      this.$nextTick(() => {
+        this.$refs['ruleForm'].clearValidate()
+      });
+    },
     /**
      * 使用indexof方法实现模糊查询
      * @param  {Array}  list     进行查询的数组
@@ -433,9 +446,12 @@ export default {
       }
     },
     delCol(index){
-      console.log(index)
+      this.checkedCols.forEach((name,cindex)=>{
+          if(name===this.tableData[index].name){
+            this.checkedCols.splice(cindex,1)
+          }
+      })
       this.tableData.splice(index,1)
-
     }
   },
   created() {
