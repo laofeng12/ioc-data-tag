@@ -109,6 +109,7 @@ public class DtCooperationAction {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         Long currentuserId = Long.valueOf(userInfo.getUserId());
         DtTaggingModelDBParam itemParams=new DtTaggingModelDBParam();
+        itemParams.setEq_isDeleted(0L);//过渡被删除的协作模型
         if (params.getEq_cooUser() == null) {
             params.setEq_cooUser(currentuserId);
 
@@ -243,12 +244,12 @@ public class DtCooperationAction {
     @ApiOperation(value = "根据模型ID及字段名查询当前用户可配置的标签组记录", nickname = "标签组记录集")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "modelId", value = "协作模型ID", required = true, dataType = "Long", paramType = "query"),
-            @ApiImplicitParam(name = "colField", value = "协作打标字段名称", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "colField", value = "协作打标字段名称", required = true, dataType = "Long", paramType = "query"),
 
     })
     @Security(session = true)
     @RequestMapping(value = "/taggroup", method = RequestMethod.POST)
-    public DataApiResponse<DtTagGroup> tagGroup(@RequestParam(value = "modelId", required = true) Long modelId, @RequestParam(value = "colField", required = true) String colField) {
+    public DataApiResponse<DtTagGroup> tagGroup(@RequestParam(value = "modelId", required = true) Long modelId, @RequestParam(value = "colField", required = true) Long colField) {
         List<DtTagGroup> result = dtCooperationService.findCurrentUserTagGroup(modelId, colField);
         DataApiResponse<DtTagGroup> resp = new DataApiResponse<>();
         resp.setRows(result);

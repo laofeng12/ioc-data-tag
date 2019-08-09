@@ -1,16 +1,14 @@
 package com.openjava.datatag.utils.jdbc.provider;
 
 import com.openjava.datatag.common.Constants;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 
 import java.sql.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author: lsw
@@ -125,12 +123,7 @@ public class PostgreSqlDataProvider extends JdbcDataProvider {
         if (StringUtils.isNotBlank(columns)) {
             String noSpaceColumns = columns.replace(" ", "");
             String[] columnArray = noSpaceColumns.split(",");
-            List<String> columnResultList = new LinkedList();
-            for (String column : columnArray) {
-                column = "\"" + column + "\"";
-                columnResultList.add(column);
-            }
-            sb.append(StringUtils.join(columnResultList, ","));
+            sb.append(StringUtils.join(columnArray, ","));
         } else {
             sb.append("*");
         }
@@ -139,10 +132,9 @@ public class PostgreSqlDataProvider extends JdbcDataProvider {
         if (pageable != null && pageable.getPageSize() != 0) {
             sb.append(" limit ");
             sb.append(pageable.getPageSize());
-            sb.append(" offset 0");
+            sb.append(" offset ");
+            sb.append(pageable.getOffset());
         }
-
-
         return sb.toString();
     }
 
@@ -216,5 +208,55 @@ public class PostgreSqlDataProvider extends JdbcDataProvider {
     @Override
     public String getValidationQuery() {
         return "select 'Hello World' as hello";
+    }
+
+    @Override
+    public String[][] getData() throws Exception{
+        String sql = getAsSubQuery(query.get(SQL));
+        List<String[]> list = new LinkedList<>();
+        LOG.info("SQL String: " + sql);
+        try (
+                Connection connection = getConnection();
+                Statement stat = connection.createStatement();
+                ResultSet rs = stat.executeQuery(sql)
+        ) {
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            String[] headerrow = new String[columnCount];
+            for (int i = 0; i < columnCount; i++) {
+                headerrow[i] = metaData.getColumnLabel(i + 1);
+            }
+
+            String[] header = headerrow;
+            list.add(header);
+            while (rs.next()) {
+                String[] row = new String[columnCount];
+                for (int j = 0; j < columnCount; j++) {
+                    int columType = metaData.getColumnType(j + 1);
+                    switch (columType) {
+                        case Types.DATE:
+                            row[j] = rs.getDate(j + 1).toString();
+                            break;
+                        default:
+                            row[j] = rs.getString(j + 1);
+                            break;
+                    }
+                }
+                list.add(row);
+            }
+        } catch (Exception e) {
+            LOG.error("ERROR:" + e.getMessage());
+            throw new Exception("ERROR:" + e.getMessage(), e);
+        }
+        if (CollectionUtils.isNotEmpty(list)){
+            String[][] result = new String[list.size()][list.get(0).length];
+            for (int i = 0; i < list.size(); i++) {
+                for (int j = 0; j < list.get(i).length; j++) {
+                    result[i][j] = list.get(i)[j];
+                }
+            }
+            return result;
+        }
+        return null;
     }
 }

@@ -12,9 +12,11 @@ import com.openjava.datatag.utils.jdbc.dataprovider.Initializing;
 import com.openjava.datatag.utils.jdbc.provider.PostgreSqlDataProvider;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.GeneralResult;
 import org.ljdp.component.result.Result;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -37,9 +39,13 @@ public class MppPgExecuteUtil extends ExecuteUtil {
      */
     private String tableName;
     /**
+     * 表名(用于多表查询)Map<表名, 表别名>
+     */
+    private Map<String, String> tableNameForQuery = new LinkedHashMap<>(16);
+    /**
      *  表主键
      */
-
+    private String tableKey;
     /**
      * 表注释
      */
@@ -54,16 +60,14 @@ public class MppPgExecuteUtil extends ExecuteUtil {
      * map<列名, 列备注>
      */
     private Map<String, String> columnMap = new LinkedHashMap<>(16);
-
+    /**
+     * 列名(用于多表查询)Map<列名, 表别名>
+     */
+    private Map<String, String> columnMapForQuery = new LinkedHashMap<>(16);
     /**
      * map<列名, 列类型>
      */
     private Map<String, String> columnTypeMap = new LinkedHashMap<>(16);
-
-    /**
-     * 表主键
-     */
-    private String tableKey;
 
     /**
      * 数据列表
@@ -76,14 +80,15 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     private List<String> updateSqlList;
 
     /**
-     * SQL
+     * 分页器
+     */
+    private Pageable pageable;
+
+    /**
+     * 查询语句
      */
     private String SQL;
 
-    /**
-     * 字符串类型
-     */
-    private String vechar = "";
     private DsDataSource dsDataSource;
 
     private PostgreSqlDataProvider dataProvider= new PostgreSqlDataProvider();
@@ -318,6 +323,23 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     @Override
     public String[][] getData(){
         try {
+            String querySql = getQuerySql();
+            Map<String, String> sqlMap = new HashMap<>(2);
+            sqlMap.put("sql", querySql);
+            initDataProvider(this.getValidDataSource(), sqlMap, false);
+            return dataProvider.getData();
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    /**
+     * 查询数据
+     */
+    @Override
+    public String[][] getData2(){
+        try {
             Map<String, String> sqlMap = new HashMap<>(2);
             sqlMap.put("sql", this.SQL);
             initDataProvider(this.getValidDataSource(), sqlMap, false);
@@ -326,6 +348,46 @@ public class MppPgExecuteUtil extends ExecuteUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 获取查询语句SQL
+     * @return
+     */
+    public String getQuerySql(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("select ");
+        if (columnMapForQuery.size()<=0){
+            sb.append(" * ");
+        }else{
+            StringBuilder columnSb = new StringBuilder();
+            for (Map.Entry<String, String> entry : columnMapForQuery.entrySet()) {
+                columnSb.append(entry.getValue()+".");//别名
+                columnSb.append("\"");
+                columnSb.append(entry.getKey());//表名
+                columnSb.append("\",");
+            }
+            String columns = columnSb.toString();
+            columns = columns.substring(0, columns.length() - 1);
+            sb.append(columns);
+        }
+        sb.append(" from ");
+        StringBuilder tableSb = new StringBuilder();
+        for (Map.Entry<String, String> entry : tableNameForQuery.entrySet()) {
+            tableSb.append("\"");
+            tableSb.append(entry.getKey()+"\" "+entry.getValue());//表名加别名
+            tableSb.append(",");
+        }
+        String tableNames = tableSb.toString();
+        tableNames = tableNames.substring(0, tableNames.length() - 1);
+        sb.append(tableNames);
+        if (pageable != null && pageable.getPageSize() != 0) {
+            sb.append(" limit ");
+            sb.append(pageable.getPageSize());
+            sb.append(" offset ");
+            sb.append(pageable.getOffset());
+        }
+        return sb.toString();
     }
 
     public List<Object> getDataList() {
@@ -355,5 +417,9 @@ public class MppPgExecuteUtil extends ExecuteUtil {
         if (dataProvider instanceof Initializing) {
             ((Initializing) dataProvider).afterPropertiesSet();
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println();
     }
 }
