@@ -231,7 +231,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
     /**
      * 描述：根据协作模型Id及协作打标字段名称查询当前用户的协作打标的标签组记录
      */
-    public List<DtTagGroup> findCurrentUserTagGroup(Long modelId, String colField) {
+    public List<DtTagGroup> findCurrentUserTagGroup(Long modelId, Long colField) {
         List<DtTagGroup> lst = new ArrayList<>();
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         Long userId = Long.valueOf(userInfo.getUserId());
