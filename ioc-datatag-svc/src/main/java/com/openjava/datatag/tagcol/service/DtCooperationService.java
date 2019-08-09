@@ -36,7 +36,7 @@ public interface DtCooperationService {
 
     List<DtCooperationSetCol> findUserModelCooField(Long userId, Long modelId);
 
-    List<DtTagGroup> findCurrentUserTagGroup(Long modelId, String colField);
+    List<DtTagGroup> findCurrentUserTagGroup(Long modelId, Long colField);
 
     DtCooperation get(Long id);
 
