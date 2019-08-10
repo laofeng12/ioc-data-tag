@@ -1969,10 +1969,10 @@ caseless@~0.12.0:
   resolved "https://registry.npmjs.org/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
   integrity sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=
 
-ch-vue-portal-layout@^0.0.56:
-  version "0.0.56"
-  resolved "https://registry.npm.taobao.org/ch-vue-portal-layout/download/ch-vue-portal-layout-0.0.56.tgz#aadacbe0011ff5c5662b0b975049d38ac795b3d6"
-  integrity sha1-qtrL4AEf9cVmKwuXUEnTiseVs9Y=
+ch-vue-portal-layout@^0.0.59:
+  version "0.0.59"
+  resolved "https://registry.npm.taobao.org/ch-vue-portal-layout/download/ch-vue-portal-layout-0.0.59.tgz#e1b5e808219308d25834170b8e8b18a5d121beb4"
+  integrity sha1-4bXoCCGTCNJYNBcLjosYpdEhvrQ=
   dependencies:
     vue-awesome-swiper "^3.1.3"
 
