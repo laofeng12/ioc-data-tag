@@ -54,7 +54,7 @@ public class TokenGenerator {
             vo.setLevel1(u.getLevel1());
 
             //会话保持时间
-            int loginTimeout = 1;
+            int loginTimeout = 5;//5分钟
             vo.setExpireInMin(loginTimeout);
 
             String userJson = JacksonTools.getObjectMapper().writeValueAsString(vo);
@@ -64,7 +64,7 @@ public class TokenGenerator {
 
             //集群版,默认用redis
             redisTemplate.boundValueOps(token).set(vo, loginTimeout, TimeUnit.MINUTES);
-            redisTemplate.boundValueOps(token+"-JSON").set(userJson, loginTimeout, TimeUnit.HOURS);
+            redisTemplate.boundValueOps(token+"-JSON").set(userJson, loginTimeout, TimeUnit.MINUTES);
         }catch (Exception e){
             e.printStackTrace();
         }

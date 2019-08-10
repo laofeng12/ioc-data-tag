@@ -569,7 +569,6 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	/**
 	 * 获取数据集数据（核心方法）
 	 */
-	private String  authorityToken = "";
 	public Object getDataFromDataSet(Long taggingModelId,int type,Pageable pageable)throws Exception{
 		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
 		Map<String,Object> sourceMap  = new LinkedHashMap<>();//表头
@@ -580,18 +579,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			}
 		}
 		LjdpHttpClient client = new LjdpHttpClient();
-		BaseUserInfo userInfo  = (BaseUserInfo) SsoContext.getUser();
-		if (userInfo!=null) {
-			client.setHeader("authority-token",SsoContext.getToken());
-			client.setHeader("User-Agent",userInfo.getUserAgent());
-		}else{
-			String token = (String) redisTemplate.boundValueOps(this.authorityToken).get();
-			if (StringUtils.isBlank(token)) {
-				token = tokenGenerator.createToken(392846190550001L);
-			}
-			client.setHeader("authority-token",token);
-			client.setHeader("User-Agent","platform-schedule-job");
-		}
+		String  token= tokenGenerator.createToken(taggingModel.getCreateUser());//模型创建者才有权限调用数据集接口
+		client.setHeader("authority-token",token);
+		client.setHeader("User-Agent","platform-schedule-job");
 		DataSetReqDTO req = new DataSetReqDTO();
 		req.setColumnList(sourceMap.keySet().stream().toArray());
 		req.setPage(pageable.getPageNumber());
@@ -707,8 +697,14 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		MppPgExecuteUtil mppPgExecuteUtil = new MppPgExecuteUtil();
 		mppPgExecuteUtil.initValidDataSource(postgreSqlConfig);//初始化数据库
 		mppPgExecuteUtil.setSQL("select count(1) from \""+tableName+"\"");
-		String[][] count = mppPgExecuteUtil.getData2();
-		long totalCount = Long.valueOf(count[1][0]);
+        long totalCount = 0;
+        try {
+            String[][] count = mppPgExecuteUtil.getData2();
+            totalCount = Long.valueOf(count[1][0]);
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.info(e.getMessage());
+        }
 		if (totalCount<=0) {
 			return pageable;
 		}
