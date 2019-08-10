@@ -139,10 +139,7 @@ export default {
       checkedCols: [],
       cols: colsOptions,
       isIndeterminate: true,
-      tableData: [{
-        colName: '2016-05-03',
-        colNameType: '王小虎'
-      }],
+      tableData: [],
       resData:[],
       treeData:[],
       multipleSelection: [],
@@ -355,7 +352,7 @@ export default {
         if(data.hasOwnProperty('orgId')) {
           const resData = await getResourceListData(data.orgId, data.type, data.databaseType)
           const resAlldata = resData.data
-          //console.log('资源树所有值',resAlldata)
+          // console.log('资源树所有值',resAlldata)
           resAlldata.forEach((item,index)=>{
             this.resData.push({orgName:item.resourceName,resourceId:item.resourceId,type:data.type,isTable:item.isTable})
           })
