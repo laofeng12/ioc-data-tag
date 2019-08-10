@@ -46,7 +46,6 @@
           <el-table-column prop="runState" label="状态">
             <template slot-scope="scope">
               <div class="state">
-                <!--<div class="stateName" :style="stateColor(scope.row.runState)">{{scope.row.runState}}</div>-->
                 <div class="stateName" :style="stateColor(scope.row.runState)">{{scope.row.runState}}</div>
               </div>
             </template>
@@ -55,7 +54,7 @@
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="打标" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-position iconLogo" @click="marking"></i>
+                    <i class="el-icon-position iconLogo" @click="marking(props.row.taggingModelId,props.row.modelName)"></i>
                 </span>
               </el-tooltip>
             </template>
@@ -162,8 +161,16 @@
           return "color:#FF3333";
         }
       },
-      marking() {
-        this.$router.push('marking')
+      marking(id,name) {
+        console.log('模型ID',id)
+        // this.$router.push('/marking/'+id)
+        this.$router.push({
+          path:'/marking',
+          query:{
+            id:id,
+            modelName:name
+          }
+        })
       },
       createLabel() {
         this.labelcreatDialog = true
@@ -177,34 +184,34 @@
         this.labelcreatDialog = false
       },
       //
-      async getList() {
-        const userId = this.$store.state.user.userInfo.userId
-        try{
-          const resList = await getcooperationList({
-            userId: userId
-          })
-          console.log('resList', resList);
-          if(resList.rows && resList.rows.length >0){
-            resList.rows.forEach(item => {
-              if (item.runState == 0) {
-                item.runState = '未运行'
-              } else if (item.runState == 1) {
-                item.runState = '运行中'
-              } else if (item.runState == 2) {
-                item.runState = '运行出错'
-              } else {
-                item.runState = '运行结束'
-              }
-            })
-            this.ztableShowList = resList.rows
-          }else{
-            this.ztableShowList = []
-            this.Loading = false
-          }
-        }catch (e) {
-          console.log(e);
-        }
-      },
+      // async getList() {
+      //   const userId = this.$store.state.user.userInfo.userId
+      //   try{
+      //     const resList = await getcooperationList({
+      //       userId: userId
+      //     })
+      //     console.log('resList', resList);
+      //     if(resList.rows && resList.rows.length >0){
+      //       resList.rows.forEach(item => {
+      //         if (item.runState == 0) {
+      //           item.runState = '未运行'
+      //         } else if (item.runState == 1) {
+      //           item.runState = '运行中'
+      //         } else if (item.runState == 2) {
+      //           item.runState = '运行出错'
+      //         } else {
+      //           item.runState = '运行结束'
+      //         }
+      //       })
+      //       this.ztableShowList = resList.rows
+      //     }else{
+      //       this.ztableShowList = []
+      //       this.Loading = false
+      //     }
+      //   }catch (e) {
+      //     console.log(e);
+      //   }
+      // },
       //
       async modelQuery() {
         const params = {
@@ -277,7 +284,7 @@
       goPage(){},
     },
     created() {
-      this.getList()
+      // this.getList()
       this.modelQuery()
     },
     computed: {},
