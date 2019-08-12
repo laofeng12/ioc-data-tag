@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 作者：hyq
@@ -20,6 +21,9 @@ public class PortrayalDetailDTO {
     private  String title;
     @ApiModelProperty("画像属性1")
     private List<String> property;
+    @ApiModelProperty("画像属性1")
+    private Map<String,String> mapProperty;
     @ApiModelProperty("画像属性2")
     private List<String> lists;
+    private Map<String,String> mapLists;
 }

@@ -7,6 +7,7 @@ import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
 import com.openjava.datatag.userprofile.dto.PortrayalDetailDTO;
 import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -93,35 +94,46 @@ public class PortrayalServiceImpl implements PortrayalService {
         if (CollectionUtils.isEmpty(result)) {
             return list;
         }
-        List<String> property = new ArrayList<>();
-        List<String> lists = new ArrayList<>();
-        List<String> removeCol = new ArrayList<>();
+        List<String> removeCol = new ArrayList<>();//不需要展示的字段
+        List<String> tagCol = new ArrayList<>();//标签属性字段
+        List<String> propertyCol = new ArrayList<>();//基础属性字段
         Map<String,Object> map = (Map<String, Object>) result.get(0);
         for(String key:map.keySet()){
-            String value = map.get(key).toString();
             if (taggingModel.getPkey().equals(key)) {
                 removeCol.add(key);
-            }
-            if (key.indexOf(Constants.DT_COL_PREFIX)!=-1){
-                lists.add(value);
+            }else if (key.indexOf(Constants.DT_COL_PREFIX)!=-1){
                 removeCol.add(key);
                 removeCol.add(key.split(Constants.DT_COL_PREFIX)[1]);
+                tagCol.add(key);
+            }else{
+                propertyCol.add(key);
             }
         }
         for (Object ob:result) {
             Map<String,Object> dataMap = (Map<String, Object>) ob;
             PortrayalDetailDTO por = new PortrayalDetailDTO();
+            List<String> property = new LinkedList<>();
+            Map<String,String> mapProperty = new LinkedHashMap<>();
+            List<String> lists =new LinkedList<>();
+            Map<String,String> mapLists= new LinkedHashMap<>();
             for(String key:dataMap.keySet()){
                 String value = dataMap.get(key).toString();
                 if (!removeCol.contains(key)){
                     property.add(value);
+                    mapProperty.put(key,value);
+                }
+                if (tagCol.contains(key)) {
+                    lists.add(value);
+                    mapLists.put(key.split(Constants.DT_COL_PREFIX)[1],value);
                 }
             }
             por.setId(pKey);
             por.setTitle(taggingModel.getModelName());
             por.setTableName(Constants.DT_TABLE_PREFIX + taggingModel.getTaggingModelId());
             por.setLists(lists);
+            por.setMapLists(mapLists);
             por.setProperty(property);
+            por.setMapProperty(mapProperty);
             list.add(por);
         }
         return list;
