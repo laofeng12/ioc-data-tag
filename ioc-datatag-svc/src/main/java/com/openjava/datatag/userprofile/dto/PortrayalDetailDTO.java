@@ -14,8 +14,8 @@ import java.util.List;
 public class PortrayalDetailDTO {
     @ApiModelProperty("主键Id")
     private String id;
-    @ApiModelProperty("详情id")
-    private String detailId;
+    @ApiModelProperty("表名称")
+    private String tableName;
     @ApiModelProperty("画像标题")
     private  String title;
     @ApiModelProperty("画像属性1")

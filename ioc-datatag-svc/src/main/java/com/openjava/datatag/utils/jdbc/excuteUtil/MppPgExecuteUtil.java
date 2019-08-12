@@ -89,6 +89,11 @@ public class MppPgExecuteUtil extends ExecuteUtil {
      */
     private String SQL;
 
+    /**
+     * 查询条件
+     */
+    private String condition;
+
     private DsDataSource dsDataSource;
 
     private PostgreSqlDataProvider dataProvider= new PostgreSqlDataProvider();
@@ -381,6 +386,9 @@ public class MppPgExecuteUtil extends ExecuteUtil {
         String tableNames = tableSb.toString();
         tableNames = tableNames.substring(0, tableNames.length() - 1);
         sb.append(tableNames);
+        if (StringUtils.isNotBlank(condition)){
+            sb.append(" "+condition+" ");
+        }
         if (pageable != null && pageable.getPageSize() != 0) {
             sb.append(" limit ");
             sb.append(pageable.getPageSize());

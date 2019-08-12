@@ -604,12 +604,12 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
     /**
      * 重组数据
      * @param cols 字段表（包括克隆的）
-     * @param dataList 原始数据（不包括克隆的）
-     * @param columnList 源表头（不包括克隆的）
+     * @param dataList 原始数据
+     * @param columnList 源表头
      * @param type 重组类型，1：键值对的数据；其他：只返回值
-     * @return Object 包括克隆的
+     * @return List
      */
-	private List rebuiltData(List<DtSetCol> cols,List<List<Object>> dataList,Object[] columnList,int type){
+	public List rebuiltData(List<DtSetCol> cols,List<List<Object>> dataList,Object[] columnList,int type){
         //重组数据
         List<List<Object>> resultList = new LinkedList<>();//重组后的数据
         for (int i = 0; i < dataList.size(); i++) {
@@ -626,7 +626,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
             for (int i = 0; i < resultList.size(); i++) {
                 String ob = "";
                 for (int j = 0; j < resultList.get(i).size(); j++) {
-                    ob += "\""+cols.get(j).getShowCol()+"\":\""+resultList.get(i).get(j)+"\",";
+                	String value = "";
+                	if (resultList.get(i).get(j)!=null){
+						value = resultList.get(i).get(j).toString();
+					}
+                    ob += "\""+cols.get(j).getShowCol()+"\":\""+value+"\",";
                 }
                 ob="{"+ob.substring(0,ob.length()-1)+"}";
                 tempData.add(JSONObject.parseObject(ob,Object.class));
@@ -706,14 +710,19 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
             logger.info(e.getMessage());
         }
 		if (totalCount<=0) {
-			return pageable;
+			Map<String,Object> map = new HashMap<>();
+			map.put("pKey",taggingModel.getPkey());
+			map.put("tableName",Constants.DT_TABLE_PREFIX+taggingModel.getTaggingModelId());
+			map.put("result",new PageImpl<>(new ArrayList<>(), pageable, 0));
+			map.put("cols","");
+			return map;
 		}
 		Map<String, String> tableNameForQuery = new LinkedHashMap<>(1);
 		tableNameForQuery.put(tableName,alias);
 		mppPgExecuteUtil.setTableNameForQuery(tableNameForQuery);
 		mppPgExecuteUtil.setPageable(pageable);
 		String[][] data = mppPgExecuteUtil.getData();//第一个为表头
-		List<List<Object>> dataList = new LinkedList<>();//表头
+		List<List<Object>> dataList = new LinkedList<>();//数据
 		for (int i = 1; i < data.length; i++) {
 			List<Object> list = new LinkedList<>();
 			for (int j = 0; j < data[i].length; j++) {
@@ -729,12 +738,17 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			cols.add(col);
 		}
 		List<Object> result = rebuiltData(cols,dataList,data[0],type);//重组数据
+		Map<String,Object> map = new HashMap<>();
+		map.put("pKey",taggingModel.getPkey());
+		map.put("tableName",Constants.DT_TABLE_PREFIX+taggingModel.getTaggingModelId());
+		map.put("cols",data[0]);
 		if (data!=null) {
-			return new PageImpl<>(result, pageable, totalCount);
+			map.put("result",new PageImpl<>(result, pageable, totalCount));
 		}else{
-			return pageable;
+			map.put("result",new PageImpl<>(result, pageable, 0));
 		}
-    }
+		return map;
+	}
 
 
 

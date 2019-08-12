@@ -8,7 +8,8 @@
         <div class="name">
           <div class="img"></div>
           <div class="text">
-            <el-input size="small"  v-if="routerName==='editModel'" v-model="runModelname" placeholder="请输入内容" @blur="getsaveName"></el-input>
+            <el-input size="small" v-if="routerName==='editModel'" v-model="runModelname" placeholder="请输入内容"
+                      @blur="getsaveName"></el-input>
             <span v-else>未命名</span>
           </div>
         </div>
@@ -18,17 +19,18 @@
           <div class="img" @click="saveAsto"></div>
         </div>
         <el-button class="button" type="primary" size="small" @click="runModel">模型调度</el-button>
- <!--<el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
+        <!--<el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
       </div>
     </div>
     <div class="content">
       <!--左边数据树目录结构-->
-      <Aside  :modelData="modelData" ref="tree"/>
+      <Aside :modelData="modelData" ref="tree"/>
       <div class="components">
         <div class="top">
           <div class="left">
             {{modelData.resourceName}}
-            <el-button  v-if="routerName==='editModel'" class="set-btn" type="text" size="mini" @click.stop="editSetTags(1)">
+            <el-button v-if="routerName==='editModel'" class="set-btn" type="text" size="mini"
+                       @click.stop="editSetTags(1)">
               <i class="el-icon-setting"></i>
             </el-button>
           </div>
@@ -65,8 +67,8 @@
 
 
         </div>
-        <div  v-if="routerName==='editModel'">
-          <EditTable :theadData="headColList" :tableData="modelTableData"  :modelId="taggingModelId"></EditTable>
+        <div v-if="routerName==='editModel'">
+          <EditTable :theadData="headColList" :tableData="modelTableData" :modelId="taggingModelId"></EditTable>
         </div>
 
       </div>
@@ -93,7 +95,8 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveasLoading" @click="saveAsmodel">确认另存</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveasLoading" @click="saveAsmodel">确认另存
+          </el-button>
         </div>
       </div>
     </el-dialog>
@@ -128,7 +131,9 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="savedispatchLoading" @click="goDispatchto">确定调度</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="savedispatchLoading" @click="goDispatchto">
+            确定调度
+          </el-button>
         </div>
       </div>
     </el-dialog>
@@ -156,7 +161,7 @@
             <div class="allPeople">
               <div class="userContent clearfix" v-for="(item,index) in list2" :key="index"
                    :class="{zxhh:changeRed == index}">
-                <div class="peopleName" :title="item.cooUserName" @click="markingPeople(item.cooUser,item.id,item.colId,index)">
+                <div class="peopleName" :title="item.cooUserName" @click="markingPeople(item.cooUser,item.id,index)">
                   {{item.cooUserName}}
                 </div>
                 <div><i class="el-icon-delete addIcon" @click="deleteList(item.id)"></i></div>
@@ -166,7 +171,8 @@
           <div class="right2">
             <h3>选择协作打标字段</h3>
             <div class="marking">
-              <el-table class="my-table tableHeight" ref="multipleTable" :data="tableData" border stripe tooltip-effect="dark"
+              <el-table class="my-table tableHeight" ref="multipleTable" :data="tableData" border stripe
+                        tooltip-effect="dark"
                         style="width: 100%;"
                         :header-cell-style="{background:'#f0f2f5'}">
                 <el-table-column label="字段" prop="showCol"></el-table-column>
@@ -176,7 +182,8 @@
                   <template slot-scope="scope">
                     <el-checkbox v-show="false"></el-checkbox>
                     <el-select class="controlChoose2" size="small" v-model="scope.row.useTagGroup" placeholder="请选择"
-                               @change="chooseSelect(scope.row)" :disabled="(!helpId || (scope.row.cooUser && scope.row.cooUser !== helpId))">
+                               @change="chooseSelect(scope.row)"
+                               :disabled="(!helpId || (scope.row.cooUser && scope.row.cooUser !== helpId))">
                       <el-option
                         v-for="item in options3"
                         :key="item.id"
@@ -206,26 +213,40 @@
 <script>
   import EditTable from '../../components/ModeleEdit/EditTable'
   import Aside from '../../components/ModeleEdit/Aside'
-  import {choosePeople, getPeople, addPeople, deletePeople, markingCheck, labelGroup, dosave,getModelData,getModelColsData,saveName,saveAs,goDispatch,getmodelDispatchdetail} from '@/api/creatModel'
+  import {
+    choosePeople,
+    getPeople,
+    addPeople,
+    deletePeople,
+    markingCheck,
+    labelGroup,
+    dosave,
+    getModelData,
+    getModelColsData,
+    saveName,
+    saveAs,
+    goDispatch,
+    getmodelDispatchdetail
+  } from '@/api/creatModel'
 
   export default {
     name: 'creatModel',
-    data () {
+    data() {
       return {
-        headColList:[],//打标字段头部数据
-        modelData:{},//获取模型数据
-        taggingModelId:0,//模型id
-        routerName:'creatModel',
-        runModelname:'未命名',
-        show:false,
-        editDialog:false,
-        saveLoading:false,
-        saveasLoading:false,
-        savedispatchLoading:false,
-        runDialog:false,
-        saveDialog:false,
-        value1:'',
-        value:'',
+        headColList: [],//打标字段头部数据
+        modelData: {},//获取模型数据
+        taggingModelId: 0,//模型id
+        routerName: 'creatModel',
+        runModelname: '未命名',
+        show: false,
+        editDialog: false,
+        saveLoading: false,
+        saveasLoading: false,
+        savedispatchLoading: false,
+        runDialog: false,
+        saveDialog: false,
+        value1: '',
+        value: '',
         tableBoxWidth: 800,
         tableBoxHeight: 800,
         tableWidth: 800,
@@ -242,88 +263,75 @@
           textarea2: '',
           modelName: '',
           date: null,
-          region:null
+          region: null
         },
-        runModelname:'',
+        runModelname: '',
         searchText: '',
         searchText2: '',
         isIndeterminate: true,
         addSetDialog: false,
-        tableData: [],
-        modelTableData:[],
+        modelTableData: [],
         options3: [],
         selectVal: '',
         changeRed: -1,
         startDisable: true,
         helpId: '',  // 协作用户id
-        cooId:'',
-        zcolId:'',
+        cooId: '',
+        zcolId: '',
         options2: [{
           value: '0',
           label: '停止运行'
-        },{
+        }, {
           value: '1',
           label: '运行一次'
-        },{
+        }, {
           value: '2',
           label: '每天一次'
-        },{
+        }, {
           value: '3',
           label: '每周一次'
-        },{
+        }, {
           value: '4',
           label: '每月一次'
-        },{
+        }, {
           value: '5',
           label: '每年一次'
         }],
         rules: {
           name: [
-            {required: true, message: '请填写',trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'}
           ],
           textarea2: [
-            {required: true, message: '请填写',trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'}
           ],
-          date:[{required: true, message: '请选择时间',trigger: 'blur'}],
-          region:[{required: true, message: '请选择时间周期',trigger: 'change'}]
+          date: [{required: true, message: '请选择时间', trigger: 'blur'}],
+          region: [{required: true, message: '请选择时间周期', trigger: 'change'}]
         },
         tableData: []
       }
     },
-    components: { EditTable, Aside },
+    components: {EditTable, Aside},
     watch: {
-      'headColList':{
-        handler:function(newValue,oldValue){
-          this.headColList=newValue
+      'headColList': {
+        handler: function (newValue, oldValue) {
+          this.headColList = newValue
         },
-        deep:true
+        deep: true
       },
-      '$route' (to, from) {
+      '$route'(to, from) {
         //console.log(to)
         this.routerName = to.name
         if (to.name === 'editModel') {
-          this.taggingModelId=to.params.id
-         // console.log('this.taggingModelId', this.taggingModelId)
+          this.taggingModelId = to.params.id
           this.getModelList(this.taggingModelId)
-          this.getModelColsList(this.taggingModelId,0,100,1)
+          this.getModelColsList(this.taggingModelId, 0, 100, 1)
         }
       }
     },
-    mounted () {
-      this.routerName =this.$route.name
-      this.taggingModelId=this.$route.params.id
-      if(this.routerName==='creatModel'){
-      }else {
-        //进入编辑模型或者打标界面
-        //获取模型数据
-        this.getModelList(this.taggingModelId)
-        this.getModelColsList(this.taggingModelId,0,100,1)
-      }
-
-    },
+    mounted() {},
     methods: {
       //type=0,新增，type=1编辑
-      editSetTags(type){
+      editSetTags(type) {
         //调用子组件里面的方法
         this.$refs['tree'].setTags(type)
       },
@@ -342,12 +350,12 @@
         }
       },
       addPeople() {
-        if(this.taggingModelId){
+        if (this.taggingModelId) {
           this.addSetDialog = true
           this.cooperatioUser()
           this.markingTable()
           this.getpeopleList()
-        }else {
+        } else {
           this.$message.error('请先进行字段设置操作！');
         }
 
@@ -356,63 +364,50 @@
         this.addSetDialog = false
       },
       // 获取模型数据
-      async getModelColsList(modelId,page,size,type) {
-       //console.log(modelId,page,size)
+      async getModelColsList(modelId, page, size, type) {
+        //console.log(modelId,page,size)
         try {
-          const data = await getModelColsData(modelId,page,size,type)
-         // console.log('表格数据',data)
-          this.modelTableData=data.data.content
+          //表格数据
+          const data = await getModelColsData(modelId, page, size, type)
+          this.modelTableData = data.data.content
         } catch (e) {
 
         }
       },
       //
-      showIt(){
+      showIt() {
         this.show = !this.show
       },
-      saveAsto(){
+      saveAsto() {
         this.editDialog = true
       },
-      closeSaveas(){
+      closeSaveas() {
         this.editDialog = false
       },
-      async runModel(){
+      async runModel() {
         this.runDialog = true
-        try{
+        try {
           const resOk = await getmodelDispatchdetail({
-            taggingModelId:this.taggingModelId
+            taggingModelId: this.taggingModelId
           })
-          if(resOk.cycleEnum == 0){
-            resOk.cycleEnum = '停止运行'
-          }
-          if(resOk.cycleEnum == 1){
-            resOk.cycleEnum = '运行一次'
-          }
-          if(resOk.cycleEnum == 2){
-            resOk.cycleEnum = '每天一次'
-          }
-          if(resOk.cycleEnum == 3){
-            resOk.cycleEnum = '每周一次'
-          }
-          if(resOk.cycleEnum == 4){
-            resOk.cycleEnum = '每月一次'
-          }
-          if(resOk.cycleEnum == 5){
-            resOk.cycleEnum = '每年一次'
-          }
+          this.options2.forEach(item => {
+            if (resOk.cycleEnum == item.value) {
+              resOk.cycleEnum = item.value
+            }
+          })
           this.ruleForm.date = resOk.startTime
           this.ruleForm.region = resOk.cycleEnum
-        }catch (e) {
+        } catch (e) {
           console.log(e);
         }
       },
-      closeRun(){
+      closeRun() {
         this.runDialog = false
       },
-      saveModel(){
+      saveModel() {
         this.saveDialog = true
       },
-      closeSave(){
+      closeSave() {
         this.saveDialog = false
       },
       // 选择协作用户列表
@@ -480,22 +475,22 @@
         }
       },
       // 点击用户
-      async markingPeople(zuserid,id,colId,index) {
+      async markingPeople(zuserid, id, index) {
         this.changeRed = index
         this.helpId = zuserid
         this.cooId = id
-        this.zcolId = colId
+        // this.zcolId = colId
         this.startDisable = false
 
       },
       // table列表
-      async markingTable(id) {
-        this.helpId = id
+      async markingTable() {
+        const userId = this.$store.state.user.userInfo.userId
         this.tableData = []
         try {
           const markingRes = await markingCheck({
             modelId: this.taggingModelId,  //模型ID
-            userId: id
+            userId: userId
           })
           if (markingRes.rows && markingRes.rows.length > 0) {
             markingRes.rows.map(item => {
@@ -527,11 +522,11 @@
         }
         try {
           const groupRes = await labelGroup(params)
-          if(groupRes.rows && groupRes.rows.length >0){
+          if (groupRes.rows && groupRes.rows.length > 0) {
             this.options3 = groupRes.rows
           }
         } catch (e) {
-          //console.log(e)
+          console.log(e)
         }
       },
       //checkbox
@@ -550,21 +545,24 @@
       chooseSelect(row, item) {
         row.cooUser = this.helpId
         row.id = this.cooId
-        row.tagColId = this.zcolId
+        row.tagColId = row.colId
       },
       // save
       async getdosave() {
         this.saveLoading = true
-        const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser}) => {
+        const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId}) => {
           return {
             "cooId": id, //id
             "id": cooFieldId,  //  cooFieldId
             "tagColName": showCol, // 打标字段
             useTagGroup,  // 标签组ID
             isCooField,//是否选中
-            cooUser //协作用户ID
+            cooUser, //协作用户ID
+            tagColId: tagColId  //
           }
         })
+        // console.log('tmp',tmp);
+        // console.log('showPeoplelist',this.showPeoplelist);
         tmp.forEach(item => {
           if (item.useTagGroup) {
             item.isCooField = true
@@ -578,8 +576,9 @@
             }
           }
         }
+        // console.log('创建',this.showPeoplelist);
         // console.log('创建',JSON.stringify(this.showPeoplelist));
-        try{
+        try {
           const saveRes = await dosave(this.showPeoplelist)
           this.$message({
             message: saveRes.message,
@@ -587,30 +586,30 @@
           });
           this.saveLoading = false
           this.addSetDialog = false
-        }catch (e) {
+        } catch (e) {
           this.saveLoading = false
         }
       },
       //名称保存
-      async getsaveName(){
-        try{
+      async getsaveName() {
+        try {
           const resName = await saveName({
-            taggingModelId:this.taggingModelId,
-            modelName:this.runModelname
+            taggingModelId: this.taggingModelId,
+            modelName: this.runModelname
           })
           this.$message({
             message: resName.message,
             type: 'success'
           });
-        }catch (e) {
+        } catch (e) {
           console.log(e);
         }
 
       },
       // 另存
-      async saveAsmodel(){
+      async saveAsmodel() {
         this.saveasLoading = true
-        try{
+        try {
           const res = await saveAs(this.taggingModelId)
           this.$message({
             message: res.message,
@@ -618,14 +617,14 @@
           });
           this.saveasLoading = false
           this.editDialog = false
-        }catch (e) {
+        } catch (e) {
           console.log(e);
           this.saveasLoading = false
         }
       },
-      async goDispatchto(){
+      async goDispatchto() {
         this.savedispatchLoading = true
-        this.$refs.ruleForm.validate(async(valid) => {
+        this.$refs.ruleForm.validate(async (valid) => {
           if (valid) {
             try {
               const param = {
@@ -651,6 +650,16 @@
       }
     },
     created() {
+      this.routerName = this.$route.name
+      this.taggingModelId = this.$route.params.id
+      if (this.routerName === 'creatModel') {
+      } else {
+        //进入编辑模型或者打标界面
+        //获取模型数据
+        this.getModelList(this.taggingModelId)
+        this.getModelColsList(this.taggingModelId, 0, 100, 1)
+        this.getpeopleList()
+      }
       this.groupList()
     },
     computed: {
@@ -728,6 +737,7 @@
       }
     }
   }
+
   .content {
     display: flex;
     .aside {
@@ -857,28 +867,33 @@
     }
   }
 
-  .cooperation,.multiply,.num{
+  .cooperation, .multiply, .num {
     font-size: 12px;
     color: #999999;
     margin-left: 4px;
   }
-  .cooperation{
+
+  .cooperation {
     margin-right: 5px;
   }
-  .iconPeople{
+
+  .iconPeople {
     font-size: 15px;
     margin-right: 2px;
     margin-top: -5px;
   }
-  .handlePeople{
+
+  .handlePeople {
     font-size: 15px;
     margin-left: 5px;
   }
-  .right{
+
+  .right {
     display: flex;
     align-items: center;
   }
-  .card{
+
+  .card {
     width: 200px;
     border: 1px solid #dedede;
     position: absolute;
@@ -888,31 +903,38 @@
     background-color: #fff;
     border-radius: 8px;
   }
-  .peopleList,.addPeople{
+
+  .peopleList, .addPeople {
     font-size: 14px;
     margin-top: 10px;
   }
-  .peopleList{
+
+  .peopleList {
     float: left;
     margin-left: 15px;
   }
-  .addPeople{
+
+  .addPeople {
     float: right;
     margin-right: 15px;
   }
-  .peopleContent{
+
+  .peopleContent {
     margin-top: 15px;
     height: 280px;
     overflow-y: auto;
   }
-  .imgPeople2,.listName{
+
+  .imgPeople2, .listName {
     float: left;
   }
-  .imgPeople2{
+
+  .imgPeople2 {
     margin-top: 6px;
     margin-left: 8px;
   }
-  .listName{
+
+  .listName {
     font-size: 12px;
     width: 105px;
     margin-left: 8px;
@@ -920,19 +942,23 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .head{
+
+  .head {
     font-size: 14px;
     float: right;
     margin-right: 8px;
   }
-  .contentA{
+
+  .contentA {
     height: 40px;
     line-height: 40px;
   }
-  .dateInp,.controlChoose{
+
+  .dateInp, .controlChoose {
     width: 340px;
   }
-  .clearfix:after{
+
+  .clearfix:after {
     content: '';
     display: block;
     clear: both;
@@ -980,6 +1006,7 @@
   .controlChoose2 {
     width: 180px !important;
   }
+
   .header {
     display: flex;
     justify-content: space-between;

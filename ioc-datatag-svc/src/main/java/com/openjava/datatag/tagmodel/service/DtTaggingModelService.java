@@ -2,6 +2,7 @@ package com.openjava.datatag.tagmodel.service;
 
 import java.util.List;
 
+import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelRenameDTO;
@@ -69,4 +70,13 @@ public interface DtTaggingModelService {
 	 * 获取可执行执行的打标sql，用去mpp自动打标
 	 */
 	List<String> getMarkingSQL(Long taggingModelId);
+	/**
+	 * 重组数据
+	 * @param cols 字段表（包括克隆的）
+	 * @param dataList 原始数据
+	 * @param columnList 源表头
+	 * @param type 重组类型，1：键值对的数据；其他：只返回值
+	 * @return List
+	 */
+	List rebuiltData(List<DtSetCol> cols, List<List<Object>> dataList, Object[] columnList, int type);
 }
