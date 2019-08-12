@@ -17,14 +17,14 @@
     <div class="content">
       <div class="components">
         <div class="contentTitle">{{modelName}}</div>
-        <div class="newTable  daList">
+        <div class="newTable  daList aa">
           <el-table ref="multipleTable" :data="tableData" border stripe tooltip-effect="dark"
                     style="width: 100%;text-align: center"
                     :header-cell-style="{background:'#f0f2f5'}">
             <el-table-column v-for="(item,index) in headData" :key="index" :prop="item.sourceCol">
               <template slot="header" slot-scope="scope">
                 <span>{{item.showCol}}</span>
-                <i v-if="item.isMarking==1&&item.isCooField==0" class="el-icon-position  iconLogo"
+                <i v-if="item.isMarking==1&&item.isCooField==1" class="el-icon-position  iconLogo"
                    @click="dataMaking(item)"></i>
               </template>
             </el-table-column>
@@ -367,12 +367,10 @@
         }
       },
       // 列表数据
-      async getModelColsList(modelId, page, size, type) {  // 1643371
-        console.log(modelId, page, size)
+      async getModelColsList() {  // 1643371
         try {
           const data = await getModelColsData(this.modeleId, 0, 100, 1)
-          // const data = await getModelColsData(1643371, 0, 100, 1)
-          console.log('表格数据', data)
+          // console.log('表格数据', data)
           this.tableData = data.data.content
         } catch (e) {
           console.log(e);
@@ -715,7 +713,7 @@
         //console.log('选中要打标的项',item)
         this.isHandle = item.isHandle
         this.conditionSetting = item.conditionSetting
-      }
+      },
     }
   }
 </script>
@@ -872,80 +870,6 @@
     color: #fff;
     font-size: 12px;
   }
-
-  /*.lookContent {*/
-  /*border: 1px solid #dcdfe6;*/
-  /*padding: 0px 10px;*/
-  /*border-radius: 4px;*/
-  /*}*/
-
-  /*.contentTop {*/
-  /*display: flex;*/
-  /*border-bottom: 1px solid #dcdfe6;*/
-  /*}*/
-
-  /*.topOne {*/
-  /*width: 40px;*/
-  /*height: 32px;*/
-  /*text-align: center;*/
-  /*line-height: 32px;*/
-  /*font-size: 12px;*/
-  /*color: #00CCCC;*/
-  /*cursor: pointer;*/
-  /*}*/
-
-  /*.deleteContent {*/
-  /*font-size: 18px;*/
-  /*padding: 0px 10px 0px 0px;*/
-  /*color: #00CCCC;*/
-  /*}*/
-
-  /*.chinese, .chinese2 {*/
-  /*font-size: 14px;*/
-  /*padding: 0px 10px;*/
-  /*}*/
-
-  /*.chinese2 {*/
-  /*color: #00CCCC;*/
-  /*}*/
-
-  /*.makingContent {*/
-  /*margin-top: 20px;*/
-  /*}*/
-
-  /*.card {*/
-  /*margin-bottom: 10px;*/
-  /*}*/
-
-  /*.chooseNum {*/
-  /*width: 200px;*/
-  /*height: 32px;*/
-  /*border: 1px solid #dcdfe6;*/
-  /*border-radius: 4px;*/
-  /*display: flex;*/
-  /*justify-content: center;*/
-  /*align-items: center;*/
-  /*font-size: 14px;*/
-  /*}*/
-
-  /*.num {*/
-  /*color: #00CCCC;*/
-  /*padding: 0px 3px;*/
-  /*}*/
-
-  /*.card2 {*/
-  /*display: flex;*/
-  /*align-items: center;*/
-  /*}*/
-
-  /*.checkIt {*/
-  /*padding: 10px;*/
-  /*}*/
-
-  /*.checkOne {*/
-  /*padding-top: 5px;*/
-  /*}*/
-
   .lookContent {
     border: 1px solid #dcdfe6;
     padding: 0px 10px;
@@ -1108,7 +1032,6 @@
 
     }
   }
-
   .clearfix:after {
     content: '';
     display: block;
