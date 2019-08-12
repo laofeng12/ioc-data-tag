@@ -74,8 +74,8 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         this.em = em;
         dao = new JpaMultiDynamicQueryDAO(em);
     }
-    public Page<?>findPageUserModelByUserId(Long userId,String modelName, Pageable pageable){
-        return dtCooperationRepository.findPageUserModelByUserId(userId,modelName,pageable);
+    public Page<?>findPageUserModelByUserId(DtCooperationDBParam item, Pageable pageable){
+        return dtCooperationRepository.findPageUserModelByUserId(item.getEq_cooUser(),item.getKeyWord(),item.getEq_taggmId(),item.getRunState(),pageable);
     }
     /**
      * 描述：注意Sql与Hql是不一样的，传的查询语句是Hql的
