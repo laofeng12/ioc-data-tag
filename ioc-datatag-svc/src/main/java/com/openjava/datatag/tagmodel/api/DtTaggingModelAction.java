@@ -292,11 +292,10 @@ public class DtTaggingModelAction {
 			@PathVariable(value="size")int size) throws Exception {
 		DataApiResponse response = new DataApiResponse();
 		Pageable pageable = PageRequest.of(page,size);
-		Object  data= dtTaggingModelService.getTaggingResultData(taggingModelId,1,pageable);
+		Object data = dtTaggingModelService.getTaggingResultData(taggingModelId,1,pageable);
 		response.setData(data);
 		return response;
 	}
-
 	/**
 	 * 导出Excel文件
 	 */
