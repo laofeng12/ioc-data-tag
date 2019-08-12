@@ -561,6 +561,8 @@
             tagColId: tagColId  //
           }
         })
+        // console.log('tmp',tmp);
+        // console.log('showPeoplelist',this.showPeoplelist);
         tmp.forEach(item => {
           if (item.useTagGroup) {
             item.isCooField = true
@@ -574,6 +576,7 @@
             }
           }
         }
+        // console.log('创建',this.showPeoplelist);
         // console.log('创建',JSON.stringify(this.showPeoplelist));
         try {
           const saveRes = await dosave(this.showPeoplelist)
