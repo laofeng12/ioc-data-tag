@@ -465,8 +465,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	/**
 	 * 获取打标数据并根据规制自动打标（核心方法）
 	 */
-	public void calculation(Long taggingModelId){
-		DtTaggingModel tagModel = get(taggingModelId);
+	public void calculation(DtTaggingModel tagModel){
+		Long taggingModelId = tagModel.getTaggingModelId();
 		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
 		if (CollectionUtils.isEmpty(cols)){
 			return ;
