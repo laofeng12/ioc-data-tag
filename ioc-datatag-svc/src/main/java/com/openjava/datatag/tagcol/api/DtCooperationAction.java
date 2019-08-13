@@ -124,8 +124,8 @@ public class DtCooperationAction {
             itemParams.setEq_runState(params.getRunState());
         }
         List<DtCooperationModelDTO> dtoList = new ArrayList<>();
-        Page<?> result = dtCooperationService.queryShopItemAndProd(params,itemParams,pageable);
-        //Page<?> result = dtCooperationService.findPageUserModelByUserId(params.getEq_cooUser(),params.getKeyWord(),pageable);
+       // Page<?> result = dtCooperationService.queryShopItemAndProd(params,itemParams,pageable);
+        Page<?> result = dtCooperationService.findPageUserModelByUserId(params,pageable);
 
         for(int i=0;i<result.getContent().size();i++){
             DtCooperationModelDTO dto=new DtCooperationModelDTO();

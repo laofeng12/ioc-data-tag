@@ -32,7 +32,7 @@ public interface DtCooperationService {
 
     Page<?> queryShopItemAndProd(DtCooperationDBParam prodPrams, DtTaggingModelDBParam itemParams, Pageable pageable);
 
-    Page<?> findPageUserModelByUserId(Long userId, String modelName, Pageable pageable);
+    Page<?> findPageUserModelByUserId(DtCooperationDBParam item, Pageable pageable);
 
     List<DtCooperationSetCol> findUserModelCooField(Long userId, Long modelId);
 
