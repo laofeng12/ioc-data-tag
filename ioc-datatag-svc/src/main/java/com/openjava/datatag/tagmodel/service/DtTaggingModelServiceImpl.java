@@ -465,8 +465,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	/**
 	 * 获取打标数据并根据规制自动打标（核心方法）
 	 */
-	public void calculation(Long taggingModelId){
-		DtTaggingModel tagModel = get(taggingModelId);
+	public void calculation(DtTaggingModel tagModel){
+		Long taggingModelId = tagModel.getTaggingModelId();
 		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
 		if (CollectionUtils.isEmpty(cols)){
 			return ;
@@ -558,6 +558,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		waitUpdateIndex.setCreateTime(new Date());
 		waitUpdateIndex.setRunState(0L);
 		waitUpdateIndex.setTableName(tagModel.getDataTableName());
+		waitUpdateIndex.setModelKeyColName(tagModel.getPkey());
 		waitUpdateIndex.setTaggingModelId(taggingModelId);
 		dtWaitUpdateIndexService.doSave(waitUpdateIndex);
 		tagModel.setRunState(Constants.DT_MODEL_SUCCESS);

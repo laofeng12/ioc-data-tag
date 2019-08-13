@@ -15,6 +15,9 @@ import com.openjava.datatag.tagmodel.service.DtSetColService;
 import com.openjava.datatag.utils.IpUtil;
 import com.openjava.datatag.user.service.SysUserService;
 import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
@@ -299,18 +302,15 @@ public class DtTaggingModelAction {
 	/**
 	 * 导出Excel文件
 	 */
-	@Security(session=true)
+	@Security(session=false)
 	@RequestMapping(value="/export", method=RequestMethod.GET)
 	public void doExport(HttpServletRequest request, HttpServletResponse response,
 			DtTaggingModelDBParam params) throws Exception{
 		try {
-			Pageable pageable = PageRequest.of(0, 20000);//限制只能导出2w，防止内存溢出
-			Page<DtTaggingModel> result = dtTaggingModelService.query(params, pageable);
-			
 			POIExcelBuilder myBuilder = new POIExcelBuilder(response.getOutputStream());
 			//设置导出字段，以下是示例，请自行编写
-//			myBuilder.addProperty("useraccount", "账号");
-//			myBuilder.addProperty("username", "用户姓名");
+			myBuilder.addProperty("taggingModelId", "模型id");
+			myBuilder.addProperty("modelDesc", "简介");
 //			myBuilder.addProperty("creatime", "创建时间", FieldType.BASE_DATE, "yyyy-MM-dd");//设置时间格式
 //			myBuilder.addProperty("userStatus", "用户状态", SysCodeUtil.codeToMap("sys.user.status"));//自动数据字典【tsys_code】翻译
 //			Map<K, V> tfMap1 = new HashMap();
@@ -318,12 +318,23 @@ public class DtTaggingModelAction {
 //			tfMap1.put(2, "状态2");
 //			myBuilder.addProperty("userStatus", "用户状态",tfMap1);//写死静态字典翻译
 			
-			myBuilder.buildSheet("标签模型", result.getContent());//放到第一个sheet
-			
+//			myBuilder.buildSheet("标签模型", result.getContent());//放到第一个sheet
+//			Workbook wb = new XSSFWorkbook();
 			String filename = "标签模型("+DateFormater.formatDatetime_SHORT(new Date())+").xlsx";
 			response.setContentType(ContentType.EXCEL);
 			response.addHeader("Content-disposition", "attachment;filename="
 					+ new String(filename.getBytes("GBK"), "iso-8859-1"));
+			for (int i = 0; i < 1000; i++) {
+				Sheet sheet = myBuilder.createSheet("第"+i+"页数据");
+				List<DtTaggingModel> list = new ArrayList<>();
+				for (long j = 0; j < 10000; j++) {
+					DtTaggingModel model = new DtTaggingModel();
+					model.setTaggingModelId(j);
+					model.setModelDesc("简介"+i);
+					list.add(model);
+				}
+				myBuilder.buildSheet(sheet, list,0);//放到第一个sheet
+			}
 			//开始导出
 			myBuilder.finish();
 		} catch (Exception e) {

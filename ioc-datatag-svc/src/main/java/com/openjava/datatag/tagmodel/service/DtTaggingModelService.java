@@ -54,7 +54,7 @@ public interface DtTaggingModelService {
 	/**
 	 * 获取打标数据并根据规制自动打标（核心方法）
 	 */
-	void calculation(Long taggingModelId);
+	void calculation(DtTaggingModel tagModel);
 
 	/**
 	 * 获取数据集数据（核心方法）
