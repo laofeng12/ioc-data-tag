@@ -558,6 +558,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		waitUpdateIndex.setCreateTime(new Date());
 		waitUpdateIndex.setRunState(0L);
 		waitUpdateIndex.setTableName(tagModel.getDataTableName());
+		waitUpdateIndex.setModelKeyColName(tagModel.getPkey());
 		waitUpdateIndex.setTaggingModelId(taggingModelId);
 		dtWaitUpdateIndexService.doSave(waitUpdateIndex);
 		tagModel.setRunState(Constants.DT_MODEL_SUCCESS);

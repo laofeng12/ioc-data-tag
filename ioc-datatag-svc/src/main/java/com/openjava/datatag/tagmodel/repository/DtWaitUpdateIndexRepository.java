@@ -16,5 +16,10 @@ import java.util.List;
  */
 public interface DtWaitUpdateIndexRepository extends DynamicJpaRepository<DtWaitUpdateIndex, Long>, DtWaitUpdateIndexRepositoryCustom{
 
+    /**
+     * 获取待更新的模型
+     * @param runState
+     * @return
+     */
     List<DtWaitUpdateIndex> getByRunState(Long runState);
 }

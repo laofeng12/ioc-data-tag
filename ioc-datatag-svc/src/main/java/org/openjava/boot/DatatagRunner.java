@@ -1,6 +1,7 @@
 package org.openjava.boot;
 
 import com.openjava.datatag.component.SchedulejobCompent;
+import com.openjava.datatag.component.SearchjobCompent;
 import com.openjava.datatag.schedule.domain.TaskInfo;
 import com.openjava.datatag.schedule.service.TaskService;
 import org.apache.logging.log4j.LogManager;
@@ -26,10 +27,13 @@ public class DatatagRunner implements ApplicationRunner {
 	private RedisTemplate<String, Object> redisTemplate;
 	@Autowired
 	SchedulejobCompent schedulejobCompent;
+	@Autowired
+	SearchjobCompent searchjobCompent;
 
 	public void run(ApplicationArguments args) throws Exception {
 		System.out.println(environmental);
 		if (!environmental){
+			//扫描待执行模型，并运行模型
 			TaskInfo taskInfo = new TaskInfo();
 			taskInfo.setJobGroup(schedulejobCompent.getJobGroup());
 			taskInfo.setJobName(schedulejobCompent.getJobName());
@@ -37,7 +41,14 @@ public class DatatagRunner implements ApplicationRunner {
 			taskInfo.setJobMethod(schedulejobCompent.getJobMethod());
 			taskInfo.setId(1);
 			taskService.addJob(taskInfo);
-			logger.info("定时任务：新建模型扫描任务已启动");
+			//扫描运行完的模型，并更新到中间表
+			taskInfo.setJobGroup(searchjobCompent.getJobGroup());
+			taskInfo.setJobName(searchjobCompent.getJobName());
+			taskInfo.setCronExpression(searchjobCompent.getQueue());
+			taskInfo.setJobMethod(searchjobCompent.getJobMethod());
+			taskInfo.setId(1);
+			taskService.addJob(taskInfo);
+			logger.info("定时任务：模型扫描任务已启动");
 			logger.info("数据标签与画像组件启动成功");
 		}else{
 			logger.info("开发环境，不跑定时任务。需要时请改DatatagRunner的environmental参数");
