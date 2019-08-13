@@ -60,7 +60,7 @@ public class PortrayalServiceImpl implements PortrayalService {
         mppPgExecuteUtil.setTableNameForQuery(tableNameForQuery);
         mppPgExecuteUtil.setCondition(" where "+alias+".\""+taggingModel.getPkey()+"\"="+pKey);
         String[][] data = mppPgExecuteUtil.getData();//第一个为表头
-        List<Object> result = getResult(data,type);
+        List<Object> result = getRebulitResult(data,type);
         List<PortrayalDetailDTO> list =  initResultDate(result,taggingModel,pKey);
         PortrayalDetailDTO portrayal = new PortrayalDetailDTO();
         if (!CollectionUtils.isEmpty(list)) {
@@ -69,7 +69,7 @@ public class PortrayalServiceImpl implements PortrayalService {
         return portrayal;
     }
 
-    private List<Object> getResult(String[][] data,int type){
+    private List<Object> getRebulitResult(String[][] data,int type){
         List<List<Object>> dataList = new LinkedList<>();//数据
         for (int i = 1; i < data.length; i++) {
             List<Object> list = new LinkedList<>();

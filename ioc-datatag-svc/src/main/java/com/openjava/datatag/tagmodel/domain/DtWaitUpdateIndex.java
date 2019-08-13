@@ -44,7 +44,7 @@ public class DtWaitUpdateIndex implements Persistable<Long>,Serializable {
 	@Column(name = "TAGGING_MODEL_ID")
 	private Long taggingModelId;
 
-	@ApiModelProperty("标签模型主键")
+	@ApiModelProperty("标签模型主键名称")
 	@Column(name = "MODEL_KEY_COL_NAME")
 	private String modelKeyColName;
 

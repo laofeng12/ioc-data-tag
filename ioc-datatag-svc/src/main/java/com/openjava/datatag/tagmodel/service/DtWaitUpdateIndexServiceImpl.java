@@ -4,6 +4,8 @@ import java.util.*;
 import javax.annotation.Resource;
 
 import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.component.PostgreSqlConfig;
+import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.utils.jdbc.dataprovider.result.AggregateResult;
 import com.openjava.datatag.utils.jdbc.dataprovider.result.ColumnIndex;
 import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
@@ -11,6 +13,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,8 +34,9 @@ public class DtWaitUpdateIndexServiceImpl implements DtWaitUpdateIndexService {
 	@Resource
 	private DtWaitUpdateIndexRepository dtWaitUpdateIndexRepository;
 	@Resource
-	private DataProviderService dataProviderService;
-
+	private DtTaggingModelService dtTaggingModelService;
+	@Resource
+	private PostgreSqlConfig postgreSqlConfig;
 	public Page<DtWaitUpdateIndex> query(DtWaitUpdateIndexDBParam params, Pageable pageable){
 		Page<DtWaitUpdateIndex> pageresult = dtWaitUpdateIndexRepository.query(params, pageable);
 		return pageresult;
@@ -65,35 +69,95 @@ public class DtWaitUpdateIndexServiceImpl implements DtWaitUpdateIndexService {
 			dtWaitUpdateIndexRepository.deleteById(new Long(items[i]));
 		}
 	}
-	public void updateModelIndex(){
-		List<DtWaitUpdateIndex> waitList =  dtWaitUpdateIndexRepository.getByRunState(Constants.DT_INDEX_RUN_STATUS_WAIT);
-		MppPgExecuteUtil pg = new MppPgExecuteUtil();
+	public List<DtWaitUpdateIndex> getByRunState(Long runState){
+		return dtWaitUpdateIndexRepository.getByRunState(runState);
+	}
+	public void updateModelIndex(List<DtWaitUpdateIndex> waitList){
+		MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();
+		mppUtil.initValidDataSource(postgreSqlConfig);//初始化数据库
 		if (CollectionUtils.isNotEmpty(waitList)) {
 			for (int i = 0; i < waitList.size() ; i++) {
+				DtWaitUpdateIndex waitUpdateIndex = waitList.get(i);
+				String modelTableName = waitUpdateIndex.getTableName();
+				String modelKeyColName = waitUpdateIndex.getModelKeyColName();
 				try	{
-					String modelTableName = waitList.get(i).getTableName();
-					String modelKeyColName = waitList.get(i).getModelKeyColName();
-					//第一步，先删索引
-					String deleteSql = "delete from \"DT_SEARCH\" t where t.model_table_name = '"+modelTableName+"'";
+					//第一步，先删中间表数据
+					String deleteSql = "delete from \""+Constants.DT_SEARCH_TABLE_NAME+"\" t where t.model_table_name = '"+modelTableName+"'";
 					List<String> deleteSqlList = new LinkedList<>();
 					deleteSqlList.add(deleteSql);
-					pg.setUpdateSqlList(deleteSqlList);
-					pg.updateDataList();
-					Pageable pageable  = PageRequest.of(0, 100000);
-					AggregateResult aggResult = dataProviderService.queryTableDataWithDsDataSourceId(pg.getValidDataSource(), modelKeyColName, modelTableName, pageable);
-					if (aggResult.getData()!=null) {
-						continue;
+					mppUtil.setUpdateSqlList(deleteSqlList);
+					mppUtil.updateDataList();
+					mppUtil.setSQL("select count(1) from \""+modelTableName+"\"");
+					long totalCount = 0;
+					try {
+						String[][] count = mppUtil.getData2();
+						totalCount = Long.valueOf(count[1][0]);
+					}catch (Exception e){
+						e.printStackTrace();
+						logger.info(e.getMessage());
 					}
-					pg.setTableName("DT_SEARCH");
-					List<Object> data = new LinkedList<>();
-					data = Arrays.asList(aggResult.getData());
-					pg.setDataList(data);
-					pg.insertDataList();
+					//第二步更新中间表
+					int pageSize = 10000;
+					Pageable pageable  = PageRequest.of(0, pageSize);
+					String alias = "t";//别名
+					Map<String, String> tableNameForQuery = new LinkedHashMap<>(1);
+					tableNameForQuery.put(modelTableName,alias);
+					mppUtil.setTableNameForQuery(tableNameForQuery);
+					Map<String, String> columnMapForQuery = new LinkedHashMap<>(1);
+					columnMapForQuery.put(modelKeyColName,alias);
+					mppUtil.setColumnMapForQuery(columnMapForQuery);
+					mppUtil.setPageable(pageable);
+					String[][] firstPageData = mppUtil.getData();//第一个为表头
+					List<Object> data = new ArrayList<>();
+					for (int j = 1; j <firstPageData.length ; j++) {
+						List<Object> oblist = Arrays.asList(firstPageData[j]);
+						List<Object> temp = new LinkedList<>();
+						oblist.forEach(record->{
+							temp.add(record);
+						});
+						temp.add(modelTableName);
+						temp.add(modelTableName);
+						data.add(temp);
+					}
+					Map<String, String> columnMap = new LinkedHashMap<>(1);
+					columnMap.put(Constants.DT_SEARCH_MODEL_PKEY,"模型的主键");
+					columnMap.put(Constants.DT_SEARCH_MODEL_TABLE_NAME,"模型表名称");
+					columnMap.put(Constants.DT_SEARCH_MODEL_PKEY_NAME,"模型主键列名");
+					mppUtil.setTableName(Constants.DT_SEARCH_TABLE_NAME);
+					mppUtil.setColumnMap(columnMap);
+					mppUtil.setDataList(data);
+					mppUtil.insertDataList();
+					Page firstPage = new PageImpl<>(data, pageable, totalCount);
+					if (firstPage.hasNext()) {
+						for (int j = 1; j < firstPage.getTotalPages(); j++) {
+							Pageable nextPage  = PageRequest.of(j, pageSize);
+							try{
+								mppUtil.setPageable(nextPage);
+								String[][] nextPageData = mppUtil.getData();//第一个为表头
+								List<Object> nextData = new ArrayList<>();
+								for (int k = 1; k<nextPageData.length ; k++) {
+									List<Object> oblist =Arrays.asList(nextPageData[k]);
+									List<Object> temp = new LinkedList<>();
+									oblist.forEach(record->{
+										temp.add(record);
+									});
+									temp.add(modelTableName);
+									temp.add(modelTableName);
+									nextData.add(temp);
+								}
+								mppUtil.setDataList(nextData);
+								mppUtil.insertDataList();
+							}catch (Exception e){
+								e.printStackTrace();
+							}
+						}
+					}
 				}catch (Exception e){
+					e.printStackTrace();
 					logger.info(e.getMessage());
 				}
+				doDelete(waitUpdateIndex.getId());
 			}
 		}
-
 	}
 }

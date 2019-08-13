@@ -25,7 +25,13 @@ public interface DtWaitUpdateIndexService {
 	void doDelete(Long id);
 	void doRemove(String ids);
 	/**
+	 * 获取待更新的模型
+	 * @param runState
+	 * @return
+	 */
+	List<DtWaitUpdateIndex> getByRunState(Long runState);
+	/**
 	 * 更新模型打标临时表的索引
 	 */
-	void updateModelIndex();
+	void updateModelIndex(List<DtWaitUpdateIndex> waitList);
 }

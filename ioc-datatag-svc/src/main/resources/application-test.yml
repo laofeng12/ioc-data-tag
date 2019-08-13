@@ -92,6 +92,12 @@ schedulejob: #定时任务组件
   jobName: scanjob
   queue: 0 0/1 * * * ? * #扫描新建模型频率
 
+searchjob: #更新模型中间表定时任务
+  jobMethod: com.openjava.datatag.schedule.job.DtTaggingUpdateIndexJob
+  jobGroup: search_job
+  jobName: search_job
+  queue: 0 0/5 * * * ? * #更新频率
+
 dataSet: #数据集相关
   resourceDataUrl: http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/
 

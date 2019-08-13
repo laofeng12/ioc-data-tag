@@ -1,5 +1,7 @@
 package com.openjava.datatag.schedule.job;
 
+import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +21,9 @@ public class DtTaggingModelCalculationJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobKey key = jobExecutionContext.getJobDetail().getKey();
         logger.info(String.format("模型调度开始执行：taggingModelId:{%s},执行时间:{%s}", key.getName(), new Date()));
-        dtTaggingModelService.calculation(Long.valueOf(key.getName()));
+        DtTaggingModel tagModel = dtTaggingModelService.get(Long.valueOf(key.getName()));
+        tagModel.setRunState(Constants.DT_MODEL_RUNNING);
+        dtTaggingModelService.doSave(tagModel);
+        dtTaggingModelService.calculation(tagModel);
     }
 }
