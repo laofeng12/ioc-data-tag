@@ -1,7 +1,10 @@
 <template>
+  <!--<div  class="table-box" :style="`width: ${tableBoxWidth}px; height: ${tableBoxHeight}px`">-->
+    <!--<div class="showCon" :style="`width: ${tableWidth}px; height: ${tableHeight}px`">-->
   <div  class="table-box">
-    <el-table border class="my-table" :data="tableData" style="width: 100%">
-      <el-table-column v-for="(item,index) in theadData" :prop="item.sourceCol" :key="index">
+    <div class="showCon" >
+    <el-table border class="my-table" :data="tableData" style="width: 100%;" :height="tableHeight">
+      <el-table-column v-for="(item,index) in theadData" :prop="item.sourceCol" :key="index" min-width="300">
         <template slot="header" slot-scope="scope">
           <el-dropdown @command="handleCommandTags($event,item)"  v-if="item.isMarking===1">
               <span class="el-dropdown-link">
@@ -178,7 +181,7 @@
       </div>
     </el-dialog>
   </div>
-
+  </div>
 </template>
 
 <script>
@@ -203,6 +206,7 @@ export default {
   },
   data () {
     return {
+      tableHeight:'',
       totalnum:20,
       size:10,
       curIndex:0,
@@ -259,9 +263,6 @@ export default {
     }
   },
   watch: {
-    filterText(val) {
-
-    },
     'connectSymbolList': {
       handler: function (newValue, oldValue) {
         this.connectSymbolList = newValue
@@ -304,6 +305,7 @@ export default {
     this.getMyTagGroupList()
     this.getConnectList('dt.tag.conditions.connect')
     this.getCountList('dt.tag.conditions.noconnect')
+    this.tableHeight = document.body.clientHeight - 137
   },
   mounted () {
   },
