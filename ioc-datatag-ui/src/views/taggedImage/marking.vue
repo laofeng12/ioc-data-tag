@@ -360,7 +360,7 @@
             // modelId: '1643371',
             userId: ''
           })
-          console.log('list', list);
+          console.log('表头list', list);
           this.headData = list.rows
         } catch (e) {
           console.log(e);
@@ -370,7 +370,7 @@
       async getModelColsList() {  // 1643371
         try {
           const data = await getModelColsData(this.modeleId, 0, 100, 1)
-          // console.log('表格数据', data)
+          console.log('表格数据', data)
           this.tableData = data.data.content
         } catch (e) {
           console.log(e);

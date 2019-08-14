@@ -7,106 +7,132 @@
         </router-link>
         <div class="name">
           <div class="img"></div>
-          <div class="text">南城区高考成绩数据</div>
+          <div class="text">{{tagName}}</div>
         </div>
       </div>
     </div>
     <div class="content">
       <div class="components">
-        <div class="newTable  daList">
+        <div class="newTable  daList" v-if="ztableShowList != ''">
           <el-table ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
                     style="width: 100%;text-align: center"
                     :header-cell-style="{background:'#f0f2f5'}">
             <template slot="empty">
               <div v-if="Loading">
-                <div v-loading="saveLoading2" ></div>
+                <div v-loading="saveLoading2"></div>
               </div>
               <div v-else>暂无数据</div>
             </template>
-            <el-table-column label="操作" width="100px">
+            <el-table-column label="操作" width="100px" v-if="doFalse">
               <template slot-scope="props" class="caozuo">
-              <span class="operationIcona  look">查看画像</span>
+                <span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>
               </template>
             </el-table-column>
-            <el-table-column prop="name" label="名称">
-              <template slot-scope="scope">
-                <span>教育体系标签</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="creator" label="创建者"></el-table-column>
-            <el-table-column prop="people" label="修改人" >
-              <div>数据搬运工</div>
-            </el-table-column>
-            <el-table-column prop="state" label="状态" >
-              <template slot-scope="scope">
-                <div class="state">
-                  <div class="spot"></div>
-                  <div class="stateName">{{scope.row.state}}</div>
-                </div>
-              </template>
-            </el-table-column>
-
+            <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
+                             :prop="item"></el-table-column>
           </el-table>
+          <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
+                              @sureClick="goPage"></element-pagination>
         </div>
+        <div v-else class="topImage">
+          <img src="../../assets/img/001.png" height="144" width="160"/></div>
       </div>
     </div>
-
-
-
   </div>
 </template>
 
 <script>
+  import ElementPagination from '@/components/ElementPagination'
+  import {getlist, getImagelist} from '@/api/lableImage.js'
 
   export default {
+    components: {ElementPagination},
     name: 'modelEdit',
-    data () {
+    data() {
       return {
-        Loading:true,
-        saveLoading2:true,
+        page: 0,
+        size: 10,
+        totalnum: 0,
+        doFalse: false,
+        Loading: true,
+        saveLoading2: true,
         tableBoxWidth: 800,
         tableBoxHeight: 800,
         tableWidth: 800,
         tableHeight: 800,
-        ztableShowList:[{
-          name:'教育',
-          creator:'大雄',
-          people:'数据搬运工',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多',
-          state:'运行中',
-        },{
-          name:'教育22',
-          creator:'大雄',
-          people:'数据搬运工22',
-          time:'2019/4/19  16:17:22',
-          introduction:'动画的很多好很多22',
-          state:'运行中',
-        }],
-
+        ztableShowList: [],
+        headData: [],
         tableData: [],
         theadData: [],
         dimensionList: [],
         measureList: [],
         componentsSwitch: true,
-        datasetId: '',
-        updateAsideForce: true
+        tagId: '',
+        tagName: '',
+        updateAsideForce: true,
+        pKey: '',
+        tableName: ''
       }
     },
     watch: {
-      theadData: function (val) {
-        this.tableWidth = val.length * 149
-      }
+      // theadData: function (val) {
+      //   this.tableWidth = val.length * 149
+      // }
     },
-    created () {
-      this.datasetId = this.$route.params.id
+    created() {
+      this.tagId = this.$route.params.id
+      this.tagName = this.$route.params.name
+      this.getList()
     },
-    mounted () {
+    mounted() {
 
     },
     methods: {
+      async getList() {
+        const params = {
+          page: this.page,
+          size: this.size,
+          // taggingModelId:'1643452'
+          taggingModelId: this.tagId
+        }
+        try {
+          //theadData
+          const resList = await getlist(params)
+          if ((resList.data.result.content && resList.data.result.content.length > 0) && (resList.data.cols && resList.data.cols.length > 0)) {
+            this.ztableShowList = resList.data.result.content
+            this.theadData = resList.data.cols
+            this.doFalse = true
+            this.pKey = resList.data.pKey
+            this.tableName = resList.data.tableName
+          } else {
+            this.ztableShowList = []
+            this.theadData = []
+            this.doFalse = false
+            this.$message.error('请先进行数据调度');
+          }
 
+          this.totalnum = resList.data.result.totalElements
+        } catch (e) {
 
+        }
+      },
+      handleCurrentChange(page) {
+        this.page = page - 1
+        this.getList()
+      },
+      goPage() {
+      },
+      // 查看画像
+      async lookImage(row) {
+        this.$router.push({
+          path: '/lookImagedetail',
+          query: {
+            pKey: row.tb_0_MODULE_ID,
+            tableName: this.tableName,
+            titleName: this.tagName
+          }
+        })
+      }
     }
   }
 </script>
@@ -146,6 +172,7 @@
       }
     }
   }
+
   .content {
     display: flex;
     .components {
@@ -181,11 +208,20 @@
       }
     }
   }
-  .look{
+
+  .look {
     color: #169BD5;
     cursor: pointer;
   }
-  .clearfix:after{
+
+  .topImage {
+    text-align: center;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .clearfix:after {
     content: '';
     display: block;
     clear: both;
