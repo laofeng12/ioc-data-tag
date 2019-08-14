@@ -1,6 +1,6 @@
 <template>
   <div  class="table-box">
-    <el-table border class="my-table" :data="tableData" style="width: 100%"  height="380">
+    <el-table border class="my-table" :data="tableData" style="width: 100%">
       <el-table-column v-for="(item,index) in theadData" :prop="item.sourceCol" :key="index">
         <template slot="header" slot-scope="scope">
           <el-dropdown @command="handleCommandTags($event,item)"  v-if="item.isMarking===1">
