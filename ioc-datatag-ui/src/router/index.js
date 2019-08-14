@@ -121,7 +121,7 @@ export default new Router({
       component: () => import('@/views/taggedImage/modelEdit.vue')
     },
     {
-      path: '/ImageDetail/:id',
+      path: '/ImageDetail/:id/:name',
       name: 'ImageDetail',
       meta: {title: '画像模型'},
       component: () => import('@/views/taggedImage/ImageDetail.vue')
@@ -143,6 +143,12 @@ export default new Router({
       name: 'marking',
       meta: {title: '协作打标'},
       component: () => import('@/views/taggedImage/marking.vue')
+    },
+    {
+      path: '/lookImagedetail',
+      name: 'lookImagedetail',
+      meta: {title: '查看画像'},
+      component: () => import('@/components/image/lookImagedetail.vue')
     },
   ]
 })

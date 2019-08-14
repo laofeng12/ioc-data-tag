@@ -1,5 +1,5 @@
 <template>
-  <div class="ele-pagination">
+  <div class="ele-pagination" v-show="total>0">
     <el-pagination
       background
       @size-change="handleSizeChange"
@@ -55,6 +55,6 @@ export default {
   margin-top:15px;
   text-align: right;
   display: flex;
-  justify-content:center
+  justify-content:flex-end
 }
 </style>

@@ -31,10 +31,8 @@ const actions = {
   },
   //查询
   async getimageList ({ commit,state }, params) {
-    console.log('chaxun',params)
     try{
       const res = await getImage(params)
-      console.log('查询',res.rows)
       commit('SET_IMAGEARR', res.rows)
     }catch (e) {
       console.log(e);
@@ -44,7 +42,6 @@ const actions = {
   async getarrList ({ commit,state }, params) {
     try{
       const res = await getImagelist(params)
-      console.log('详情',res.data)
       commit('SET_LISTARR', res.data)
     }catch (e) {
       console.log(e);

@@ -25,12 +25,12 @@
           <el-tag class="people">....</el-tag>
         </div>
         <div>
-          <el-button type="text" @click="lookDetail(item.id)">查看详情</el-button>
+          <el-button type="text" @click="lookDetail(item.id,item.tableName)">查看详情</el-button>
         </div>
       </el-card>
     </div>
     <div class="back">
-      <el-button @click="goback">返回</el-button>
+      <el-button @click="goback" v-if="contentArr != ''">返回</el-button>
     </div>
   </div>
 </template>
@@ -50,8 +50,13 @@
       queryDetail() {
         this.getimageList(this.input2)
       },
-      lookDetail(detailId) {
-        this.getarrList(detailId)
+      lookDetail(detailId,tableName) {
+        localStorage.setItem('pKey',detailId)
+        localStorage.setItem('tableName',tableName)
+        this.getarrList({
+          pKey:detailId,
+          tableName:tableName
+        })
         this.$router.push({
           path:'/detailImage',
           query:{

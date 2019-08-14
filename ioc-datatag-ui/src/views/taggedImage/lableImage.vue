@@ -1,26 +1,26 @@
 <template>
   <div class="app-container">
     <div class="actionBar">
-        <el-input
-          class="zxinp moduleOne"
-          size="small"
-          placeholder="请输入内容"
-          prefix-icon="el-icon-search"
-          v-model="input2">
-        </el-input>
-        <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-        <el-button class="zxlistBtn" size="small" type="primary" @click="modelQuery">查询</el-button>
-        <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
-        <el-button size="small" type="primary" @click="createModel">创建模型</el-button>
-        <el-button size="small" type="primary" @click="cooperationModel">协作模型</el-button>
-        <!--<el-button size="small" type="primary" >下载管理</el-button>-->
+      <el-input
+        class="zxinp moduleOne"
+        size="small"
+        placeholder="请输入内容"
+        prefix-icon="el-icon-search"
+        v-model="input2">
+      </el-input>
+      <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button class="zxlistBtn" size="small" type="primary" @click="modelQuery">查询</el-button>
+      <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
+      <el-button size="small" type="primary" @click="createModel">创建模型</el-button>
+      <el-button size="small" type="primary" @click="cooperationModel">协作模型</el-button>
+      <!--<el-button size="small" type="primary" >下载管理</el-button>-->
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -55,7 +55,8 @@
             <template slot-scope="scope" class="caozuo">
               <el-tooltip class="item" effect="dark" content="调度" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-s-operation iconLogo" @click="handleControl(scope.row.modelName,scope.row.taggingModelId)"></i>
+                    <i class="el-icon-s-operation iconLogo"
+                       @click="handleControl(scope.row.modelName,scope.row.taggingModelId)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -67,7 +68,7 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="画像" placement="top">
                 <span class="operationIcona">
-                    <router-link :to="`/ImageDetail/456`">
+                    <router-link :to="`/ImageDetail/${scope.row.taggingModelId}/${scope.row.modelName}`">
                       <i class="el-icon-user iconLogo"></i>
                     </router-link>
                 </span>
@@ -80,13 +81,15 @@
 
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" @click="handleDelete(scope.row.modelName,scope.row.taggingModelId)"></i>
+                <i class="el-icon-delete iconLogo"
+                   @click="handleDelete(scope.row.modelName,scope.row.taggingModelId)"></i>
               </span>
               </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
-        <element-pagination :pageSize="size"  :total="totalnum"  @handleCurrentChange="handleCurrentChange" @sureClick="goPage"></element-pagination>
+        <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
+                            @sureClick="goPage"></element-pagination>
       </div>
       <el-dialog class="creat" title="模型调度" :visible.sync="controlDialog" width="530px" center
                  :close-on-click-modal="false"
@@ -119,7 +122,9 @@
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="dispatchLoading" @click="sureDispatch">确定调度</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="dispatchLoading" @click="sureDispatch">
+              确定调度
+            </el-button>
           </div>
         </div>
       </el-dialog>
@@ -170,7 +175,8 @@
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="sureDelete">确定删除</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="sureDelete">确定删除
+            </el-button>
             <el-button size="small" type="primary" class="queryBtn" @click="cancelDelete">取消</el-button>
           </div>
         </div>
@@ -213,7 +219,7 @@
 </template>
 
 <script>
-  import {getmodelList,getDispatch,getDelete,getDispatchdetail} from '@/api/lableImage.js'
+  import {getmodelList, getDispatch, getDelete, getDispatchdetail} from '@/api/lableImage.js'
   import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
 
@@ -225,23 +231,23 @@
         page: 0,
         size: 10,
         totalnum: 0,
-        like_modelName:'',
-        eq_runState:'',
-        dispatchName:'',
-        dispatchId:'',
-        deleteName:'',
-        deleteId:'',
+        like_modelName: '',
+        eq_runState: '',
+        dispatchName: '',
+        dispatchId: '',
+        deleteName: '',
+        deleteId: '',
         input2: '',
         Loading: true,
         saveLoading2: true,
         controlDialog: false,
         downloadDialog: false,
         deleteDialog: false,
-        dispatchLoading:false,
-        deleteLoading:false,
+        dispatchLoading: false,
+        deleteLoading: false,
         saveLoading: false,
         labelcreatDialog: false,
-        creatsaveLoading:false,
+        creatsaveLoading: false,
         percentage: 30,
         value1: '',
         textarea: '',
@@ -270,19 +276,19 @@
         options2: [{
           value: '0',
           label: '停止运行'
-        },{
+        }, {
           value: '1',
           label: '运行一次'
-        },{
+        }, {
           value: '2',
           label: '每天一次'
-        },{
+        }, {
           value: '3',
           label: '每周一次'
-        },{
+        }, {
           value: '4',
           label: '每月一次'
-        },{
+        }, {
           value: '5',
           label: '每年一次'
         }],
@@ -296,10 +302,10 @@
         },
         rules: {
           date: [
-            {required: true, message: '请选择时间',trigger: 'blur'}
+            {required: true, message: '请选择时间', trigger: 'blur'}
           ],
           region: [
-            { required: true, message: '请选择周期', trigger: 'change' }
+            {required: true, message: '请选择周期', trigger: 'change'}
           ],
           labelName: [
             {required: true, message: '请填写名称', trigger: 'blur'}
@@ -329,24 +335,24 @@
           return "backgroundColor:#ee0320";
         }
       },
-      async handleControl(name,id) {
+      async handleControl(name, id) {
         this.controlDialog = true
         this.dispatchName = name
         this.dispatchId = id
-          try{
-            const resOk = await getDispatchdetail({
-              taggingModelId:id
-            })
-            this.options2.forEach(item =>{
-              if(resOk.cycleEnum == item.value){
-                resOk.cycleEnum = item.value
-              }
-            })
-            this.ruleForm.date = resOk.startTime
-            this.ruleForm.region = resOk.cycleEnum
-          }catch (e) {
-            console.log(e);
-          }
+        try {
+          const resOk = await getDispatchdetail({
+            taggingModelId: id
+          })
+          this.options2.forEach(item => {
+            if (resOk.cycleEnum == item.value) {
+              resOk.cycleEnum = item.value
+            }
+          })
+          this.ruleForm.date = resOk.startTime
+          this.ruleForm.region = resOk.cycleEnum
+        } catch (e) {
+          console.log(e);
+        }
       },
       closeControl() {
         this.controlDialog = false
@@ -359,7 +365,7 @@
         this.downloadDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      handleDelete(name,id) {
+      handleDelete(name, id) {
         this.deleteDialog = true
         this.deleteName = name
         this.deleteId = id
@@ -367,7 +373,7 @@
       closedelete() {
         this.deleteDialog = false
       },
-      cancelDelete(){
+      cancelDelete() {
         this.deleteDialog = false
       },
       createLabel() {
@@ -421,23 +427,24 @@
           console.log(e);
         }
       },
-      handleCurrentChange(page){
-        this.page = page-1
+      handleCurrentChange(page) {
+        this.page = page - 1
         this.datamodelList()
       },
-      goPage(){},
-      modelQuery(){
+      goPage() {
+      },
+      modelQuery() {
         this.page = 0
         this.datamodelList()
       },
-      sureDispatch(){
+      sureDispatch() {
         const param = {
           "cycleEnum": this.ruleForm.region,
           "id": this.dispatchId,
           "startTime": this.ruleForm.date
         }
         this.dispatchLoading = true
-        this.$refs.ruleForm.validate(async(valid) => {
+        this.$refs.ruleForm.validate(async (valid) => {
           if (valid) {
             try {
               const res = await getDispatch(param)
@@ -458,9 +465,9 @@
         });
 
       },
-      async sureDelete(){
+      async sureDelete() {
         const res = await getDelete({
-          id:this.deleteId
+          id: this.deleteId
         })
         this.$message({
           message: res.message,
@@ -491,7 +498,7 @@
                   tagsName: this.ruleForm.tagsName
                 })
                 this.creatsaveLoading = false
-                this.$router.push('/tree/'+ data.id)
+                this.$router.push('/tree/' + data.id)
               } catch (e) {
                 this.creatsaveLoading = false
                 console.log(e);
@@ -562,6 +569,7 @@
   .stateName {
     color: #00CC33;
   }
+
   .area {
     width: 360px;
   }

@@ -52,9 +52,20 @@ export function getImage(id) {
  *
  * @param data
  */
-export function getImagelist(detailId) {
+// export function getImagelist(detailId) {
+//   return fetch ({
+//     url:'/datatag/portrayal/getCoolDetail/'+detailId,
+//     method:'get'
+//   })
+// }
+
+/**
+ *
+ * @param data
+ */
+export function getImagelist({tableName,pKey}) {
   return fetch ({
-    url:'/datatag/portrayal/getCoolDetail/'+detailId,
+    url:`datatag/portrayal/getCoolDetail/${tableName}/${pKey}`,
     method:'get'
   })
 }
@@ -68,5 +79,17 @@ export function getDispatchdetail(params) {
     url:'/datatag/tagmodel/dtTaggingModel/Dispatch',
     method:'get',
     params
+  })
+}
+
+
+/**
+ *查询模型打标结果列表
+ * @param data
+ */
+export function getlist({taggingModelId,page,size}) {
+  return fetch ({
+    url:`/datatag/tagmodel/dtTaggingModel/${taggingModelId}/${page}/${size}/`,
+    method:'get'
   })
 }

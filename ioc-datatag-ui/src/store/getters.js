@@ -8,6 +8,8 @@ const getters = {
   menuList: state => state.app.menuList,
   apiv1Token: state => state.user.apiv1Token,
   imagesList: state => state.dictionary.imagesList,
-  catalogmenuList: state => state.app.catalogmenuList
+  catalogmenuList: state => state.app.catalogmenuList,
+  imageId: state => state.tagPanel.listArr.id,
+  imageName: state => state.tagPanel.listArr.tableName,
 }
 export default getters

@@ -162,8 +162,6 @@
         }
       },
       marking(id,name) {
-        console.log('模型ID',id)
-        // this.$router.push('/marking/'+id)
         this.$router.push({
           path:'/marking',
           query:{
@@ -224,7 +222,6 @@
         }
         try{
           const resQuery = await cooperationQuery(params)
-          console.log('resQuery',resQuery);
           if(resQuery.rows && resQuery.rows.length > 0){
             resQuery.rows.forEach(item => {
               if (item.runState == 0) {
