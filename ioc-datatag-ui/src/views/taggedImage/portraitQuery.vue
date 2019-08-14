@@ -6,7 +6,7 @@
         <el-input
           class="zxinp moduleOne"
           size="small"
-          placeholder="请输入内容"
+          placeholder="请输入需要查询的ID"
           prefix-icon="el-icon-search"
           v-model="input2">
         </el-input>
