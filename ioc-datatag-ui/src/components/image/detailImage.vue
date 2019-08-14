@@ -15,7 +15,7 @@
       </div>
     </div>
     <div>
-      <p class="numDetail"><span>{{titleId}}</span><span>的画像详情</span></p>
+      <p class="numDetail"><span>{{titleId}}</span><span>&nbsp&nbsp的画像详情</span></p>
       <div class="circularContent">
         <div class="circular">
           <div class="circularOne">
@@ -73,7 +73,12 @@
     created() {
       this.titleId = this.$route.query.detailId
       this.input2 = this.$route.query.id
-      this.getarrList()
+      const pKey = localStorage.getItem('pKey')
+      const tableName = localStorage.getItem('tableName')
+      this.getarrList({
+        pKey:pKey,
+        tableName:tableName
+      })
     },
     computed: {
       ...mapState({
@@ -160,6 +165,7 @@
   .circularContent {
     margin-top: 50px;
     margin-bottom: 135px;
+    margin-left: 80px;
   }
 
   .peopleDetail, .peopleDetail2, .peopleDetail3, .peopleDetail4 {
@@ -169,11 +175,15 @@
     box-shadow: 0 0 0 6px #e9fcff30;
     position: absolute;
     padding: 7px 27px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .peopleDetail {
     top: 30px;
-    left: -172px;
+    left: -247px;
   }
 
   .peopleDetail2 {
@@ -254,8 +264,12 @@
     border: 1px solid #fff;
   }
 
-  .contentDetail, .contentDetai2, .contentDetai3, .contentDetai4, .contentDetai5, .contentDetai6, .contentDetai7 {
+  .contentDetai1, .contentDetai2, .contentDetai3, .contentDetai4, .contentDetai5, .contentDetai6, .contentDetai7 {
     padding: 7px 27px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .zxinp {
