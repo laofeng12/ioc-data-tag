@@ -22,7 +22,7 @@
             <div class="h4">
               <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">{{resourceName}}</el-checkbox>
             </div>
-            <ul>
+            <ul class="contentNum">
               <li v-for="(item,index) in columnData"  >
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                   <el-checkbox  :label="item.name":key="item.id" >
@@ -556,6 +556,10 @@ export default {
         cursor: pointer;
       }*/
     }
+  }
+  .contentNum{
+    height: 300px;
+    overflow: auto;
   }
 </style>
 <style lang="stylus" scoped>
