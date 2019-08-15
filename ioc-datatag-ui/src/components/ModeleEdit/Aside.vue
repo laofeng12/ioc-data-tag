@@ -12,17 +12,17 @@
       </el-tree>
     </div>
     <!--字段设置-->
-    <el-dialog class="creat" title="字段设置"  :visible.sync="colSetDialog" width="720px" center :modal-append-to-body="false" :close-on-click-modal="false"
+    <el-dialog class="creat" title="字段设置"  :visible.sync="colSetDialog" width="800px" center :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close"  @open="init">
       <div class="col-set-box">
         <el-container class="">
-          <el-aside width="250px" class="left">
+          <el-aside width="270px" class="left">
             <h3>选择字段</h3>
             <el-input placeholder="输入关键词搜索列表" v-model="searchText" size="small" suffix-icon="el-icon-search"></el-input>
             <div class="h4">
               <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">{{resourceName}}</el-checkbox>
             </div>
-            <ul>
+            <ul class="contentNum">
               <li v-for="(item,index) in columnData"  >
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                   <el-checkbox  :label="item.name":key="item.id" >
@@ -39,7 +39,7 @@
               </li>
             </ul>
           </el-aside>
-          <div class="right">
+          <div class="right" style="width: 100%;">
             <h3>已择字段</h3>
             <div>
               <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
@@ -82,6 +82,7 @@
                   label="字段"  prop="name">
                 </el-table-column>
                 <el-table-column
+                  width="80"
                   prop="type"
                   label="类型">
                 </el-table-column>
@@ -556,6 +557,10 @@ export default {
         cursor: pointer;
       }*/
     }
+  }
+  .contentNum{
+    height: 300px;
+    overflow: auto;
   }
 </style>
 <style lang="stylus" scoped>

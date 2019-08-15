@@ -23,7 +23,7 @@
               </div>
               <div v-else>暂无数据</div>
             </template>
-            <el-table-column label="操作" width="100px" v-if="doFalse">
+            <el-table-column label="操作" width="100px">
               <template slot-scope="props" class="caozuo">
                 <span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>
               </template>
@@ -124,10 +124,14 @@
       },
       // 查看画像
       async lookImage(row) {
+        console.log('hhh',row)
+        console.log('11',this.pKey)
+        const obj = row
+        console.log('44',row[this.pKey])
         this.$router.push({
           path: '/lookImagedetail',
           query: {
-            pKey: row.tb_0_MODULE_ID,
+            pKey: row[this.pKey],
             tableName: this.tableName,
             titleName: this.tagName
           }
@@ -220,7 +224,9 @@
     top: 50%;
     transform: translateY(-50%);
   }
-
+.newTable{
+  padding: 0px 15px;
+}
   .clearfix:after {
     content: '';
     display: block;
