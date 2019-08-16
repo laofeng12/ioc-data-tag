@@ -1,12 +1,11 @@
 <template>
-  <!--<div  class="table-box" :style="`width: ${tableBoxWidth}px; height: ${tableBoxHeight}px`">-->
-    <!--<div class="showCon" :style="`width: ${tableWidth}px; height: ${tableHeight}px`">-->
   <div  class="table-box">
     <div class="showCon" >
     <el-table border class="my-table" :data="tableData" style="width: 100%;" :height="tableHeight">
       <el-table-column v-for="(item,index) in theadData" :prop="item.sourceCol" :key="index" min-width="300">
         <template slot="header" slot-scope="scope">
           <el-dropdown @command="handleCommandTags($event,item)"  v-if="item.isMarking===1">
+          <!--<el-dropdown @command="handleCommandTags($event,item)"  v-if="item.isMarking===true || item.isMarking==1">-->
               <span class="el-dropdown-link">
                 {{item.showCol}} <i class="el-icon-setting"></i>
               </span>
@@ -206,6 +205,7 @@ export default {
   },
   data () {
     return {
+      ztheadData:'',
       tableHeight:'',
       totalnum:20,
       size:10,
@@ -280,7 +280,6 @@ export default {
     },
     'tagSetList':{
       handler:function(newValue,oldValue){
-       // console.log('tagSetlist',newValue)
         this.tagSetList=newValue
       },
       deep:true
@@ -294,9 +293,10 @@ export default {
     },
     'theadData':{
       handler:function(newValue,oldValue){
-        this.theadData=newValue
+        this.theadData = newValue
         this.$set(this.theadData)
       },
+      immediate: true,
       deep:true
     }
   },
@@ -778,12 +778,6 @@ label{
   .card{
     margin-bottom: 10px;
     cursor: pointer;
-    &.acitve{
-/*      box-shadow: 0 2px 12px 0 #0486fe;
-      box-shadow: 0 2px 12px 0 #86fe00;*/
-    /*  border: 1px solid #0486fe;*/
-
-  }
   }
   .chooseNum{
     width: 200px;
@@ -802,7 +796,6 @@ label{
     }
   }
 .self-mark-choose-box{
-/*  position: relative;*/
   position: absolute;
   right: 100px;
 
@@ -811,7 +804,6 @@ label{
   width: 200px;
   position: absolute;
   right: 0px;
-/*  margin-top: 10px;*/
   border: 1px solid #dcdfe6;
   border-radius: 4px;
   padding: 5px 10px;
@@ -851,7 +843,6 @@ label{
     display: flex;
     align-items:center;/*垂直居中*/
     .condition{
-     /* display: flex;*/
       position: relative;
       .connect-symbol{
         .smbol{

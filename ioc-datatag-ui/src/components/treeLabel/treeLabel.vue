@@ -552,7 +552,7 @@
 <style scoped>
   .treeContainer {
     width: 100%;
-    height: 700px;
+    /*height: 700px;*/
     display: flex;
   }
 
@@ -610,7 +610,7 @@
     margin-top: 20px;
     padding-left: 5px;
     padding-right: 5px;
-    height: 565px;
+    /*height: 565px;*/
     overflow-y: auto;
   }
 
@@ -621,7 +621,7 @@
   }
 
   .newTable {
-    height: 590px;
+    /*height: 590px;*/
     overflow-y: auto;
     margin-top: -20px;
   }
