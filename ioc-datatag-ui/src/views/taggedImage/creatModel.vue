@@ -256,7 +256,6 @@
         showPeoplelist: [],
         arrlist: [],
         peopleLength: 0,
-        // modeId: 1639943, // 模型ID
         modeId: 1640046, // 模型ID
         ruleForm: {
           name: '',
@@ -345,7 +344,21 @@
           this.modelData = data
           this.modelName = data.resourceName
           this.runModelname = data.modelName
+          console.log('data',data)
+          console.log('获取模型数据',data.colList)
+          data.colList.forEach(item =>{
+            console.log('333',item.isMarking)
+           if(item.isMarking == false){
+              return item.isMarking=0
+            }else{
+              return item.isMarking=1
+            }
+
+          })
+          console.log('获取模型数据111',data.colList)
           this.headColList = data.colList
+          console.log('获取模型数据22',this.headColList)
+          this.$store.dispatch('getlistArr', this.headColList)
         } catch (e) {
         }
       },
@@ -479,7 +492,6 @@
         this.changeRed = index
         this.helpId = zuserid
         this.cooId = id
-        // this.zcolId = colId
         this.startDisable = false
 
       },
@@ -561,8 +573,6 @@
             tagColId: tagColId  //
           }
         })
-        // console.log('tmp',tmp);
-        // console.log('showPeoplelist',this.showPeoplelist);
         tmp.forEach(item => {
           if (item.useTagGroup) {
             item.isCooField = true

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <treeLabel></treeLabel>
-    <div style="text-align:center">
+    <div class="back">
       <el-button @click="goback">返回</el-button>
     </div>
   </div>
@@ -32,5 +32,8 @@
 </script>
 
 <style scoped>
-
+.back{
+  text-align: center;
+  margin-top: 30px;
+}
 </style>

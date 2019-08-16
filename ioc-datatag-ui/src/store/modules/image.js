@@ -1,7 +1,8 @@
 export default {
   state: {
     content:'',
-    contentArr:[]
+    contentArr:[],
+    tableArr:[]
   },
   mutations: {
     saveContent (state, params) {
@@ -9,6 +10,9 @@ export default {
     },
     arrContent (state, params) {
       state.contentArr = params
+    },
+    listArr(state,params){
+      state.tableArr = params
     }
   },
   actions: {
@@ -17,6 +21,9 @@ export default {
     },
     getArr ({commit,state}, params) {
       commit('arrContent', params)
+    },
+    getlistArr ({commit,state}, params) {
+      commit('listArr', params)
     },
   }
 }
