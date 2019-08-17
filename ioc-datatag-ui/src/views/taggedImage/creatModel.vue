@@ -24,7 +24,7 @@
     </div>
     <div class="content">
       <!--左边数据树目录结构-->
-      <Aside :modelData="modelData" ref="tree"/>
+      <Aside :modelData="modelData" ref="tree" @commit="getModelData"/>
       <div class="components">
         <div class="top">
           <div class="left">
@@ -344,23 +344,18 @@
           this.modelData = data
           this.modelName = data.resourceName
           this.runModelname = data.modelName
-          console.log('data',data)
-          console.log('获取模型数据',data.colList)
-          data.colList.forEach(item =>{
-            console.log('333',item.isMarking)
-           if(item.isMarking == false){
-              return item.isMarking=0
-            }else{
-              return item.isMarking=1
-            }
-
-          })
-          console.log('获取模型数据111',data.colList)
           this.headColList = data.colList
-          console.log('获取模型数据22',this.headColList)
           this.$store.dispatch('getlistArr', this.headColList)
         } catch (e) {
         }
+      },
+      getModelData () {
+        if(this.$route.name == 'editModel'){
+          this.getModelList(this.$route.params.id)
+        }else {
+          return
+        }
+
       },
       addPeople() {
         if (this.taggingModelId) {

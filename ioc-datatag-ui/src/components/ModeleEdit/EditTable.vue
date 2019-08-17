@@ -4,8 +4,8 @@
     <el-table border class="my-table" :data="tableData" style="width: 100%;" :height="tableHeight">
       <el-table-column v-for="(item,index) in theadData" :prop="item.sourceCol" :key="index" min-width="300">
         <template slot="header" slot-scope="scope">
-          <el-dropdown @command="handleCommandTags($event,item)"  v-if="item.isMarking===1">
-          <!--<el-dropdown @command="handleCommandTags($event,item)"  v-if="item.isMarking===true || item.isMarking==1">-->
+          <!--<el-dropdown @command="handleCommandTags($event,item)"  v-if="item.isMarking===1">-->
+          <el-dropdown @command="handleCommandTags($event,item)"  v-if="theadData[index].isMarking===true || theadData[index].isMarking==1">
               <span class="el-dropdown-link">
                 {{item.showCol}} <i class="el-icon-setting"></i>
               </span>
@@ -292,12 +292,7 @@ export default {
       deep:true
     },
     'theadData':{
-      handler:function(newValue,oldValue){
-        this.theadData = newValue
-        this.$set(this.theadData)
-      },
-      immediate: true,
-      deep:true
+      handler:function(newValue,oldValue){}
     }
   },
   created () {
@@ -344,7 +339,6 @@ export default {
     },
     //选择标签层拿树
     clickTreeItem(data,node){
-     // console.log('data',data)
       this.childrenNode=data.childrenNode
       this.tagSetList=[]
       this.childrenNode.forEach((item,index)=>{
@@ -374,7 +368,6 @@ export default {
     },
     //选择运算符号
     chooseCountSymbol(item){
-      //console.log(item)
       const conditionObj={
         isConnectSymbol:0,//是否有连接符号
         symbol:item.codename,//连接符名或者>,=
@@ -525,8 +518,6 @@ export default {
       }
       try {
         const data = await delCol(params)
-       // console.log('data', data)
-       // console.log('this.modelId',this.modelId)
         this.$message.success(data.message)
         this.$parent.getModelList(this.modelId)
         this.$parent.getModelColsList(this.modelId,0,100,1)

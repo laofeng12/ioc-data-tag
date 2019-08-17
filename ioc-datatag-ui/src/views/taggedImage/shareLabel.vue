@@ -23,7 +23,7 @@
             <div v-else>暂无数据</div>
           </template>
           <el-table-column prop="tagsName" label="名称"></el-table-column>
-          <el-table-column prop="people" label="共享人/共享时间" >
+          <el-table-column prop="people" label="共享人/更新时间" >
             <template slot-scope="scope">
               <div>
                 <div>{{scope.row.shareUserName}}</div>
