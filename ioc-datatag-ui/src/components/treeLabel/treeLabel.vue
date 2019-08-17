@@ -1,4 +1,8 @@
 <template>
+  <div>
+    <div class="back">
+      <el-button size="small" @click="goback">返回</el-button>
+    </div>
   <div class="treeContainer">
     <div class="treelabel">
       <div class="labelTitle">
@@ -207,6 +211,7 @@
         </div>
       </div>
     </el-dialog>
+  </div>
   </div>
 </template>
 
@@ -531,6 +536,9 @@
           console.log(e);
         }
       },
+      goback(){
+        this.$router.go(-1)
+      }
     },
     created() {
       if (this.$route.name == 'lookTree') {
@@ -632,5 +640,9 @@
 
   .secondTable >>> .el-table__header-wrapper {
     display: none;
+  }
+  .back {
+    display: flex;
+    justify-content: flex-end;
   }
 </style>

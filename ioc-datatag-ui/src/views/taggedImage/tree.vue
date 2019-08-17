@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
     <treeLabel></treeLabel>
-    <div class="back">
-      <el-button @click="goback">返回</el-button>
-    </div>
+    <!--<div class="back">-->
+      <!--<el-button @click="goback">返回</el-button>-->
+    <!--</div>-->
   </div>
 </template>
 

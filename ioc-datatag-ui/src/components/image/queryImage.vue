@@ -13,6 +13,9 @@
         <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">查询</el-button>
       </div>
     </div>
+    <div class="back">
+      <el-button size="small" @click="goback" v-if="contentArr != ''">返回</el-button>
+    </div>
     <div class="queryCard">
       <el-card class="box-card card2" v-for="(item,index) in contentArr" :key="index">
         <div class="numId">
@@ -29,9 +32,7 @@
         </div>
       </el-card>
     </div>
-    <div class="back">
-      <el-button @click="goback" v-if="contentArr != ''">返回</el-button>
-    </div>
+
   </div>
 </template>
 
@@ -135,7 +136,10 @@
   }
 
   .back {
-    text-align: center;
-    margin-top: 20px;
+    /*text-align: center;*/
+    /*margin-top: 20px;*/
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -32px;
   }
 </style>

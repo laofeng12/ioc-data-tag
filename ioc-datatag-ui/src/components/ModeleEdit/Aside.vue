@@ -3,15 +3,15 @@
     <el-input placeholder="输入关键词搜索" v-model="filterText" class="search" size="small"
               suffix-icon="el-icon-search"></el-input>
     <div class="tree-box">
-      <el-tree icon-class="el-icon-folder" class="tree" :props="props" :filter-node-method="filterNode" ref="tree"
+      <el-tree icon-class="el-icon-folder" class="tree" :props="props" :highlight-current="true" :filter-node-method="filterNode" ref="tree"
                :load="loadNode" lazy>
-        <span class="custom-tree-node" slot-scope="{ node, data }">
-        <span class="cus-node-title">{{ data.orgName }}</span>
-          <el-button class="set-btn" type="text" size="mini" :disabled="routerName==='editModel'"
+        <div class="custom-tree-node" slot-scope="{ node, data }">
+        <div class="cus-node-title" style="line-height: 12px">{{ data.orgName }}</div>
+          <el-button class="set-btn btnMargin" type="text" size="mini" :disabled="routerName==='editModel'"
                      v-if="data.isTable===true" @click.stop="setTags(0,node,data)">
             <i class="el-icon-setting"></i>
           </el-button>
-        </span>
+        </div>
       </el-tree>
     </div>
     <!--字段设置-->
@@ -96,8 +96,9 @@
                 <el-table-column
                   label="选择打标字段" width="110">
                   <template slot-scope="scope">
-                    <el-checkbox :value="scope.row.isMarking" v-if="scope.row.name===ruleForm.pkey || ruleForm.pkey==''" disabled></el-checkbox>
-                    <el-checkbox :value="scope.row.isMarking" v-else @change="getCheckChange(scope.row,$event)"></el-checkbox>
+                      <el-checkbox  v-if="scope.row.name===ruleForm.pkey || ruleForm.pkey==''" disabled></el-checkbox>
+                      <el-checkbox v-else-if ='routerName == "creatModel"' @change="getCheckChange(scope.row,$event)"></el-checkbox>
+                      <el-checkbox :value="scope.row.isMarking"  v-else @change="getCheckChange(scope.row,$event)"></el-checkbox>
                   </template>
                 </el-table-column>
               </el-table>
@@ -276,23 +277,15 @@
       },
       //加载树节点
       loadNode(node, resolve) {
-        //console.log(resolve)
         if (node.level === 0) {
           return resolve([{orgName: '数据目录'}])
         }
         else if (node.level === 1) {
-          return resolve([{orgName: this.dataLakeDirectoryName, id: '1'}, {
-            orgName: this.dataSetDirectoryName,
-            id: '2'
-          }])
-        }
-        else if (node.level === 2) {
+          return resolve([{orgName: this.dataLakeDirectoryName, id: '1'}, {orgName: this.dataSetDirectoryName, id: '2'}])
+        } else if (node.level === 2) {
           this.getThreeChild(node.data.id, resolve)
-        }
-        else {
-          // this.getTreeChild(node.data,resolve)
+        } else {
           this.getChildTreeData(node.data, resolve)
-          //console.log(node.data)
         }
       },
       //获取4级树子节点
@@ -350,7 +343,6 @@
       async getOneZtreeData() {
         try {
           const data = await getOneZtreeData()
-          //console.log(data)
           this.oneNodeData = data.data
           this.dataLakeDirectoryName = this.oneNodeData.dataLakeDirectoryName
           this.dataSetDirectoryName = this.oneNodeData.dataSetDirectoryName
@@ -466,6 +458,7 @@
       },
       //选择打标字段
       getCheckChange(row, $event) {
+        console.log('log',row)
         if(row.isMarking == false) {
           row.isMarking = true
         }else{
@@ -490,7 +483,6 @@
     },
     created() {
       this.getOneZtreeData()
-
     },
     mounted() {
       this.routerName = this.$route.name
@@ -599,6 +591,9 @@
   .contentNum {
     height: 300px;
     overflow: auto;
+  }
+  .btnMargin{
+    margin-left: 5px;
   }
 </style>
 <style lang="stylus" scoped>

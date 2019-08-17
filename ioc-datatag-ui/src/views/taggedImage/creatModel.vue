@@ -29,7 +29,7 @@
         <div class="top">
           <div class="left">
             {{modelData.resourceName}}
-            <el-button v-if="routerName==='editModel'" class="set-btn" type="text" size="mini"
+            <el-button v-if="routerName==='editModel'" class="set-btn btnMargin" type="text" size="mini"
                        @click.stop="editSetTags(1)">
               <i class="el-icon-setting"></i>
             </el-button>
@@ -1285,5 +1285,7 @@
   .zxhh {
     background-color: #58ea6a;
   }
-
+  .btnMargin{
+    margin-left: 5px;
+  }
 </style>
