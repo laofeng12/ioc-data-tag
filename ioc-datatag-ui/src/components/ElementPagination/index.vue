@@ -10,7 +10,7 @@
       :total="total"
     >
     </el-pagination>
-    <el-button type="primary" @click="sureClick()" size="small" v-show="isSureBtn">确定</el-button>
+    <el-button type="primary" @click="sureClick()" size="mini" v-show="isSureBtn">确定</el-button>
   </div>
 </template>
 <script>

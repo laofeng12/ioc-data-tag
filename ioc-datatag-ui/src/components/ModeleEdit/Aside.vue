@@ -3,15 +3,15 @@
     <el-input placeholder="输入关键词搜索" v-model="filterText" class="search" size="small"
               suffix-icon="el-icon-search"></el-input>
     <div class="tree-box">
-      <el-tree icon-class="el-icon-folder" class="tree" :props="props" :filter-node-method="filterNode" ref="tree"
+      <el-tree icon-class="el-icon-folder" class="tree" :props="props" :highlight-current="true" :filter-node-method="filterNode" ref="tree"
                :load="loadNode" lazy>
-        <span class="custom-tree-node" slot-scope="{ node, data }">
-        <span class="cus-node-title">{{ data.orgName }}</span>
-          <el-button class="set-btn" type="text" size="mini" :disabled="routerName==='editModel'"
+        <div class="custom-tree-node" slot-scope="{ node, data }">
+        <div class="cus-node-title" style="line-height: 12px">{{ data.orgName }}</div>
+          <el-button class="set-btn btnMargin" type="text" size="mini" :disabled="routerName==='editModel'"
                      v-if="data.isTable===true" @click.stop="setTags(0,node,data)">
             <i class="el-icon-setting"></i>
           </el-button>
-        </span>
+        </div>
       </el-tree>
     </div>
     <!--字段设置-->
@@ -96,14 +96,9 @@
                 <el-table-column
                   label="选择打标字段" width="110">
                   <template slot-scope="scope">
-                    <el-checkbox v-model="scope.row.isMarking===1"
-                                 v-if="scope.row.name===ruleForm.pkey || ruleForm.pkey==''" disabled></el-checkbox>
-                    <el-checkbox v-model="scope.row.isMarking===1" v-else
-                                 @change="getCheckChange(scope.row,$event)"></el-checkbox>
-                    <!--<el-checkbox :checked="scope.row.isMarking==0?false:true"-->
-                    <!--v-if="scope.row.name===ruleForm.pkey || ruleForm.pkey==''" disabled></el-checkbox>-->
-                    <!--<el-checkbox :checked="scope.row.isMarking==0?false:true" v-else-->
-                    <!--@change="getCheckChange(scope.row,$event)"></el-checkbox>-->
+                      <el-checkbox  v-if="scope.row.name===ruleForm.pkey || ruleForm.pkey==''" disabled></el-checkbox>
+                      <el-checkbox v-else-if ='routerName == "creatModel"' @change="getCheckChange(scope.row,$event)"></el-checkbox>
+                      <el-checkbox :value="scope.row.isMarking"  v-else @change="getCheckChange(scope.row,$event)"></el-checkbox>
                   </template>
                 </el-table-column>
               </el-table>
@@ -113,8 +108,7 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="setCols">确认选择
-          </el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="setCols">确认选择</el-button>
         </div>
       </div>
     </el-dialog>
@@ -194,16 +188,14 @@
         this.$refs.tree.filter(val)
       },
       modelData: function (newVal, oldVal) {
+        this.modelData.colList.forEach((item, index) => {
+          if(item.isMarking == 0){
+            item.isMarking=false
+          }else{
+            item.isMarking=true
+          }
+        })
         this.modelData = newVal
-        console.log('新数据', this.modelData)
-        // this.modelData.colList.map(item =>{
-        //     if(item.isMarking == 0){
-        //       item.isMarking = false
-        //     }
-        //     if(item.isMarking == 1) {
-        //       item.isMarking = true
-        //     }
-        // })
       },
       searchText(val) {
         this.columnData = this.fuzzyQuery(this.columnData, val)
@@ -244,13 +236,10 @@
       handleCheckAllChange(val) {
         this.checkedCols = val ? colsOptions : [];
         this.isIndeterminate = false;
-        console.log(this.checkAll)
         if (this.checkAll === true) {
           this.tableData = this.columnData
           this.tableData.forEach((item, index) => {
-            //item.isChecked=false
-            item.isMarking = 0
-            // item.isMarking = false
+            item.isMarking = false
           })
         } else {
           this.tableData = []
@@ -260,13 +249,11 @@
         let checkedCount = value.length;
         this.checkAll = checkedCount === this.cols.length;
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
-        //console.log(this.checkedCols)
         this.tableData = []
-        console.log(value)
         this.checkedCols.forEach((citem) => {
           this.columnData.map((item, index) => {
-            item.isMarking = 0
-            // item.isMarking = false
+            // item.isMarking = 0
+            item.isMarking = false
             item.colSort = ''
             if (item.name == citem) {
               this.tableData.push(item)
@@ -285,29 +272,20 @@
       },
       //树过滤
       filterNode(value, data) {
-        //console.log(data)
         if (!value) return true;
         return data.orgName.indexOf(value) !== -1
       },
       //加载树节点
       loadNode(node, resolve) {
-        //console.log(resolve)
         if (node.level === 0) {
           return resolve([{orgName: '数据目录'}])
         }
         else if (node.level === 1) {
-          return resolve([{orgName: this.dataLakeDirectoryName, id: '1'}, {
-            orgName: this.dataSetDirectoryName,
-            id: '2'
-          }])
-        }
-        else if (node.level === 2) {
+          return resolve([{orgName: this.dataLakeDirectoryName, id: '1'}, {orgName: this.dataSetDirectoryName, id: '2'}])
+        } else if (node.level === 2) {
           this.getThreeChild(node.data.id, resolve)
-        }
-        else {
-          // this.getTreeChild(node.data,resolve)
+        } else {
           this.getChildTreeData(node.data, resolve)
-          //console.log(node.data)
         }
       },
       //获取4级树子节点
@@ -358,7 +336,6 @@
               name: item.sourceCol, isMarking: item.isMarking,
               colId: item.colId, type: item.sourceDataType, colSort: item.colSort
             })
-            console.log('编辑', this.tableData);
           })
         }
       },
@@ -366,7 +343,6 @@
       async getOneZtreeData() {
         try {
           const data = await getOneZtreeData()
-          //console.log(data)
           this.oneNodeData = data.data
           this.dataLakeDirectoryName = this.oneNodeData.dataLakeDirectoryName
           this.dataSetDirectoryName = this.oneNodeData.dataSetDirectoryName
@@ -413,32 +389,20 @@
       },
       //确认选择
       setCols() {
-        // console.log('resourceId',this.resourceId)
-        // console.log('pkey',this.pkey)
-        console.log('888', this.tableData);
         this.saveLoading = true
         this.$refs['ruleForm'].validate((valid) => {
           if (valid) {
             const colList = []
             this.tableData.map((item, index) => {
-              // if(item.isMarking == false){
-              //   console.log('442')
-              //   item.isMarking = 0
-              // }
-              // if(item.isMarking == true){
-              //   console.log('443')
-              //   item.isMarking = 1
-              // }
               colList.push({
                 sourceCol: item.name,
                 sourceDataType: item.type,
-                isMarking: item.isMarking,
+                isMarking: item.isMarking ? 1 : 0,
                 colId: item.colId,
                 colSort: item.colSort,
                 taggingModelId: this.modelData.taggingModelId
               })
             })
-            console.log('colList', colList)
             if (colList.length === 1) {
               this.$message({
                 message: '单个字段的数据集不能进行数据打标，请选择其它数据集',
@@ -487,29 +451,19 @@
           duration: 2000,
           type: 'success'
         })
+        this.$emit('commit')
         if (this.routerName === 'creatModel') {
           this.$router.push({path: `editModel/${Id}`})
         }
-
       },
       //选择打标字段
       getCheckChange(row, $event) {
-        console.log(row)
-        if (row.isMarking == 0) {
-          row.isMarking = 1
-          console.log(row.isMarking)
-        } else {
-          row.isMarking = 0
-          console.log(row.isMarking)
+        console.log('log',row)
+        if(row.isMarking == false) {
+          row.isMarking = true
+        }else{
+          row.isMarking = false
         }
-        // if (row.isMarking == false) {
-        //   row.isMarking = true
-        //   console.log(row.isMarking)
-        // } else {
-        //   row.isMarking = false
-        //   console.log(row.isMarking)
-        // }
-
       },
       delCol(index) {
         this.checkedCols.forEach((name, cindex) => {
@@ -520,15 +474,15 @@
         this.tableData.splice(index, 1)
       },
       changeSel() {
-        console.log('99')
-        console.log('选中', this.ruleForm.pkey);
-        console.log('==', this.tableData)
-        console.log('++', this.checkedCols)
+        this.tableData.map(item =>{
+          if(item.name == this.ruleForm.pkey){
+              item.isMarking = false
+          }
+        })
       },
     },
     created() {
       this.getOneZtreeData()
-
     },
     mounted() {
       this.routerName = this.$route.name
@@ -637,6 +591,9 @@
   .contentNum {
     height: 300px;
     overflow: auto;
+  }
+  .btnMargin{
+    margin-left: 5px;
   }
 </style>
 <style lang="stylus" scoped>
