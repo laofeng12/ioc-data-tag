@@ -95,6 +95,8 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             SysUser u = sysUserService.findByFullname(itemParams.getKeyWord());
             if (u!=null) {
                 multiHql+= " and (t.modifyUser ="+u.getUserid() +" or t.modelName like '%"+itemParams.getKeyWord()+"%')";
+            }else{
+                multiHql+= " and t.modelName like '%"+itemParams.getKeyWord()+"%'";
             }
         }
         Page<?> dbresult = dao.query(multiHql, pageable, prodPrams, itemParams);
