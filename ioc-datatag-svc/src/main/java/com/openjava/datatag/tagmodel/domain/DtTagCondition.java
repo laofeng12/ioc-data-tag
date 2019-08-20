@@ -56,7 +56,7 @@ public class DtTagCondition implements Persistable<Long>,Serializable {
 	private Long isHandle;
 
 	@ApiModelProperty("逻辑语句")
-	@Length(min=0, max=128)
+	@Length(min=0, max=4000)
 	@Column(name = "FILTER_EXPRESSION")
 	private String filterExpression;
 	
