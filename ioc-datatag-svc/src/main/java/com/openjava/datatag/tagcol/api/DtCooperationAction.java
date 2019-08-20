@@ -109,14 +109,8 @@ public class DtCooperationAction {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         Long currentuserId = Long.valueOf(userInfo.getUserId());
         DtTaggingModelDBParam itemParams=new DtTaggingModelDBParam();
-        itemParams.setEq_isDeleted(0L);//过渡被删除的协作模型
         if (params.getEq_cooUser() == null) {
             params.setEq_cooUser(currentuserId);
-
-        }
-        if(params.getKeyWord()!=null)
-        {
-            itemParams.setLike_modelName(params.getKeyWord());
 
         }
         if(params.getRunState()!=null)
@@ -124,8 +118,8 @@ public class DtCooperationAction {
             itemParams.setEq_runState(params.getRunState());
         }
         List<DtCooperationModelDTO> dtoList = new ArrayList<>();
-       // Page<?> result = dtCooperationService.queryShopItemAndProd(params,itemParams,pageable);
-        Page<?> result = dtCooperationService.findPageUserModelByUserId(params,pageable);
+        Page<?> result = dtCooperationService.queryShopItemAndProd(params,itemParams,pageable);
+//        Page<?> result = dtCooperationService.findPageUserModelByUserId(params,pageable);
 
         for(int i=0;i<result.getContent().size();i++){
             DtCooperationModelDTO dto=new DtCooperationModelDTO();

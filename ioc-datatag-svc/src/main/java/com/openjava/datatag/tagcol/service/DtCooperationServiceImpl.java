@@ -20,6 +20,7 @@ import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
+import com.openjava.datatag.user.domain.SysUser;
 import com.openjava.datatag.user.service.SysUserService;
 import com.openjava.datatag.utils.TimeUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -88,8 +89,14 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         //params.addQueryCondition(fieldB, "_gt_", value1);
         //编写查询HQL的主部分（不用写查询条件）
         //执行查询
-        String multiHql = "select t,o from DtTaggingModel t, DtCooperation o where t.taggingModelId=o.taggmId";
-        QueryParamsUtil.dealLike(prodPrams);//要用些方法转化like的查询条件才可以模糊查询，不然只能全匹配查询
+        String multiHql = "select t,o from DtTaggingModel t, DtCooperation o where t.taggingModelId=o.taggmId and t.isDeleted=0 ";
+//        QueryParamsUtil.dealLike(prodPrams);//要用些方法转化like的查询条件才可以模糊查询，不然只能全匹配查询
+        if (StringUtils.isNotBlank(itemParams.getKeyWord())){
+            SysUser u = sysUserService.findByFullname(itemParams.getKeyWord());
+            if (u!=null) {
+                multiHql+= " and (t.modifyUser ="+u.getUserid() +" or t.modelName like '%"+itemParams.getKeyWord()+"%')";
+            }
+        }
         Page<?> dbresult = dao.query(multiHql, pageable, prodPrams, itemParams);
         return dbresult;
     }

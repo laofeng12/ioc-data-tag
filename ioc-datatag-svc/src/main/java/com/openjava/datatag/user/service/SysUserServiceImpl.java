@@ -32,7 +32,7 @@ public class SysUserServiceImpl implements SysUserService {
 			return null;
 		}
 		SysUser m = o.get();
-		if(m.getAccounttype() != null) {
+		/*if(m.getAccounttype() != null) {
 			Map<String, SysCode> sysaccounttype = sysCodeService.getCodeMap("sys.account.type");
 			SysCode c = sysaccounttype.get(m.getAccounttype().toString());
 			if(c != null) {
@@ -66,8 +66,10 @@ public class SysUserServiceImpl implements SysUserService {
 			if(c != null) {
 				m.setFromtypeName(c.getCodename());
 			}
-		}
+		}*/
 		return m;
 	}
-
+	public SysUser findByFullname(String fullname){
+		return sysUserRepository.findByFullname(fullname);
+	}
 }
