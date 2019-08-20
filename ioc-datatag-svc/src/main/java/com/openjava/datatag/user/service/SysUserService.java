@@ -10,6 +10,7 @@ import com.openjava.datatag.user.domain.SysUser;
  */
 public interface SysUserService {
 
-	public SysUser get(Long id);
+	SysUser get(Long id);
+	SysUser findByFullname(String fullname);
 
 }

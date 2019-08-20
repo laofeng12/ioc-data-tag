@@ -10,9 +10,11 @@ import org.ljdp.core.spring.data.DynamicJpaRepository;
  */
 public interface SysUserRepository extends DynamicJpaRepository<SysUser, Long>, SysUserRepositoryCustom {
 	
-	public SysUser findByAccount(String account);
+	SysUser findByAccount(String account);
 
-	public SysUser findByMobile(String mobile);
+	SysUser findByMobile(String mobile);
 
-	public SysUser findByOarelationid(String uid);
+	SysUser findByOarelationid(String uid);
+
+	SysUser findByFullname(String fullname);
 }
