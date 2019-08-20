@@ -29,7 +29,7 @@
               </template>
             </el-table-column>
             <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
-                             :prop="item"></el-table-column>
+                             :prop="item" min-width="300"></el-table-column>
           </el-table>
           <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
                               @sureClick="goPage"></element-pagination>
@@ -108,7 +108,7 @@
             this.ztableShowList = []
             this.theadData = []
             this.doFalse = false
-            this.$message.error('请先进行数据调度');
+            // this.$message.error('请先进行数据调度');
           }
 
           this.totalnum = resList.data.result.totalElements
@@ -124,10 +124,8 @@
       },
       // 查看画像
       async lookImage(row) {
-        console.log('hhh',row)
-        console.log('11',this.pKey)
         const obj = row
-        console.log('44',row[this.pKey])
+        // console.log('44',row[this.pKey])
         this.$router.push({
           path: '/lookImagedetail',
           query: {

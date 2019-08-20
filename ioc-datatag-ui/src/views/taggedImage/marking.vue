@@ -55,7 +55,7 @@
           <el-col :span="11">
             <div class="allTree">
               <div class="sel">
-                <el-input style="width: 210px"
+                <el-input style="width: 215px"
                           size="small"
                           placeholder="请输入内容"
                           v-model="ruleForm.tagLev">
@@ -68,7 +68,6 @@
                     :props="defaultProps"
                     default-expand-all
                     :filter-node-method="filterNode"
-                    :expand-on-click-node="false"
                     @node-click="clickTreeItem"
                     ref="tree">
                       <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -620,8 +619,10 @@
       },
       // 标签层数据
       async getTagLevList(id) {
+        console.log('4444444')
         try {
           const data = await getTagLevData(id)
+          console.log('标签层数据',data.childrenNode)
             data.childrenNode.forEach(item =>{
               if(item.leaf == true){
                 console.log('9')
@@ -831,7 +832,7 @@
 
   /**/
   .sel {
-    width: 215px;
+    /*width: 215px;*/
     height: 32px;
   }
 

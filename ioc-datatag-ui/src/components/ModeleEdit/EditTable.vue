@@ -11,7 +11,7 @@
               </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="0" icon="el-icon-document-copy">克隆字段</el-dropdown-item>
-                <el-dropdown-item command="1" icon="el-icon-price-tag">字段打标</el-dropdown-item>
+                <el-dropdown-item command="1" icon="el-icon-price-tag">数据打标</el-dropdown-item>
                 <el-dropdown-item command="2" icon="el-icon-close">清除字段</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -48,26 +48,44 @@
             <el-col :span="11">
               <div class="allTree">
                 <div class="sel">
-                  <el-input style="width: 210px"
+                  <el-input style="width: 215px"
                             size="small"
                             placeholder="请输入内容"
                             v-model="ruleForm.tagLev">
                     <i slot="suffix" class="el-input__icon el-icon-arrow-down" @click="showTree()"></i>
                   </el-input>
                   <div class="treeBoder" v-show="showLevTree">
+                    <el-input size="small" v-model="ruleForm.tag" placeholder="请输入关键字查询" style="margin-bottom:10px;"/>
                     <el-tree
-                      class="filter-tree"
                       :data="treeLevdata"
                       :props="defaultProps"
+                      node-key="id"
+                      ref="treeForm"
+                      show-checkbox
                       default-expand-all
+                      check-strictly
                       :filter-node-method="filterNode"
-                      :expand-on-click-node="false"
-                      @node-click="clickTreeItem"
-                      ref="tree">
-                      <span class="custom-tree-node" slot-scope="{ node, data }">
-                        <span> <el-radio :disabled="data.leaf" v-model="radio" :label="data">{{data.tagName}}</el-radio></span>
+                      @check-change="handleClick"
+                      @node-click="nodeClick">
+                      <span class="slot-t-node" slot-scope="{ node, data }">
+                      <i :class="{ 'fa fa-folder': !node.expanded, 'fa fa-folder-open':node.expanded}"
+                         style="color: #fcd568;"/>
+                      <span>{{ node.label }}</span>
                       </span>
                     </el-tree>
+                    <!--<el-tree-->
+                    <!--class="filter-tree"-->
+                    <!--:data="treeLevdata"-->
+                    <!--:props="defaultProps"-->
+                    <!--default-expand-all-->
+                    <!--:filter-node-method="filterNode"-->
+                    <!--@node-click="clickTreeItem"-->
+                    <!--ref="tree">-->
+                    <!--<span class="custom-tree-node" slot-scope="{ node, data }">-->
+                    <!--<span> <el-radio :disabled="data.leaf" v-model="radio" :label="data">{{data.tagName}}</el-radio></span>-->
+                    <!--</span>-->
+                    <!--</el-tree>-->
+
                   </div>
                 </div>
               </div>
@@ -298,14 +316,14 @@
           this.countSymbolList = newValue
         }
       },
-      'ruleForm.tagLev': {
+      'ruleForm.tag': {
         handler: function (newValue, oldValue) {
-          this.$refs.tree.filter(newValue)
+          this.$refs.treeForm.filter(newValue)
         }
       },
       'tagSetList': {
         handler: function (newValue, oldValue) {
-          this.tagSetList = newValue
+          // this.tagSetList = newValue
         },
         deep: true
       },
@@ -319,7 +337,7 @@
       'theadData': {
         handler: function (newValue, oldValue) {
         }
-      }
+      },
     },
     created() {
       //获取标签组
@@ -348,7 +366,6 @@
       },
       //点击分页确认
       goPage() {
-
       },
       //深度克隆
       deepClone(obj) {
@@ -364,16 +381,40 @@
         return newObj
       },
       //选择标签层拿树
-      clickTreeItem(data, node) {
-        this.childrenNode = data.childrenNode
-        this.tagSetList = []
-        this.childrenNode.forEach((item, index) => {
-          if (item.leafParent === false) {
-            this.tagSetList.push(item)
+      // clickTreeItem(data, node) {
+      //   console.log('clickTreeItem', data)
+      //   this.childrenNode = data.childrenNode
+      //   console.log('123', data.childrenNode)
+      //   console.log('345', this.childrenNode)
+      //   this.tagSetList = []
+      //   this.childrenNode.forEach((item, index) => {
+      //     if (item.leafParent === false) {
+      //       this.tagSetList.push(item)
+      //     }
+      //   })
+      //   this.ruleForm.tagLev = data.tagName
+      //   this.showLevTree = false
+      // },
+      nodeClick(data, checked, node) {
+      },
+      handleClick(data, checked, node) {
+        if (checked === true) {
+          this.tagSetList = []
+          this.checkedId = data.id;
+          this.$refs.treeForm.setCheckedKeys([data.id]);
+          if (data.childrenNode) {
+            data.childrenNode.map(item => {
+              if (item.leafParent == false) {
+                this.tagSetList.push(item)
+              }
+            })
           }
-        })
-        this.ruleForm.tagLev = data.tagName
-        this.showLevTree = false
+          this.ruleForm.tagLev = data.tagName
+        } else {
+          if (this.checkedId == data.id) {
+            this.$refs.treeForm.setCheckedKeys([data.id]);
+          }
+        }
       },
       //选择连接符号
       chooseConnectSymbo(item) {
@@ -511,8 +552,8 @@
       },
       ///过滤树
       filterNode(value, data) {
-        if (!value) return true
-        return data.tagName.indexOf(value) !== -1
+        if (!value) return true;
+        return data.tagName.indexOf(value) !== -1;
       },
       colSetTags(data) {
         this.setTagsDialog = true
@@ -619,7 +660,7 @@
             size: 200
           }
           const data = await getMyTagGroupData(params)
-          //console.log(data)
+          console.log('选择标签组', data.rows)
           this.tagTeamList = data.rows
         } catch (e) {
 
@@ -629,6 +670,7 @@
       async getTagLevList(id) {
         try {
           const data = await getTagLevData(id)
+          console.log('选择标签组', data.childrenNode)
           this.treeLevdata = data.childrenNode
         } catch (e) {
 
@@ -750,6 +792,8 @@
     background-color: #fff;
     position: absolute;
     z-index: 55;
+    width: 215px;
+    padding-top: 3px;
   }
 
   .lookContent {
@@ -905,10 +949,12 @@
 
     }
   }
+
   .table-box {
     overflow: auto;
   }
-  .btnMargin{
+
+  .btnMargin {
     margin-left: 5px;
   }
 </style>
