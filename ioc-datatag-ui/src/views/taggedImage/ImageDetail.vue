@@ -23,13 +23,13 @@
               </div>
               <div v-else>暂无数据</div>
             </template>
-            <el-table-column label="操作" width="100px" v-if="doFalse">
+            <el-table-column label="操作" width="100px">
               <template slot-scope="props" class="caozuo">
                 <span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>
               </template>
             </el-table-column>
             <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
-                             :prop="item"></el-table-column>
+                             :prop="item" min-width="300"></el-table-column>
           </el-table>
           <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
                               @sureClick="goPage"></element-pagination>
@@ -108,7 +108,7 @@
             this.ztableShowList = []
             this.theadData = []
             this.doFalse = false
-            this.$message.error('请先进行数据调度');
+            // this.$message.error('请先进行数据调度');
           }
 
           this.totalnum = resList.data.result.totalElements
@@ -124,10 +124,12 @@
       },
       // 查看画像
       async lookImage(row) {
+        const obj = row
+        // console.log('44',row[this.pKey])
         this.$router.push({
           path: '/lookImagedetail',
           query: {
-            pKey: row.tb_0_MODULE_ID,
+            pKey: row[this.pKey],
             tableName: this.tableName,
             titleName: this.tagName
           }
@@ -220,7 +222,9 @@
     top: 50%;
     transform: translateY(-50%);
   }
-
+.newTable{
+  padding: 0px 15px;
+}
   .clearfix:after {
     content: '';
     display: block;

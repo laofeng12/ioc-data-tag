@@ -129,39 +129,35 @@
         </div>
       </el-dialog>
       <!--下载-->
-      <el-dialog class="creat" title="下载数据" :visible.sync="downloadDialog" width="530px" center
+      <el-dialog class="creat" title="导出数据" :visible.sync="downloadDialog" width="530px" center
                  :close-on-click-modal="false"
                  @close="closeDownload">
         <div class="del-dialog-cnt">
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px">
-            <el-form-item label="下载数据范围:" prop="download" class="nameOne">
-              <el-select class="controlChoose" size="small" v-model="value" placeholder="请选择">
+            <el-form-item label="导出数据范围:" prop="download" class="nameOne">
+              <el-select class="controlChoose" size="small" v-model="exportValue" placeholder="请选择">
                 <el-option
-                  v-for="item in options2"
+                  v-for="item in options3"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="调度开始时间:" prop="date" class="nameOne">
-              <el-date-picker
+            <el-form-item label="导出数据数量:" prop="exportNum" class="controlChoose">
+              <el-input
+                class="controlChoose"
                 size="small"
-                class="dateInp"
-                v-model="value1"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd HH:mm:ss"
-                type="datetimerange"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期">
-              </el-date-picker>
+                placeholder="请输入内容"
+                v-model="exportNum">
+              </el-input>
             </el-form-item>
 
           </el-form>
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定下载</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定导出</el-button>
           </div>
         </div>
       </el-dialog>
@@ -292,6 +288,15 @@
           value: '5',
           label: '每年一次'
         }],
+        options3:[{
+          value: '',
+          label: '导出全部数据'
+        },{
+          value: '1',
+          label: '导出部分数据'
+        }],
+        exportValue:'',
+        exportNum:'',
         value: '',
         ztableShowList: [],
         ruleForm: {

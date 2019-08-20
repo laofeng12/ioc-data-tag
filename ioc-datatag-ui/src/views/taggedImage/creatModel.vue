@@ -24,12 +24,12 @@
     </div>
     <div class="content">
       <!--左边数据树目录结构-->
-      <Aside :modelData="modelData" ref="tree"/>
+      <Aside :modelData="modelData" ref="tree" @commit="getModelData"/>
       <div class="components">
         <div class="top">
           <div class="left">
             {{modelData.resourceName}}
-            <el-button v-if="routerName==='editModel'" class="set-btn" type="text" size="mini"
+            <el-button v-if="routerName==='editModel'" class="set-btn btnMargin" type="text" size="mini"
                        @click.stop="editSetTags(1)">
               <i class="el-icon-setting"></i>
             </el-button>
@@ -256,7 +256,6 @@
         showPeoplelist: [],
         arrlist: [],
         peopleLength: 0,
-        // modeId: 1639943, // 模型ID
         modeId: 1640046, // 模型ID
         ruleForm: {
           name: '',
@@ -346,8 +345,17 @@
           this.modelName = data.resourceName
           this.runModelname = data.modelName
           this.headColList = data.colList
+          this.$store.dispatch('getlistArr', this.headColList)
         } catch (e) {
         }
+      },
+      getModelData () {
+        if(this.$route.name == 'editModel'){
+          this.getModelList(this.$route.params.id)
+        }else {
+          return
+        }
+
       },
       addPeople() {
         if (this.taggingModelId) {
@@ -479,7 +487,6 @@
         this.changeRed = index
         this.helpId = zuserid
         this.cooId = id
-        // this.zcolId = colId
         this.startDisable = false
 
       },
@@ -561,8 +568,6 @@
             tagColId: tagColId  //
           }
         })
-        // console.log('tmp',tmp);
-        // console.log('showPeoplelist',this.showPeoplelist);
         tmp.forEach(item => {
           if (item.useTagGroup) {
             item.isCooField = true
@@ -1280,5 +1285,7 @@
   .zxhh {
     background-color: #58ea6a;
   }
-
+  .btnMargin{
+    margin-left: 5px;
+  }
 </style>

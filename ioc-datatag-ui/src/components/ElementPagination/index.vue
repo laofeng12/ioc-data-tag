@@ -56,5 +56,6 @@ export default {
   text-align: right;
   display: flex;
   justify-content:flex-end
+  margin-right 25px
 }
 </style>
