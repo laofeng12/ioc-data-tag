@@ -20,8 +20,8 @@
         <div class="newTable  daList aa">
           <el-table ref="multipleTable" :data="tableData" border stripe tooltip-effect="dark"
                     style="width: 100%;text-align: center"
-                    :header-cell-style="{background:'#f0f2f5'}">
-            <el-table-column v-for="(item,index) in headData" :key="index" :prop="item.sourceCol">
+                    :header-cell-style="{background:'#f0f2f5'}" :height="tableHeight">
+            <el-table-column v-for="(item,index) in headData" :key="index" :prop="item.sourceCol" min-width="300">
               <template slot="header" slot-scope="scope">
                 <span>{{item.showCol}}</span>
                 <i v-if="item.isMarking==1&&item.isCooField==1" class="el-icon-position  iconLogo"
@@ -62,16 +62,22 @@
                   <i slot="suffix" class="el-input__icon el-icon-arrow-down" @click="showTree()"></i>
                 </el-input>
                 <div class="treeBoder" v-show="showLevTree">
+                  <el-input size="small" v-model="ruleForm.tag" placeholder="请输入关键字查询" style="margin-bottom:10px;"/>
                   <el-tree
-                    class="filter-tree"
                     :data="treeLevdata"
                     :props="defaultProps"
+                    node-key="id"
+                    ref="treeForm"
+                    show-checkbox
                     default-expand-all
+                    check-strictly
                     :filter-node-method="filterNode"
-                    @node-click="clickTreeItem"
-                    ref="tree">
-                      <span class="custom-tree-node" slot-scope="{ node, data }">
-                        <span> <el-radio :disabled="data.leaf" v-model="radio" :label="data">{{data.tagName}}</el-radio></span>
+                    @check-change="handleClick"
+                    @node-click="nodeClick">
+                      <span class="slot-t-node span-ellipsis" slot-scope="{ node, data }">
+                      <i :class="{ 'fa fa-folder': !node.expanded, 'fa fa-folder-open':node.expanded}"
+                         style="color: #fcd568;"/>
+                      <span :title="data.tagName">{{ data.tagName }}</span>
                       </span>
                   </el-tree>
                 </div>
@@ -218,6 +224,7 @@
     data() {
       return {
         fieldId:'',  // 打标字段ID
+        tableHeight: '',
         modeleId: '',
         modelName: '',
         headData: [],
@@ -239,7 +246,8 @@
         ruleForm: {
           tagTeam: '',
           tagLev: '',
-          tagSet: ''
+          tagSet: '',
+          tag:''
         },
         rules: {
           tagTeam: [
@@ -278,15 +286,6 @@
       }
     },
     watch: {
-      // theadData: function (val) {
-      //   this.tableWidth = val.length * 149
-      // },
-      // filterText(val) {
-      //   this.$refs.tree.filter(val);
-      // }
-      filterText(val) {
-
-      },
       'connectSymbolList': {
         handler: function (newValue, oldValue) {
           this.connectSymbolList = newValue
@@ -297,9 +296,9 @@
           this.countSymbolList = newValue
         }
       },
-      'ruleForm.tagLev': {
+      'ruleForm.tag': {
         handler: function (newValue, oldValue) {
-          this.$refs.tree.filter(newValue)
+          this.$refs.treeForm.filter(newValue)
         }
       },
       'tagSetList': {
@@ -322,7 +321,7 @@
           this.$set(this.theadData)
         },
         deep: true
-      }
+      },
     },
     created() {
       this.modeleId = this.$route.query.id
@@ -331,6 +330,7 @@
       this.getModelColsList()
       this.getConnectList('dt.tag.conditions.connect')
       this.getCountList('dt.tag.conditions.noconnect')
+      this.tableHeight = document.body.clientHeight - 137
     },
     mounted() {
     },
@@ -410,17 +410,26 @@
         return newObj
       },
       //选择标签层拿树
-      clickTreeItem(data, node) {
-        // console.log('data',data)
-        this.childrenNode = data.childrenNode
-        this.tagSetList = []
-        this.childrenNode.forEach((item, index) => {
-          if (item.leafParent === false) {
-            this.tagSetList.push(item)
+      nodeClick(data, checked, node) {
+      },
+      handleClick(data, checked, node) {
+        if (checked === true) {
+          this.tagSetList = []
+          this.checkedId = data.id;
+          this.$refs.treeForm.setCheckedKeys([data.id]);
+          if (data.childrenNode) {
+            data.childrenNode.map(item => {
+              if (item.leafParent == false) {
+                this.tagSetList.push(item)
+              }
+            })
           }
-        })
-        this.ruleForm.tagLev = data.tagName
-        this.showLevTree = false
+          this.ruleForm.tagLev = data.tagName
+        } else {
+          if (this.checkedId == data.id) {
+            this.$refs.treeForm.setCheckedKeys([data.id]);
+          }
+        }
       },
       //选择连接符号
       chooseConnectSymbo(item) {
@@ -801,11 +810,12 @@
     color: #333333;
     height: 50px;
     line-height: 50px;
-    margin-left: 20px;
+    margin-left: 50px;
   }
 
   .daList {
     margin-top: -20px;
+    padding: 0px 20px 0px 25px;
   }
 
   .rightBtn {
@@ -855,8 +865,16 @@
     position: relative;
     z-index: 55;
     overflow: auto;
+    width: 215px;
+    padding-top: 3px;
   }
-
+  .span-ellipsis {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+  }
   .treeBoder2 {
     width: 218px;
     position: absolute;
