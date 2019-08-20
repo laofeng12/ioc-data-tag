@@ -661,7 +661,7 @@
             size: 200
           }
           const data = await getMyTagGroupData(params)
-          console.log('选择标签组', data.rows)
+          // console.log('选择标签组', data.rows)
           this.tagTeamList = data.rows
         } catch (e) {
 
@@ -671,7 +671,7 @@
       async getTagLevList(id) {
         try {
           const data = await getTagLevData(id)
-          console.log('选择标签组', data.childrenNode)
+          // console.log('选择标签组', data.childrenNode)
           this.treeLevdata = data.childrenNode
         } catch (e) {
 
