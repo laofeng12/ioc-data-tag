@@ -8,6 +8,8 @@ import com.openjava.datatag.component.PostgreSqlConfig;
 import com.openjava.datatag.component.TokenGenerator;
 import com.openjava.datatag.demo.dto.BaseResp;
 import com.openjava.datatag.demo.dto.TopDepartmentReqReqDTO;
+import com.openjava.datatag.log.domain.DtTaggingErrorLog;
+import com.openjava.datatag.log.service.DtTaggingErrorLogService;
 import com.openjava.datatag.log.service.DtTagmUpdateLogService;
 import com.openjava.datatag.schedule.domain.TaskInfo;
 import com.openjava.datatag.schedule.service.TaskService;
@@ -95,6 +97,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private RedisTemplate<String, Object> redisTemplate;
 	@Resource
 	private PostgreSqlConfig postgreSqlConfig;
+	@Resource
+	private DtTaggingErrorLogService dtTaggingErrorLogService;
 
 	public void copy(Long id,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -544,6 +548,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		}catch (Exception e){
 			e.printStackTrace();
 			logger.info(e.getMessage());
+			DtTaggingErrorLog errorLog = new DtTaggingErrorLog();
+			errorLog.setErrorInfo(e.getMessage().getBytes());
+			errorLog.setErrorTime(new Date());
+			errorLog.setTaggingModelId(taggingModelId);
+			dtTaggingErrorLogService.doSave(errorLog);
 		}
 		Date end = new Date();
 		//第四步update数据（传sql进mpp,在mpp计算）
@@ -562,6 +571,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		waitUpdateIndex.setTaggingModelId(taggingModelId);
 		dtWaitUpdateIndexService.doSave(waitUpdateIndex);
 		tagModel.setRunState(Constants.DT_MODEL_SUCCESS);
+		if (successCount<totalCount) {
+			tagModel.setRunState(Constants.DT_MODEL_ERROR);
+		}
+		tagModel.setUpdateNum(totalCount);
+		tagModel.setSuccessNum(successCount);
 		doSave(tagModel);
 		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},成功数{%s},总耗时:{%s}毫秒",taggingModelId,totalCount,successCount,end.getTime()-begin.getTime()));
 	}
