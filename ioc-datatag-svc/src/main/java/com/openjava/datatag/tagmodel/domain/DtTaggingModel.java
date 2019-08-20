@@ -126,7 +126,14 @@ public class DtTaggingModel implements Persistable<Long>,Serializable {
 	@Max(9L)
 	@Column(name = "IS_DELETED")
 	private Long isDeleted;
-	
+
+	@ApiModelProperty("成功个数")
+	@Column(name = "SUCCESS_NUN")
+	private Long successNum;
+	@ApiModelProperty("更新总个数")
+	@Column(name = "UPDATE_NUN")
+	private Long updateNum;
+
 	
 	@ApiModelProperty("是否新增")
 	@Transient
