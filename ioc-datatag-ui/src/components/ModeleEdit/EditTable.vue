@@ -67,10 +67,10 @@
                       :filter-node-method="filterNode"
                       @check-change="handleClick"
                       @node-click="nodeClick">
-                      <span class="slot-t-node" slot-scope="{ node, data }">
+                      <span class="slot-t-node span-ellipsis" slot-scope="{ node, data }">
                       <i :class="{ 'fa fa-folder': !node.expanded, 'fa fa-folder-open':node.expanded}"
                          style="color: #fcd568;"/>
-                      <span>{{ node.label }}</span>
+                        <span :title="data.tagName">{{ data.tagName }}</span>
                       </span>
                     </el-tree>
                     <!--<el-tree-->
@@ -267,7 +267,8 @@
         ruleForm: {
           tagTeam: '',
           tagLev: '',
-          tagSet: ''
+          tagSet: '',
+          tag:''
         },
         rules: {
           tagTeam: [
@@ -794,8 +795,15 @@
     z-index: 55;
     width: 215px;
     padding-top: 3px;
+    overflow: auto;
   }
-
+  .span-ellipsis {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+  }
   .lookContent {
     border: 1px solid #dcdfe6;
     padding: 0px 10px;
