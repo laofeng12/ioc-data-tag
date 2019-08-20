@@ -149,6 +149,6 @@ export default new Router({
       name: 'lookImagedetail',
       meta: {title: '查看画像'},
       component: () => import('@/components/image/lookImagedetail.vue')
-    },
+    }
   ]
 })
