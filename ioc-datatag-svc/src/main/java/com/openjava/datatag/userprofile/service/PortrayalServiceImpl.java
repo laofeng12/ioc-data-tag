@@ -9,6 +9,7 @@ import com.openjava.datatag.userprofile.dto.PortrayalDetailDTO;
 import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.PageImpl;
@@ -58,7 +59,7 @@ public class PortrayalServiceImpl implements PortrayalService {
         Map<String, String> tableNameForQuery = new LinkedHashMap<>(1);
         tableNameForQuery.put(tableName,alias);
         mppPgExecuteUtil.setTableNameForQuery(tableNameForQuery);
-        mppPgExecuteUtil.setCondition(" where "+alias+".\""+taggingModel.getPkey()+"\"="+pKey);
+        mppPgExecuteUtil.setCondition(" where "+alias+".\""+taggingModel.getPkey()+"\"='"+pKey+"'");
         String[][] data = mppPgExecuteUtil.getData();//第一个为表头
         List<Object> result = getRebulitResult(data,type);
         List<PortrayalDetailDTO> list =  initResultDate(result,taggingModel,pKey);
@@ -89,6 +90,13 @@ public class PortrayalServiceImpl implements PortrayalService {
         return result;
     }
 
+    /**
+     * 处理成前端想要的数据结构
+     * @param result
+     * @param taggingModel
+     * @param pKey
+     * @return
+     */
     private List<PortrayalDetailDTO> initResultDate(List<Object> result, DtTaggingModel taggingModel, String pKey){
         List<PortrayalDetailDTO> list = new ArrayList<>();
         if (CollectionUtils.isEmpty(result)) {
@@ -123,7 +131,9 @@ public class PortrayalServiceImpl implements PortrayalService {
                     mapProperty.put(key,value);
                 }
                 if (tagCol.contains(key)) {
-                    lists.add(value);
+                    if (StringUtils.isNotBlank(value)) {
+                        lists.add(value);
+                    }
                     mapLists.put(key.split(Constants.DT_COL_PREFIX)[1],value);
                 }
             }
