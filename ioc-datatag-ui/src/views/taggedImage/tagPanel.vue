@@ -4,9 +4,9 @@
       <div class="dataChange">
         <div class="changeOne">
           <div class="distance">
-            <div class="title">数据集</div>
+            <div class="title">使用数据集</div>
             <div>
-              <span><i class="el-icon-plus iconSize"></i></span>
+              <!--<span><i class="el-icon-plus iconSize"></i></span>-->
               <span class="num">{{growth.growthOne}}</span>
               <!--<span class="percentage">%</span>-->
             </div>
@@ -15,7 +15,7 @@
         </div>
         <div class="changeTwo">
           <div class="distance">
-            <div class="title">标签/数据集</div>
+            <div class="title">使用标签/使用数据集</div>
             <div>
               <span class="num">{{growth.growthTwo}}</span>
             </div>
@@ -24,7 +24,7 @@
         </div>
         <div class="changeThree">
           <div class="distance">
-            <div class="title">唯一标签</div>
+            <div class="title">新增唯一标签</div>
             <div>
               <span class="num">{{growth.growthThree}}</span>
             </div>
