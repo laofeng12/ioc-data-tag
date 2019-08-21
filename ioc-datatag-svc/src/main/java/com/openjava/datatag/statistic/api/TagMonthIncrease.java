@@ -3,6 +3,7 @@ package com.openjava.datatag.statistic.api;
 import com.openjava.datatag.statistic.domain.DtTagTemp;
 import com.openjava.datatag.statistic.domain.DtTagThanDataSet;
 import com.openjava.datatag.statistic.domain.DtTaggingModelTemp;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import org.ljdp.component.result.DataApiResponse;
@@ -23,49 +24,42 @@ import javax.annotation.Resource;
  * 3.提供上个月标签数据量统计
  *
  */
-
+@Api(tags = "标签仪表盘-顶部三大数据")
 @RestController
 @RequestMapping("/datatag/statistic")
 public class TagMonthIncrease {
     @Resource
     private com.openjava.datatag.statistic.service.TagDashboardService TagDashboardService;
 
-    /*
-     * 获取上个月数据集增长百分比
+    /**
+     * 获取上个月使用数据集
      *
-     * */
-
-    private String growth_rate;
-    @ApiOperation(value = "标签/数据集增长变化:最近一个月数据集增长百分比", nickname="select", notes = "报文格式：content-type=application/json")
+     */
+    @ApiOperation(value = "使用数据集个数(多个模型使用同一个数据集时算一个使用数据集)", nickname="select", notes = "报文格式：content-type=application/json")
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
     @Security(session=true)
-
     @ResponseBody
     @RequestMapping(value = "/datasetgrowth",method = RequestMethod.GET)
-    public Object getDataSetGrowth(){
-
-        growth_rate = TagDashboardService.getDataSetIncreasePercentage();
-        DtTaggingModelTemp dtTaggingModelTemp = new DtTaggingModelTemp(growth_rate);
+    public DataApiResponse<DtTaggingModelTemp> getDataSetGrowth(){
+        Long lastMonthDataSetCount = TagDashboardService.lastMonthDataSetCount();
+        DtTaggingModelTemp dtTaggingModelTemp = new DtTaggingModelTemp(lastMonthDataSetCount);
         DataApiResponse<DtTaggingModelTemp> apiResp = new DataApiResponse<>();
         apiResp.setData(dtTaggingModelTemp);
         return apiResp;
     }
 
-    /*
-     * 获取上个月唯一标签新增数量
+    /**
+     * 上新增唯一标签数量
      *
      * */
-
-
     private int tagsum;
-    @ApiOperation(value = "标签/数据集增长变化:最近一个月标签新增数量", nickname="select", notes = "报文格式：content-type=application/json")
+    @ApiOperation(value = "上新增唯一标签数量", nickname="select", notes = "报文格式：content-type=application/json")
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    //验证用户登录
-    //@Security(session=true)
+    @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "/getLastMonthTagSum",method = RequestMethod.GET)
     public Object getLastMonthTagSum(){
@@ -76,22 +70,20 @@ public class TagMonthIncrease {
         return apiResp;
     }
 
-    /*
-     * 获取上个月每个数据集对应的标签的平均数
+    /**
+     * 获取上个月使用标签和使用据集的比重
      *
-     * */
-    private  double numbers;
-    @ApiOperation(value = "标签/数据集增长变化:最近一个月每个数据集对应的标签的平均数", nickname="select", notes = "报文格式：content-type=application/json")
+     */
+    @ApiOperation(value = "获取上个月使用标签和使用据集的比重", nickname="select", notes = "报文格式：content-type=application/json")
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    //验证用户登录
-    //@Security(session=true)
+    @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "/getTagThanDataSet",method = RequestMethod.GET)
     public Object getTagThanDataSet(){
-        numbers = TagDashboardService.getTagThanDataSet();
-        DtTagThanDataSet dtTagThanDataSet = new DtTagThanDataSet(numbers);
+        String percentage = TagDashboardService.getTagThanDataSet();
+        DtTagThanDataSet dtTagThanDataSet = new DtTagThanDataSet(percentage);
         DataApiResponse<DtTagThanDataSet> apiResp = new DataApiResponse<>();
         apiResp.setData(dtTagThanDataSet);
         return apiResp;

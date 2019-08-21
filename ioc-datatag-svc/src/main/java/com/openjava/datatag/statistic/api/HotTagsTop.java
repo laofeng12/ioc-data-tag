@@ -1,6 +1,7 @@
 package com.openjava.datatag.statistic.api;
 
 import com.openjava.datatag.common.MyErrorConstants;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import org.ljdp.component.result.DataApiResponse;
@@ -21,7 +22,7 @@ import java.util.List;
  * 1.获取top5的相关热门标签
  *
  */
-
+@Api(tags = "标签仪表盘-热门标签top")
 @RestController
 @RequestMapping("/datatag/statistic")
 public class HotTagsTop {
@@ -35,8 +36,7 @@ public class HotTagsTop {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    //验证用户登录
-    //@Security(session=true)
+    @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getsamedayhottags" ,method = RequestMethod.GET)
     public  Object getHotTags(){
@@ -54,8 +54,7 @@ public class HotTagsTop {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    //验证用户登录
-    //@Security(session=true)
+    @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getyesterdayhottags" ,method = RequestMethod.GET)
     public  Object getYesterdayHotTags(){
@@ -73,8 +72,7 @@ public class HotTagsTop {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    //验证用户登录
-    //@Security(session=true)
+    @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getlastweekhottags" ,method = RequestMethod.GET)
     public  Object getLastweekHotTags(){
@@ -92,8 +90,7 @@ public class HotTagsTop {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    //验证用户登录
-    //@Security(session=true)
+    @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getlastmonthhottags" ,method = RequestMethod.GET)
     public  Object getLastMonthHotTags(){
@@ -112,7 +109,7 @@ public class HotTagsTop {
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
     //验证用户登录
-    //@Security(session=true)
+    @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getlastyearhottags" ,method = RequestMethod.GET)
     public  Object getLastYearHotTags(){

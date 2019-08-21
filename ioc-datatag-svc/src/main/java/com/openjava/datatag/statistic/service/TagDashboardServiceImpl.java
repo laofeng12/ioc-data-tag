@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +16,8 @@ public class TagDashboardServiceImpl implements TagDashboardService {
     private TagDashboardRepository tagDashboardRepository;
 
     @Override
-    public String getDataSetIncreasePercentage() {
-        return tagDashboardRepository.getDataSetIncreasePercentage();
+    public Long lastMonthDataSetCount() {
+        return tagDashboardRepository.lastMonthDataSetCount();
     }
 
     @Override
@@ -25,8 +26,15 @@ public class TagDashboardServiceImpl implements TagDashboardService {
     }
 
     @Override
-    public  double getTagThanDataSet(){
-        return tagDashboardRepository.getTagThanDataSet();
+    public  String getTagThanDataSet(){
+        String tagThanDataSet = "0%";
+        Long lastMonthTagCount = tagDashboardRepository.lastMonthTagCount();
+        Long lastMonthDataSetCount = tagDashboardRepository.lastMonthDataSetCount();
+        if (lastMonthDataSetCount!=0) {
+            BigDecimal bigDecimal = new  BigDecimal(lastMonthTagCount).divide(new BigDecimal(lastMonthDataSetCount),2).setScale(0,BigDecimal.ROUND_UP);
+            tagThanDataSet = bigDecimal.toString()+"%";
+        }
+        return tagThanDataSet;
     }
 
     @Override
