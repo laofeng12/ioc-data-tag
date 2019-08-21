@@ -10,8 +10,8 @@ import lombok.Data;
 
 @Data
 public class DtTaggingModelTemp {
-    private Long growthOne;
+    private Long growth_rate;
     public DtTaggingModelTemp(Long lastMonthDataSetCount){
-        this.growthOne=lastMonthDataSetCount;
+        this.growth_rate=lastMonthDataSetCount;
     }
 }
