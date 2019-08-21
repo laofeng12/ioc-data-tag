@@ -11,8 +11,8 @@ import lombok.Data;
 
 @Data
 public class DtTagThanDataSet {
-   private double numbers;
-    public DtTagThanDataSet(double numbers){
+   private String numbers;
+    public DtTagThanDataSet(String numbers){
         this.numbers=numbers;
     }
 

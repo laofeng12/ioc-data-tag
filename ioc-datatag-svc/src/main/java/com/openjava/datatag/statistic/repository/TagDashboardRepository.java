@@ -37,7 +37,7 @@ public interface TagDashboardRepository extends DynamicJpaRepository<DtTaggingMo
             "                       trunc(last_day(add_months(sysdate, -2))) - 1 / 86400 +1\n" +
             "                 group by TAGGING_TABLE_NAME) t3) t4\n" +
             "    on 1 = 1")
-    public String getDataSetIncreasePercentage();
+    String getDataSetIncreasePercentage();
 
     /**
      * 查询上个月新增唯一标签数量
@@ -259,6 +259,21 @@ public interface TagDashboardRepository extends DynamicJpaRepository<DtTaggingMo
     public  List<Object> getLastYearHotTags();
 
 
-
-
+    /**
+     * 上个月标签使用个数
+     * @author zmk
+     */
+    @Query(nativeQuery = true,value = "select count(1) from (select t1.TAG_NAME from DT_TAG_CONDITION t ,DT_TAG t1 " +
+            "where t.TAG_ID=t1.ID and t.IS_DELETED=0 and t.CREATE_TIME>= trunc(add_months(sysdate, -1), 'mm') " +
+            "and t.CREATE_TIME<= trunc(last_day(add_months(sysdate, -1))) - 1 / 86400 + 1" +
+            "group by t1.TAG_NAME)tagNameTable ")
+    Long lastMonthTagCount();
+    /**
+     * 上个月数据集使用个数
+     */
+    @Query(nativeQuery = true,value = "select count(1) from (select t.DATA_SET_ID,t.RESOURCE_TYPE from  DT_TAGGING_MODEL t  " +
+            "where t.IS_DELETED=0 and t.CREATE_TIME>= trunc(add_months(sysdate, -1), 'mm') " +
+            "and t.CREATE_TIME<= trunc(last_day(add_months(sysdate, -1))) - 1 / 86400 + 1" +
+            "group by t.DATA_SET_ID,t.RESOURCE_TYPE)tagNameTable ")
+    Long lastMonthDataSetCount();
 }

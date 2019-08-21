@@ -2,6 +2,7 @@ package com.openjava.datatag.statistic.api;
 
 
 import com.openjava.datatag.statistic.service.TagDashboardService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import org.ljdp.component.result.DataApiResponse;
@@ -24,7 +25,7 @@ import java.util.Map;
  * 2.提供全部标签数量，去年，上个月标签数据查询
  *
  */
-
+@Api(tags = "标签仪表盘-标签变化模块")
 @RestController
 @RequestMapping("/datatag/statistic")
 public class TagColumChart {
@@ -40,9 +41,7 @@ public class TagColumChart {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    //验证用户登录
-    //@Security(session=true)
-
+    @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getMonthlyLabelChanges",method = RequestMethod.GET)
     public Object getMonthlyLabelChanges(){
@@ -60,8 +59,7 @@ public class TagColumChart {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    //验证用户登录
-    //@Security(session=true)
+    @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getAllYearMonth",method = RequestMethod.GET)
     public Object getLeftListData(){

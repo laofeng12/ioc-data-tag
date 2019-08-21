@@ -5,16 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 public interface TagDashboardService {
-    public String  getDataSetIncreasePercentage();
-    public int getLastMonthTagSum();
-    public double getTagThanDataSet();
-    public List<Object> getMonthlyLabelChanges();
-    //public List<Object> getAllYearMonth();
-    public Map<String,String> getAllYearMonth();
-    public List<Object> getSamedayHotTags();
-    public List<Object> getYesterdayHotTags();
-    public List<Object> getLastweekHotTags();
-    public List<Object> getLastMonthHotTags();
-    public List<Object> getLastYearHotTags();
+    Long  lastMonthDataSetCount();
+    int getLastMonthTagSum();
+    String getTagThanDataSet();
+    List<Object> getMonthlyLabelChanges();
+    Map<String,String> getAllYearMonth();
+    List<Object> getSamedayHotTags();
+    List<Object> getYesterdayHotTags();
+    List<Object> getLastweekHotTags();
+    List<Object> getLastMonthHotTags();
+    List<Object> getLastYearHotTags();
 
 }
