@@ -7,6 +7,7 @@ import com.openjava.datatag.schedule.service.TaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ljdp.common.spring.SpringContext;
+import org.ljdp.support.web.loader.LjdpWebLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -31,8 +32,8 @@ public class DatatagRunner implements ApplicationRunner {
 	SearchjobCompent searchjobCompent;
 
 	public void run(ApplicationArguments args) throws Exception {
-		System.out.println(environmental);
-		if (!environmental){
+//		System.out.println(environmental);
+		/*if (!environmental){
 			//扫描待执行模型，并运行模型
 			TaskInfo taskInfo = new TaskInfo();
 			taskInfo.setJobGroup(schedulejobCompent.getJobGroup());
@@ -52,7 +53,9 @@ public class DatatagRunner implements ApplicationRunner {
 			logger.info("数据标签与画像组件启动成功");
 		}else{
 			logger.info("开发环境，不跑定时任务。需要时请改DatatagRunner的environmental参数");
-		}
+		}*/
+        LjdpWebLoader.contextInitialized();
+        System.out.println("LJDP启动成功");
 	}
 
 }
