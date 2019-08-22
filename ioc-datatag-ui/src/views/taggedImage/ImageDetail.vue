@@ -13,7 +13,7 @@
     </div>
     <div class="content">
       <div class="components">
-        <div class="newTable  daList" v-if="ztableShowList != ''">
+        <div class="newTable  daList  imageTable" v-if="ztableShowList != ''">
           <el-table ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
                     style="width: 100%;text-align: center"
                     :header-cell-style="{background:'#f0f2f5'}">
@@ -23,13 +23,19 @@
               </div>
               <div v-else>暂无数据</div>
             </template>
-            <el-table-column label="操作" width="100px">
-              <template slot-scope="props" class="caozuo">
-                <span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>
-              </template>
+            <!--<el-table-column label="操作" width="100px">-->
+              <!--<template slot-scope="props" class="caozuo">-->
+                <!--<span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>-->
+              <!--</template>-->
+            <!--</el-table-column>-->
+            <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
+                             :prop="item" min-width="300" v-if="index <1">
+            <template slot-scope="props" class="caozuo">
+              <span class="operationIcona  look" @click="lookImage(props.row)">{{props.row[item]}}</span>
+            </template>
             </el-table-column>
             <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
-                             :prop="item" min-width="300"></el-table-column>
+                             :prop="item" min-width="300" v-if="index > 0"></el-table-column>
           </el-table>
           <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
                               @sureClick="goPage"></element-pagination>
@@ -51,15 +57,11 @@
     data() {
       return {
         page: 0,
-        size: 10,
+        size: 15,
         totalnum: 0,
         doFalse: false,
         Loading: true,
         saveLoading2: true,
-        tableBoxWidth: 800,
-        tableBoxHeight: 800,
-        tableWidth: 800,
-        tableHeight: 800,
         ztableShowList: [],
         headData: [],
         tableData: [],
@@ -74,11 +76,7 @@
         tableName: ''
       }
     },
-    watch: {
-      // theadData: function (val) {
-      //   this.tableWidth = val.length * 149
-      // }
-    },
+    watch: {},
     created() {
       this.tagId = this.$route.params.id
       this.tagName = this.$route.params.name
@@ -92,7 +90,6 @@
         const params = {
           page: this.page,
           size: this.size,
-          // taggingModelId:'1643452'
           taggingModelId: this.tagId
         }
         try {
@@ -230,4 +227,6 @@
     display: block;
     clear: both;
   }
+
+
 </style>
