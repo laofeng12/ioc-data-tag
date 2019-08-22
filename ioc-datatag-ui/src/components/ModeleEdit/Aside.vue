@@ -32,12 +32,12 @@
             <ul class="contentNum">
               <li v-for="(item,index) in columnData">
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
-                  <el-checkbox :label="item.name" :key="item.id">
+                  <el-checkbox :label="item.definition" :key="item.id">
                     <span class="col-name-box">
                       <span v-if="item.type==='string'" class="blue">Str.</span>
                       <span v-else-if="item.type==='number'" class="green">No.</span>
                       <span v-else="item.type==='date'" class="orange">Date.</span>
-                      <span class="col-name" :title="item.name">{{item.name}}</span>
+                      <span class="col-name" :title="item.definition">{{item.definition}}</span>
                     </span>
                   </el-checkbox>
                 </el-checkbox-group>
@@ -53,8 +53,8 @@
                     <el-option
                       v-for="(item,index) in myData"
                       :key="item.id"
-                      :label="item.name"
-                      :value="item.name">
+                      :label="item.definition"
+                      :value="item.definition">
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -68,7 +68,7 @@
                     <i class="el-icon-delete"></i>
                   </template>
                   <template slot-scope="scope">
-                    <el-button v-if="scope.row.name===ruleForm.pkey" class="set-btn" type="text" :disabled="true">
+                    <el-button v-if="scope.row.definition == ruleForm.pkey" class="set-btn" type="text" :disabled="true">
                       <i class="el-icon-delete"></i>
                     </el-button>
                     <el-button v-else class="set-btn" type="text">
@@ -85,7 +85,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="字段" prop="name">
+                  label="字段" prop="definition">
                 </el-table-column>
                 <el-table-column
                   width="80"
@@ -95,10 +95,10 @@
                 <el-table-column
                   label="选择打标字段" width="110">
                   <template slot-scope="scope">
-                    <el-checkbox v-if="scope.row.name===ruleForm.pkey || ruleForm.pkey==''" disabled></el-checkbox>
+                    <el-checkbox v-if="scope.row.definition===ruleForm.pkey || ruleForm.pkey==''" disabled></el-checkbox>
                     <el-checkbox v-else-if='routerName == "creatModel"'
                                  @change="getCheckChange(scope.row,$event)"></el-checkbox>
-                    <el-checkbox :value="scope.row.isMarking" v-else
+                    <el-checkbox :checked="scope.row.isMarking" v-else
                                  @change="getCheckChange(scope.row,$event)"></el-checkbox>
                   </template>
                 </el-table-column>
@@ -271,7 +271,7 @@
             // item.isMarking = 0
             item.isMarking = false
             item.colSort = ''
-            if (item.name == citem) {
+            if (item.definition == citem) {
               this.tableData.push(item)
             }
           })
@@ -310,9 +310,7 @@
         //   })
         // }
       },
-      close() {
-
-      },
+      close() {},
       //树过滤
       filterNode(value, data) {
         if (!value) return true;
@@ -373,19 +371,23 @@
         })
         if (this.routerName === 'editModel') {
           //获取主键值
+          console.log('主键值',this.modelData);
           this.ruleForm.pkey = this.modelData.pkey
           //获取选中的字段，从接口来
+          console.log('jiekou',this.modelData.colList);
           this.modelData.colList.forEach((item, index) => {
             this.checkedCols.push(item.sourceCol)
             this.tableData.push({
-              name: item.sourceCol, isMarking: item.isMarking,
+              definition: item.sourceCol, isMarking: item.isMarking,
               colId: item.colId, type: item.sourceDataType, colSort: item.colSort
             })
           })
           // 编辑下拉
+          console.log('bian',this.checkedCols);
+          console.log('bian22',this.columnData);
           this.checkedCols.forEach((citem) => {
             this.columnData.map((item, index) => {
-              if (item.name == citem) {
+              if (item.definition == citem) {
                 this.editData.push(item)
               }
             })
