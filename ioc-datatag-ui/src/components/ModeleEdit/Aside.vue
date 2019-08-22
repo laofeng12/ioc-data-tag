@@ -96,7 +96,8 @@
                   <template slot-scope="scope">
                       <el-checkbox  v-if="scope.row.name===ruleForm.pkey || ruleForm.pkey==''" disabled></el-checkbox>
                       <el-checkbox v-else-if ='routerName == "creatModel"' @change="getCheckChange(scope.row,$event)"></el-checkbox>
-                      <el-checkbox :label="scope.row.isMarking"  v-else @change="getCheckChange(scope.row,$event)"></el-checkbox>
+                      <el-checkbox  v-else :value="scope.row.isMarking"  @change="getCheckChange(scope.row,$event)"></el-checkbox>
+                    <!--<el-checkbox  v-else :value="scope.row.isMarking == 1"  @change="val => $set(scope.row,'isMarking',val ? 1 : 0)">{{scope.row.isMarking}}</el-checkbox>-->
                   </template>
                 </el-table-column>
               </el-table>
@@ -243,6 +244,7 @@
           this.tableData = this.columnData
           // console.log('全选',this.columnData);
           this.tableData.forEach((item, index) => {
+            // item.isMarking = 0
             item.isMarking = false
             if (item.colSort === '') {
               item.colSort = index + 1
@@ -262,8 +264,8 @@
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
         this.tableData = []
         this.myData = []
-        // console.log('勾选1',this.checkedCols);
-        // console.log('勾选2',this.columnData);
+        console.log('勾选1',this.checkedCols);
+        console.log('勾选2',this.columnData);
         this.checkedCols.forEach((citem) => {
           this.columnData.map((item, index) => {
             // item.isMarking = 0
@@ -274,7 +276,7 @@
             }
           })
         })
-        // console.log('排序',this.tableData)
+        console.log('排序',this.tableData)
         this.tableData.forEach((item, index) => {
           if (item.colSort === '') {
             item.colSort = index + 1
@@ -451,18 +453,20 @@
       },
       //确认选择
       setCols() {
+        console.log('确认选择',this.tableData)
         this.saveLoading = true
         this.$refs['ruleForm'].validate((valid) => {
           if (valid) {
             const colList = []
             this.tableData.map((item, index) => {
               colList.push({
-                sourceCol: item.name,
+                sourceCol: item.definition,
                 sourceDataType: item.type,
                 isMarking: item.isMarking ? 1 : 0,
                 colId: item.colId,
                 colSort: item.colSort,
-                taggingModelId: this.modelData.taggingModelId
+                taggingModelId: this.modelData.taggingModelId,
+                sourceColId:item.id
               })
             })
             if (colList.length === 1) {
@@ -520,8 +524,10 @@
       },
       //选择打标字段
       getCheckChange(row, $event) {
-        // console.log('log',row)
+        console.log('log',row)
+        console.log('===',row.isMarking)
         if(row.isMarking == false) {
+          console.log(0);
           row.isMarking = true
         }else{
           row.isMarking = false
