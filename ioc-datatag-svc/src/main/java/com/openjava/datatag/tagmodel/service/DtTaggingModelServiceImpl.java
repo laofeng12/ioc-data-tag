@@ -590,7 +590,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		DtTaggingModel taggingModel = get(taggingModelId);
 		for (int i = 0; i < cols.size(); i++) {
 			if (cols.get(i).getIsSource()==1) {
-				sourceMap.put(cols.get(i).getSourceCol(),cols.get(i).getSourceCol());
+				sourceMap.put(cols.get(i).getSourceColId(),cols.get(i).getSourceCol());
 			}
 		}
 		LjdpHttpClient client = new LjdpHttpClient();
@@ -598,7 +598,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		client.setHeader("authority-token",token);
 		client.setHeader("User-Agent","platform-schedule-job");
 		DataSetReqDTO req = new DataSetReqDTO();
-		req.setColumnList(sourceMap.keySet().stream().toArray());
+		req.setColumnList(sourceMap.values().stream().toArray());
+		req.setColumnIdList(sourceMap.keySet().stream().toArray());
 		req.setPage(pageable.getPageNumber());
 		req.setSize(pageable.getPageSize());
 		System.out.println( JSONObject.toJSONString(req));
@@ -608,7 +609,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		if (resp.getStatusLine().getStatusCode()==200 && data.getCode()==200) {
 			//重组数据
 			List<List<Object>> dataList =data.getData().getData();//原始数据
-			Object[] columnList =  sourceMap.keySet().stream().toArray();//表头
+			Object[] columnList =  sourceMap.values().stream().toArray();//表头
             List result= rebuiltData(cols,dataList,columnList,type);//处理数据
             return new PageImpl<>(result, pageable, data.getData().getTotal());
 		}else {
