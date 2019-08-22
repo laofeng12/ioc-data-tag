@@ -39,12 +39,12 @@ export default new Router({
       name: 'taggedImage',
       component: ContainerWrapper,
       redirect: '/lableImage',
-      meta: {title: '数据标签与画像'},
+      meta: {title: '标签与画像'},
       children: [
         {
           path: '/lableImage',
           name: 'lableImage',
-          meta: {title: '模型部署管理'},
+          meta: {title: '模型部署'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/lableImage.vue'),
         },
         {
