@@ -16,7 +16,7 @@ public class MyErrorConstants {
     public static final int TAG_NOT_FOUND = -40001;//无此标签
     public static final int TAG_GROUP_NOT_FOUND = -40002;//无此标签组
     public static final int SHARE_TAG_GROUP_NOT_FOUND = -40003;//无此共享标签组
-
+    public static final int CAN_NOT_CHOOSE = -40004;//不能选用自己的标签组
     //=======字段打标相关错误代码===========
     public static final int TAG_TAGGING_GRAMMAR_ERROR= -30002;//条件设置语法错误
 
