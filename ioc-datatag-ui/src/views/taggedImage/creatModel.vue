@@ -24,7 +24,7 @@
     </div>
     <div class="content">
       <!--左边数据树目录结构-->
-      <Aside :modelData="modelData" ref="tree" @commit="getModelData"/>
+      <Aside :modelData="modelData" ref="tree" @commit="getModelDatalist"/>
       <div class="components">
         <div class="top">
           <div class="left">
@@ -61,14 +61,14 @@
                 <div class="listName" :title="item.cooUserName">{{item.cooUserName}}</div>
                 <div class="head"><i class="el-icon-delete" @click="deleteList(item.id)"></i></div>
               </div>
-
             </div>
           </div>
-
-
         </div>
         <div v-if="routerName==='editModel'">
-          <EditTable :theadData="headColList" :tableData="modelTableData" :modelId="taggingModelId"></EditTable>
+          <!--<EditTable :theadData="headColList" :tableData="modelTableData" :modelId="taggingModelId"-->
+                     <!--@commit2="getModelDatalist"></EditTable>-->
+          <EditTable ref="ztable" :tableData="modelTableData" :modelId="taggingModelId"
+                     @commit2="getModelDatalist"></EditTable>
         </div>
 
       </div>
@@ -247,10 +247,6 @@
         saveDialog: false,
         value1: '',
         value: '',
-        tableBoxWidth: 800,
-        tableBoxHeight: 800,
-        tableWidth: 800,
-        tableHeight: 800,
         search: '',
         chooseList: [],
         showPeoplelist: [],
@@ -318,7 +314,6 @@
         deep: true
       },
       '$route'(to, from) {
-        //console.log(to)
         this.routerName = to.name
         if (to.name === 'editModel') {
           this.taggingModelId = to.params.id
@@ -327,7 +322,8 @@
         }
       }
     },
-    mounted() {},
+    mounted() {
+    },
     methods: {
       //type=0,新增，type=1编辑
       editSetTags(type) {
@@ -345,14 +341,15 @@
           this.modelName = data.resourceName
           this.runModelname = data.modelName
           this.headColList = data.colList
-          this.$store.dispatch('getlistArr', this.headColList)
+          this.$store.dispatch('getlistArr', data.colList)
+
         } catch (e) {
         }
       },
-      getModelData () {
-        if(this.$route.name == 'editModel'){
+      getModelDatalist() {
+        if (this.$route.name == 'editModel') {
           this.getModelList(this.$route.params.id)
-        }else {
+        } else {
           return
         }
 
@@ -1285,7 +1282,8 @@
   .zxhh {
     background-color: #58ea6a;
   }
-  .btnMargin{
+
+  .btnMargin {
     margin-left: 5px;
   }
 </style>
