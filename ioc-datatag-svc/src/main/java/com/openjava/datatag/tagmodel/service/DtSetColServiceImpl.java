@@ -107,6 +107,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 		conditions.forEach(record->{
 			record.setIsDeleted(Constants.PUBLIC_YES);
 			EntityClassUtil.dealModifyInfo(record,userInfo);
+			dtFilterExpressionService.doRemoveByTagConditionId(record.getTagConditionId());
 			dtTagConditionService.doSave(record);
 		});
 		String content = "{\"delConditions\":" + JSONObject.toJSONString(conditions)+"}";
