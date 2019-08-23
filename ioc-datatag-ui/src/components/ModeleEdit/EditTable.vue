@@ -219,6 +219,7 @@
 
 <script>
   import ElementPagination from '@/components/ElementPagination'
+  import {mapState} from 'vuex'
   import {
     getMyTagGroupData,
     getTagLevData,
@@ -233,10 +234,10 @@
     components: {ElementPagination},
     name: 'datasetEditable',
     props: {
-      theadData: {
-        type: Array,
-        default: Array
-      },
+      // theadData: {
+      //   type: Array,
+      //   default: Array
+      // },
       modelId: {
         type: String,
         default: ''
@@ -268,7 +269,7 @@
           tagTeam: '',
           tagLev: '',
           tagSet: '',
-          tag:''
+          tag: ''
         },
         rules: {
           tagTeam: [
@@ -335,10 +336,21 @@
         },
         deep: true
       },
-      'theadData': {
-        handler: function (newValue, oldValue) {
-        }
-      },
+      // 'this.theadData': {
+      //   handler: function (newValue, oldValue) {
+      //     // this.theadData = newValue
+      //     // this.$set(this.theadData)
+      //   },
+      //   deep: true
+      // },
+    },
+    computed: {
+      ...mapState({
+        theadData: state => state.image.tableArr
+      })
+      // theadData(){
+      //   return this.$store.state.image.tableArr
+      // }
     },
     created() {
       //获取标签组
@@ -346,6 +358,7 @@
       this.getConnectList('dt.tag.conditions.connect')
       this.getCountList('dt.tag.conditions.noconnect')
       this.tableHeight = document.body.clientHeight - 137
+
     },
     mounted() {
     },
@@ -382,20 +395,6 @@
         return newObj
       },
       //选择标签层拿树
-      // clickTreeItem(data, node) {
-      //   console.log('clickTreeItem', data)
-      //   this.childrenNode = data.childrenNode
-      //   console.log('123', data.childrenNode)
-      //   console.log('345', this.childrenNode)
-      //   this.tagSetList = []
-      //   this.childrenNode.forEach((item, index) => {
-      //     if (item.leafParent === false) {
-      //       this.tagSetList.push(item)
-      //     }
-      //   })
-      //   this.ruleForm.tagLev = data.tagName
-      //   this.showLevTree = false
-      // },
       nodeClick(data, checked, node) {
       },
       handleClick(data, checked, node) {
@@ -580,7 +579,6 @@
       },
       // 清除字段
       async delCol(data) {
-        console.log(data.colId)
         const params = {
           id: data.colId
         }
@@ -589,13 +587,13 @@
           this.$message.success(data.message)
           this.$parent.getModelList(this.modelId)
           this.$parent.getModelColsList(this.modelId, 0, 100, 1)
+          this.$emit('commit2')
         } catch (e) {
 
         }
       },
       // 克隆字段
       async cloneCol(data) {
-        //console.log('colId',data.colId)
         const params = {
           colId: data.colId
         }
@@ -604,6 +602,7 @@
           this.$message.success(data.message)
           this.$parent.getModelList(this.modelId)
           this.$parent.getModelColsList(this.modelId, 0, 100, 1)
+          this.$emit('commit2')
         } catch (e) {
 
         }
@@ -632,7 +631,6 @@
       },
       //选择标签组
       chooseTagTeam(id) {
-        // console.log(id)
         this.chooseTagTeamid = id
         this.getTagLevList(id)
       },
@@ -679,7 +677,6 @@
       },
       // 查询打标历史接口
       async getHistoryColList(colId) {
-        // console.log('colId',colId)
         const params = {
           colId: colId
         }
@@ -756,7 +753,7 @@
         this.isHandle = item.isHandle
         this.conditionSetting = item.conditionSetting
       }
-    }
+    },
   }
 </script>
 
@@ -797,6 +794,7 @@
     padding-top: 3px;
     overflow: auto;
   }
+
   .span-ellipsis {
     width: 100%;
     overflow: hidden;
@@ -804,6 +802,7 @@
     text-overflow: ellipsis;
     display: block;
   }
+
   .lookContent {
     border: 1px solid #dcdfe6;
     padding: 0px 10px;
