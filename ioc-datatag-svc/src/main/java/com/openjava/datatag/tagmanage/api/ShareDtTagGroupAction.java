@@ -75,6 +75,9 @@ public class ShareDtTagGroupAction {
         if(db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES) || db.getIsShare().equals(Constants.PUBLIC_NO)) {
             throw new APIException(MyErrorConstants.SHARE_TAG_GROUP_NOT_FOUND, "无此标签组或未共享");
         }
+        if (db.getCreateUser().equals(Long.valueOf(userInfo.getUserId()))){
+            throw new APIException(MyErrorConstants.CAN_NOT_CHOOSE, "不能选用自己的标签组");
+        }
         dtShareTagGroupService.choose(id,Long.parseLong(userInfo.getUserId()),ip);
         return new SuccessMessage("选用成功");
     }
