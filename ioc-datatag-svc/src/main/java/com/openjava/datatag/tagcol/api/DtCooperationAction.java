@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
 import com.openjava.datatag.tagcol.dto.*;
@@ -290,6 +291,7 @@ public class DtCooperationAction {
             db.setTaggmId(body.getTaggmId());
             db.setCooUser(body.getCooUser());
             db.setIsNew(true);//执行insert
+            db.setState(Constants.DT_COOP_TAGCOL_LIMMIT_NO);
             DtCooperation dbObj = dtCooperationService.doSave(db);
         } else {
             //修改，记录更新时间等

@@ -67,6 +67,16 @@ public class DtCooperation implements Persistable<Long>,Serializable {
 	@Column(name = "CREATE_USER")
 	private Long createUser;
 
+	@ApiModelProperty("状态")
+	@Column(name = "STATE")
+	private Long state;
+
+	@ApiModelProperty("完成时间")
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "COMPLETE_TIME")
+	private Date completeTime;
 	
 	@ApiModelProperty("是否新增")
 	@Transient

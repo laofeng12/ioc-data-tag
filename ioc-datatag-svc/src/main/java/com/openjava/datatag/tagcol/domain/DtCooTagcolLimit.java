@@ -55,7 +55,12 @@ public class DtCooTagcolLimit implements Persistable<Long>,Serializable {
 	@ApiModelProperty("模型的字段Id")
 	@Column(name = "TAG_COL_ID")
 	private Long tagColId;
-	
+
+	@ApiModelProperty("状态")
+	@Column(name = "STATE")
+	private Long state;
+
+
 	@ApiModelProperty("是否新增")
 	@Transient
     private Boolean isNew;

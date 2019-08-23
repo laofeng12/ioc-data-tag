@@ -29,4 +29,16 @@ public interface DtCooTagcolLimitRepository extends DynamicJpaRepository<DtCooTa
     @Modifying
     @Query("delete DtCooTagcolLimit t where t.cooId=:cooId")
     int deleteBycoolId(@Param("cooId")Long cooId);
+    /**
+     * @author zmk
+     * 根据字段获取协作打标列
+     */
+    DtCooTagcolLimit findByTagColId(Long tagColId);
+    /**
+     * @author zmk
+     * 根据状态还有协作id获取打标列
+     */
+     List<DtCooTagcolLimit> findByStateAndCooId(Long state ,Long cooId);
+
 }
+

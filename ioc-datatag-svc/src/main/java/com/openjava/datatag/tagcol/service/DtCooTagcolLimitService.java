@@ -25,4 +25,9 @@ public interface DtCooTagcolLimitService {
 	int deleteBycoolId(Long colId);
 	void doDelete(Long id);
 	void doRemove(String ids);
+	/**
+	 * 处理打标之后的操作
+	 * @param colId
+	 */
+	void completeDtcooRagcol(Long colId);
 }
