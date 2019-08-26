@@ -86,7 +86,11 @@ public class Constants {
     public static final String DT_SEARCH_MODEL_PKEY ="model_p_key";//模型的主键
     public static final String DT_SEARCH_MODEL_PKEY_NAME ="model_p_key_col_name";//模型主键列名
 
-
+    //===========   协作打标  ===========================================
+    public static final Long DT_COOPERATION_NO = 0L;//进行中
+    public static final Long DT_COOPERATION_YES = 1L;//完成
+    public static final Long DT_COOP_TAGCOL_LIMMIT_NO = 0L;//未完成协作
+    public static final Long DT_COOP_TAGCOL_LIMMIT_YES = 1L;//已完成协作
 
     //===========标签组状态=================
     public static final Long DT_TG_LOG_NEW = 1L;//日志记录为新增

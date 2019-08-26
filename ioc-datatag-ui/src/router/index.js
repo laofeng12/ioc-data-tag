@@ -121,7 +121,7 @@ export default new Router({
       component: () => import('@/views/taggedImage/modelEdit.vue')
     },
     {
-      path: '/ImageDetail/:id/:name',
+      path: '/ImageDetail',
       name: 'ImageDetail',
       meta: {title: '画像模型'},
       component: () => import('@/views/taggedImage/ImageDetail.vue')

@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import com.alibaba.fastjson.JSONObject;
 import com.commons.utils.QueryParamsUtil;
 import com.commons.utils.VoUtils;
+import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
 import com.openjava.datatag.tagcol.domain.DtTagmCooLog;
@@ -36,6 +37,7 @@ import org.ljdp.util.DateFormater;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,7 +101,9 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 multiHql+= " and t.modelName like '%"+itemParams.getKeyWord()+"%'";
             }
         }
-        Page<?> dbresult = dao.query(multiHql, pageable, prodPrams, itemParams);
+        Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Order.desc("o.modifyTime")));
+        Page<?> dbresult = dao.query(multiHql, mypage, prodPrams, itemParams);
         return dbresult;
     }
 
@@ -340,6 +344,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 col.setCooUser(dtos.getCooUser());
                 col.setIsNew(false);
                 col.setModifyTime(new Date());
+                col.setState(Constants.DT_COOPERATION_NO);
                 //MyBeanUtils.copyPropertiesNotNull(col,req);
                 //EntityClassUtil.dealModifyInfo(col,userInfo);
                 col = dtCooperationRepository.save(col);
@@ -381,6 +386,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                     newcolLimit.setCooId(col.getId());
                     newcolLimit.setTagColId(record.getTagColId());
                     newcolLimit.setId(ConcurrentSequence.getInstance().getSequence());
+                    newcolLimit.setState(Constants.DT_COOP_TAGCOL_LIMMIT_NO);
                     newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
                 }
 

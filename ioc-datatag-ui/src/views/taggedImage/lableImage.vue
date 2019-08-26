@@ -17,7 +17,7 @@
         </el-option>
       </el-select>
       <el-button class="zxlistBtn" size="small" type="primary" @click="modelQuery">查询</el-button>
-      <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
+      <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
       <el-button size="small" type="primary" @click="createModel">创建模型</el-button>
       <el-button size="small" type="primary" @click="cooperationModel">协作模型</el-button>
       <!--<el-button size="small" type="primary" >下载管理</el-button>-->
@@ -33,21 +33,21 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="modelName" label="名称"></el-table-column>
+          <el-table-column prop="modelName" label="标签组名称"></el-table-column>
           <el-table-column prop="createUserName" label="创建者"></el-table-column>
-          <el-table-column prop="people" label="修改人/修改时间">
-            <template slot-scope="scope">
-              <div>
-                <div>{{scope.row.modifyUserName}}</div>
-                <div>{{scope.row.modifyTime}}</div>
-              </div>
-            </template>
-          </el-table-column>
           <el-table-column prop="state" label="状态">
             <template slot-scope="scope">
               <div class="state">
                 <div class="spot" :style="spotColor(scope.row.runState)"></div>
                 <div class="stateName" :style="stateColor(scope.row.runState)">{{scope.row.runState}}</div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="people" label="修改人/修改时间">
+            <template slot-scope="scope">
+              <div>
+                <div>{{scope.row.modifyUserName}}</div>
+                <div>{{scope.row.modifyTime}}</div>
               </div>
             </template>
           </el-table-column>
@@ -68,9 +68,10 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="画像" placement="top">
                 <span class="operationIcona">
-                    <router-link :to="`/ImageDetail/${scope.row.taggingModelId}/${scope.row.modelName}`">
-                      <i class="el-icon-user iconLogo"></i>
-                    </router-link>
+                    <!--<router-link :to="`/ImageDetail/${scope.row.taggingModelId}/${scope.row.modelName}`">-->
+                      <!--<i class="el-icon-user iconLogo"></i>-->
+                    <!--</router-link>-->
+                 <i class="el-icon-user iconLogo" @click="lookImage(scope.row,scope.row.taggingModelId,scope.row.modelName)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="导出数据" placement="top">
@@ -517,6 +518,19 @@
           console.log(e);
         }
       },
+      lookImage(row,id,name){
+        if(row.runState != '运行成功'){
+          this.$message.error('请先进行数据调度');
+        }else{
+          this.$router.push({
+            path:'/ImageDetail',
+            query:{
+              detailId:id,
+              imageName:name
+            }
+          })
+        }
+      }
     },
     created() {
       this.datamodelList()

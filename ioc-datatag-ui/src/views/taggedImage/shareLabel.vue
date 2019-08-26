@@ -22,22 +22,22 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="tagsName" label="名称"></el-table-column>
-          <el-table-column prop="people" label="共享人/更新时间" >
-            <template slot-scope="scope">
-              <div>
-                <div>{{scope.row.shareUserName}}</div>
-                <div>{{scope.row.modifyTime}}</div>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
-          <el-table-column prop="level1" label="单位" ></el-table-column>
+          <el-table-column prop="tagsName" label="标签组名称"></el-table-column>
           <el-table-column prop="source" label="使用热度" >
             <template slot-scope="scope">
               <div class="gress">
                 <div class="gressPercentage"><el-progress :percentage="scope.row.popularityLevel" :show-text="false" :color="customColorMethod"></el-progress></div>
                 <div>{{scope.row.popularity}}</div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="level1" label="单位" ></el-table-column>
+          <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
+          <el-table-column prop="people" label="共享人/更新时间" >
+            <template slot-scope="scope">
+              <div>
+                <div>{{scope.row.shareUserName}}</div>
+                <div>{{scope.row.modifyTime}}</div>
               </div>
             </template>
           </el-table-column>
@@ -191,6 +191,7 @@
           this.labelDialog = false
           this.$router.push('/tagManage')
         }catch (e) {
+          this.saveLoading = false
           console.log(e);
         }
       },

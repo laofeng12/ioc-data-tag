@@ -21,7 +21,7 @@
                @close="close" @open="init">
       <div class="col-set-box">
         <el-container class="">
-          <el-aside width="270px" class="left">
+          <el-aside width="250px" class="left">
             <h3>选择字段</h3>
             <el-input placeholder="输入关键词搜索列表" v-model="searchText" size="small" suffix-icon="el-icon-search"></el-input>
             <div class="h4">
@@ -32,7 +32,7 @@
             <ul class="contentNum">
               <li v-for="(item,index) in columnData">
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
-                  <el-checkbox :label="item.definition" :key="item.id">
+                  <el-checkbox :label="item.definition" :key="item.definition">
                     <span class="col-name-box">
                       <span v-if="item.type==='string'" class="blue">Str.</span>
                       <span v-else-if="item.type==='number'" class="green">No.</span>
@@ -52,7 +52,7 @@
                   <el-select v-model="ruleForm.pkey" filterable placeholder="请选择主键" size="small" @change="changeSel">
                     <el-option
                       v-for="(item,index) in myData"
-                      :key="item.id"
+                      :key="item.sourceColId"
                       :label="item.definition"
                       :value="item.definition">
                     </el-option>
@@ -68,7 +68,8 @@
                     <i class="el-icon-delete"></i>
                   </template>
                   <template slot-scope="scope">
-                    <el-button v-if="scope.row.definition == ruleForm.pkey" class="set-btn" type="text" :disabled="true">
+                    <el-button v-if="scope.row.definition == ruleForm.pkey" class="set-btn" type="text"
+                               :disabled="true">
                       <i class="el-icon-delete"></i>
                     </el-button>
                     <el-button v-else class="set-btn" type="text">
@@ -84,18 +85,14 @@
                     <!--<el-input class="sort" size="small" v-model="scope.row.colSort" placeholder="请输入内容"></el-input>-->
                   </template>
                 </el-table-column>
-                <el-table-column
-                  label="字段" prop="definition">
-                </el-table-column>
-                <el-table-column
-                  width="80"
-                  prop="type"
-                  label="类型">
+                <el-table-column label="字段" prop="definition"></el-table-column>
+                <el-table-column width="80" prop="type" label="类型">
                 </el-table-column>
                 <el-table-column
                   label="选择打标字段" width="110">
                   <template slot-scope="scope">
-                    <el-checkbox v-if="scope.row.definition===ruleForm.pkey || ruleForm.pkey==''" disabled></el-checkbox>
+                    <el-checkbox v-if="scope.row.definition===ruleForm.pkey || ruleForm.pkey==''"
+                                 disabled></el-checkbox>
                     <el-checkbox v-else-if='routerName == "creatModel"'
                                  @change="getCheckChange(scope.row,$event)"></el-checkbox>
                     <el-checkbox :checked="scope.row.isMarking" v-else
@@ -138,6 +135,7 @@
     },
     data() {
       return {
+        modelId:'',
         sortNum: '',
         isNew: true,
         dataLakeDirectoryTree: [],
@@ -262,13 +260,12 @@
         let checkedCount = value.length;
         this.checkAll = checkedCount === this.cols.length;
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
-          this.tableData = []
-          this.myData = []
-        // console.log('勾选1',this.checkedCols);   // 左边勾选的项
+        this.tableData = []
+        this.myData = []
+        // console.log('勾选1', this.checkedCols);   // 左边勾选的项
         // console.log('勾选2',this.columnData);   // 左边全部字段项
         this.checkedCols.forEach((citem) => {
           this.columnData.map((item, index) => {
-            // item.isMarking = 0
             item.isMarking = false
             item.colSort = ''
             if (item.definition == citem) {
@@ -276,7 +273,7 @@
             }
           })
         })
-        // console.log('排序',this.tableData)
+        // console.log('排序', this.tableData)
         this.tableData.forEach((item, index) => {
           if (item.colSort === '') {
             item.colSort = index + 1
@@ -296,21 +293,21 @@
           this.myData = this.tableData
         }
         // 编辑
-        // if (this.routerName === 'editModel') {
-        //   this.modelData.colList.forEach(item =>{
-        //     if(item.isMarking == true){
-        //       this.tableData.map(newItem =>{
-        //         if(newItem.name == item.sourceCol){
-        //           newItem.isMarking = true
-        //         }
-        //
-        //       })
-        //     }
-        //
-        //   })
-        // }
+        if (this.routerName === 'editModel') {
+          this.modelData.colList.forEach(item => {
+            this.tableData.map(newItem => {
+              if (item.isMarking == true && newItem.definition == item.showCol) {
+                newItem.isMarking = true
+              }
+              if (item.sourceColId == newItem.id) {
+                Object.assign(newItem, {colId: item.colId})
+              }
+            })
+          })
+        }
       },
-      close() {},
+      close() {
+      },
       //树过滤
       filterNode(value, data) {
         if (!value) return true;
@@ -350,6 +347,8 @@
       },
       //对字段进行选择确认,type=0,新建模型，type=1编辑模型
       async setTags(type, node, data) {
+        this.myData = []
+        this.editData = []
         this.colSetDialog = true
         let colsData = {}
         if (type === 0) {
@@ -371,20 +370,16 @@
         })
         if (this.routerName === 'editModel') {
           //获取主键值
-          console.log('主键值',this.modelData);
           this.ruleForm.pkey = this.modelData.pkey
           //获取选中的字段，从接口来
-          console.log('jiekou',this.modelData.colList);
           this.modelData.colList.forEach((item, index) => {
-            this.checkedCols.push(item.sourceCol)
+            this.checkedCols.push(item.showCol)
             this.tableData.push({
-              definition: item.sourceCol, isMarking: item.isMarking,
+              definition: item.showCol, isMarking: item.isMarking,
               colId: item.colId, type: item.sourceDataType, colSort: item.colSort
             })
           })
           // 编辑下拉
-          console.log('bian',this.checkedCols);
-          console.log('bian22',this.columnData);
           this.checkedCols.forEach((citem) => {
             this.columnData.map((item, index) => {
               if (item.definition == citem) {
@@ -460,7 +455,7 @@
                 colId: item.colId,
                 colSort: item.colSort,
                 taggingModelId: this.modelData.taggingModelId,
-                sourceColId:item.id
+                sourceColId: item.id
               })
             })
             if (colList.length === 1) {
@@ -512,6 +507,8 @@
           type: 'success'
         })
         this.$emit('commit')
+        this.$parent.getModelList(this.taggingModelId)
+        this.$parent.getModelColsList(this.taggingModelId, 0, 100, 1)
         if (this.routerName === 'creatModel') {
           this.$router.push({path: `editModel/${Id}`})
         }
@@ -526,7 +523,7 @@
       },
       delCol(index) {
         this.checkedCols.forEach((name, cindex) => {
-          if (name === this.tableData[index].name) {
+          if (name === this.tableData[index].definition) {
             this.checkedCols.splice(cindex, 1)
           }
         })
@@ -542,6 +539,10 @@
     },
     created() {
       this.getOneZtreeData()
+      if (this.$route.name == 'editModel') {
+        this.modelId=this.$route.params.id
+      }
+
     },
     mounted() {
       this.routerName = this.$route.name

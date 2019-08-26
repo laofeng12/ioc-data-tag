@@ -17,7 +17,7 @@
     <div class="content">
       <div class="components">
         <div class="contentTitle">{{modelName}}</div>
-        <div class="newTable  daList aa">
+        <div class="newTable  daList">
           <el-table ref="multipleTable" :data="tableData" border stripe tooltip-effect="dark"
                     style="width: 100%;text-align: center"
                     :header-cell-style="{background:'#f0f2f5'}" :height="tableHeight">
@@ -57,12 +57,12 @@
               <div class="sel">
                 <el-input style="width: 215px"
                           size="small"
-                          placeholder="请输入内容"
+                          placeholder="请选择"
                           v-model="ruleForm.tagLev">
                   <i slot="suffix" class="el-input__icon el-icon-arrow-down" @click="showTree()"></i>
                 </el-input>
                 <div class="treeBoder" v-show="showLevTree">
-                  <el-input size="small" v-model="ruleForm.tag" placeholder="请输入关键字查询" style="margin-bottom:10px;"/>
+                  <el-input size="small" v-model="filterText" placeholder="请输入关键字查询" style="margin-bottom:10px;"/>
                   <el-tree
                     :data="treeLevdata"
                     :props="defaultProps"
@@ -223,14 +223,14 @@
     name: 'marking',
     data() {
       return {
-        fieldId:'',  // 打标字段ID
+        fieldId: '',  // 打标字段ID
         tableHeight: '',
         modeleId: '',
         modelName: '',
         headData: [],
         tableData: [],
         totalnum: 20,
-        size: 10,
+        size: 15,
         curIndex: 0,
         connectSymbolList: [],
         countSymbolList: [],
@@ -247,7 +247,7 @@
           tagTeam: '',
           tagLev: '',
           tagSet: '',
-          tag:''
+          tag: ''
         },
         rules: {
           tagTeam: [
@@ -296,10 +296,8 @@
           this.countSymbolList = newValue
         }
       },
-      'ruleForm.tag': {
-        handler: function (newValue, oldValue) {
-          this.$refs.treeForm.filter(newValue)
-        }
+      filterText(val) {
+        this.$refs.treeForm.filter(val);
       },
       'tagSetList': {
         handler: function (newValue, oldValue) {
@@ -359,7 +357,7 @@
             // modelId: '1643371',
             userId: ''
           })
-          console.log('表头list', list);
+          // console.log('表头list', list);
           this.headData = list.rows
         } catch (e) {
           console.log(e);
@@ -369,7 +367,7 @@
       async getModelColsList() {  // 1643371
         try {
           const data = await getModelColsData(this.modeleId, 0, 100, 1)
-          console.log('表格数据', data)
+          // console.log('表格数据', data)
           this.tableData = data.data.content
         } catch (e) {
           console.log(e);
@@ -425,6 +423,7 @@
             })
           }
           this.ruleForm.tagLev = data.tagName
+          this.showLevTree = false
         } else {
           if (this.checkedId == data.id) {
             this.$refs.treeForm.setCheckedKeys([data.id]);
@@ -527,8 +526,6 @@
       },
       //选中自动打标内容
       checkMarkChange(item) {
-        // console.log(value)
-        // console.log(item)
         this.checkList = item.checkList
         item.conditionSetting[0].theValues = this.checkList.join(",")
       },
@@ -559,7 +556,6 @@
         }, [])
       },
       delSelfMark(index) {
-        // console.log(index)
         this.selfMarkList.splice(index, 1)
       },
       search() {
@@ -628,18 +624,13 @@
       },
       // 标签层数据
       async getTagLevList(id) {
-        console.log('4444444')
         try {
           const data = await getTagLevData(id)
-          console.log('标签层数据',data.childrenNode)
-            data.childrenNode.forEach(item =>{
-              if(item.leaf == true){
-                console.log('9')
-               Object.assign(data.childrenNode,{disabled:true})
-                console.log('444',data.childrenNode);
-              }
-            })
-          console.log('333',data.childrenNode);
+          data.childrenNode.forEach(item => {
+            if (item.leaf == true) {
+              Object.assign(data.childrenNode, {disabled: true})
+            }
+          })
           this.treeLevdata = data.childrenNode
         } catch (e) {
           console.log(e);
@@ -720,7 +711,6 @@
       //选中要打标条件修改
       chooseMark(item, index) {
         this.curIndex = index
-        //console.log('选中要打标的项',item)
         this.isHandle = item.isHandle
         this.conditionSetting = item.conditionSetting
       },
@@ -868,6 +858,7 @@
     width: 215px;
     padding-top: 3px;
   }
+
   .span-ellipsis {
     width: 100%;
     overflow: hidden;
@@ -875,6 +866,7 @@
     text-overflow: ellipsis;
     display: block;
   }
+
   .treeBoder2 {
     width: 218px;
     position: absolute;
@@ -889,6 +881,7 @@
     color: #fff;
     font-size: 12px;
   }
+
   .lookContent {
     border: 1px solid #dcdfe6;
     padding: 0px 10px;
@@ -1051,6 +1044,7 @@
 
     }
   }
+
   .clearfix:after {
     content: '';
     display: block;

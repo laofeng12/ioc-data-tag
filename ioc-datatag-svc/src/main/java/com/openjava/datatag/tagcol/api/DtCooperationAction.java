@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
 import com.openjava.datatag.tagcol.dto.*;
@@ -118,6 +119,7 @@ public class DtCooperationAction {
             itemParams.setEq_runState(params.getRunState());
         }
         List<DtCooperationModelDTO> dtoList = new ArrayList<>();
+
         Page<?> result = dtCooperationService.queryShopItemAndProd(params,itemParams,pageable);
 //        Page<?> result = dtCooperationService.findPageUserModelByUserId(params,pageable);
 
@@ -290,6 +292,7 @@ public class DtCooperationAction {
             db.setTaggmId(body.getTaggmId());
             db.setCooUser(body.getCooUser());
             db.setIsNew(true);//执行insert
+            db.setState(Constants.DT_COOPERATION_NO);
             DtCooperation dbObj = dtCooperationService.doSave(db);
         } else {
             //修改，记录更新时间等
