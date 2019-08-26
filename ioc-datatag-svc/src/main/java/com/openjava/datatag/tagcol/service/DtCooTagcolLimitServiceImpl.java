@@ -13,6 +13,8 @@ import com.openjava.datatag.tagcol.repository.DtCooperationRepository;
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import com.openjava.datatag.tagmodel.service.DtTagConditionService;
 import org.apache.commons.collections.CollectionUtils;
+import org.ljdp.component.user.BaseUserInfo;
+import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -74,15 +76,19 @@ public class DtCooTagcolLimitServiceImpl implements DtCooTagcolLimitService {
 		}
 	}
 	public void completeDtcooRagcol(Long colId){
-		DtCooTagcolLimit cooTagcolLimit = dtCooTagcolLimitRepository.findByTagColId(colId);
-		if (Constants.DT_COOP_TAGCOL_LIMMIT_YES == cooTagcolLimit.getState()){
-			return;
-		}
+        DtCooTagcolLimit cooTagcolLimit = dtCooTagcolLimitRepository.findByTagColId(colId);
+        if (cooTagcolLimit==null ||Constants.DT_COOP_TAGCOL_LIMMIT_YES == cooTagcolLimit.getState()){
+            return;
+        }
+        DtCooperation cooperation = dtCooperationService.get(cooTagcolLimit.getCooId());
+        BaseUserInfo user = (BaseUserInfo) SsoContext.getUser();
+        if (!user.getUserId().equals(cooperation.getCooUser())){
+            return;
+        }
 		cooTagcolLimit.setState(Constants.DT_COOP_TAGCOL_LIMMIT_YES);
 		dtCooTagcolLimitRepository.save(cooTagcolLimit);
 		List<DtCooTagcolLimit> cooTagcolLimitList = dtCooTagcolLimitRepository.findByStateAndCooId(Constants.DT_COOP_TAGCOL_LIMMIT_NO,cooTagcolLimit.getCooId());
 		if (CollectionUtils.isNotEmpty(cooTagcolLimitList) && cooTagcolLimitList.size()<=1){
-			DtCooperation cooperation = dtCooperationService.get(cooTagcolLimit.getCooId());
 			cooperation.setState(Constants.DT_COOPERATION_YES);
 			cooperation.setCompleteTime(new Date());
 			dtCooperationService.doSave(cooperation);

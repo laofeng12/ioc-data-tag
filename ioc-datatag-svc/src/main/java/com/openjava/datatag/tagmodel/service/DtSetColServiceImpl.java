@@ -8,6 +8,7 @@ import com.openjava.datatag.common.MyErrorConstants;
 
 import com.openjava.datatag.log.service.DtTagcolUpdateLogService;
 import com.openjava.datatag.log.service.DtTagmUpdateLogService;
+import com.openjava.datatag.tagcol.service.DtCooTagcolLimitService;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
@@ -63,7 +64,8 @@ public class DtSetColServiceImpl implements DtSetColService {
 
 	@Resource
 	private DtTagmUpdateLogService dtTagmUpdateLogService;
-
+	@Resource
+	private DtCooTagcolLimitService dtCooTagcolLimitService;
 
 	public Page<DtSetCol> query(DtSetColDBParam params, Pageable pageable){
 		Page<DtSetCol> pageresult = dtSetColRepository.query(params, pageable);
@@ -383,7 +385,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 				dtTagConditionService.doDelete(record.getId());
 			}
 		}
-
+		dtCooTagcolLimitService.completeDtcooRagcol(col.getColId());//处理协助打标
 		EntityClassUtil.dealModifyInfo(col,userInfo);
 		String content = "{\"req\":" + reqParams
                 + ",\"delCondition\":" + JSONObject.toJSONString(delLog)
