@@ -47,9 +47,9 @@
               </el-option>
             </el-select>
           </el-col>
-          <el-col :span="9">
-            <el-link type="primary" :underline="false" @click="editLabelgroup">编辑标签组</el-link>
-          </el-col>
+          <!--<el-col :span="9">-->
+            <!--<el-link type="primary" :underline="false" @click="editLabelgroup">编辑标签组</el-link>-->
+          <!--</el-col>-->
         </el-form-item>
         <el-form-item label="选择标签层:" prop="tagLev">
           <el-col :span="11">
@@ -94,9 +94,9 @@
           </el-col>
           <el-col :span="9">
             <el-row>
-              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="handleMark">自动打标
+              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="handleMark">添加自动打标
               </el-button>
-              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="selfMark">人工打标</el-button>
+              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="selfMark">添加人工打标</el-button>
             </el-row>
           </el-col>
         </el-form-item>
@@ -340,6 +340,7 @@
       dataMaking(row) {
         this.setTagsDialog = true
         this.fieldId = row.colId
+        this.colId = row.colId
         //获取标签组
         this.getMyTagGroupList(row.colId)
       },
