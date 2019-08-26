@@ -81,18 +81,18 @@ public class DtCooTagcolLimitServiceImpl implements DtCooTagcolLimitService {
             return;
         }
         DtCooperation cooperation = dtCooperationService.get(cooTagcolLimit.getCooId());
-        BaseUserInfo user = (BaseUserInfo) SsoContext.getUser();
-        if (!user.getUserId().equals(cooperation.getCooUser())){
+		BaseUserInfo user = (BaseUserInfo) SsoContext.getUser();
+		if (!user.getUserId().equals(cooperation.getCooUser().toString())){
             return;
         }
-		cooTagcolLimit.setState(Constants.DT_COOP_TAGCOL_LIMMIT_YES);
-		dtCooTagcolLimitRepository.save(cooTagcolLimit);
 		List<DtCooTagcolLimit> cooTagcolLimitList = dtCooTagcolLimitRepository.findByStateAndCooId(Constants.DT_COOP_TAGCOL_LIMMIT_NO,cooTagcolLimit.getCooId());
 		if (CollectionUtils.isNotEmpty(cooTagcolLimitList) && cooTagcolLimitList.size()<=1){
 			cooperation.setState(Constants.DT_COOPERATION_YES);
 			cooperation.setCompleteTime(new Date());
 			dtCooperationService.doSave(cooperation);
 		}
+		cooTagcolLimit.setState(Constants.DT_COOP_TAGCOL_LIMMIT_YES);
+		dtCooTagcolLimitRepository.save(cooTagcolLimit);
 	}
 
 	public static void main(String[] args) {

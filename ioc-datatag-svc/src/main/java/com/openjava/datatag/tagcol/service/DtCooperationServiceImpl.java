@@ -37,6 +37,7 @@ import org.ljdp.util.DateFormater;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,7 +101,9 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 multiHql+= " and t.modelName like '%"+itemParams.getKeyWord()+"%'";
             }
         }
-        Page<?> dbresult = dao.query(multiHql, pageable, prodPrams, itemParams);
+        Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Order.desc("o.modifyTime")));
+        Page<?> dbresult = dao.query(multiHql, mypage, prodPrams, itemParams);
         return dbresult;
     }
 
@@ -341,7 +344,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 col.setCooUser(dtos.getCooUser());
                 col.setIsNew(false);
                 col.setModifyTime(new Date());
-                col.setState(Constants.DT_COOP_TAGCOL_LIMMIT_NO);
+                col.setState(Constants.DT_COOPERATION_NO);
                 //MyBeanUtils.copyPropertiesNotNull(col,req);
                 //EntityClassUtil.dealModifyInfo(col,userInfo);
                 col = dtCooperationRepository.save(col);
