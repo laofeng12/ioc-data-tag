@@ -70,9 +70,9 @@ public class DtCooperationModelDTO {
 	@ApiModelProperty("调度运行周期- 周期枚举 DT_MODEL_DISPATCH")
 	private Long cycleEnum;
 	
-	@ApiModelProperty("运行状态:未运行/运行中/运行出错/运行结束")
+	@ApiModelProperty("协作完成状态:进行中/已完成")
 	private Long runState;
-	
+
 	@ApiModelProperty("删除标记")
 	private Long isDeleted;
 

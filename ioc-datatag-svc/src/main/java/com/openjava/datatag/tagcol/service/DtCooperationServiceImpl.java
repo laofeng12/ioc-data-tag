@@ -101,6 +101,9 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 multiHql+= " and t.modelName like '%"+itemParams.getKeyWord()+"%'";
             }
         }
+        if(itemParams.getRunState()!=null){
+            multiHql+= " and o.state = "+itemParams.getRunState();
+        }
         Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                 Sort.by(Sort.Order.desc("o.modifyTime")));
         Page<?> dbresult = dao.query(multiHql, mypage, prodPrams, itemParams);

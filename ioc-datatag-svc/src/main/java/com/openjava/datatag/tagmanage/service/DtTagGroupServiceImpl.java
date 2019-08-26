@@ -6,9 +6,12 @@ import com.openjava.datatag.log.service.DtTaggUpdateLogService;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
+import org.apache.commons.collections.CollectionUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.sequence.SequenceService;
+import org.ljdp.component.user.BaseUserInfo;
+import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -123,11 +126,37 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 
 	public Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable){
 		Page<DtTagGroup> result = query(params,pageable);
-		for (DtTagGroup tgg: result){
-			Long plvl = dtTagGroupRepository.findPopuLvlByTagsId(tgg.getId());
-			tgg.setPopularityLevel(plvl);
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		if (CollectionUtils.isNotEmpty(result.getContent())){
+			Long maxPopularity = dtTagGroupRepository.findMaxPopularityBytagsIdAAndIsDeleted(Long.valueOf(userInfo.getUserId()),Constants.PUBLIC_NO);
+			for (DtTagGroup tgg: result){
+				Long plvl = dtTagGroupRepository.findPopuLvlByTagsId(tgg.getId());
+				tgg.setPopularityLevel(plvl);
+			}
+
 		}
 		return result;
+	}
+
+	/**
+	 * 工具数字获取随动分母
+	 */
+	private static long getDenominator(Long maxPopularity){
+		long denominator = 10L;
+		if (maxPopularity==null){
+			return denominator;
+		}
+		System.out.println(maxPopularity/10);
+		System.out.println(maxPopularity%10);
+		while (maxPopularity/10>10 || (maxPopularity/10>10 && maxPopularity%10>0)){
+			maxPopularity = maxPopularity/10;
+			denominator = denominator*10;
+		}
+		return denominator;
+	}
+
+	public static void main(String[] args) {
+		System.out.println(getDenominator(11L));
 	}
 
 }

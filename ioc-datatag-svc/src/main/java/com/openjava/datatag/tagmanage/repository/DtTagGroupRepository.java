@@ -24,4 +24,7 @@ public interface DtTagGroupRepository extends DynamicJpaRepository<DtTagGroup, L
             ,nativeQuery = true
     )
     Long  findPopuLvlByTagsId(Long tagsId);
+
+    @Query(value = "select max (t.popularity) from DtTagGroup t where t.createUser=:createUser and t.isDeleted=:isDeleted")
+    Long findMaxPopularityBytagsIdAAndIsDeleted(Long createUser,Long isDeleted);
 }
