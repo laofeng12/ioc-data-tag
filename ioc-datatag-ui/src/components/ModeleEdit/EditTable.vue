@@ -98,17 +98,15 @@
                 </el-option>
               </el-select>
             </el-col>
-            <el-col :span="9">
+            <el-col :span="10">
               <el-row>
-                <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="handleMark">自动打标
+                <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="handleMark">添加自动打标
                 </el-button>
-                <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="selfMark">人工打标
+                <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="selfMark">添加人工打标
                 </el-button>
               </el-row>
             </el-col>
           </el-form-item>
-
-
           <div class="lookContent">
             <div class="contentTop" v-show="isHandle===0">
               <div class="connect-smbol-box">
@@ -410,6 +408,7 @@
             })
           }
           this.ruleForm.tagLev = data.tagName
+          this.showLevTree = false
         } else {
           if (this.checkedId == data.id) {
             this.$refs.treeForm.setCheckedKeys([data.id]);

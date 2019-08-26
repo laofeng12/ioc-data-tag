@@ -8,8 +8,17 @@
         <div class="name">
           <div class="img"></div>
           <div class="text">
-            <el-input size="small" v-if="routerName==='editModel'" v-model="runModelname" placeholder="请输入内容"
-                      @blur="getsaveName"></el-input>
+            <div class="zedit" v-if="routerName==='editModel'">
+              <!--<el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容"-->
+                        <!--@blur="getsaveName"></el-input>-->
+              <el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容"></el-input>
+              <span v-show="showBtn">{{runModelname}}</span>
+              <div class="editTwo">
+                <i v-show="showBtn" class="el-icon-edit" @click="rename"></i>
+                <el-button v-show="!showBtn" size="mini" type="primary" @click="getsaveName">确定</el-button>
+              </div>
+
+            </div>
             <span v-else>未命名</span>
           </div>
         </div>
@@ -205,8 +214,6 @@
         </div>
       </div>
     </el-dialog>
-
-    <!--添加-->
   </div>
 </template>
 
@@ -233,6 +240,7 @@
     name: 'creatModel',
     data() {
       return {
+        showBtn:true,
         headColList: [],//打标字段头部数据
         modelData: {},//获取模型数据
         taggingModelId: 0,//模型id
@@ -325,6 +333,9 @@
     mounted() {
     },
     methods: {
+      rename(){
+        this.showBtn = false
+      },
       //type=0,新增，type=1编辑
       editSetTags(type) {
         //调用子组件里面的方法
@@ -360,6 +371,7 @@
           this.cooperatioUser()
           this.markingTable()
           this.getpeopleList()
+          this.show = false
         } else {
           this.$message.error('请先进行字段设置操作！');
         }
@@ -603,6 +615,7 @@
             message: resName.message,
             type: 'success'
           });
+          this.showBtn = true
         } catch (e) {
           console.log(e);
         }
@@ -1285,5 +1298,13 @@
 
   .btnMargin {
     margin-left: 5px;
+  }
+  .zedit{
+    display: flex;
+    align-items: center;
+  }
+  .editTwo{
+    margin-left: 15px;
+    cursor: pointer;
   }
 </style>

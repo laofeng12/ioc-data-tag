@@ -90,6 +90,11 @@ public class DtTagGroup extends BaseMessageDTO implements Persistable<Long>,Seri
 	@Transient
 	private Long popularityLevel;
 
+	@ApiModelProperty("热度百分比")
+	@Transient
+	private String percentage;
+
+
 
 //	@Transient
 //	@JsonIgnore

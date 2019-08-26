@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -130,8 +131,14 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		if (CollectionUtils.isNotEmpty(result.getContent())){
 			Long maxPopularity = dtTagGroupRepository.findMaxPopularityBytagsIdAAndIsDeleted(Long.valueOf(userInfo.getUserId()),Constants.PUBLIC_NO);
 			for (DtTagGroup tgg: result){
-				Long plvl = dtTagGroupRepository.findPopuLvlByTagsId(tgg.getId());
-				tgg.setPopularityLevel(plvl);
+//				Long plvl = dtTagGroupRepository.findPopuLvlByTagsId(tgg.getId());
+//				tgg.setPopularityLevel(plvl);
+				if (tgg.getPopularity()==null){
+					tgg.setPercentage("0%");
+				}else {
+					BigDecimal big = new BigDecimal(tgg.getPopularity()).divide(new BigDecimal(getDenominator(tgg.getPopularity())) ,BigDecimal.ROUND_UP).setScale(0,BigDecimal.ROUND_UP);
+					tgg.setPercentage(big.toString()+"%");
+				}
 			}
 
 		}
@@ -146,17 +153,15 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		if (maxPopularity==null){
 			return denominator;
 		}
-		System.out.println(maxPopularity/10);
-		System.out.println(maxPopularity%10);
-		while (maxPopularity/10>10 || (maxPopularity/10>10 && maxPopularity%10>0)){
-			maxPopularity = maxPopularity/10;
+		while (maxPopularity/10>=10 || (maxPopularity>10 && maxPopularity%10>0)){
+			maxPopularity = maxPopularity/10+maxPopularity%10;
 			denominator = denominator*10;
 		}
 		return denominator;
 	}
 
 	public static void main(String[] args) {
-		System.out.println(getDenominator(11L));
+		System.out.println(getDenominator(10001L));
 	}
 
 }

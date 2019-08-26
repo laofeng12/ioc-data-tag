@@ -41,7 +41,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="efficiency" label="完成时间"></el-table-column>
+          <el-table-column prop="completeTime" label="完成时间"></el-table-column>
           <el-table-column prop="people" label="修改人/修改时间">
             <template slot-scope="scope">
               <div>
@@ -124,16 +124,10 @@
             label: '全部'
           }, {
             value: '0',
-            label: '未运行'
+            label: '进行中'
           }, {
             value: '1',
-            label: '运行中'
-          }, {
-            value: '2',
-            label: '运行出错'
-          }, {
-            value: '3',
-            label: '运行结束'
+            label: '已完成'
           }
         ],
         ztableShowList: [],
@@ -153,9 +147,9 @@
     },
     methods: {
       stateColor(name) {
-        if (name == '未运行' || name == '运行结束'){
+        if (name == '已完成'){
           return "color:#999999";
-        } else if (name == '运行中') {
+        } else if (name == '进行中') {
           return "color:#00CC33";
         } else {
           return "color:#FF3333";
@@ -181,36 +175,6 @@
         this.$refs.ruleForm.resetFields();
         this.labelcreatDialog = false
       },
-      //
-      // async getList() {
-      //   const userId = this.$store.state.user.userInfo.userId
-      //   try{
-      //     const resList = await getcooperationList({
-      //       userId: userId
-      //     })
-      //     console.log('resList', resList);
-      //     if(resList.rows && resList.rows.length >0){
-      //       resList.rows.forEach(item => {
-      //         if (item.runState == 0) {
-      //           item.runState = '未运行'
-      //         } else if (item.runState == 1) {
-      //           item.runState = '运行中'
-      //         } else if (item.runState == 2) {
-      //           item.runState = '运行出错'
-      //         } else {
-      //           item.runState = '运行结束'
-      //         }
-      //       })
-      //       this.ztableShowList = resList.rows
-      //     }else{
-      //       this.ztableShowList = []
-      //       this.Loading = false
-      //     }
-      //   }catch (e) {
-      //     console.log(e);
-      //   }
-      // },
-      //
       async modelQuery() {
         const params = {
           eq_cooUser:'',
@@ -225,13 +189,9 @@
           if(resQuery.rows && resQuery.rows.length > 0){
             resQuery.rows.forEach(item => {
               if (item.runState == 0) {
-                item.runState = '未运行'
-              } else if (item.runState == 1) {
-                item.runState = '运行中'
-              } else if (item.runState == 2) {
-                item.runState = '运行出错'
+                item.runState = '进行中'
               } else {
-                item.runState = '运行结束'
+                item.runState = '已完成'
               }
             })
             this.ztableShowList = resQuery.rows
