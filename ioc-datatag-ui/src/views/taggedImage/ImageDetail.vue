@@ -78,8 +78,10 @@
     },
     watch: {},
     created() {
-      this.tagId = this.$route.params.id
-      this.tagName = this.$route.params.name
+      // this.tagId = this.$route.params.id
+      // this.tagName = this.$route.params.name
+      this.tagId = this.$route.query.detailId
+      this.tagName = this.$route.query.imageName
       this.getList()
     },
     mounted() {

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div>
-      <div class="queryTitle">画像查询</div>
+      <!--<div class="queryTitle">画像查询</div>-->
       <div class="queryIt">
         <el-input
           class="zxinp moduleOne"
@@ -10,7 +10,7 @@
           prefix-icon="el-icon-search"
           v-model="input2">
         </el-input>
-        <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">查询</el-button>
+        <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">画像查询</el-button>
       </div>
     </div>
   </div>
@@ -68,8 +68,15 @@
   }
 
   .queryIt {
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*margin-top: 25px;*/
+  }
+  .queryIt{
     display: flex;
-    justify-content: center;
-    margin-top: 25px;
+    transform: translate(-50%,-50%);
+    position: absolute;
+    top: 40%;
+    left: 50%;
   }
 </style>

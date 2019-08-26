@@ -17,7 +17,7 @@
           </el-option>
         </el-select>
         <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
-        <el-button size="small" type="primary" @click="createLabel">创建标签</el-button>
+        <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
         <el-button size="small" type="primary" @click="shareLabel">共享标签组</el-button>
     </div>
     <div class="tableBar">
@@ -31,16 +31,7 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="tagsName" label="名称"></el-table-column>
-          <el-table-column prop="modifyTime" label="修改时间">
-          </el-table-column>
-          <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
-          <el-table-column prop="isShare" label="共享状态">
-            <template slot-scope="scope">
-              <div v-if="scope.row.isShare===0">未共享</div>
-              <div v-if="scope.row.isShare===1">已共享</div>
-            </template>
-          </el-table-column>
+          <el-table-column prop="tagsName" label="标签组名称"></el-table-column>
           <el-table-column prop="source" label="使用热度">
             <template slot-scope="scope">
               <div class="gress">
@@ -52,6 +43,14 @@
               </div>
             </template>
           </el-table-column>
+          <el-table-column prop="isShare" label="共享状态">
+            <template slot-scope="scope">
+              <div v-if="scope.row.isShare===0">未共享</div>
+              <div v-if="scope.row.isShare===1">已共享</div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
+          <el-table-column prop="modifyTime" label="修改时间"></el-table-column>
           <el-table-column label="操作" width="180px">
             <template slot-scope="{row,$index}" class="caozuo">
               <el-tooltip class="item" effect="dark" content="共享" placement="top">
@@ -82,6 +81,8 @@
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
             <el-form-item label="标签组名称:" prop="labelName" class="nameOne">
               <el-input
+                maxlength="25"
+                show-word-limit
                 class="zxinp moduleOne"
                 size="small"
                 placeholder="请输入内容"
@@ -94,6 +95,8 @@
                 type="textarea"
                 :autosize="{ minRows: 2, maxRows: 4}"
                 placeholder="请输入内容"
+                maxlength="100"
+                show-word-limit
                 v-model="ruleForm.textarea">
               </el-input>
             </el-form-item>
@@ -121,6 +124,8 @@
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
             <el-form-item label="标签组名称:" prop="tagsName" class="nameOne">
               <el-input
+                maxlength="25"
+                show-word-limit
                 class="zxinp moduleOne"
                 size="small"
                 placeholder="请输入内容"
@@ -133,6 +138,8 @@
                 type="textarea"
                 :autosize="{ minRows: 2, maxRows: 4}"
                 placeholder="请输入内容"
+                maxlength="100"
+                show-word-limit
                 v-model="ruleForm.synopsis">
               </el-input>
             </el-form-item>
@@ -227,7 +234,7 @@
           this.isShare = true
         }
         this.labelId = row.id
-        console.log(this.isShare)
+        // console.log(this.isShare)
 
       },
       closeShare() {
