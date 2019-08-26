@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import com.alibaba.fastjson.JSONObject;
 import com.commons.utils.QueryParamsUtil;
 import com.commons.utils.VoUtils;
+import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
 import com.openjava.datatag.tagcol.domain.DtTagmCooLog;
@@ -340,6 +341,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 col.setCooUser(dtos.getCooUser());
                 col.setIsNew(false);
                 col.setModifyTime(new Date());
+                col.setState(Constants.DT_COOP_TAGCOL_LIMMIT_NO);
                 //MyBeanUtils.copyPropertiesNotNull(col,req);
                 //EntityClassUtil.dealModifyInfo(col,userInfo);
                 col = dtCooperationRepository.save(col);
@@ -381,6 +383,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                     newcolLimit.setCooId(col.getId());
                     newcolLimit.setTagColId(record.getTagColId());
                     newcolLimit.setId(ConcurrentSequence.getInstance().getSequence());
+                    newcolLimit.setState(Constants.DT_COOP_TAGCOL_LIMMIT_NO);
                     newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
                 }
 
