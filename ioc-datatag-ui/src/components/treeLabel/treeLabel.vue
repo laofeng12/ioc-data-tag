@@ -98,7 +98,7 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" @click="handleDelete(props.row.id)"></i>
+                <i class="el-icon-delete iconLogo" @click="handleDelete(props.row,props.row.id)"></i>
               </span>
               </el-tooltip>
             </template>
@@ -113,7 +113,7 @@
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
           <el-form-item label="标签名称:" prop="name" class="nameOne">
-            <el-input v-model="ruleForm.name"></el-input>
+            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
           <el-form-item label="标签简介:" prop="textarea" class="nameOne">
             <el-input
@@ -121,6 +121,8 @@
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 4}"
               placeholder="请输入内容"
+              maxlength="100"
+              show-word-limit
               v-model="ruleForm.textarea">
             </el-input>
           </el-form-item>
@@ -135,15 +137,13 @@
         </div>
       </div>
     </el-dialog>
-
-
     <el-dialog class="creat" title="添加下级标签" :visible.sync="labelDialog2" width="530px" center
                :close-on-click-modal="false"
                @close="closedialogTwo">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
           <el-form-item label="标签名称:" prop="name" class="nameOne">
-            <el-input v-model="ruleForm.name"></el-input>
+            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
           <el-form-item label="标签简介:" prop="textarea" class="nameOne">
             <el-input
@@ -151,6 +151,8 @@
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 4}"
               placeholder="请输入内容"
+              maxlength="100"
+              show-word-limit
               v-model="ruleForm.textarea">
             </el-input>
           </el-form-item>
@@ -165,8 +167,6 @@
         </div>
       </div>
     </el-dialog>
-
-
     <el-dialog class="creat" title="编辑标签" :visible.sync="editDialog" width="530px" center :close-on-click-modal="false"
                @close="closeEdit">
       <div class="del-dialog-cnt">
@@ -199,7 +199,7 @@
                @close="closedelete">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" style="text-align: center">
-          <el-form-item>您正在删除南城区高考成绩数据，是否确认删除？</el-form-item>
+          <el-form-item>您正在删除{{this.tagName}}，是否确认删除？</el-form-item>
         </el-form>
       </div>
       <div slot="footer" class="dialog-footer device">
@@ -224,6 +224,7 @@
     name: "treeLabel",
     data() {
       return {
+        tagName:'',
         delTreeId: 0,
         lvl: 1,
         id: 0,
@@ -337,7 +338,7 @@
       },
 
       //添加顶级标签
-      add(synopsis, tagsName) {
+      add(tagsName,synopsis) {
         this.saveLoading = true
         this.$refs.ruleForm.validate((valid) => {
           if (valid) {
@@ -437,9 +438,11 @@
       },
       closedialogOne() {
         this.labelDialog = false
+        this.$refs.ruleForm.resetFields()
       },
       closedialogTwo() {
         this.labelDialog2 = false
+        this.$refs.ruleForm.resetFields()
       },
       closeEdit() {
         this.editDialog = false
@@ -447,7 +450,8 @@
       closedelete() {
         this.deleteDialog = false
       },
-      handleDelete(id) {
+      handleDelete(name,id) {
+        this.tagName = name.tagName
         this.delTreeId = id
         this.deleteDialog = true
       },
@@ -504,6 +508,7 @@
           tagName: tagsName,
           tagsId: tagsId,//标签组id
         }
+        console.log('params',params);
         try {
           const data = await getDtTagData(params)
           this.sharelookTree()

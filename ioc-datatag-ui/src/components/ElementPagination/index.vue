@@ -36,11 +36,11 @@ export default {
   },
   methods: {
     handleCurrentChange (page) {
-      console.log(`当前页: ${page}`)
+      // console.log(`当前页: ${page}`)
       this.$emit('handleCurrentChange', page)
     },
     handleSizeChange (pageSize) {
-      console.log(`每页 ${pageSize} 条`)
+      // console.log(`每页 ${pageSize} 条`)
       this.$emit('handleSizeChange', pageSize)
     },
     sureClick () {

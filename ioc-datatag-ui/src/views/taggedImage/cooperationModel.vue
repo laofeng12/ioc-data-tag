@@ -17,7 +17,7 @@
         </el-option>
       </el-select>
       <el-button size="small" type="primary" @click="modelQuery">查询</el-button>
-      <el-button class="zxlistBtn" size="small" type="primary" @click="createLabel">创建标签</el-button>
+      <el-button class="zxlistBtn" size="small" type="primary" @click="createLabel">创建标签组</el-button>
       <router-link to="/lableImage">
         <el-button size="small" type="primary">我的模型</el-button>
       </router-link>
@@ -33,20 +33,20 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="modelName" label="名称"></el-table-column>
+          <el-table-column prop="modelName" label="标签组名称"></el-table-column>
+          <el-table-column prop="runState" label="状态">
+            <template slot-scope="scope">
+              <div class="state">
+                <div class="stateName" :style="stateColor(scope.row.runState)">{{scope.row.runState}}</div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="efficiency" label="完成时间"></el-table-column>
           <el-table-column prop="people" label="修改人/修改时间">
             <template slot-scope="scope">
               <div>
                 <div>{{scope.row.modifyUserName}}</div>
                 <div>{{scope.row.modifyTime}}</div>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="efficiency" label="完成效率"></el-table-column>
-          <el-table-column prop="runState" label="状态">
-            <template slot-scope="scope">
-              <div class="state">
-                <div class="stateName" :style="stateColor(scope.row.runState)">{{scope.row.runState}}</div>
               </div>
             </template>
           </el-table-column>
