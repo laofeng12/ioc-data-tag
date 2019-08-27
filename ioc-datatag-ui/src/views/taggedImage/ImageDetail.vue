@@ -41,7 +41,8 @@
                               @sureClick="goPage"></element-pagination>
         </div>
         <div v-else class="topImage">
-          <img src="../../assets/img/001.png" height="144" width="160"/></div>
+        <img src="../../assets/img/001.png" height="144" width="160"/>
+        </div>
       </div>
     </div>
   </div>

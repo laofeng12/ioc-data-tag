@@ -36,7 +36,10 @@
             <template slot-scope="scope">
               <div class="gress">
                 <div class="gressPercentage">
-                  <el-progress :percentage="scope.row.popularityLevel" :show-text="false"
+                  <!--{{scope.row.percentage}}-->
+                  <!--<el-progress :percentage="scope.row.popularityLevel" :show-text="false"-->
+                               <!--:color="customColorMethod"></el-progress>-->
+                  <el-progress :percentage="scope.row.percentage" :show-text="false"
                                :color="customColorMethod"></el-progress>
                 </div>
                 <div>{{scope.row.popularity}}</div>
@@ -59,7 +62,7 @@
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-                <router-link :to="`editTree/${row.id}`">
+                <router-link :to="`editTree/${row.id}/${row.tagsName}`">
                   <i class="el-icon-edit-outline iconLogo"></i>
                 </router-link>
               </el-tooltip>
@@ -281,7 +284,7 @@
                   tagsName: this.ruleForm.tagsName
                 })
                 this.creatsaveLoading = false
-                this.$router.push('/labelcreatTree/' + data.id)
+                this.$router.push('/labelcreatTree/' + data.id +'/'+ data.tagsName)
               } catch (e) {
                 this.creatsaveLoading = false
                 console.log(e);

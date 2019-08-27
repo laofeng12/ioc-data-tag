@@ -41,7 +41,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="completeTime" label="完成时间"></el-table-column>
+          <el-table-column prop="completeTime" label="完成时间">-</el-table-column>
           <el-table-column prop="people" label="修改人/修改时间">
             <template slot-scope="scope">
               <div>

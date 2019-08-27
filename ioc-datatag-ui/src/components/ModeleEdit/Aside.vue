@@ -320,15 +320,14 @@
         }
         else if (node.level === 1) {
           return resolve([{orgName: this.dataLakeDirectoryName, id: '1'}, {
-            orgName: this.dataSetDirectoryName,
-            id: '2'
-          }])
+            orgName: this.dataSetDirectoryName, id: '2'}])
         } else if (node.level === 2) {
           this.getThreeChild(node.data.id, resolve)
         } else {
           this.getChildTreeData(node.data, resolve)
         }
       },
+
       //获取4级树子节点
       getChildTreeData(data, resolve) {
         // console.log('点击当前的数据',data)
