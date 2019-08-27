@@ -11,14 +11,18 @@ import com.openjava.datatag.tagmanage.repository.DtShareTagGroupRepository;
 import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
 import com.openjava.datatag.tagmanage.repository.DtTagRepository;
 import com.openjava.datatag.utils.tree.TagDTOTreeNode;
+import org.apache.commons.collections.CollectionUtils;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.sequence.ConcurrentSequence;
+import org.ljdp.component.user.BaseUserInfo;
+import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +44,20 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
 
 
     public Page<DtShareTagGroup> findList(String searchKey, Pageable pageable){
-        return dtShareTagGroupRepository.findList("%" + searchKey+ "%", pageable);
+        Page<DtShareTagGroup> result = dtShareTagGroupRepository.findList("%" + searchKey+ "%", pageable);
+        if (CollectionUtils.isNotEmpty(result.getContent())){
+            Long maxPopularity = dtTagGroupRepository.findMaxPopularityBytagsIdAAndIsDeletedAAndIsShare(Constants.PUBLIC_NO,Constants.PUBLIC_YES);
+            for (DtShareTagGroup tgg: result){
+                if (tgg.getPopularity()==null){
+                    tgg.setPercentage(0L);
+                }else {
+                    BigDecimal big = new BigDecimal(tgg.getPopularity()).divide(new BigDecimal(DtTagGroupServiceImpl.getDenominator(maxPopularity)) ,2,BigDecimal.ROUND_UP).multiply(new BigDecimal(100));
+                    tgg.setPercentage(big.longValueExact());
+                }
+            }
+
+        }
+        return result;
     }
 
     public void choose(Long id,Long userId,String ip) throws APIException {

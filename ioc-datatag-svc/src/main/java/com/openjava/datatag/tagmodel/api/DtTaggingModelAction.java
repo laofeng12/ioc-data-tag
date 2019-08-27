@@ -124,6 +124,15 @@ public class DtTaggingModelAction {
 			MyBeanUtils.copyPropertiesNotBlank(dto,tgm);
 			dto.setCreateUserName(sysUserService.get(dto.getCreateUser()).getFullname());
 			dto.setModifyUserName(sysUserService.get(dto.getModifyUser()).getFullname());
+			if (tgm.getUpdateNum()==null) {
+				dto.setRunResult("0/0");
+			}else {
+				if (tgm.getSuccessNum()==null){
+					dto.setRunResult("0/0");
+				}else {
+					dto.setRunResult(tgm.getUpdateNum()+"/"+tgm.getSuccessNum());
+				}
+			}
 			showList.add(dto);
 		}
 		Page<DtTaggingModelDTO> showResult = new PageImpl<>(showList,pageable,results.getTotalElements());
