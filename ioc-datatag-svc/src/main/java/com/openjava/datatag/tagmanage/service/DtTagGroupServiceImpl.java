@@ -131,12 +131,10 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		if (CollectionUtils.isNotEmpty(result.getContent())){
 			Long maxPopularity = dtTagGroupRepository.findMaxPopularityBytagsIdAAndIsDeleted(Long.valueOf(userInfo.getUserId()),Constants.PUBLIC_NO);
 			for (DtTagGroup tgg: result){
-//				Long plvl = dtTagGroupRepository.findPopuLvlByTagsId(tgg.getId());
-//				tgg.setPopularityLevel(plvl);
 				if (tgg.getPopularity()==null){
 					tgg.setPercentage(0L);
 				}else {
-					BigDecimal big = new BigDecimal(tgg.getPopularity()).divide(new BigDecimal(getDenominator(tgg.getPopularity())) ,BigDecimal.ROUND_UP).setScale(0,BigDecimal.ROUND_UP);
+					BigDecimal big = new BigDecimal(tgg.getPopularity()).divide(new BigDecimal(DtTagGroupServiceImpl.getDenominator(maxPopularity)) ,2,BigDecimal.ROUND_UP).multiply(new BigDecimal(100));
 					tgg.setPercentage(big.longValueExact());
 				}
 			}
@@ -148,7 +146,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 	/**
 	 * 工具数字获取随动分母
 	 */
-	private static long getDenominator(Long maxPopularity){
+	public static long getDenominator(Long maxPopularity){
 		long denominator = 10L;
 		if (maxPopularity==null){
 			return denominator;

@@ -57,6 +57,8 @@ public class DtShareTagGroup {
     @ApiModelProperty("热度等级-从0~4")
     private String popularityLevel;
 
-
+    @ApiModelProperty("热度百分比")
+    @Transient
+    private Long percentage;
 
 }
