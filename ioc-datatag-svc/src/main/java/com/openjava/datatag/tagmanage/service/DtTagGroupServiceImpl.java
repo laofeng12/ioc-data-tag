@@ -134,10 +134,10 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 //				Long plvl = dtTagGroupRepository.findPopuLvlByTagsId(tgg.getId());
 //				tgg.setPopularityLevel(plvl);
 				if (tgg.getPopularity()==null){
-					tgg.setPercentage("0%");
+					tgg.setPercentage("0");
 				}else {
 					BigDecimal big = new BigDecimal(tgg.getPopularity()).divide(new BigDecimal(getDenominator(tgg.getPopularity())) ,BigDecimal.ROUND_UP).setScale(0,BigDecimal.ROUND_UP);
-					tgg.setPercentage(big.toString()+"%");
+					tgg.setPercentage(big.toString());
 				}
 			}
 
