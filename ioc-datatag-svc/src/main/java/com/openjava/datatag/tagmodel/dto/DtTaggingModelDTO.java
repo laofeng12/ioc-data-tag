@@ -57,6 +57,7 @@ public class DtTaggingModelDTO{
 
     private Long isDeleted;
 
+    private String runResult;
 
    private Boolean isNew;
 
