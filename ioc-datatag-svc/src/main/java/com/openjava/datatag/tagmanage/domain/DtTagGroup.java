@@ -92,7 +92,7 @@ public class DtTagGroup extends BaseMessageDTO implements Persistable<Long>,Seri
 
 	@ApiModelProperty("热度百分比")
 	@Transient
-	private String percentage;
+	private Long percentage;
 
 
 
