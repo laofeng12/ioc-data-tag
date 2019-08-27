@@ -135,7 +135,7 @@
     },
     data() {
       return {
-        modelId:'',
+        modelId: '',
         sortNum: '',
         isNew: true,
         dataLakeDirectoryTree: [],
@@ -320,8 +320,7 @@
         }
         else if (node.level === 1) {
           return resolve([{orgName: this.dataLakeDirectoryName, id: '1'}, {
-            orgName: this.dataSetDirectoryName,
-            id: '2'
+            orgName: this.dataSetDirectoryName, id: '2'
           }])
         } else if (node.level === 2) {
           this.getThreeChild(node.data.id, resolve)
@@ -329,6 +328,7 @@
           this.getChildTreeData(node.data, resolve)
         }
       },
+
       //获取4级树子节点
       getChildTreeData(data, resolve) {
         // console.log('点击当前的数据',data)
@@ -422,6 +422,7 @@
           }
           //获取资源树里面表
           if (data.hasOwnProperty('orgId')) {
+            this.resData = []
             const resData = await getResourceListData(data.orgId, data.type, data.databaseType)
             const resAlldata = resData.data
             // console.log('资源树所有值',resAlldata)
@@ -540,7 +541,7 @@
     created() {
       this.getOneZtreeData()
       if (this.$route.name == 'editModel') {
-        this.modelId=this.$route.params.id
+        this.modelId = this.$route.params.id
       }
 
     },

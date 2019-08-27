@@ -341,6 +341,7 @@
         this.setTagsDialog = true
         this.fieldId = row.colId
         this.colId = row.colId
+        this.sourceCol = row.sourceCol
         //获取标签组
         this.getMyTagGroupList(row.colId)
       },
@@ -542,9 +543,11 @@
       showSelf(itemObj) {
         itemObj.showSelfMark = !itemObj.showSelfMark
         this.colList = []
+        console.log('666',this.sourceCol);
         const name = this.sourceCol
+        console.log('999',this.tableData);
         this.tableData.forEach((item, index) => {
-          //console.log(item[name])
+          console.log('888',item[name])
           const markName = item[name]
           this.colList.push({markName: markName})
 

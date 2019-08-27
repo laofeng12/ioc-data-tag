@@ -33,7 +33,7 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="modelName" label="标签组名称"></el-table-column>
+          <el-table-column prop="modelName" label="模型名称"></el-table-column>
           <el-table-column prop="createUserName" label="创建者"></el-table-column>
           <el-table-column prop="state" label="状态">
             <template slot-scope="scope">
@@ -43,6 +43,7 @@
               </div>
             </template>
           </el-table-column>
+          <el-table-column prop="runResult" label="调度总量/成功数量"></el-table-column>
           <el-table-column prop="people" label="修改人/修改时间">
             <template slot-scope="scope">
               <div>
@@ -265,7 +266,7 @@
           label: '运行成功'
         }, {
           value: '4',
-          label: '运行失败'
+          label: '运行错误'
         }, {
           value: '-1',
           label: '运行结束'
@@ -419,7 +420,7 @@
                 item.runState = '运行成功'
               }
               if (item.runState == 4) {
-                item.runState = '运行失败'
+                item.runState = '运行错误'
               }
               if (item.runState == -1) {
                 item.runState = '运行结束'

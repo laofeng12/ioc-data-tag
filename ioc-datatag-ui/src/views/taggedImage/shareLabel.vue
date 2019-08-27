@@ -26,7 +26,7 @@
           <el-table-column prop="source" label="使用热度" >
             <template slot-scope="scope">
               <div class="gress">
-                <div class="gressPercentage"><el-progress :percentage="scope.row.popularityLevel" :show-text="false" :color="customColorMethod"></el-progress></div>
+                <div class="gressPercentage"><el-progress :percentage="scope.row.percentage" :show-text="false" :color="customColorMethod"></el-progress></div>
                 <div>{{scope.row.popularity}}</div>
               </div>
             </template>
@@ -45,7 +45,7 @@
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="查看" placement="top">
               <span class="operationIcona">
-                <router-link :to="`lookTree/${props.row.tagsId}`">
+                <router-link :to="`lookTree/${props.row.tagsId}/${props.row.tagsName}`">
                   <i class="el-icon-view iconLogo"></i>
                 </router-link>
               </span>
