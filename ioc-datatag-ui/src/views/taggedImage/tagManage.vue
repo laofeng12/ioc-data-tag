@@ -56,7 +56,7 @@
           <el-table-column prop="modifyTime" label="修改时间"></el-table-column>
           <el-table-column label="操作" width="180px">
             <template slot-scope="{row,$index}" class="caozuo">
-              <el-tooltip class="item" effect="dark" content="共享" placement="top">
+              <el-tooltip class="item" effect="dark" content="设置" placement="top">
                 <span class="operationIcona">
                     <i class="el-icon-share iconLogo" @click="handleShare(row,$index)"></i>
                 </span>
@@ -114,9 +114,8 @@
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定 </el-button>
             <el-button size="small" plain class="btn-group" @click="closeShare2">取消</el-button>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定
-            </el-button>
           </div>
         </div>
       </el-dialog>
