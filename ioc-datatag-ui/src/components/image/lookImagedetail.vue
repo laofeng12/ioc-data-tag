@@ -20,6 +20,7 @@
             <div class="circular">
               <div class="circularOne">
                 <div>
+                  <el-button class="peopleDetailid" size="mini" round><span>ID：</span><span>{{pKey}}</span></el-button>
                   <el-button v-for="(item,key,index) in leftListarr" :class='"peopleDetail"+(1+index)' size="mini" round
                              :title="`${key}：${item}`">{{key}}：{{item}}
                   </el-button>
@@ -244,7 +245,7 @@
     margin-left: 80px;
   }
 
-  .peopleDetail1, .peopleDetail2, .peopleDetail3, .peopleDetail4 {
+  .peopleDetailid,.peopleDetail1, .peopleDetail2, .peopleDetail3, .peopleDetail4 {
     color: #00CCCC;
     background-color: #fff;
     border: 1px solid #fff;
@@ -387,5 +388,8 @@
   .back {
     text-align: center;
     margin-top: 20px;
+  }
+  .peopleDetailid{
+
   }
 </style>
