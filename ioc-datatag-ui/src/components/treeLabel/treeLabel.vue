@@ -21,6 +21,7 @@
           default-expand-all
           :filter-node-method="filterNode"
           :expand-on-click-node="false"
+          :highlight-current="true"
           @node-click="handleNodeClick"
           ref="tree">
         <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -46,9 +47,9 @@
     </div>
 
     <div class="tableContent">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
-        <el-form-item label="标签名称:" prop="name" class="nameOne">
-          <el-input v-model="ruleForm.name"  maxlength="25" show-word-limit></el-input>
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" v-if="showContent">
+        <el-form-item label="标签名称:" prop="name2" class="nameOne">
+          <el-input v-model="ruleForm.name2"  maxlength="25" show-word-limit></el-input>
         </el-form-item>
         <el-form-item label="标签简介:" prop="textarea2" class="nameOne">
           <el-input
@@ -62,11 +63,13 @@
           </el-input>
         </el-form-item>
         <el-form-item style="text-align: center">
-          <el-button size="small" type="primary" :loading="editLoading" @click="sureShare">保存</el-button>
-          <el-button size="small" @click="handleDelete(props.row,props.row.id)">删除</el-button>
+          <el-button v-show="showBtndo" size="small" type="primary" :loading="editLoading" @click="sureShare(ruleForm.deteleId)">保存</el-button>
+          <el-button v-show="showBtndo" size="small" @click="handleDelete(ruleForm.name2,ruleForm.deteleId)">删除</el-button>
           <el-button size="small" @click="goback">返回</el-button>
         </el-form-item>
       </el-form>
+      <div class="noImage"  v-else>
+        <img src="../../assets/img/002.png" height="144" width="160"/></div>
       </div>
     <el-dialog class="creat" title="添加顶级标签" :visible.sync="labelDialog" width="530px" center
                :close-on-click-modal="false"
@@ -128,32 +131,6 @@
         </div>
       </div>
     </el-dialog>
-    <el-dialog class="creat" title="编辑标签" :visible.sync="editDialog" width="530px" center :close-on-click-modal="false"
-               @close="closeEdit">
-      <div class="del-dialog-cnt">
-        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
-          <el-form-item label="标签名称:" prop="name" class="nameOne">
-            <el-input v-model="ruleForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="标签简介:" prop="textarea2" class="nameOne">
-            <el-input
-              class="area"
-              type="textarea"
-              :autosize="{ minRows: 2, maxRows: 4}"
-              placeholder="请输入内容"
-              v-model="ruleForm.textarea2">
-            </el-input>
-          </el-form-item>
-        </el-form>
-      </div>
-      <div slot="footer" class="dialog-footer device">
-        <div>
-          <el-button size="small" plain class="btn-group" @click="closeShare2">取消</el-button>
-          <el-button size="small" type="primary" class="queryBtn" :loading="editLoading" @click="sureShare">确定
-          </el-button>
-        </div>
-      </div>
-    </el-dialog>
 
     <el-dialog class="creat" title="删除提示" :visible.sync="deleteDialog" width="530px" center
                :close-on-click-modal="false"
@@ -185,6 +162,8 @@
     name: "treeLabel",
     data() {
       return {
+        showContent:true,
+        showBtndo:true,
         groupName:'',
         tabHeight:'',
         tagName:'',
@@ -228,12 +207,16 @@
         ztableShowList: [],
         ruleForm: {
           name: '',
-          introduction: '',
+          name2:'',
           textarea: '',
-          textarea2: ''
+          textarea2: '',
+          deteleId:''
         },
         rules: {
           name: [
+            {required: true, message: '请填写', trigger: 'blur'}
+          ],
+          name2: [
             {required: true, message: '请填写', trigger: 'blur'}
           ],
           textarea: [
@@ -258,26 +241,18 @@
       }
     },
     methods: {
-      //编辑标签弹窗
-      editLabel(row) {
-        // console.log(row)
-        this.ruleForm.name = row.tagName
-        this.ruleForm.textarea2 = row.synopsis
-        this.id = row.id
-        this.editDialog = true
-      },
       // 编辑标签确认
-      async sureShare() {
+      async sureShare(id) {
         this.editLoading = true
         const tagsId = Number(this.$route.params.tagsId)
         this.$refs.ruleForm.validate(async (valid) => {
           if (valid) {
             try {
               const params = {
-                id: this.id,
+                id: id,
                 isNew: false,
                 synopsis: this.ruleForm.textarea2,
-                tagName: this.ruleForm.name,
+                tagName: this.ruleForm.name2,
                 tagsId: tagsId
               }
               const data = await getDtTagData(params)
@@ -291,7 +266,7 @@
                 this.sharelookTree()
                 this.editDialog = false
                 this.editLoading = false
-                this.$refs.ruleForm.resetFields()
+                // this.$refs.ruleForm.resetFields()
               } else {
                 this.editLoading = false
                 this.$message.error(data.message)
@@ -316,6 +291,7 @@
               this.labelDialog = false
               this.saveLoading = false
               this.$refs.ruleForm.resetFields()
+              this.showContent = true
             } catch (e) {
               this.saveLoading = false
               console.log(e);
@@ -326,7 +302,7 @@
         });
       },
       //添加下级
-      addNext(synopsis, tagsName) {
+      addNext(tagsName,synopsis) {
         this.savelabelLoading = true
         this.$refs.ruleForm.validate((valid) => {
           if (valid) {
@@ -365,8 +341,9 @@
         return data.tagName.indexOf(value) !== -1;
       },
       async handleNodeClick(data) {
-        this.ruleForm.name = data.tagName
+        this.ruleForm.name2 = data.tagName
         this.ruleForm.textarea2 = data.synopsis
+        this.ruleForm.deteleId = data.id
         this.tableparentList = []
         const treeTable = await looktreeTable(data.id)
         this.ztableShowList = treeTable.childrenTag
@@ -385,7 +362,6 @@
 
       remove(node, data) {
         this.delTree(data.id)
-        console.log('remove', data.id)
       },
       renderContent(h, {node, data, store}) {
         return (
@@ -421,7 +397,7 @@
         this.deleteDialog = false
       },
       handleDelete(name,id) {
-        this.tagName = name.tagName
+        this.tagName = name
         this.delTreeId = id
         this.deleteDialog = true
       },
@@ -437,7 +413,6 @@
               type: 'success'
             });
             this.sharelookTree()
-
           } else {
             this.$message.error(data.message)
           }
@@ -446,26 +421,6 @@
 
         }
         this.deleteDialog = false
-      },
-      //删除表格对应标签
-      async delTag(id) {
-        try {
-          const data = await delTree(id)
-          //console.log(data)
-          if (data.message == '删除成功') {
-            this.$message({
-              message: '删除成功',
-              duration: 1000,
-              type: 'success'
-            });
-            this.getTagsData()
-          } else {
-            this.$message.error(data.message)
-          }
-
-        } catch (e) {
-
-        }
       },
       //新建树节点
       async getDtTagData(preaTagId, synopsis, tagsName) {
@@ -478,7 +433,6 @@
           tagName: tagsName,
           tagsId: tagsId,//标签组id
         }
-        console.log('params',params);
         try {
           const data = await getDtTagData(params)
           this.sharelookTree()
@@ -493,8 +447,13 @@
           this.data = res.childrenNode
           if (res.childrenNode && res.childrenNode.length > 0) {
             const treeTable = await looktreeTable(res.childrenNode[0].id)
-            this.ruleForm.name = treeTable.parentTag.tagName
+            this.ruleForm.name2 = treeTable.parentTag.tagName
             this.ruleForm.textarea2 = treeTable.parentTag.synopsis
+            this.ruleForm.deteleId = treeTable.parentTag.id
+          }else{
+            this.showContent = false
+            this.ruleForm.name2 = ''
+            this.ruleForm.textarea2 = ''
           }
         } catch (e) {
           console.log(e);
@@ -510,6 +469,7 @@
         this.addLabel = false
         this.topaddLabel = false
         this.labelEdit = false
+        this.showBtndo = false
       } else if (this.$route.name == 'editTree') {
         this.sharelookTree()
       } else if (this.$route.name == 'labelcreatTree') {
@@ -517,7 +477,6 @@
       }else if(this.$route.name == 'tree'){
         this.sharelookTree()
       }else {}
-
       this.groupName = this.$route.params.tagsName
     }
   };
@@ -540,6 +499,7 @@
 
   .treelabel, .tableContent {
     float: left;
+    border: 1px solid #dcdfe6;
   }
 
   .treelabel {
@@ -551,10 +511,12 @@
     width: 81%;
     margin-top: 20px;
     padding: 0px 16px;
+    padding-top: 20px;
   }
 
   .labelTitle {
-    width: 320px;
+    /*width: 320px;*/
+    width: 318px;
     height: 48px;
     font-size: 14px;
     color: #606266;
@@ -615,5 +577,9 @@
   }
   .iconLabel{
     padding-right: 5px;
+  }
+  .noImage{
+    text-align: center;
+    margin-top: 20%;
   }
 </style>

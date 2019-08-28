@@ -73,13 +73,13 @@ export default new Router({
         {
           path: '/lookTree/:tagsId/:tagsName',
           name: 'lookTree',
-          meta: {title: '查看标签组'},
+          meta: {title: '查看标签'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
         },
         {
           path: '/editTree/:tagsId/:tagsName',
           name: 'editTree',
-          meta: {title: '编辑标签组'},
+          meta: {title: '编辑标签'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
         },
         {
@@ -89,9 +89,9 @@ export default new Router({
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
         },
         {
-          path: '/tree/:tagsId',
+          path: '/tree/:tagsId/:tagsName',
           name: 'tree',
-          meta: {title: '创建标签组'},
+          meta: {title: '创建标签'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
         },
         {
