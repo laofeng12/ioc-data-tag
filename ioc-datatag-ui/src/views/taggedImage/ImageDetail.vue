@@ -13,7 +13,7 @@
     </div>
     <div class="content">
       <div class="components">
-        <div class="newTable  daList  imageTable" v-if="ztableShowList != ''">
+        <div class="newTable  daList  imageTable" v-if="showTable">
           <el-table ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
                     style="width: 100%;text-align: center"
                     :header-cell-style="{background:'#f0f2f5'}">
@@ -40,7 +40,7 @@
           <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
                               @sureClick="goPage"></element-pagination>
         </div>
-        <div v-else class="topImage">
+        <div v-if="showPicture" class="topImage">
         <img src="../../assets/img/001.png" height="144" width="160"/>
         </div>
       </div>
@@ -57,6 +57,8 @@
     name: 'modelEdit',
     data() {
       return {
+        showTable:true,
+        showPicture:false,
         page: 0,
         size: 15,
         totalnum: 0,
@@ -108,6 +110,9 @@
             this.ztableShowList = []
             this.theadData = []
             this.doFalse = false
+            this.showPicture = true
+            this.Loading = false
+            this.showTable = false
             // this.$message.error('请先进行数据调度');
           }
 

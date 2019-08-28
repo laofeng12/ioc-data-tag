@@ -315,6 +315,7 @@
       },
       //加载树节点
       loadNode(node, resolve) {
+        console.log('node',node);
         if (node.level === 0) {
           return resolve([{orgName: '数据目录'}])
         }
@@ -328,6 +329,7 @@
           this.getChildTreeData(node.data, resolve)
         }
       },
+
 
       //获取4级树子节点
       getChildTreeData(data, resolve) {

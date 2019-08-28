@@ -21,6 +21,12 @@
           <el-table ref="multipleTable" :data="tableData" border stripe tooltip-effect="dark"
                     style="width: 100%;text-align: center"
                     :header-cell-style="{background:'#f0f2f5'}" :height="tableHeight">
+            <template slot="empty">
+              <div v-if="Loading">
+                <div v-loading="saveLoading2"></div>
+              </div>
+              <div v-else>暂无数据</div>
+            </template>
             <el-table-column v-for="(item,index) in headData" :key="index" :prop="item.sourceCol" min-width="300">
               <template slot="header" slot-scope="scope">
                 <span>{{item.showCol}}</span>
@@ -223,6 +229,8 @@
     name: 'marking',
     data() {
       return {
+        Loading: true,
+        saveLoading2: true,
         fieldId: '',  // 打标字段ID
         tableHeight: '',
         modeleId: '',
@@ -370,7 +378,12 @@
         try {
           const data = await getModelColsData(this.modeleId, 0, 100, 1)
           // console.log('表格数据', data)
-          this.tableData = data.data.content
+          if(data.data.content && data.data.content.length >0){
+            this.tableData = data.data.content
+          }else{
+            this.tableData = []
+            this.Loading = false
+          }
         } catch (e) {
           console.log(e);
         }

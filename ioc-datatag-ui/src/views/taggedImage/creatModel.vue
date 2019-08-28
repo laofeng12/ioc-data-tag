@@ -11,6 +11,7 @@
             <div class="zedit" v-if="routerName==='editModel'">
               <!--<el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容"-->
                         <!--@blur="getsaveName"></el-input>-->
+              模型名称：
               <el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容"></el-input>
               <span v-show="showBtn">{{runModelname}}</span>
               <div class="editTwo">
@@ -19,7 +20,7 @@
               </div>
 
             </div>
-            <span v-else>未命名</span>
+            <span v-else> 模型名称：未命名</span>
           </div>
         </div>
       </div>
