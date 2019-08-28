@@ -58,7 +58,7 @@
             <template slot-scope="{row,$index}" class="caozuo">
               <el-tooltip class="item" effect="dark" content="设置" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-share iconLogo" @click="handleShare(row,$index)"></i>
+                    <i class="el-icon-document iconLogo" @click="handleShare(row,$index)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -77,7 +77,7 @@
         <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
                             @sureClick="goPage"></element-pagination>
       </div>
-      <el-dialog class="creat" title="共享标签组" :visible.sync="shareDialog" width="530px" center
+      <el-dialog class="creat" title="标签组设置" :visible.sync="shareDialog" width="530px" center
                  :close-on-click-modal="false"
                  @close="closeShare">
         <div class="del-dialog-cnt">
