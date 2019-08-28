@@ -1,9 +1,12 @@
 <template>
   <div>
+    <div class="back">
+      <el-button size="small" @click="goback">返回</el-button>
+    </div>
   <div class="treeContainer">
     <div class="treelabel">
       <div class="labelTitle">
-        <div class="labelName"><i class="el-icon-folder iconLabel"></i>{{groupName}}</div>
+        <div class="labelName">标签树</div>
         <div v-show="topaddLabel"><i class="el-icon-plus add" @click="openOne"></i></div>
       </div>
       <el-input
@@ -12,7 +15,7 @@
         placeholder="输入关键字进行过滤"
         v-model="filterText">
       </el-input>
-      <div class="treeTop" :style="{height:taHeight}">
+      <div class="treeTop">
         <el-tree
           class="filter-tree"
           :data="data"
@@ -46,28 +49,64 @@
     </div>
 
     <div class="tableContent">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
-        <el-form-item label="标签名称:" prop="name" class="nameOne">
-          <el-input v-model="ruleForm.name"  maxlength="25" show-word-limit></el-input>
-        </el-form-item>
-        <el-form-item label="标签简介:" prop="textarea2" class="nameOne">
-          <el-input
-            class="area"
-            type="textarea"
-            :autosize="{ minRows: 8, maxRows: 4}"
-            placeholder="请输入内容"
-            maxlength="100"
-            show-word-limit
-            v-model="ruleForm.textarea2">
-          </el-input>
-        </el-form-item>
-        <el-form-item style="text-align: center">
-          <el-button size="small" type="primary" :loading="editLoading" @click="sureShare">保存</el-button>
-          <el-button size="small" @click="handleDelete(props.row,props.row.id)">删除</el-button>
-          <el-button size="small" @click="goback">返回</el-button>
-        </el-form-item>
-      </el-form>
+      <div class="newTable  daList">
+        <el-table ref="multipleTable" :data="tableparentList" border stripe tooltip-effect="dark"
+                  style="width: 100%;text-align: center"
+                  :header-cell-style="{background:'#f0f2f5'}">
+          <template slot="empty">
+            <div v-if="Loading">
+              <div v-loading="saveLoading2"></div>
+            </div>
+            <div v-else>暂无数据</div>
+          </template>
+          <el-table-column prop="tagName" label="标签名称"></el-table-column>
+          <el-table-column prop="createTime" label="创建时间"></el-table-column>
+          <el-table-column prop="synopsis" label="标签简介"></el-table-column>
+          <el-table-column label="操作" width="180px" v-if="labelEdit">
+            <template slot-scope="props" class="caozuo">
+              <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+              <span class="operationIcona">
+                  <i class="el-icon-edit-outline iconLogo" @click="editLabel(props.row)"></i>
+              </span>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="删除" placement="top">
+              <span class="operationIcona">
+                <i class="el-icon-delete iconLogo" @click="handleDelete(props.row.id)"></i>
+              </span>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-table class="secondTable" ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
+                  style="width: 100%;text-align: center"
+                  :header-cell-style="{background:'#f0f2f5'}">
+          <template slot="empty">
+            <div v-if="Loading2">
+              <div v-loading="saveLoading2"></div>
+            </div>
+            <div v-else>暂无数据</div>
+          </template>
+          <el-table-column prop="tagName" label=""></el-table-column>
+          <el-table-column prop="createTime" label=""></el-table-column>
+          <el-table-column prop="synopsis" label=""></el-table-column>
+          <el-table-column label="操作" width="180px" v-if="labelEdit">
+            <template slot-scope="props" class="caozuo">
+              <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+              <span class="operationIcona">
+                  <i class="el-icon-edit-outline iconLogo" @click="editLabel(props.row)"></i>
+              </span>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="删除" placement="top">
+              <span class="operationIcona">
+                <i class="el-icon-delete iconLogo" @click="handleDelete(props.row,props.row.id)"></i>
+              </span>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
+    </div>
+
     <el-dialog class="creat" title="添加顶级标签" :visible.sync="labelDialog" width="530px" center
                :close-on-click-modal="false"
                @close="closedialogOne">
@@ -185,8 +224,6 @@
     name: "treeLabel",
     data() {
       return {
-        groupName:'',
-        tabHeight:'',
         tagName:'',
         delTreeId: 0,
         lvl: 1,
@@ -250,11 +287,6 @@
     watch: {
       filterText(val) {
         this.$refs.tree.filter(val);
-      }
-    },
-    computed:{
-      taHeight:function () {
-        return (document.body.clientHeight - 300) + "px"
       }
     },
     methods: {
@@ -365,8 +397,6 @@
         return data.tagName.indexOf(value) !== -1;
       },
       async handleNodeClick(data) {
-        this.ruleForm.name = data.tagName
-        this.ruleForm.textarea2 = data.synopsis
         this.tableparentList = []
         const treeTable = await looktreeTable(data.id)
         this.ztableShowList = treeTable.childrenTag
@@ -493,8 +523,19 @@
           this.data = res.childrenNode
           if (res.childrenNode && res.childrenNode.length > 0) {
             const treeTable = await looktreeTable(res.childrenNode[0].id)
-            this.ruleForm.name = treeTable.parentTag.tagName
-            this.ruleForm.textarea2 = treeTable.parentTag.synopsis
+            if (treeTable == '') {
+              this.Loading = false
+            } else {
+              this.tableparentList = []
+              this.ztableShowList = treeTable.childrenTag ? treeTable.childrenTag : []
+              this.tableparentList.push(treeTable.parentTag)
+              if (this.ztableShowList == '') {
+                this.Loading2 = false
+              }
+            }
+          } else {
+            this.Loading = false
+            this.Loading2 = false
           }
         } catch (e) {
           console.log(e);
@@ -517,8 +558,6 @@
       }else if(this.$route.name == 'tree'){
         this.sharelookTree()
       }else {}
-
-      this.groupName = this.$route.params.tagsName
     }
   };
 </script>
@@ -526,6 +565,7 @@
 <style scoped>
   .treeContainer {
     width: 100%;
+    /*height: 700px;*/
     display: flex;
   }
 
@@ -550,7 +590,6 @@
   .tableContent {
     width: 81%;
     margin-top: 20px;
-    padding: 0px 16px;
   }
 
   .labelTitle {
@@ -559,16 +598,13 @@
     font-size: 14px;
     color: #606266;
     background: rgb(240, 242, 245);
+    /*margin-top: 20px;*/
   }
 
   .labelName {
     float: left;
     line-height: 48px;
-    padding-left: 15px;
-    width: 200px;
-    overflow: hidden;
-    text-overflow:ellipsis;
-    white-space: nowrap;
+    margin-left: 15px;
   }
 
   .add {
@@ -587,8 +623,8 @@
     margin-top: 20px;
     padding-left: 5px;
     padding-right: 5px;
+    /*height: 565px;*/
     overflow-y: auto;
-    /*border: 1px solid red;*/
   }
 
   .iconLogo {
@@ -598,6 +634,7 @@
   }
 
   .newTable {
+    /*height: 590px;*/
     overflow-y: auto;
     margin-top: -20px;
   }
@@ -612,8 +649,5 @@
   .back {
     display: flex;
     justify-content: flex-end;
-  }
-  .iconLabel{
-    padding-right: 5px;
   }
 </style>
