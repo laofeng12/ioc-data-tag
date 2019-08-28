@@ -36,7 +36,10 @@
             <template slot-scope="scope">
               <div class="gress">
                 <div class="gressPercentage">
-                  <el-progress :percentage="scope.row.popularityLevel" :show-text="false"
+                  <!--{{scope.row.percentage}}-->
+                  <!--<el-progress :percentage="scope.row.popularityLevel" :show-text="false"-->
+                               <!--:color="customColorMethod"></el-progress>-->
+                  <el-progress :percentage="scope.row.percentage" :show-text="false"
                                :color="customColorMethod"></el-progress>
                 </div>
                 <div>{{scope.row.popularity}}</div>
@@ -53,13 +56,13 @@
           <el-table-column prop="modifyTime" label="修改时间"></el-table-column>
           <el-table-column label="操作" width="180px">
             <template slot-scope="{row,$index}" class="caozuo">
-              <el-tooltip class="item" effect="dark" content="共享" placement="top">
+              <el-tooltip class="item" effect="dark" content="设置" placement="top">
                 <span class="operationIcona">
                     <i class="el-icon-share iconLogo" @click="handleShare(row,$index)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-                <router-link :to="`editTree/${row.id}`">
+                <router-link :to="`editTree/${row.id}/${row.tagsName}`">
                   <i class="el-icon-edit-outline iconLogo"></i>
                 </router-link>
               </el-tooltip>
@@ -111,9 +114,8 @@
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定 </el-button>
             <el-button size="small" plain class="btn-group" @click="closeShare2">取消</el-button>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定
-            </el-button>
           </div>
         </div>
       </el-dialog>
@@ -281,7 +283,7 @@
                   tagsName: this.ruleForm.tagsName
                 })
                 this.creatsaveLoading = false
-                this.$router.push('/labelcreatTree/' + data.id)
+                this.$router.push('/labelcreatTree/' + data.id +'/'+ data.tagsName)
               } catch (e) {
                 this.creatsaveLoading = false
                 console.log(e);

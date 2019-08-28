@@ -71,19 +71,19 @@ export default new Router({
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/shareLabel.vue')
         },
         {
-          path: '/lookTree/:tagsId',
+          path: '/lookTree/:tagsId/:tagsName',
           name: 'lookTree',
           meta: {title: '查看标签组'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
         },
         {
-          path: '/editTree/:tagsId',
+          path: '/editTree/:tagsId/:tagsName',
           name: 'editTree',
           meta: {title: '编辑标签组'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
         },
         {
-          path: '/labelcreatTree/:tagsId',
+          path: '/labelcreatTree/:tagsId/:tagsName',
           name: 'labelcreatTree',
           meta: {title: '创建标签组'},
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tree.vue')
