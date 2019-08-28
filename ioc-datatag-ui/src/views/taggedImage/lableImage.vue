@@ -505,7 +505,7 @@
                   tagsName: this.ruleForm.tagsName
                 })
                 this.creatsaveLoading = false
-                this.$router.push('/tree/' + data.id)
+                this.$router.push('/tree/' + data.id +'/'+ data.tagsName)
               } catch (e) {
                 this.creatsaveLoading = false
                 console.log(e);
