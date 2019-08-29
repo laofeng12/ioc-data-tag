@@ -14,7 +14,8 @@
           </el-select>
         </el-col>
         <el-col :span="11">
-          <el-link type="primary" :underline="false">编辑标签组</el-link>
+          <!--<el-link type="primary" :underline="false">编辑标签组</el-link>-->
+          <el-button type="text">编辑标签组</el-button>
         </el-col>
       </el-form-item>
       <el-form-item label="选择标签层" prop="region">

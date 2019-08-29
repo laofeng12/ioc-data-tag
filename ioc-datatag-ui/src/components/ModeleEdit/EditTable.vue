@@ -302,7 +302,8 @@
         isHandle: 1,
         radio: '1',
         childrenNode: [],
-        chooseTagTeamid: ''
+        chooseTagTeamid: '',
+        chooseTagTeamname: ''
       }
     },
     watch: {
@@ -632,12 +633,18 @@
       chooseTagTeam(id) {
         this.chooseTagTeamid = id
         this.getTagLevList(id)
+        this.tagTeamList.forEach(item=>{
+          if(item.id == id){
+            this.chooseTagTeamname = item.tagsName
+
+          }
+        })
       },
       // 编辑标签组
       editLabelgroup() {
         if (this.chooseTagTeamid) {
           this.$router.push({
-            path: '/editTree/' + this.chooseTagTeamid,
+            path: '/editTree/' + this.chooseTagTeamid+'/'+this.chooseTagTeamname,
           })
         } else {
           this.$message.error('请先选择标签组！');
