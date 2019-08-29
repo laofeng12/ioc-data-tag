@@ -341,6 +341,7 @@
           } else {
             this.ztableShowList = []
             this.Loading = false
+            this.totalnum = 0
           }
 
         } catch (e) {
