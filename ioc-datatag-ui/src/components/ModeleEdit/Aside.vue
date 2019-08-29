@@ -135,6 +135,7 @@
     },
     data() {
       return {
+        noKey:0,
         modelId: '',
         sortNum: '',
         isNew: true,
@@ -255,35 +256,40 @@
               }
             }
           })
-
-          //
-          if (val) {
-            this.checkedCols.forEach((citem) => {
-              this.columnData.map((item, index) => {
-                if (item.definition == citem) {
-                  this.editData.push(item)
-                }
-              })
-            })
-            if (this.resourceType == 0) {
-              this.editData.forEach((item, index) => {
-                if (item.isPrimaryKey == 1) {
-                  this.myData.push(item)
-                }
-              })
-            } else {
-              this.myData = this.editData
-            }
-          } else {
-            this.myData = []
-            this.ruleForm.pkey = ''
-          }
-
         } else {
           this.tableData = []
         }
+        if (val) {
+          this.checkedCols.forEach((citem) => {
+            this.columnData.map((item, index) => {
+              if (item.definition == citem) {
+                this.editData.push(item)
+              }
+            })
+          })
+          if (this.resourceType == 0) {
+            this.editData.forEach((item, index) => {
+              if (item.isPrimaryKey == 1) {
+                this.myData.push(item)
+              }
+            })
+          } else {
+            this.myData = this.editData
+          }
+          console.log('8888')
+        } else {
+          console.log('134')
+          this.myData = []
+          this.ruleForm.pkey = ''
+          this.$refs.ruleForm.resetFields()
+          // console.log('444',this.ruleForm.pkey);
+          // // this.ruleForm.pkey = ''
+          // console.log('555',this.ruleForm.pkey);
+          // this.noKey = 1
+        }
       },
       handleCheckedColsChange(value) {
+        console.log('dian',value)
         let checkedCount = value.length;
         this.checkAll = checkedCount === this.cols.length;
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
@@ -318,6 +324,12 @@
           })
         } else {
           this.myData = this.tableData
+        }
+        // 清空
+        if(value == ''){
+          this.myData = []
+          this.ruleForm.pkey = ''
+          this.$refs.ruleForm.resetFields()
         }
         // 编辑
         if (this.routerName === 'editModel') {
