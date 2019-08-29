@@ -47,9 +47,9 @@
     </div>
 
     <div class="tableContent">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" v-if="showContent">
+      <el-form :model="ruleForm2" :rules="rules" ref="ruleForm2" label-width="100px" v-if="showContent">
         <el-form-item label="标签名称:" prop="name2" class="nameOne">
-          <el-input v-model="ruleForm.name2"  maxlength="25" show-word-limit></el-input>
+          <el-input v-model="ruleForm2.name2"  maxlength="25" show-word-limit :disabled="lookContent"></el-input>
         </el-form-item>
         <el-form-item label="标签简介:" prop="textarea2" class="nameOne">
           <el-input
@@ -59,12 +59,13 @@
             placeholder="请输入内容"
             maxlength="100"
             show-word-limit
-            v-model="ruleForm.textarea2">
+            :disabled="lookContent"
+            v-model="ruleForm2.textarea2">
           </el-input>
         </el-form-item>
         <el-form-item style="text-align: center">
           <el-button v-show="showBtndo" size="small" type="primary" :loading="editLoading" @click="sureShare(ruleForm.deteleId)">保存</el-button>
-          <el-button v-show="showBtndo" size="small" @click="handleDelete(ruleForm.name2,ruleForm.deteleId)">删除</el-button>
+          <el-button v-show="showBtndo" size="small" @click="handleDelete(ruleForm2.name2,ruleForm.deteleId)">删除</el-button>
           <el-button size="small" @click="goback">返回</el-button>
         </el-form-item>
       </el-form>
@@ -145,7 +146,7 @@
           <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="delTree(delTreeId)">
             确定删除
           </el-button>
-          <el-button size="small" type="primary" class="queryBtn">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" @click="cancelDelete">取消</el-button>
         </div>
       </div>
     </el-dialog>
@@ -162,6 +163,7 @@
     name: "treeLabel",
     data() {
       return {
+        lookContent:false,
         showContent:true,
         showBtndo:true,
         groupName:'',
@@ -207,10 +209,12 @@
         ztableShowList: [],
         ruleForm: {
           name: '',
-          name2:'',
           textarea: '',
-          textarea2: '',
           deteleId:''
+        },
+        ruleForm2:{
+          name2:'',
+          textarea2: ''
         },
         rules: {
           name: [
@@ -245,14 +249,14 @@
       async sureShare(id) {
         this.editLoading = true
         const tagsId = Number(this.$route.params.tagsId)
-        this.$refs.ruleForm.validate(async (valid) => {
+        this.$refs.ruleForm2.validate(async (valid) => {
           if (valid) {
             try {
               const params = {
                 id: id,
                 isNew: false,
-                synopsis: this.ruleForm.textarea2,
-                tagName: this.ruleForm.name2,
+                synopsis: this.ruleForm2.textarea2,
+                tagName: this.ruleForm2.name2,
                 tagsId: tagsId
               }
               const data = await getDtTagData(params)
@@ -341,8 +345,8 @@
         return data.tagName.indexOf(value) !== -1;
       },
       async handleNodeClick(data) {
-        this.ruleForm.name2 = data.tagName
-        this.ruleForm.textarea2 = data.synopsis
+        this.ruleForm2.name2 = data.tagName
+        this.ruleForm2.textarea2 = data.synopsis
         this.ruleForm.deteleId = data.id
         this.tableparentList = []
         const treeTable = await looktreeTable(data.id)
@@ -422,6 +426,9 @@
         }
         this.deleteDialog = false
       },
+      cancelDelete(){
+        this.deleteDialog = false
+      },
       //新建树节点
       async getDtTagData(preaTagId, synopsis, tagsName) {
         const tagsId = Number(this.$route.params.tagsId)
@@ -447,13 +454,13 @@
           this.data = res.childrenNode
           if (res.childrenNode && res.childrenNode.length > 0) {
             const treeTable = await looktreeTable(res.childrenNode[0].id)
-            this.ruleForm.name2 = treeTable.parentTag.tagName
-            this.ruleForm.textarea2 = treeTable.parentTag.synopsis
+            this.ruleForm2.name2 = treeTable.parentTag.tagName
+            this.ruleForm2.textarea2 = treeTable.parentTag.synopsis
             this.ruleForm.deteleId = treeTable.parentTag.id
           }else{
             this.showContent = false
-            this.ruleForm.name2 = ''
-            this.ruleForm.textarea2 = ''
+            this.ruleForm2.name2 = ''
+            this.ruleForm2.textarea2 = ''
           }
         } catch (e) {
           console.log(e);
@@ -470,6 +477,7 @@
         this.topaddLabel = false
         this.labelEdit = false
         this.showBtndo = false
+        this.lookContent = true
       } else if (this.$route.name == 'editTree') {
         this.sharelookTree()
       } else if (this.$route.name == 'labelcreatTree') {
