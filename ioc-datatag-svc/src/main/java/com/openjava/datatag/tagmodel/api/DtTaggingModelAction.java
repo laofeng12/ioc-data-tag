@@ -356,7 +356,7 @@ public class DtTaggingModelAction {
 		}
 	}
 
-	@ApiOperation(value = "PG测试", nickname="PG测试")
+//	@ApiOperation(value = "PG测试", nickname="PG测试")
 	@Security(session=false)
 	@RequestMapping(value="/test",method=RequestMethod.GET)
 	public DataApiResponse<Object> test() throws Exception {

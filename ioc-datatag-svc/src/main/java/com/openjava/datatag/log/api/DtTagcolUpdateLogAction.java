@@ -43,7 +43,7 @@ import com.openjava.datatag.log.query.DtTagcolUpdateLogDBParam;
  * @author zmk
  *
  */
-@Api(tags="字段表日志")
+//@Api(tags="字段表日志")
 @RestController
 @RequestMapping("/datatag/tagmodel/dtTagcolUpdateLog")
 public class DtTagcolUpdateLogAction {

@@ -49,7 +49,7 @@ import com.openjava.datatag.tagcol.query.DtTagmCooLogDBParam;
  * @author hyq
  *
  */
-@Api(tags="协作成员配置操作日志")
+//@Api(tags="协作成员配置操作日志")
 @RestController
 @RequestMapping("/openjava/datatag/dtTagmCooLog")
 public class DtTagmCooLogAction {
