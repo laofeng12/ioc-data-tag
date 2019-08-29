@@ -4,6 +4,7 @@
       <el-input
         class="zxinp moduleOne"
         size="small"
+        clearable
         placeholder="请输入内容"
         prefix-icon="el-icon-search"
         v-model="input2">
