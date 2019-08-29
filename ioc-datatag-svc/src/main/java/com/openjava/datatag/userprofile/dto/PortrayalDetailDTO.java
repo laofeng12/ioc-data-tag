@@ -19,11 +19,12 @@ public class PortrayalDetailDTO {
     private String tableName;
     @ApiModelProperty("画像标题")
     private  String title;
-    @ApiModelProperty("画像属性1")
+    @ApiModelProperty("基础属性")
     private List<String> property;
-    @ApiModelProperty("画像属性1")
+    @ApiModelProperty("键值对基础属性")
     private Map<String,String> mapProperty;
-    @ApiModelProperty("画像属性2")
+    @ApiModelProperty("画像属性")
     private List<String> lists;
+    @ApiModelProperty("键值对画像属性")
     private Map<String,String> mapLists;
 }
