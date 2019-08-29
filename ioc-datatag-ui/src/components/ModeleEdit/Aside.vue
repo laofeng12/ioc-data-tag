@@ -135,7 +135,6 @@
     },
     data() {
       return {
-        noKey:0,
         modelId: '',
         sortNum: '',
         isNew: true,
@@ -276,20 +275,13 @@
           } else {
             this.myData = this.editData
           }
-          console.log('8888')
         } else {
-          console.log('134')
           this.myData = []
           this.ruleForm.pkey = ''
           this.$refs.ruleForm.resetFields()
-          // console.log('444',this.ruleForm.pkey);
-          // // this.ruleForm.pkey = ''
-          // console.log('555',this.ruleForm.pkey);
-          // this.noKey = 1
         }
       },
       handleCheckedColsChange(value) {
-        console.log('dian',value)
         let checkedCount = value.length;
         this.checkAll = checkedCount === this.cols.length;
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
