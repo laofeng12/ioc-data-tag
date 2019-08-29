@@ -133,8 +133,8 @@ public class PortrayalServiceImpl implements PortrayalService {
                 if (tagCol.contains(key)) {
                     if (StringUtils.isNotBlank(value)) {
                         lists.add(value);
+                        mapLists.put(key.split(Constants.DT_COL_PREFIX)[1],value);
                     }
-                    mapLists.put(key.split(Constants.DT_COL_PREFIX)[1],value);
                 }
             }
             por.setId(pKey);
