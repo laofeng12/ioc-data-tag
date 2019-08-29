@@ -236,6 +236,7 @@
       },
       //全选
       handleCheckAllChange(val) {
+        console.log('val',val)
         this.checkedCols = val ? colsOptions : [];
         this.isIndeterminate = false;
         if (this.checkAll === true) {
@@ -243,8 +244,10 @@
             item.colSort = ''
           })
           this.tableData = this.columnData
+          console.log('this.columnData',this.columnData)
+          console.log('this.tableData',this.tableData)
           this.tableData.forEach((item, index) => {
-            item.isMarking = false
+            // item.isMarking = false
             if (item.colSort === '') {
               item.colSort = index + 1
               if (item.colSort > 9) {
@@ -315,7 +318,6 @@
       },
       //加载树节点
       loadNode(node, resolve) {
-        console.log('node',node);
         if (node.level === 0) {
           return resolve([{orgName: '数据目录'}])
         }
@@ -338,7 +340,7 @@
       },
       //获取3级树子节点
       getThreeChild(id, resolve) {
-//  这里可以替换成向后台发起的请求修改data,为了演示我用的是写死的数据,获取到data后,resolve出去就好了
+      //这里可以替换成向后台发起的请求修改data,为了演示我用的是写死的数据,获取到data后,resolve出去就好了
         if (id === '1') {
           const data = this.dataLakeDirectoryTree
           resolve(data)
@@ -441,7 +443,7 @@
           resolve(allData)
 
         } catch (e) {
-
+          resolve([])
         }
       },
       //确认选择
