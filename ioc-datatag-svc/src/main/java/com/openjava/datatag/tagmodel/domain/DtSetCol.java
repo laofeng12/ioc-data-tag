@@ -51,7 +51,7 @@ public class DtSetCol implements Persistable<Long>,Serializable {
 	private String sourceCol;
 
 	@ApiModelProperty("源字段id")
-	@Length(min=1, max=32)
+	@Length(min=1)
 	@Column(name = "SOURCE_COL_ID")
 	private String sourceColId;
 

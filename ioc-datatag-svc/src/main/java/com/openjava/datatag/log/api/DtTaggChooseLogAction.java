@@ -27,7 +27,7 @@ import com.openjava.datatag.log.query.DtTaggChooseLogDBParam;
  * @author lch
  *
  */
-@Api(tags="共享标签组选用日志-不可用")
+//@Api(tags="共享标签组选用日志-不可用")
 @RestController
 @RequestMapping("/datatag/tagmanage/dtTaggChooseLog")
 public class DtTaggChooseLogAction {

@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * @author zmk
  */
-@Api(tags="调度接口")
+//@Api(tags="调度接口")
 @RestController
 @RequestMapping("/schedule")
 public class JobDemoAction {

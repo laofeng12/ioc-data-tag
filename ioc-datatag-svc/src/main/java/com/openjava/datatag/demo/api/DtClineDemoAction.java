@@ -42,7 +42,7 @@ import java.util.Date;
  * @author zmk
  *
  */
-@Api(tags="demo")
+//@Api(tags="demo")
 @RestController
 @RequestMapping("/datatag/demo/cline")
 public class DtClineDemoAction {

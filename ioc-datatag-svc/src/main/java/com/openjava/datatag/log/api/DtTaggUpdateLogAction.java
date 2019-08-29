@@ -29,7 +29,7 @@ import com.openjava.datatag.log.query.DtTaggUpdateLogDBParam;
  * @author lch
  *
  */
-@Api(tags="标签组日志-不可用")
+//@Api(tags="标签组日志-不可用")
 @RestController
 @RequestMapping("/datatag/tagmanage/dtTaggUpdateLog")
 public class DtTaggUpdateLogAction {
