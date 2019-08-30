@@ -190,6 +190,8 @@
               <el-input
                 class="zxinp moduleOne"
                 size="small"
+                maxlength="25"
+                show-word-limit
                 placeholder="请输入内容"
                 v-model="ruleForm.tagsName" style="width: 360px">
               </el-input>
@@ -198,6 +200,8 @@
               <el-input
                 class="area"
                 type="textarea"
+                maxlength="100"
+                show-word-limit
                 :autosize="{ minRows: 2, maxRows: 4}"
                 placeholder="请输入内容"
                 v-model="ruleForm.synopsis">
