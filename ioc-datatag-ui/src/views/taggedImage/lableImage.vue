@@ -91,8 +91,15 @@
             </template>
           </el-table-column>
         </el-table>
-        <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
-                            @sureClick="goPage"></element-pagination>
+        <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
+                            <!--@sureClick="goPage"></element-pagination>-->
+        <element-pagination
+          :pageSize="size"
+          :currentPage="page+1"
+          :total="totalnum"
+          @handleSizeChange="handleSizeChange"
+          @handleCurrentChange="handleCurrentChange"
+        ></element-pagination>
       </div>
       <el-dialog class="creat" title="模型调度" :visible.sync="controlDialog" width="530px" center
                  :close-on-click-modal="false"
@@ -448,6 +455,10 @@
       },
       handleCurrentChange(page) {
         this.page = page - 1
+        this.datamodelList()
+      },
+      handleSizeChange (size) {
+        this.size = size
         this.datamodelList()
       },
       goPage() {
