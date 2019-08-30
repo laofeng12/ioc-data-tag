@@ -236,7 +236,9 @@
       },
       //全选
       handleCheckAllChange(val) {
-        console.log('val',val)
+        this.tableData = []
+        this.myData = []
+        this.editData = []
         this.checkedCols = val ? colsOptions : [];
         this.isIndeterminate = false;
         if (this.checkAll === true) {
@@ -244,10 +246,8 @@
             item.colSort = ''
           })
           this.tableData = this.columnData
-          console.log('this.columnData',this.columnData)
-          console.log('this.tableData',this.tableData)
           this.tableData.forEach((item, index) => {
-            // item.isMarking = false
+            item.isMarking = false
             if (item.colSort === '') {
               item.colSort = index + 1
               if (item.colSort > 9) {
@@ -258,6 +258,28 @@
         } else {
           this.tableData = []
         }
+        if (val) {
+          this.checkedCols.forEach((citem) => {
+            this.columnData.map((item, index) => {
+              if (item.definition == citem) {
+                this.editData.push(item)
+              }
+            })
+          })
+          if (this.resourceType == 0) {
+            this.editData.forEach((item, index) => {
+              if (item.isPrimaryKey == 1) {
+                this.myData.push(item)
+              }
+            })
+          } else {
+            this.myData = this.editData
+          }
+        } else {
+          this.myData = []
+          this.ruleForm.pkey = ''
+          this.$refs.ruleForm.resetFields()
+        }
       },
       handleCheckedColsChange(value) {
         let checkedCount = value.length;
@@ -265,8 +287,8 @@
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
         this.tableData = []
         this.myData = []
-        // console.log('勾选1', this.checkedCols);   // 左边勾选的项
-        // console.log('勾选2',this.columnData);   // 左边全部字段项
+        // 左边勾选的项 this.checkedCols
+        // 左边全部字段项 this.columnData
         this.checkedCols.forEach((citem) => {
           this.columnData.map((item, index) => {
             item.isMarking = false
@@ -294,6 +316,12 @@
           })
         } else {
           this.myData = this.tableData
+        }
+        // 清空
+        if(value == ''){
+          this.myData = []
+          this.ruleForm.pkey = ''
+          this.$refs.ruleForm.resetFields()
         }
         // 编辑
         if (this.routerName === 'editModel') {
@@ -340,7 +368,7 @@
       },
       //获取3级树子节点
       getThreeChild(id, resolve) {
-      //这里可以替换成向后台发起的请求修改data,为了演示我用的是写死的数据,获取到data后,resolve出去就好了
+        //这里可以替换成向后台发起的请求修改data,为了演示我用的是写死的数据,获取到data后,resolve出去就好了
         if (id === '1') {
           const data = this.dataLakeDirectoryTree
           resolve(data)
@@ -370,7 +398,7 @@
         this.resourceType = colsData.data.type   // 0数据湖 1自建目录
         this.tableData = []
         this.columnData.forEach((item, inde) => {
-          colsOptions.push(item.name)
+          colsOptions.push(item.definition)
         })
         if (this.routerName === 'editModel') {
           //获取主键值
@@ -511,12 +539,15 @@
           duration: 2000,
           type: 'success'
         })
-        this.$emit('commit')
-        this.$parent.getModelList(this.taggingModelId)
-        this.$parent.getModelColsList(this.taggingModelId, 0, 100, 1)
-        if (this.routerName === 'creatModel') {
-          this.$router.push({path: `editModel/${Id}`})
+        if (data.message == '保存成功') {
+          this.$emit('commit')
+          this.$parent.getModelList(this.taggingModelId)
+          this.$parent.getModelColsList(this.taggingModelId, 0, 100, 1)
+          if (this.routerName === 'creatModel') {
+            this.$router.push({path: `editModel/${Id}`})
+          }
         }
+
       },
       //选择打标字段
       getCheckChange(row, $event) {
