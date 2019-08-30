@@ -11,7 +11,8 @@
             <div class="zedit" v-if="routerName==='editModel'">
               <!--<el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容"-->
                         <!--@blur="getsaveName"></el-input>-->
-              <el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容"></el-input>
+              <el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容" maxlength="25"
+                        show-word-limit></el-input>
               <span v-show="showBtn">模型名称：{{runModelname}}</span>
               <div class="editTwo">
                 <i v-show="showBtn" class="el-icon-edit" @click="rename"></i>

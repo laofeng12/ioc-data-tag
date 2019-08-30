@@ -9,7 +9,7 @@
         <div class="custom-tree-node" slot-scope="{ node, data }">
           <div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>
           <el-button class="set-btn btnMargin" type="text" size="mini" :disabled="routerName==='editModel'"
-                     v-if="data.isTable===true" @click.stop="setTags(0,node,data)">
+                     v-if="data.isTable===true" @click.stop="setTags(0,node,data)" :title="openScope">
             <i class="el-icon-setting"></i>
           </el-button>
         </div>
@@ -38,6 +38,7 @@
                       <span v-else-if="item.type==='number'" class="green">No.</span>
                       <span v-else="item.type==='date'" class="orange">Date.</span>
                       <span class="col-name" :title="item.definition">{{item.definition}}</span>
+                      <span></span>
                     </span>
                   </el-checkbox>
                 </el-checkbox-group>
@@ -135,6 +136,7 @@
     },
     data() {
       return {
+        openScope:'',
         modelId: '',
         sortNum: '',
         isNew: true,
@@ -385,12 +387,12 @@
         let colsData = {}
         if (type === 0) {
           //新建模型字段确认获取数据
-          colsData = await getResourceInfoData(data.resourceId, data.type)
+          colsData = await getResourceInfoData(data.resourceId, data.type,0)
         } else {
           //编辑模型字段确认获取数据
           const resourceId = this.modelData.resourceId
           const type = this.modelData.resourceType
-          colsData = await getResourceInfoData(resourceId, type)
+          colsData = await getResourceInfoData(resourceId, type,1)
         }
         this.columnData = colsData.data.column
         this.resourceName = colsData.data.resourceName
@@ -456,6 +458,17 @@
           if (data.hasOwnProperty('orgId')) {
             this.resData = []
             const resData = await getResourceListData(data.orgId, data.type, data.databaseType)
+            console.log('resData',resData);
+            // 状态
+            if(resData.openScope == '1'){
+              this.openScope = '全部对外公开'
+            }else if(resData.openScope == '2'){
+              this.openScope = '全部对内公开'
+            }else if(resData.openScope == '3'){
+              this.openScope = '部分对内公开'
+            }else {
+              this.openScope = '不公开'
+            }
             const resAlldata = resData.data
             // console.log('资源树所有值',resAlldata)
             resAlldata.forEach((item, index) => {
@@ -590,7 +603,7 @@
   .col-name-box {
     display: flex;
     .col-name {
-      width: 150px;
+      width: 100px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
