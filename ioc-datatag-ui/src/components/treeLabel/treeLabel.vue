@@ -9,6 +9,7 @@
       <el-input
         class="elInput"
         size="small"
+        clearable
         placeholder="输入关键字进行过滤"
         v-model="filterText">
       </el-input>
@@ -221,10 +222,13 @@
             {required: true, message: '请填写', trigger: 'blur'}
           ],
           name2: [
-            {required: true, message: '请填写', trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'},{trigger: 'change'}
           ],
           textarea: [
             {required: true, message: '请填写', trigger: 'blur'}
+          ],
+          textarea2: [
+            {required: true, message: '请填写', trigger: 'blur'},{trigger: 'change'}
           ]
         },
         data: [],

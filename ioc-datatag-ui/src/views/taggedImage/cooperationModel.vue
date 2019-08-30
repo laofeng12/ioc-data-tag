@@ -4,6 +4,7 @@
       <el-input
         class="zxinp moduleOne"
         size="small"
+        clearable
         placeholder="请输入内容"
         prefix-icon="el-icon-search"
         v-model="input2">
@@ -61,7 +62,14 @@
           </el-table-column>
         </el-table>
       </div>
-      <element-pagination :pageSize="size"  :total="totalnum"  @handleCurrentChange="handleCurrentChange" @sureClick="goPage"></element-pagination>
+      <!--<element-pagination :pageSize="size"  :total="totalnum"  @handleCurrentChange="handleCurrentChange" @sureClick="goPage"></element-pagination>-->
+      <element-pagination
+        :pageSize="size"
+        :currentPage="page+1"
+        :total="totalnum"
+        @handleSizeChange="handleSizeChange"
+        @handleCurrentChange="handleCurrentChange"
+      ></element-pagination>
     </div>
     <el-dialog class="creat" title="创建标签组" :visible.sync="labelcreatDialog" width="530px" center
                :close-on-click-modal="false"
@@ -72,6 +80,8 @@
             <el-input
               class="zxinp moduleOne"
               size="small"
+              maxlength="25"
+              show-word-limit
               placeholder="请输入内容"
               v-model="ruleForm.tagsName" style="width: 360px">
             </el-input>
@@ -80,6 +90,8 @@
             <el-input
               class="area"
               type="textarea"
+              maxlength="100"
+              show-word-limit
               :autosize="{ minRows: 2, maxRows: 4}"
               placeholder="请输入内容"
               v-model="ruleForm.synopsis">
@@ -236,6 +248,10 @@
       },
       handleCurrentChange(page){
         this.page = page-1
+        this.datamodelList()
+      },
+      handleSizeChange (size) {
+        this.size = size
         this.datamodelList()
       },
       goPage(){},
