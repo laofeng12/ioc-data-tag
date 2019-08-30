@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
  * 定时任务例子
  */
 @Component
-public class OlapJob {
+public class TestJob {
 
 
 
-    private Logger logger=LoggerFactory.getLogger(OlapJob.class);
+    private Logger logger=LoggerFactory.getLogger(TestJob.class);
 
     public void cronJob() throws Exception {
     }
