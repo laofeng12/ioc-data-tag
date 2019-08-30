@@ -255,32 +255,30 @@
               }
             }
           })
-
-          //
-          if (val) {
-            this.checkedCols.forEach((citem) => {
-              this.columnData.map((item, index) => {
-                if (item.definition == citem) {
-                  this.editData.push(item)
-                }
-              })
-            })
-            if (this.resourceType == 0) {
-              this.editData.forEach((item, index) => {
-                if (item.isPrimaryKey == 1) {
-                  this.myData.push(item)
-                }
-              })
-            } else {
-              this.myData = this.editData
-            }
-          } else {
-            this.myData = []
-            this.ruleForm.pkey = ''
-          }
-
         } else {
           this.tableData = []
+        }
+        if (val) {
+          this.checkedCols.forEach((citem) => {
+            this.columnData.map((item, index) => {
+              if (item.definition == citem) {
+                this.editData.push(item)
+              }
+            })
+          })
+          if (this.resourceType == 0) {
+            this.editData.forEach((item, index) => {
+              if (item.isPrimaryKey == 1) {
+                this.myData.push(item)
+              }
+            })
+          } else {
+            this.myData = this.editData
+          }
+        } else {
+          this.myData = []
+          this.ruleForm.pkey = ''
+          this.$refs.ruleForm.resetFields()
         }
       },
       handleCheckedColsChange(value) {
@@ -318,6 +316,12 @@
           })
         } else {
           this.myData = this.tableData
+        }
+        // 清空
+        if(value == ''){
+          this.myData = []
+          this.ruleForm.pkey = ''
+          this.$refs.ruleForm.resetFields()
         }
         // 编辑
         if (this.routerName === 'editModel') {

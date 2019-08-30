@@ -1,32 +1,33 @@
 <template>
   <div class="ele-pagination" v-show="total>0">
-    <div class="page-detail">
-      共 {{total}} 条记录 第{{currentPage}} / {{` ${total === 0  ? 1 : Math.ceil(total/pageSize)} 页`}}
-    </div>
     <el-pagination
-      class="page-wrap"
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="currentPage"
-      :page-sizes="[5, 10, 20, 30, 40, 50]"
       :page-size="pageSize"
-      layout="prev, pager, next, sizes, jumper"
+      layout="total, prev, pager, next, jumper"
       :total="total"
     >
     </el-pagination>
+    <el-button type="primary" @click="sureClick()" size="mini" v-show="isSureBtn">确定</el-button>
   </div>
 </template>
 <script>
 export default {
+  name: 'index',
   props: {
+    isSureBtn: {
+      type: Boolean,
+      default: true
+    },
     total: {
       type: Number,
       default: 40
     },
     pageSize: {
       type: Number,
-      default: 5
+      default: 10
     },
     currentPage: {
       type: Number,
@@ -35,10 +36,15 @@ export default {
   },
   methods: {
     handleCurrentChange (page) {
+      // console.log(`当前页: ${page}`)
       this.$emit('handleCurrentChange', page)
     },
     handleSizeChange (pageSize) {
+      // console.log(`每页 ${pageSize} 条`)
       this.$emit('handleSizeChange', pageSize)
+    },
+    sureClick () {
+      this.$emit('sureClick')
     }
   }
 }
@@ -47,17 +53,9 @@ export default {
 <style lang="stylus" scoped>
 .ele-pagination{
   margin-top:15px;
-  // text-align: right;
-  overflow hidden;
-  .page-detail {
-    display inline-block;
-    line-height 32px;
-    font-size 14px;
-    color #000000;
-    opacity 0.65;
-  }
-  .page-wrap {
-    float right;
-  }
+  text-align: right;
+  display: flex;
+  justify-content:flex-end
+  margin-right 25px
 }
 </style>
