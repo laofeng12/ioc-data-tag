@@ -33,7 +33,7 @@ public class DatatagRunner implements ApplicationRunner {
 
 	public void run(ApplicationArguments args) throws Exception {
 //		System.out.println(environmental);
-		if (!environmental){
+		/*if (!environmental){
 			//扫描待执行模型，并运行模型
 			TaskInfo taskInfo = new TaskInfo();
 			taskInfo.setJobGroup(schedulejobCompent.getJobGroup());
@@ -53,7 +53,7 @@ public class DatatagRunner implements ApplicationRunner {
 			logger.info("数据标签与画像组件启动成功");
 		}else{
 			logger.info("开发环境，不跑定时任务。需要时请改DatatagRunner的environmental参数");
-		}
+		}*/
 //        LjdpWebLoader.contextInitialized();
 //        System.out.println("LJDP启动成功");
 	}
