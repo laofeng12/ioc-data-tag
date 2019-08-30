@@ -72,9 +72,9 @@ export function markingCheck(data) {
 }
 
 // 创建模型--资源表对应字段
-export function getResourceInfoData (resourceId,type) {
+export function getResourceInfoData (resourceId,type,isOnlyPermitted) {
   return fetch({
-    url: `/pds/datalake/dataLake/resourceInfo/${resourceId}-${type}`,
+    url: `/pds/datalake/dataLake/resourceInfo/${resourceId}-${type}-${isOnlyPermitted}`,
     method: 'get'
   })
 }
