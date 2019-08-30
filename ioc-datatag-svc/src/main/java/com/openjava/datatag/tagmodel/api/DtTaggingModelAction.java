@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.commons.utils.QueryParamsUtil;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
@@ -117,6 +118,7 @@ public class DtTaggingModelAction {
 		params.setEq_createUser(Long.parseLong(userInfo.getUserId()));
 		Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
 				Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));
+		QueryParamsUtil.dealLike(params);
 		Page<DtTaggingModel> results =  dtTaggingModelService.query(params, mypage);
 		List<DtTaggingModelDTO> showList = new ArrayList<>();
 		for (DtTaggingModel tgm: results){
