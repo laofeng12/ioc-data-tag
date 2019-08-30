@@ -9,6 +9,7 @@
       <el-input
         class="elInput"
         size="small"
+        clearable
         placeholder="输入关键字进行过滤"
         v-model="filterText">
       </el-input>
