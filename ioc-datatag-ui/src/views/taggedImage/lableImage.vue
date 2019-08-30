@@ -108,6 +108,7 @@
                 value-format="yyyy-MM-dd HH:mm:ss"
                 format="yyyy-MM-dd HH:mm:ss"
                 type="datetime"
+                :picker-options="pickerOptions"
                 placeholder="选择日期时间">
               </el-date-picker>
             </el-form-item>
@@ -322,6 +323,11 @@
             {required: true, message: '请填写名称', trigger: 'blur'}
           ]
         },
+        pickerOptions: {
+          disabledDate(time) {
+            return time.getTime() <= Date.now() - 8.64e7
+          }
+        },
       }
     },
     methods: {
@@ -456,6 +462,15 @@
         this.$refs.ruleForm.validate(async (valid) => {
           if (valid) {
             try {
+              const remindTime = this.ruleForm.date
+              const str = remindTime.toString()
+              const str2 = str.replace('/-/g', '/')
+              const oldTime = new Date(str2).getTime()
+              if (oldTime <= new Date().getTime()) {
+                this.$message.error('运行开始时间不能小于当前时间!')
+                this.dispatchLoading = false
+                return
+              }
               const res = await getDispatch(param)
               this.$message({
                 message: res.message,
