@@ -75,8 +75,15 @@
             </template>
           </el-table-column>
         </el-table>
-        <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
-                            @sureClick="goPage"></element-pagination>
+        <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
+                            <!--@sureClick="goPage"></element-pagination>-->
+        <element-pagination
+          :pageSize="size"
+          :currentPage="page+1"
+          :total="totalnum"
+          @handleSizeChange="handleSizeChange"
+          @handleCurrentChange="handleCurrentChange"
+        ></element-pagination>
       </div>
       <el-dialog class="creat" title="标签组设置" :visible.sync="shareDialog" width="530px" center
                  :close-on-click-modal="false"
@@ -383,6 +390,10 @@
       //点击分页跳转
       handleCurrentChange(page) {
         this.page = page - 1
+        this.getTagsData()
+      },
+      handleSizeChange (size) {
+        this.size = size
         this.getTagsData()
       },
       //点击分页确认

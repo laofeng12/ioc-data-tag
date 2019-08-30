@@ -91,8 +91,15 @@
             </template>
           </el-table-column>
         </el-table>
-        <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
-                            @sureClick="goPage"></element-pagination>
+        <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
+                            <!--@sureClick="goPage"></element-pagination>-->
+        <element-pagination
+          :pageSize="size"
+          :currentPage="page+1"
+          :total="totalnum"
+          @handleSizeChange="handleSizeChange"
+          @handleCurrentChange="handleCurrentChange"
+        ></element-pagination>
       </div>
       <el-dialog class="creat" title="模型调度" :visible.sync="controlDialog" width="530px" center
                  :close-on-click-modal="false"
@@ -108,6 +115,7 @@
                 value-format="yyyy-MM-dd HH:mm:ss"
                 format="yyyy-MM-dd HH:mm:ss"
                 type="datetime"
+                :picker-options="pickerOptions"
                 placeholder="选择日期时间">
               </el-date-picker>
             </el-form-item>
@@ -189,6 +197,8 @@
               <el-input
                 class="zxinp moduleOne"
                 size="small"
+                maxlength="25"
+                show-word-limit
                 placeholder="请输入内容"
                 v-model="ruleForm.tagsName" style="width: 360px">
               </el-input>
@@ -197,6 +207,8 @@
               <el-input
                 class="area"
                 type="textarea"
+                maxlength="100"
+                show-word-limit
                 :autosize="{ minRows: 2, maxRows: 4}"
                 placeholder="请输入内容"
                 v-model="ruleForm.synopsis">
@@ -322,6 +334,11 @@
             {required: true, message: '请填写名称', trigger: 'blur'}
           ]
         },
+        pickerOptions: {
+          disabledDate(time) {
+            return time.getTime() <= Date.now() - 8.64e7
+          }
+        },
       }
     },
     methods: {
@@ -440,6 +457,10 @@
         this.page = page - 1
         this.datamodelList()
       },
+      handleSizeChange (size) {
+        this.size = size
+        this.datamodelList()
+      },
       goPage() {
       },
       modelQuery() {
@@ -456,6 +477,15 @@
         this.$refs.ruleForm.validate(async (valid) => {
           if (valid) {
             try {
+              const remindTime = this.ruleForm.date
+              const str = remindTime.toString()
+              const str2 = str.replace('/-/g', '/')
+              const oldTime = new Date(str2).getTime()
+              if (oldTime <= new Date().getTime()) {
+                this.$message.error('运行开始时间不能小于当前时间!')
+                this.dispatchLoading = false
+                return
+              }
               const res = await getDispatch(param)
               this.$message({
                 message: res.message,

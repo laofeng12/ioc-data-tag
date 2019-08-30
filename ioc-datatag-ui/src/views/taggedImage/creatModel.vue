@@ -123,6 +123,7 @@
               format="yyyy-MM-dd HH:mm:ss"
               v-model="ruleForm.date"
               type="datetime"
+              :picker-options="pickerOptions"
               placeholder="选择日期时间">
             </el-date-picker>
           </el-form-item>
@@ -310,6 +311,11 @@
           date: [{required: true, message: '请选择时间', trigger: 'blur'}],
           region: [{required: true, message: '请选择时间周期', trigger: 'change'}]
         },
+        pickerOptions: {
+          disabledDate(time) {
+            return time.getTime() <= Date.now() - 8.64e7
+          }
+        },
         tableData: []
       }
     },
@@ -400,6 +406,7 @@
       },
       closeSaveas() {
         this.editDialog = false
+        this.$refs.ruleForm.resetFields()
       },
       async runModel() {
         this.runDialog = true
@@ -420,6 +427,7 @@
       },
       closeRun() {
         this.runDialog = false
+        this.$refs.ruleForm.resetFields()
       },
       saveModel() {
         this.saveDialog = true
@@ -646,6 +654,15 @@
                 "cycleEnum": this.ruleForm.region,
                 "id": this.taggingModelId,
                 "startTime": this.ruleForm.date
+              }
+              const remindTime = this.ruleForm.date
+              const str = remindTime.toString()
+              const str2 = str.replace('/-/g', '/')
+              const oldTime = new Date(str2).getTime()
+              if (oldTime <= new Date().getTime()) {
+                this.$message.error('运行开始时间不能小于当前时间!')
+                this.savedispatchLoading = false
+                return
               }
               const resto = await goDispatch(param)
               this.$message({

@@ -37,8 +37,15 @@
             <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
                              :prop="item" min-width="300" v-if="index > 0"></el-table-column>
           </el-table>
-          <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
-                              @sureClick="goPage"></element-pagination>
+          <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
+                              <!--@sureClick="goPage"></element-pagination>-->
+          <element-pagination
+            :pageSize="size"
+            :currentPage="page+1"
+            :total="totalnum"
+            @handleSizeChange="handleSizeChange"
+            @handleCurrentChange="handleCurrentChange"
+          ></element-pagination>
         </div>
         <div v-if="showPicture" class="topImage">
         <img src="../../assets/img/001.png" height="144" width="160"/>
@@ -123,6 +130,10 @@
       },
       handleCurrentChange(page) {
         this.page = page - 1
+        this.getList()
+      },
+      handleSizeChange (size) {
+        this.size = size
         this.getList()
       },
       goPage() {
