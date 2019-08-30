@@ -222,13 +222,13 @@
             {required: true, message: '请填写', trigger: 'blur'}
           ],
           name2: [
-            {required: true, message: '请填写', trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'},{trigger: 'change'}
           ],
           textarea: [
             {required: true, message: '请填写', trigger: 'blur'}
           ],
           textarea2: [
-            {required: true, message: '请填写', trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'},{trigger: 'change'}
           ]
         },
         data: [],
