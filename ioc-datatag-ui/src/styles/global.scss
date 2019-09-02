@@ -84,3 +84,19 @@ p {
 .treeCode .el-tree-node>.el-tree-node__children{
   overflow: inherit !important;
 }
+
+
+// 叶子节点去掉图标
+.aside .el-tree-node__expand-icon.is-leaf::before
+{
+  display: none;
+}
+
+// 标签管理
+.treeBel .el-tree-node__expand-icon.is-leaf{
+  display: none;
+}
+
+.treeBel .el-tree .el-tree-node__expand-icon.expanded{
+  transform: rotate(90deg) !important;
+}

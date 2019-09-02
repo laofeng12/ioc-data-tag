@@ -38,7 +38,7 @@ public interface DtCooperationRepository extends DynamicJpaRepository<DtCooperat
     /**
      *分页根据用户Id查找该用户要协作的模型记录集
      */
-    @Query(value =" select t,o from DtTaggingModel t, DtCooperation o where t.taggingModelId=o.taggmId \n" +
+    @Query(value =" select t,o from com.openjava.datatag.tagmodel.domain.DtTaggingModel t, DtCooperation o where t.taggingModelId=o.taggmId \n" +
             "and (o.cooUser=:userId or :userId is null) and (t.modelName like '%' || :keyWord || '%' or :keyWord is null) and (o.taggmId=:taggmId or :taggmId is null) and (t.runState=:runState or :runState is null) order by t.modifyTime desc"
             )
     Page<?> findPageUserModelByUserId(@Param("userId")Long userId ,@Param("keyWord")String keyWord, @Param("taggmId")Long taggmId ,@Param("runState")Long runState ,Pageable pageable);

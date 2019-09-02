@@ -36,5 +36,5 @@ public interface TaskService {
     /**
      * 验证是否存在
      */
-    boolean checkExists(String jobName, String jobGroup) throws SchedulerException;
+    boolean checkExists(String jobName, String jobGroup) throws Exception;
 }
