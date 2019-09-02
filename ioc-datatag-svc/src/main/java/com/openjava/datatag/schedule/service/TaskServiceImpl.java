@@ -99,7 +99,7 @@ public class TaskServiceImpl implements TaskService{
 //            System.out.println(clazz);
             JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).withDescription(createTime).usingJobData("parameter",jobDescription).build();
             scheduler.scheduleJob(jobDetail, trigger);
-        } catch (SchedulerException | ClassNotFoundException e) {
+        } catch (Exception e) {
             throw new APIException(MyErrorConstants.PUBLIC_ERROE,"类名不存在或执行表达式错误");
         }
     }
@@ -134,7 +134,7 @@ public class TaskServiceImpl implements TaskService{
             triggerSet.add(cronTrigger);
 
             scheduler.scheduleJob(jobDetail, triggerSet, true);
-        } catch (SchedulerException e) {
+        } catch (Exception e) {
             throw new APIException(MyErrorConstants.PUBLIC_ERROE,"类名不存在或执行表达式错误");
         }
     }
@@ -177,7 +177,7 @@ public class TaskServiceImpl implements TaskService{
                 scheduler.resumeTrigger(triggerKey);
                 logger.info("===> Resume success, triggerKey:{}", triggerKey);
             }
-        } catch (SchedulerException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -185,7 +185,7 @@ public class TaskServiceImpl implements TaskService{
     /**
      * 验证是否存在
      */
-    public boolean checkExists(String jobName, String jobGroup) throws SchedulerException{
+    public boolean checkExists(String jobName, String jobGroup) throws Exception{
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
         return scheduler.checkExists(triggerKey);
     }
