@@ -102,7 +102,7 @@
 
 <style lang="scss" scoped>
   .container-wrapper {
-    /*padding: 15px;*/
+    padding: 15px;
     background: #f2f2f2;
     /*min-height: calc(100vh - 50px);*/
   }

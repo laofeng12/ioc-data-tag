@@ -222,3 +222,15 @@ export function getmodelDispatchdetail(params) {
     params
   })
 }
+
+
+/**
+ * 数据湖订阅
+ * @param
+ */
+export function getdatalakeLink(resourceId) {
+  return fetch ({
+    url:`/pds/datalake/dataLake/subscribePermission/${resourceId}`,
+    method:'get'
+  })
+}
