@@ -1,6 +1,6 @@
 package com.openjava.datatag.statistic.repository;
 
-import com.openjava.datatag.statistic.domain.DtTaggingModel;
+import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import org.ljdp.core.spring.data.DynamicJpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
