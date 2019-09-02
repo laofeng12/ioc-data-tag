@@ -95,9 +95,9 @@ dataSet: #数据集相关
   resourceDataUrl: http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/
 
 pgconfig:
-  username: mppuser
   password: ioc123456
-  ip: 183.6.55.26
+  username: mppuser
+  ip: 192.168.6.101
   port: 5432
   dataBaseName: postgres
   pooled: true
