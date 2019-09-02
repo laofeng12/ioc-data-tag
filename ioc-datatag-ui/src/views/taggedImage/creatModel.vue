@@ -242,6 +242,7 @@
     name: 'creatModel',
     data() {
       return {
+        openScope:'',
         showBtn:true,
         headColList: [],//打标字段头部数据
         modelData: {},//获取模型数据
