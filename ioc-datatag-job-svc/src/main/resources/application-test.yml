@@ -92,7 +92,7 @@ searchjob: #更新模型中间表定时任务
 
 
 dataSet: #数据集相关
-  resourceDataUrl: http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/
+  resourceDataUrl: http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/
 
 pgconfig:
   password: ioc123456
