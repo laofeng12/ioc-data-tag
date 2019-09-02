@@ -469,7 +469,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	/**
 	 * 获取打标数据并根据规制自动打标（核心方法）
 	 */
-	public void calculation(DtTaggingModel tagModel){
+	public void calculation(DtTaggingModel tagModel) {
 		Long taggingModelId = tagModel.getTaggingModelId();
 		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
 		if (CollectionUtils.isEmpty(cols)){
@@ -549,7 +549,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			e.printStackTrace();
 			logger.info(e.getMessage());
 			DtTaggingErrorLog errorLog = new DtTaggingErrorLog();
-			errorLog.setErrorInfo(e.getMessage().getBytes());
+			try {
+                errorLog.setErrorInfo(e.getMessage().getBytes("utf-8"));
+            }catch (Exception e2){
+                errorLog.setErrorInfo(e.getMessage().getBytes());
+            }
 			errorLog.setErrorTime(new Date());
 			errorLog.setTaggingModelId(taggingModelId);
 			dtTaggingErrorLogService.doSave(errorLog);
@@ -571,7 +575,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		waitUpdateIndex.setTaggingModelId(taggingModelId);
 		dtWaitUpdateIndexService.doSave(waitUpdateIndex);
 		tagModel.setRunState(Constants.DT_MODEL_SUCCESS);
-		if (successCount<totalCount) {
+		if (successCount<totalCount||successCount==0) {
 			tagModel.setRunState(Constants.DT_MODEL_ERROR);
 		}
 		tagModel.setUpdateNum(totalCount);
