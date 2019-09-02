@@ -1,7 +1,7 @@
 <template>
   <div>
   <div class="treeContainer">
-    <div class="treelabel">
+    <div class="treelabel treeBel">
       <div class="labelTitle">
         <div class="labelName"><i class="el-icon-folder iconLabel"></i>{{groupName}}</div>
         <div v-show="topaddLabel"><i class="el-icon-plus add" @click="openOne"></i></div>
@@ -26,7 +26,7 @@
           @node-click="handleNodeClick"
           ref="tree">
         <span class="custom-tree-node" slot-scope="{ node, data }">
-        <span>{{ node.label }}</span>
+        <span class="labelLength" :title="node.label">{{ node.label }}</span>
         <span v-show="addLabel">
           <!--<el-button-->
           <!--type="text"-->
@@ -593,5 +593,12 @@
   .noImage{
     text-align: center;
     margin-top: 20%;
+  }
+  .labelLength{
+    display: inline-block;
+    width: 180px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
   }
 </style>

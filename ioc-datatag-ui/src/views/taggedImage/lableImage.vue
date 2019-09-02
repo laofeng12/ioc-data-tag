@@ -5,7 +5,7 @@
         class="zxinp moduleOne"
         size="small"
         clearable
-        placeholder="请输入内容"
+        placeholder="请输入模型名称"
         prefix-icon="el-icon-search"
         v-model="input2">
       </el-input>

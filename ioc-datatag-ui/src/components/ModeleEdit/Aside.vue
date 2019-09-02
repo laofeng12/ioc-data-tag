@@ -5,11 +5,14 @@
     <div class="tree-box">
       <el-tree icon-class="el-icon-folder" class="tree" :props="props" :highlight-current="true"
                :filter-node-method="filterNode" ref="tree"
+               node-key="id"
+               :default-expanded-keys="[1,2]"
+               :default-checked-keys="[1,2]"
                :load="loadNode" lazy>
         <div class="custom-tree-node" slot-scope="{ node, data }">
           <div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>
           <el-button class="set-btn btnMargin" type="text" size="mini" :disabled="routerName==='editModel'"
-                     v-if="data.isTable===true" @click.stop="setTags(0,node,data)">
+                     v-if="data.isTable===true" @click.stop="setTags(0,node,data)" :title="openScope">
             <i class="el-icon-setting"></i>
           </el-button>
         </div>
@@ -38,6 +41,7 @@
                       <span v-else-if="item.type==='number'" class="green">No.</span>
                       <span v-else="item.type==='date'" class="orange">Date.</span>
                       <span class="col-name" :title="item.definition">{{item.definition}}</span>
+                      <span></span>
                     </span>
                   </el-checkbox>
                 </el-checkbox-group>
@@ -135,6 +139,7 @@
     },
     data() {
       return {
+        openScope:'',
         modelId: '',
         sortNum: '',
         isNew: true,
@@ -344,39 +349,6 @@
         if (!value) return true;
         return data.orgName.indexOf(value) !== -1
       },
-      //加载树节点
-      loadNode(node, resolve) {
-        if (node.level === 0) {
-          return resolve([{orgName: '数据目录'}])
-        }
-        else if (node.level === 1) {
-          return resolve([{orgName: this.dataLakeDirectoryName, id: '1'}, {
-            orgName: this.dataSetDirectoryName, id: '2'
-          }])
-        } else if (node.level === 2) {
-          this.getThreeChild(node.data.id, resolve)
-        } else {
-          this.getChildTreeData(node.data, resolve)
-        }
-      },
-
-
-      //获取4级树子节点
-      getChildTreeData(data, resolve) {
-        // console.log('点击当前的数据',data)
-        this.getChildtreeData(data, resolve)
-      },
-      //获取3级树子节点
-      getThreeChild(id, resolve) {
-        //这里可以替换成向后台发起的请求修改data,为了演示我用的是写死的数据,获取到data后,resolve出去就好了
-        if (id === '1') {
-          const data = this.dataLakeDirectoryTree
-          resolve(data)
-        } else if (id == '2') {
-          const data = this.dataSetDirectoryTree
-          resolve(data)
-        }
-      },
       //对字段进行选择确认,type=0,新建模型，type=1编辑模型
       async setTags(type, node, data) {
         this.myData = []
@@ -385,12 +357,12 @@
         let colsData = {}
         if (type === 0) {
           //新建模型字段确认获取数据
-          colsData = await getResourceInfoData(data.resourceId, data.type)
+          colsData = await getResourceInfoData(data.resourceId, data.type,0)
         } else {
           //编辑模型字段确认获取数据
           const resourceId = this.modelData.resourceId
           const type = this.modelData.resourceType
-          colsData = await getResourceInfoData(resourceId, type)
+          colsData = await getResourceInfoData(resourceId, type,1)
         }
         this.columnData = colsData.data.column
         this.resourceName = colsData.data.resourceName
@@ -456,6 +428,23 @@
           if (data.hasOwnProperty('orgId')) {
             this.resData = []
             const resData = await getResourceListData(data.orgId, data.type, data.databaseType)
+            console.log('resData',resData);
+            if(resData){
+              resData.data.map(item =>{
+                console.log('item',item)
+                Object.assign(item,{leaf:true})
+              })
+            }
+            // 状态
+            if(resData.openScope == '1'){
+              this.openScope = '全部对外公开'
+            }else if(resData.openScope == '2'){
+              this.openScope = '全部对内公开'
+            }else if(resData.openScope == '3'){
+              this.openScope = '部分对内公开'
+            }else {
+              this.openScope = '不公开'
+            }
             const resAlldata = resData.data
             // console.log('资源树所有值',resAlldata)
             resAlldata.forEach((item, index) => {
@@ -472,6 +461,38 @@
 
         } catch (e) {
           resolve([])
+        }
+      },
+      //获取3级树子节点
+      getThreeChild(id, resolve) {
+        //这里可以替换成向后台发起的请求修改data,为了演示我用的是写死的数据,获取到data后,resolve出去就好了
+        if (id === '1') {
+          const data = this.dataLakeDirectoryTree
+          resolve(data)
+        } else if (id == '2') {
+          const data = this.dataSetDirectoryTree
+          resolve(data)
+        }
+      },
+      //获取4级树子节点
+      getChildTreeData(data, resolve) {
+        // console.log('点击当前的数据',data)
+        this.getChildtreeData(data, resolve)
+      },
+      //加载树节点
+      loadNode(node, resolve) {
+        console.log('node',node)
+        if (node.level === 0) {
+          return resolve([{orgName: '数据目录',id: '0'}])
+        }
+        else if (node.level === 1) {
+          return resolve([{orgName: this.dataLakeDirectoryName, id: '1'}, {
+            orgName: this.dataSetDirectoryName, id: '2'
+          }])
+        } else if (node.level === 2) {
+          this.getThreeChild(node.data.id, resolve)
+        } else {
+          this.getChildTreeData(node.data, resolve)
         }
       },
       //确认选择
@@ -578,7 +599,6 @@
       if (this.$route.name == 'editModel') {
         this.modelId = this.$route.params.id
       }
-
     },
     mounted() {
       this.routerName = this.$route.name
@@ -590,7 +610,7 @@
   .col-name-box {
     display: flex;
     .col-name {
-      width: 150px;
+      width: 100px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
