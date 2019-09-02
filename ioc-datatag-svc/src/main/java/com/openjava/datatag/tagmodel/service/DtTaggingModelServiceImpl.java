@@ -571,7 +571,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		waitUpdateIndex.setTaggingModelId(taggingModelId);
 		dtWaitUpdateIndexService.doSave(waitUpdateIndex);
 		tagModel.setRunState(Constants.DT_MODEL_SUCCESS);
-		if (successCount<totalCount) {
+		if (successCount<totalCount||successCount==0) {
 			tagModel.setRunState(Constants.DT_MODEL_ERROR);
 		}
 		tagModel.setUpdateNum(totalCount);
