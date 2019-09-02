@@ -48,6 +48,7 @@ public class JobBootRunner implements ApplicationRunner {
 		taskService.addJob(taskInfo);
 		logger.info("定时任务：模型扫描任务、更新中间表索引任务已启动");
 		logger.info("数据标签与画像组件定时任务启动成功");
+
 	}
 
 }
