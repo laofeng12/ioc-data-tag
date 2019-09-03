@@ -53,7 +53,7 @@ public abstract class ExecuteUtil {
      * 插入数据
      * @return
      */
-    public abstract Result insertDataList();
+    public abstract Result insertDataList()throws Exception;
 
     /**
      * 获取插入数据的sql
