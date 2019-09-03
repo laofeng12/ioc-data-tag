@@ -148,8 +148,9 @@
                   <!--人工打标结构-->
                   <div class="card-handle" v-if="item.isHandle===0">
                     <i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i>
-                    <el-input style="width:100px" size="small" v-model="item.tagSetName" placeholder="请输入内容"
-                              readonly></el-input>
+                    <div class="labelCard" :title="item.tagSetName">{{item.tagSetName}}</div>
+                    <!--<el-input style="width:100px" size="small" v-model="item.tagSetName" placeholder="请输入内容"-->
+                              <!--readonly></el-input>-->
                     <span class="chinese">{{item.sourceCol}}</span>
                     <div class="conditions">
                       <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
@@ -169,8 +170,8 @@
                   <div class="card2" v-else>
                     <div><i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i></div>
                     <div>
-                      <el-input style="width:100px" size="small" v-model="item.tagSetName" placeholder="请输入内容"
-                                readonly></el-input>
+                      <div class="labelCard" :title="item.tagSetName">{{item.tagSetName}}</div>
+                      <!--<el-input style="width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" size="small" v-model="item.tagSetName" placeholder="请输入内容" readonly></el-input>-->
                     </div>
                     <div class="chinese">{{item.sourceCol}}</div>
                     <div class="self-mark-choose-box">
@@ -633,8 +634,8 @@
       chooseTagTeam(id) {
         this.chooseTagTeamid = id
         this.getTagLevList(id)
-        this.tagTeamList.forEach(item=>{
-          if(item.id == id){
+        this.tagTeamList.forEach(item => {
+          if (item.id == id) {
             this.chooseTagTeamname = item.tagsName
 
           }
@@ -644,7 +645,7 @@
       editLabelgroup() {
         if (this.chooseTagTeamid) {
           this.$router.push({
-            path: '/editTree/' + this.chooseTagTeamid+'/'+this.chooseTagTeamname,
+            path: '/editTree/' + this.chooseTagTeamid + '/' + this.chooseTagTeamname,
           })
         } else {
           this.$message.error('请先选择标签组！');
@@ -969,5 +970,21 @@
 
   .btnMargin {
     margin-left: 5px;
+  }
+
+  .labelCard {
+    width: 100px;
+    height: 32px;
+    line-height: 32px;
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    border: 1px solid #dcdfe6;
+    color:#606266;
+    padding:0 15px;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
 </style>
