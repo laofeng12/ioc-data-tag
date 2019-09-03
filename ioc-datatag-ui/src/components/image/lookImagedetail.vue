@@ -24,7 +24,7 @@
                   <el-button v-for="(item,key,index) in leftListarr" :class='"peopleDetail"+(1+index)' size="mini" round
                              :title="`${key}：${item}`">{{key}}：{{item}}
                   </el-button>
-                  <!--<el-button class="peopleDetail" size="mini" round><span>ID：</span><span>2222</span></el-button>-->
+                  <!--<el-button class="peopleDetailid" size="mini" round><span>ID：</span><span>2222</span></el-button>-->
                   <!--<el-button class="peopleDetail1" size="mini" round>33</el-button>-->
                   <!--<el-button class="peopleDetail2" size="mini" round>tb_0_MODULE_CREATETIME：33</el-button>-->
                   <!--<el-button class="peopleDetail2" size="mini" round>tb_0_MODULE_CREATETIME：张晓非</el-button>-->
@@ -258,21 +258,23 @@
     white-space: nowrap;
     left: -293px;
   }
-
-  .peopleDetail1 {
+  .peopleDetailid{
     top: 30px;
   }
-
-  .peopleDetail2 {
+  .peopleDetail1 {
     top: 80px;
   }
 
-  .peopleDetail3 {
+  .peopleDetail2 {
     top: 130px;
   }
 
-  .peopleDetail4 {
+  .peopleDetail3 {
     top: 180px;
+  }
+
+  .peopleDetail4 {
+    top: 230px;
   }
 
   .contentDetai1 {
