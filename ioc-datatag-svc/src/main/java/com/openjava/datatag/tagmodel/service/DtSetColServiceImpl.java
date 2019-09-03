@@ -342,7 +342,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 				filterExpression= check(req.getColId(),record);
 			}catch (Exception e){
 				e.printStackTrace();
-				throw new APIException(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR,"条件设置语法错误:"+i);//i参数可以告知前端第几个条件设置错误了
+				throw new APIException(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR,(i+1)+"");//i参数可以告知前端第几个条件设置错误了
 			}
 
 			//新增和修改

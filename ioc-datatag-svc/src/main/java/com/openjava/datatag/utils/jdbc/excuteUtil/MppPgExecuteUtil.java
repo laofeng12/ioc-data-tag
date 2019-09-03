@@ -218,7 +218,7 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     }
 
     @Override
-    public Result insertDataList() {
+    public Result insertDataList() throws Exception{
         Result result = new GeneralResult();
         List<String> insertDataSqlList = this.getInsertDataSqlList();
         Map<String, String> sqlMap = new HashMap<>(2);
@@ -231,6 +231,7 @@ public class MppPgExecuteUtil extends ExecuteUtil {
                 result.setSuccess(createTableResult);
             } catch (Exception e) {
                 e.printStackTrace();
+                throw e;
             }
         }
 

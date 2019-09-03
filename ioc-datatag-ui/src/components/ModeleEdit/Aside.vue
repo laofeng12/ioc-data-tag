@@ -25,28 +25,50 @@
       <div class="col-set-box">
         <el-container class="">
           <el-aside width="250px" class="left">
-            <h3>选择字段</h3>
-            <el-input placeholder="输入关键词搜索列表" v-model="searchText" size="small" suffix-icon="el-icon-search"></el-input>
-            <div class="h4">
-              <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
-                {{resourceName}}
-              </el-checkbox>
-            </div>
-            <ul class="contentNum">
-              <li v-for="(item,index) in columnData">
-                <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
-                  <el-checkbox :label="item.definition" :key="item.definition">
-                    <span class="col-name-box">
-                      <span v-if="item.type==='string'" class="blue">Str.</span>
-                      <span v-else-if="item.type==='number'" class="green">No.</span>
-                      <span v-else="item.type==='date'" class="orange">Date.</span>
-                      <span class="col-name" :title="item.definition">{{item.definition}}</span>
-                      <span></span>
-                    </span>
+            <el-tabs v-model="activeName" @tab-click="handleClick">
+              <el-tab-pane label="可用字段" name="first">
+                <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
+                          suffix-icon="el-icon-search"></el-input>
+                <div class="h4">
+                  <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
+                    {{resourceName}}
                   </el-checkbox>
-                </el-checkbox-group>
-              </li>
-            </ul>
+                </div>
+                <ul class="contentNum">
+                  <li v-for="(item,index) in allList">
+                    <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
+                      <el-checkbox :label="item.definition" :key="item.definition">
+                        <span class="col-name-box">
+                          <span v-if="item.type==='string'" class="blue">Str.</span>
+                          <span v-else-if="item.type==='number'" class="green">No.</span>
+                          <span v-else="item.type==='date'" class="orange">Date.</span>
+                          <span class="col-name" :title="item.definition">{{item.definition}}</span>
+                        </span>
+                      </el-checkbox>
+                    </el-checkbox-group>
+                  </li>
+                </ul>
+              </el-tab-pane>
+              <el-tab-pane label="全部字段" name="second" class="">
+                <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
+                          suffix-icon="el-icon-search"></el-input>
+                <div class="h4">
+                  <span class="allNametitle">{{resourceName}}</span>
+                </div>
+                <ul class="contentNum">
+                  <li v-for="(item,index) in list">
+                    <div class="col-name-box">
+                      <div v-if="item.type==='string'" class="blue">Str.</div>
+                      <div v-else-if="item.type==='number'" class="green">No.</div>
+                      <div v-else="item.type==='date'" class="orange">Date.</div>
+                      <div class="col-name" :title="item.definition">{{item.definition}}</div>
+                      <div class="power"><span>{{powerName}}</span></div>
+                    </div>
+                  </li>
+                </ul>
+                <div class="subscribeData" v-if="this.resourceType == 0" @click="getLink">订阅数据</div>
+              </el-tab-pane>
+            </el-tabs>
           </el-aside>
           <div class="right" style="width: 100%;">
             <h3>已择字段</h3>
@@ -125,7 +147,8 @@
     getResourceListData,
     getResourceInfoData,
     setColsData,
-    getModelData
+    getModelData,
+    getdatalakeLink
   } from '@/api/creatModel'
 
   const colsOptions = [];
@@ -139,7 +162,9 @@
     },
     data() {
       return {
-        openScope:'',
+        powerName:'',
+        activeName: 'first',
+        openScope: '',
         modelId: '',
         sortNum: '',
         isNew: true,
@@ -169,6 +194,7 @@
         resourceId: 0,
         resourceType: 0,
         columnData: [],
+        allcolumnData:[],
         myData: [],
         editData: [],
         checkTags: false,
@@ -204,9 +230,6 @@
         })
         this.modelData = newVal
       },
-      searchText(val) {
-        this.columnData = this.fuzzyQuery(this.columnData, val)
-      },
     },
     methods: {
       //初始化弹窗清空数据
@@ -231,9 +254,9 @@
       fuzzyQuery(list, keyWord) {
         const arr = []
         list.map(item => {
-          if (item.name &&
-            (item.name.toLowerCase().includes(keyWord) ||
-              item.name.toUpperCase().includes(keyWord))) {
+          if (item.definition &&
+            (item.definition.toLowerCase().includes(keyWord) ||
+              item.definition.toUpperCase().includes(keyWord))) {
             arr.push(item)
           }
         })
@@ -323,7 +346,7 @@
           this.myData = this.tableData
         }
         // 清空
-        if(value == ''){
+        if (value == '') {
           this.myData = []
           this.ruleForm.pkey = ''
           this.$refs.ruleForm.resetFields()
@@ -355,22 +378,43 @@
         this.editData = []
         this.colSetDialog = true
         let colsData = {}
+        let allcolsData = {}
         if (type === 0) {
           //新建模型字段确认获取数据
-          colsData = await getResourceInfoData(data.resourceId, data.type,0)
+          colsData = await getResourceInfoData(data.resourceId, data.type, 1)  // 有权限的字段
+          allcolsData = await getResourceInfoData(data.resourceId, data.type, 0)  // 全部的字段
         } else {
           //编辑模型字段确认获取数据
           const resourceId = this.modelData.resourceId
           const type = this.modelData.resourceType
-          colsData = await getResourceInfoData(resourceId, type,1)
+          colsData = await getResourceInfoData(resourceId, type, 1)  // 有权限的字段
+          allcolsData = await getResourceInfoData(resourceId, type, 0)  // 全部的字段
         }
+        // 全部字段
+        this.allcolumnData = allcolsData.data.column
+        // 有权限字段
         this.columnData = colsData.data.column
         this.resourceName = colsData.data.resourceName
         this.resourceId = colsData.data.resourceId
         this.resourceType = colsData.data.type   // 0数据湖 1自建目录
         this.tableData = []
-        this.columnData.forEach((item, inde) => {
+        this.columnData.forEach((item, index) => {
           colsOptions.push(item.definition)
+        })
+        // 全部的字段权限显示
+        this.allcolumnData.forEach((item, index) => {
+          if(item.viewable == false){
+            this.powerName = '无权限'
+            return
+          }else if (item.decryption == false){
+            this.powerName = '加密'
+            return
+          }else if (item.sensitived == false) {
+            this.powerName = '脱敏'
+            return
+          }else {
+            this.powerName = ''
+          }
         })
         if (this.routerName === 'editModel') {
           //获取主键值
@@ -428,21 +472,19 @@
           if (data.hasOwnProperty('orgId')) {
             this.resData = []
             const resData = await getResourceListData(data.orgId, data.type, data.databaseType)
-            console.log('resData',resData);
-            if(resData){
-              resData.data.map(item =>{
-                console.log('item',item)
-                Object.assign(item,{leaf:true})
+            if (resData) {
+              resData.data.map(item => {
+                Object.assign(item, {leaf: true})
               })
             }
             // 状态
-            if(resData.openScope == '1'){
+            if (resData.openScope == '1') {
               this.openScope = '全部对外公开'
-            }else if(resData.openScope == '2'){
+            } else if (resData.openScope == '2') {
               this.openScope = '全部对内公开'
-            }else if(resData.openScope == '3'){
+            } else if (resData.openScope == '3') {
               this.openScope = '部分对内公开'
-            }else {
+            } else {
               this.openScope = '不公开'
             }
             const resAlldata = resData.data
@@ -481,9 +523,9 @@
       },
       //加载树节点
       loadNode(node, resolve) {
-        console.log('node',node)
+        // console.log('node', node)
         if (node.level === 0) {
-          return resolve([{orgName: '数据目录',id: '0'}])
+          return resolve([{orgName: '数据目录', id: '0'}])
         }
         else if (node.level === 1) {
           return resolve([{orgName: this.dataLakeDirectoryName, id: '1'}, {
@@ -540,7 +582,6 @@
               this.setColData(params)
               this.saveLoading = false
             }
-
           } else {
             console.log('error submit!!');
             this.saveLoading = false
@@ -593,6 +634,28 @@
           }
         })
       },
+      handleClick(tab, event) {
+        // console.log(tab, event);
+      },
+      async getLink(){
+        try{
+          const link = await getdatalakeLink(this.resourceId)
+          if(link.data.code == 200){
+            this.$message({
+              message: link.data.message,
+              type: 'success'
+            });
+          }else if(link.data.code == 307){
+            window.location = link.data.dataLakeApplyPageUrl
+          }else {
+
+          }
+        }catch (e) {
+          console.log(e);
+        }
+
+
+      }
     },
     created() {
       this.getOneZtreeData()
@@ -602,6 +665,30 @@
     },
     mounted() {
       this.routerName = this.$route.name
+    },
+    computed: {
+      list() {
+        const arr = []
+        this.columnData.map(item => {
+          if (item.definition &&
+            (item.definition.toLowerCase().includes(this.searchText) ||
+              item.definition.toUpperCase().includes(this.searchText))) {
+            arr.push(item)
+          }
+        })
+        return arr
+      },
+      allList() {
+        const arr = []
+        this.allcolumnData.map(item => {
+          if (item.definition &&
+            (item.definition.toLowerCase().includes(this.searchText) ||
+              item.definition.toUpperCase().includes(this.searchText))) {
+            arr.push(item)
+          }
+        })
+        return arr
+      },
     }
   }
 </script>
@@ -613,6 +700,7 @@
       width: 100px;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
@@ -665,6 +753,12 @@
         background-color: #f4f9fb;
         border: 1px solid #eee;
         font-weight: bold;
+        .allNametitle {
+          padding-left: 10px;
+          font-size: 14px;
+          color: #606266;
+          font-weight: 500;
+        }
       }
       ul {
         margin: 0;
@@ -699,6 +793,19 @@
 
   .btnMargin {
     margin-left: 5px;
+  }
+  .subscribeData{
+    font-size: 14px;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    color: #fff;
+    background-color: #0486fe;
+    border-color: #0486fe;
+    cursor: pointer;
+  }
+  .power{
+    color: #b1b1b1;
   }
 </style>
 <style lang="stylus" scoped>
