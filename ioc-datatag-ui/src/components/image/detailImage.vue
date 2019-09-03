@@ -179,12 +179,13 @@
   }
 
   .circularContent {
-    margin-top: 50px;
-    margin-bottom: 135px;
+    padding-top: 50px;
+    /*margin-bottom: 135px;*/
     /*margin-left: 80px;*/
     padding-left: 80px;
     padding-right: 80px;
     overflow-x: auto;
+    padding-bottom: 50px;
   }
 
   .peopleDetail, .peopleDetail2, .peopleDetail3, .peopleDetail4,.peopleDetail5,.peopleDetail6,.peopleDetail7,.peopleDetail8,.peopleDetail9,.peopleDetail10 {
