@@ -40,41 +40,26 @@
                 <div class="dataImage">数据画像</div>
               </div>
             </div>
-            <div>
-            <!--<div v-for="(item,index) in listArr.lists" :key="'info2-'+index">-->
-              <!--<el-button :class='"contentDetai"+(1+index)' size="mini" round v-if="index < 8">{{item}}</el-button>-->
-              <el-button class="contentDetai1" size="mini" round>美容顾问</el-button>
-              <el-button class="contentDetai2" size="mini" round>租房</el-button>
-              <el-button class="contentDetai3" size="mini" round>工作5年</el-button>
-              <el-button class="contentDetai4" size="mini" round>乐观派</el-button>
-              <el-button class="contentDetai5" size="mini" round>月收入2000元</el-button>
-              <el-button class="contentDetai6" size="mini" round>未婚</el-button>
-              <el-button class="contentDetai7" size="mini" round>单身</el-button>
+            <div v-for="(item,index) in listArr.lists" :key="'info2-'+index">
+              <el-button :class='"contentDetai"+(1+index)' size="mini" round v-if="index < 8">{{item}}</el-button>
+              <!--<el-button class="contentDetai1" size="mini" round>美容顾问</el-button>-->
+              <!--<el-button class="contentDetai2" size="mini" round>租房</el-button>-->
+              <!--<el-button class="contentDetai3" size="mini" round>工作5年</el-button>-->
+              <!--<el-button class="contentDetai4" size="mini" round>乐观派</el-button>-->
+              <!--<el-button class="contentDetai5" size="mini" round>月收入2000元</el-button>-->
+              <!--<el-button class="contentDetai6" size="mini" round>未婚</el-button>-->
+              <!--<el-button class="contentDetai7" size="mini" round>单身</el-button>-->
             </div>
             <!--zeng-->
             <div style="position:absolute;left: 580px;top:0px">
-              <!--<div v-for="(item,index) in listArr.lists" :key="'info2-'+index">-->
-              <!--<el-button :class='"contentDetai"+(1+index)' size="mini" round  v-if="7 < index && index < 15">{{item}}</el-button>-->
-            <!--</div>-->
-              <el-button class="contentDetai1" size="mini" round>美容顾问</el-button>
-              <el-button class="contentDetai2" size="mini" round>租房</el-button>
-              <el-button class="contentDetai3" size="mini" round>工作5年</el-button>
-              <el-button class="contentDetai4" size="mini" round>乐观派</el-button>
-              <el-button class="contentDetai5" size="mini" round>月收入2000元</el-button>
-              <el-button class="contentDetai6" size="mini" round>未婚</el-button>
-              <el-button class="contentDetai7" size="mini" round>单身</el-button>
+              <div v-for="(item,index) in listArr.lists" :key="'info2-'+index">
+              <el-button :class='"contentDetai"+(1+index)' size="mini" round  v-if="7 < index && index < 15">{{item}}</el-button>
+            </div>
             </div>
             <div style="position:absolute;left: 800px;top:0px">
-              <!--<div v-for="(item,index) in listArr.lists" :key="'info2-'+index">-->
-              <!--<el-button :class='"contentDetai"+(1+index)' size="mini" round v-if="14 < index && index < 22">{{item}}</el-button>-->
-            <!--</div>-->
-              <el-button class="contentDetai1" size="mini" round>美容顾问</el-button>
-              <el-button class="contentDetai2" size="mini" round>租房</el-button>
-              <el-button class="contentDetai3" size="mini" round>工作5年</el-button>
-              <el-button class="contentDetai4" size="mini" round>乐观派</el-button>
-              <el-button class="contentDetai5" size="mini" round>月收入2000元</el-button>
-              <el-button class="contentDetai6" size="mini" round>未婚</el-button>
-              <el-button class="contentDetai7" size="mini" round>单身</el-button>
+              <div v-for="(item,index) in listArr.lists" :key="'info2-'+index">
+              <el-button :class='"contentDetai"+(1+index)' size="mini" round v-if="14 < index && index < 22">{{item}}</el-button>
+            </div>
           </div>
         </div>
       </div>
