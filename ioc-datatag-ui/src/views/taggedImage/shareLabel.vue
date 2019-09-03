@@ -51,7 +51,7 @@
                 </router-link>
               </span>
               </el-tooltip>
-              <el-tooltip class="item" effect="dark" content="选用标签组" placement="top">
+              <el-tooltip class="item" effect="dark" content="选用为我的" placement="top">
               <span class="operationIcona">
                 <i class="el-icon-position iconLogo" @click="Selection(props.row.tagsId,props.row.tagsName)"></i>
               </span>
