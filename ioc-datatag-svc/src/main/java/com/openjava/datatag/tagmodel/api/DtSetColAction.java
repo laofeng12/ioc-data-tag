@@ -14,6 +14,7 @@ import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
 import org.ljdp.component.exception.APIException;
+import org.ljdp.component.result.DataApiResponse;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.SequenceService;
 import org.ljdp.component.sequence.ConcurrentSequence;
@@ -139,10 +140,20 @@ public class DtSetColAction {
 	})
 	@Security(session=true)
 	@RequestMapping(value="/saveCondition",method=RequestMethod.POST)
-	public SuccessMessage saveCondition(@RequestBody SaveConditionDTO req,
-										HttpServletRequest request)throws Exception{
+	public DataApiResponse<Object> saveCondition(@RequestBody SaveConditionDTO req,
+												 HttpServletRequest request)throws Exception{
 		req.setIp(request);
-		dtSetColService.saveCondition(req);
-		return new SuccessMessage("保存成功");
+		DataApiResponse<Object> result = new DataApiResponse<>();
+		try{
+			dtSetColService.saveCondition(req);
+			result.setMessage("保存成功");
+		}catch (APIException e){
+			if (MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR==e.getCode()){
+				result.setCode(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR);
+				result.setData(e.getMessage());
+				result.setMessage("第"+e.getMessage()+"条数据设置语法错误，请重新设置");
+			}
+		}
+		return result;
 	}
 }
