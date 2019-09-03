@@ -59,13 +59,13 @@
                   <!--// 增加-->
                   <div style="position:absolute;left: 600px;top:0px">
                     <el-button v-for="(item,key,index) in rightListarr" :key="'info2-'+index"
-                               :class='"contentDetai"+(1+index)' size="mini" round v-if="10 < index && index < 20"
+                               :class='"contentDetai"+(1+index)' size="mini" round v-if="9 < index && index < 20"
                                :title="`${key}：${item}`">{{key}}：{{item}}
                     </el-button>
                   </div>
                   <div style="position:absolute;left: 840px;top:0px">
                     <el-button v-for="(item,key,index) in rightListarr" :key="'info2-'+index"
-                               :class='"contentDetai"+(1+index)' size="mini" round v-if="20 < index && index < 30"
+                               :class='"contentDetai"+(1+index)' size="mini" round v-if="19 < index && index < 30"
                                :title="`${key}：${item}`">{{key}}：{{item}}
                     </el-button>
                   </div>
@@ -245,7 +245,7 @@
     margin-left: 80px;
   }
 
-  .peopleDetailid,.peopleDetail1, .peopleDetail2, .peopleDetail3, .peopleDetail4 {
+  .peopleDetailid, .peopleDetail1, .peopleDetail2, .peopleDetail3, .peopleDetail4, .peopleDetail5, .peopleDetail6, .peopleDetail7, .peopleDetail8, .peopleDetail9, .peopleDetail10 {
     color: #00CCCC;
     background-color: #fff;
     border: 1px solid #fff;
@@ -258,9 +258,11 @@
     white-space: nowrap;
     left: -293px;
   }
-  .peopleDetailid{
+
+  .peopleDetailid {
     top: 30px;
   }
+
   .peopleDetail1 {
     top: 80px;
   }
@@ -275,6 +277,30 @@
 
   .peopleDetail4 {
     top: 230px;
+  }
+
+  .peopleDetail5 {
+    top: 280px;
+  }
+
+  .peopleDetail6 {
+    top: 330px;
+  }
+
+  .peopleDetail7 {
+    top: 380px;
+  }
+
+  .peopleDetail8 {
+    top: 430px;
+  }
+
+  .peopleDetail9 {
+    top: 480px;
+  }
+
+  .peopleDetail10 {
+    top: 530px;
   }
 
   .contentDetai1 {
@@ -391,7 +417,8 @@
     text-align: center;
     margin-top: 20px;
   }
-  .peopleDetailid{
+
+  .peopleDetailid {
 
   }
 </style>
