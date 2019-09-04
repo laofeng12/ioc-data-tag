@@ -304,7 +304,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 			DtTagGroup selectTagGroups = dtTagGroupService.get(children.getTagsId());//用于前端展示选中的
 			result.setSelectTag(children);//标签
 			DtTag father = dtTagService.get(children.getPreaTagId());//用于前端展示选中的（默认用第一个）
-			result.setSelectTag(father);//标签层
+			result.setSelectTags(father);//标签层
 			result.setSelectTagGroup(selectTagGroups);//表签组
 			//result.setTags(tagList);
 		}
