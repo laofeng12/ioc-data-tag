@@ -100,9 +100,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	@Resource
 	private DtTaggingErrorLogService dtTaggingErrorLogService;
 
-	public void copy(Long id,String ip)throws Exception{
+	public void copy(DtTaggingModelCopyDTO copy,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		DtTaggingModel model = get(id);
+		DtTaggingModel model = get(copy.getTaggingModelId());
 		if (model==null) {
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"此Id查无模型");
 		}
@@ -115,7 +115,13 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				.register(new SqlDateConverter(null), Date.class);//解决时间空复制时出现异常
 		BeanUtils.copyProperties(tempDTO,model);
 		BeanUtils.copyProperties(clone,tempDTO);
+		clone.setModelName(copy.getModelName());
+		clone.setModelDesc(copy.getModelDesc());
 		clone.setTaggingModelId(null);
+		clone.setCycle(null);
+		clone.setStartTime(null);
+		clone.setCycleEnum(null);
+		clone.setRunState(Constants.DT_MODEL_NO_BEGIN);
 		EntityClassUtil.dealCreateInfo(clone,userInfo);
 		clone = doSave(clone);
 		clone.setDataTableName("DT_"+clone.getTaggingModelId());//@TODO 这里要注意

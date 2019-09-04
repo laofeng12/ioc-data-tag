@@ -13,6 +13,8 @@ public class DtSetColDTO {
     private Long taggingModelId;
 
     private String sourceCol;
+    private String sourceColId;
+    private String sourceDataType;
 
     private String showCol;
 
@@ -30,10 +32,12 @@ public class DtSetColDTO {
 
     private Long isDeleted;
 
+    private Long isPKey;
+
     private Long isHandle;
 
     private Long isMarking;
 
     private Long isSource;
-
+    private Long colSort;
 }

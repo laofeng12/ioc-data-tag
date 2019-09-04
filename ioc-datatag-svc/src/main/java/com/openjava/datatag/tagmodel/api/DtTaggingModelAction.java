@@ -10,6 +10,7 @@ import com.commons.utils.QueryParamsUtil;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
+import com.openjava.datatag.tagmodel.dto.DtTaggingModelCopyDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelRenameDTO;
 import com.openjava.datatag.tagmodel.service.DtSetColService;
@@ -239,9 +240,11 @@ public class DtTaggingModelAction {
 	@Security(session=true)
 	@RequestMapping(value="/copy/{taggingModelId}",method=RequestMethod.POST)
 	public SuccessMessage clone(@PathVariable(value="taggingModelId")Long id,
+								@RequestBody DtTaggingModelCopyDTO copy,
 								HttpServletRequest request) throws Exception {
 		String ip = IpUtil.getRealIP(request);
-		dtTaggingModelService.copy(id,ip);
+		copy.setTaggingModelId(id);
+		dtTaggingModelService.copy(copy,ip);
 		return new SuccessMessage("另存成功");
 	}
 
