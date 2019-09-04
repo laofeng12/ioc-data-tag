@@ -300,11 +300,12 @@ public class DtSetColServiceImpl implements DtSetColService {
 		result.setCondtion(conditionsDTOs);//打标的条件设置列表
 		if (CollectionUtils.isNotEmpty(conditions)) {
 			DtTagCondition condition =conditions.get(0);
-			DtTag selectTag = dtTagService.get(condition.getTagId());//用于前端展示选中的（默认用第一个）
-			DtTagGroup selectTagGroups = dtTagGroupService.get(selectTag.getTagsId());//用于前端展示选中的
-			//List<DtTag> tagList= dtTagService.findByTagsId(selectTagGroups.getId());//默认选中标签组的所有标签
-			result.setSelectTags(selectTag);
-			result.setSelectTagGroup(selectTagGroups);
+			DtTag children = dtTagService.get(condition.getTagId());//用于前端展示选中的（默认用第一个）
+			DtTagGroup selectTagGroups = dtTagGroupService.get(children.getTagsId());//用于前端展示选中的
+			result.setSelectTag(children);//标签
+			DtTag father = dtTagService.get(children.getPreaTagId());//用于前端展示选中的（默认用第一个）
+			result.setSelectTag(father);//标签层
+			result.setSelectTagGroup(selectTagGroups);//表签组
 			//result.setTags(tagList);
 		}
 		return result;
