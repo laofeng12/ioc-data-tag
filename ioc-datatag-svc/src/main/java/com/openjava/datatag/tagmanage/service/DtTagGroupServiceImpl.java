@@ -129,7 +129,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		Page<DtTagGroup> result = query(params,pageable);
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		if (CollectionUtils.isNotEmpty(result.getContent())){
-			Long maxPopularity = dtTagGroupRepository.findMaxPopularityBytagsIdAAndIsDeleted(Long.valueOf(userInfo.getUserId()),Constants.PUBLIC_NO);
+			Long maxPopularity = dtTagGroupRepository.findMaxPopularityBytagsIdAAndIsDeletedAAndIsShare(Constants.PUBLIC_NO,Constants.PUBLIC_YES);
 			for (DtTagGroup tgg: result){
 				if (tgg.getPopularity()==null){
 					tgg.setPercentage(0L);

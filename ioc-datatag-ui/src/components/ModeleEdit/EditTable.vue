@@ -45,11 +45,10 @@
             </el-col>
           </el-form-item>
           <el-form-item label="选择标签层:" prop="tagLev">
-            <el-col :span="11">
+            <el-col :span="7.5">
               <div class="allTree">
                 <div class="sel">
-                  <el-input style="width: 215px"
-                            size="small"
+                  <el-input size="small"
                             placeholder="请输入内容"
                             v-model="ruleForm.tagLev">
                     <i slot="suffix" class="el-input__icon el-icon-arrow-down" @click="showTree()"></i>
@@ -138,18 +137,17 @@
               </div>
             </div>
             <!--自动打标不可操作-->
-
-
             <div class="makingContent">
               <!--打标开始-->
               <div class="card" v-for="(item,index) in selfMarkList" :key="index" @click="chooseMark(item,index)"
                    :class="{acitve:curIndex===index}">
-                <el-card class="box-card">
+                <el-card class="box-card" :class="{borderColor:changeRed == index+1}">
                   <!--人工打标结构-->
                   <div class="card-handle" v-if="item.isHandle===0">
                     <i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i>
-                    <el-input style="width:100px" size="small" v-model="item.tagSetName" placeholder="请输入内容"
-                              readonly></el-input>
+                    <div class="labelCard" :title="item.tagSetName">{{item.tagSetName}}</div>
+                    <!--<el-input style="width:100px" size="small" v-model="item.tagSetName" placeholder="请输入内容"-->
+                              <!--readonly></el-input>-->
                     <span class="chinese">{{item.sourceCol}}</span>
                     <div class="conditions">
                       <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
@@ -169,8 +167,8 @@
                   <div class="card2" v-else>
                     <div><i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i></div>
                     <div>
-                      <el-input style="width:100px" size="small" v-model="item.tagSetName" placeholder="请输入内容"
-                                readonly></el-input>
+                      <div class="labelCard" :title="item.tagSetName">{{item.tagSetName}}</div>
+                      <!--<el-input style="width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" size="small" v-model="item.tagSetName" placeholder="请输入内容" readonly></el-input>-->
                     </div>
                     <div class="chinese">{{item.sourceCol}}</div>
                     <div class="self-mark-choose-box">
@@ -178,6 +176,7 @@
                         <span>已选</span>
                         <span class="num">{{item.checkList.length}}</span>
                         <span>条</span>
+                        <i class="el-icon-caret-bottom"></i>
                       </div>
                       <div class="self-mark-list" v-show="item.showSelfMark">
                         <el-input
@@ -247,6 +246,8 @@
     },
     data() {
       return {
+        changeRed:-1,
+        znumber:'',
         ztheadData: '',
         tableHeight: '',
         totalnum: 20,
@@ -633,8 +634,8 @@
       chooseTagTeam(id) {
         this.chooseTagTeamid = id
         this.getTagLevList(id)
-        this.tagTeamList.forEach(item=>{
-          if(item.id == id){
+        this.tagTeamList.forEach(item => {
+          if (item.id == id) {
             this.chooseTagTeamname = item.tagsName
 
           }
@@ -644,7 +645,7 @@
       editLabelgroup() {
         if (this.chooseTagTeamid) {
           this.$router.push({
-            path: '/editTree/' + this.chooseTagTeamid+'/'+this.chooseTagTeamname,
+            path: '/editTree/' + this.chooseTagTeamid + '/' + this.chooseTagTeamname,
           })
         } else {
           this.$message.error('请先选择标签组！');
@@ -724,7 +725,6 @@
       async getSaveMarkList() {
         // console.log('this.selfMarkList',this.selfMarkList)
         //console.log('this.valuesType',this.valuesType)
-        try {
           let conditions = this.deepClone(this.selfMarkList)
           conditions.forEach((obj, index) => {
             delete obj.checkList
@@ -738,19 +738,20 @@
             colId: this.colId,
             condtion: conditions
           }
-          const data = await saveMarkData(params)
-          this.$message({
-            showClose: true,
-            message: '打标成功',
-            duration: 2000,
-            type: 'success'
-          })
-          this.setTagsDialog = false
-          this.selfMarkList = []
+          try{
+            const data = await saveMarkData(params)
+              this.$message({
+                showClose: true,
+                message: '打标成功',
+                duration: 2000,
+                type: 'success'
+              })
+              this.setTagsDialog = false
+              this.selfMarkList = []
+          }catch (e) {
+            this.changeRed = e.data.message
+          }
 
-        } catch (e) {
-
-        }
       },
       //选中要打标条件修改
       chooseMark(item, index) {
@@ -969,5 +970,24 @@
 
   .btnMargin {
     margin-left: 5px;
+  }
+
+  .labelCard {
+    width: 100px;
+    height: 32px;
+    line-height: 32px;
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    border: 1px solid #dcdfe6;
+    color:#606266;
+    padding:0 15px;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .borderColor{
+    border: 1px solid #ee0320;
   }
 </style>

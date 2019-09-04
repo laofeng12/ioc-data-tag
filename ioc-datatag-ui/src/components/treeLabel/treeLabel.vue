@@ -271,7 +271,20 @@
                   duration: 1000,
                   type: 'success'
                 })
-                this.sharelookTree()
+                // this.sharelookTree()
+                try {
+                  const res = await lookTree(this.$route.params.tagsId)
+                  this.data = res.childrenNode
+                  if (res.childrenNode && res.childrenNode.length > 0) {
+                    const treeTable = await looktreeTable(res.childrenNode[0].id)
+                  }else{
+                    this.showContent = false
+                    this.ruleForm2.name2 = ''
+                    this.ruleForm2.textarea2 = ''
+                  }
+                } catch (e) {
+                  console.log(e);
+                }
                 this.editDialog = false
                 this.editLoading = false
                 // this.$refs.ruleForm.resetFields()

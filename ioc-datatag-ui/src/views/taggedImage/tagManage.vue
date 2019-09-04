@@ -33,7 +33,7 @@
             <div v-else>暂无数据</div>
           </template>
           <el-table-column prop="tagsName" label="标签组名称"></el-table-column>
-          <el-table-column prop="source" label="使用热度">
+          <el-table-column prop="source" label="选用热度">
             <template slot-scope="scope">
               <div class="gress">
                 <div class="gressPercentage">

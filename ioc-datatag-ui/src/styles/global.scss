@@ -87,10 +87,10 @@ p {
 
 
 // 叶子节点去掉图标
-.aside .el-tree-node__expand-icon.is-leaf::before
-{
-  display: none;
-}
+//.aside .el-tree-node__expand-icon.is-leaf::before
+//{
+//  display: none;
+//}
 
 // 标签管理
 .treeBel .el-tree-node__expand-icon.is-leaf{

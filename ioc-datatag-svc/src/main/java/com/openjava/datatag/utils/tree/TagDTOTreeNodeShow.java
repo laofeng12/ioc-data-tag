@@ -32,6 +32,8 @@ public class TagDTOTreeNodeShow {
 
     private Boolean isLeafParent;
 
+    private Boolean isNotLeafParent;
+
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     private Date createTime;
@@ -55,6 +57,7 @@ public class TagDTOTreeNodeShow {
         lvl = tree.getTag().getLvl();
         isLeaf = tree.isLeaf();
         isLeafParent = tree.isLeafParent();
+        isNotLeafParent = !tree.isLeafParent();//应前端要求给个取反的字段
         childrenNode = new ArrayList<>();
         for (TagDTOTreeNode ctree: tree.getChildrenNode()){
             TagDTOTreeNodeShow ctreeShow = new TagDTOTreeNodeShow(ctree);
@@ -148,5 +151,13 @@ public class TagDTOTreeNodeShow {
 
     public void setLeafParent(Boolean leafParent) {
         isLeafParent = leafParent;
+    }
+
+    public Boolean getNotLeafParent() {
+        return isNotLeafParent;
+    }
+
+    public void setNotLeafParent(Boolean notLeafParent) {
+        isNotLeafParent = notLeafParent;
     }
 }
