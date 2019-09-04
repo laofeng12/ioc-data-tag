@@ -45,11 +45,10 @@
             </el-col>
           </el-form-item>
           <el-form-item label="选择标签层:" prop="tagLev">
-            <el-col :span="11">
+            <el-col :span="7.5">
               <div class="allTree">
                 <div class="sel">
-                  <el-input style="width: 215px"
-                            size="small"
+                  <el-input size="small"
                             placeholder="请输入内容"
                             v-model="ruleForm.tagLev">
                     <i slot="suffix" class="el-input__icon el-icon-arrow-down" @click="showTree()"></i>
@@ -138,13 +137,11 @@
               </div>
             </div>
             <!--自动打标不可操作-->
-
-
             <div class="makingContent">
               <!--打标开始-->
               <div class="card" v-for="(item,index) in selfMarkList" :key="index" @click="chooseMark(item,index)"
                    :class="{acitve:curIndex===index}">
-                <el-card class="box-card">
+                <el-card class="box-card" :class="{borderColor:changeRed == index+1}">
                   <!--人工打标结构-->
                   <div class="card-handle" v-if="item.isHandle===0">
                     <i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i>
@@ -179,6 +176,7 @@
                         <span>已选</span>
                         <span class="num">{{item.checkList.length}}</span>
                         <span>条</span>
+                        <i class="el-icon-caret-bottom"></i>
                       </div>
                       <div class="self-mark-list" v-show="item.showSelfMark">
                         <el-input
@@ -248,6 +246,8 @@
     },
     data() {
       return {
+        changeRed:-1,
+        znumber:'',
         ztheadData: '',
         tableHeight: '',
         totalnum: 20,
@@ -725,7 +725,6 @@
       async getSaveMarkList() {
         // console.log('this.selfMarkList',this.selfMarkList)
         //console.log('this.valuesType',this.valuesType)
-        try {
           let conditions = this.deepClone(this.selfMarkList)
           conditions.forEach((obj, index) => {
             delete obj.checkList
@@ -739,19 +738,20 @@
             colId: this.colId,
             condtion: conditions
           }
-          const data = await saveMarkData(params)
-          this.$message({
-            showClose: true,
-            message: '打标成功',
-            duration: 2000,
-            type: 'success'
-          })
-          this.setTagsDialog = false
-          this.selfMarkList = []
+          try{
+            const data = await saveMarkData(params)
+              this.$message({
+                showClose: true,
+                message: '打标成功',
+                duration: 2000,
+                type: 'success'
+              })
+              this.setTagsDialog = false
+              this.selfMarkList = []
+          }catch (e) {
+            this.changeRed = e.data.message
+          }
 
-        } catch (e) {
-
-        }
       },
       //选中要打标条件修改
       chooseMark(item, index) {
@@ -986,5 +986,8 @@
     overflow: hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+  }
+  .borderColor{
+    border: 1px solid #ee0320;
   }
 </style>
