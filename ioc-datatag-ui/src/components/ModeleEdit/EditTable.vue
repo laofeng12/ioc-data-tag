@@ -72,19 +72,6 @@
                         <span :title="data.tagName">{{ data.tagName }}</span>
                       </span>
                     </el-tree>
-                    <!--<el-tree-->
-                    <!--class="filter-tree"-->
-                    <!--:data="treeLevdata"-->
-                    <!--:props="defaultProps"-->
-                    <!--default-expand-all-->
-                    <!--:filter-node-method="filterNode"-->
-                    <!--@node-click="clickTreeItem"-->
-                    <!--ref="tree">-->
-                    <!--<span class="custom-tree-node" slot-scope="{ node, data }">-->
-                    <!--<span> <el-radio :disabled="data.leaf" v-model="radio" :label="data">{{data.tagName}}</el-radio></span>-->
-                    <!--</span>-->
-                    <!--</el-tree>-->
-
                   </div>
                 </div>
               </div>
@@ -176,7 +163,8 @@
                         <span>已选</span>
                         <span class="num">{{item.checkList.length}}</span>
                         <span>条</span>
-                        <i class="el-icon-caret-bottom"></i>
+                        <i class="el-icon-caret-top" v-if="item.showSelfMark==true"></i>
+                        <i class="el-icon-caret-bottom" v-else></i>
                       </div>
                       <div class="self-mark-list" v-show="item.showSelfMark">
                         <el-input
@@ -261,7 +249,7 @@
         defaultProps: {
           children: 'childrenNode', // 子集的属性
           label: 'tagName',
-          disabled: 'leaf'// 是否可以选择
+          disabled: 'notLeafParent'// 是否可以选择
         },
         saveLoading: false,
         ruleForm: {
