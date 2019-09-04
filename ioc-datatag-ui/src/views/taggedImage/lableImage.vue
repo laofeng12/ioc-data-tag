@@ -314,6 +314,7 @@
         exportNum:'',
         value: '',
         ztableShowList: [],
+        timer:'',
         ruleForm: {
           region: null,
           date: null,
@@ -410,6 +411,12 @@
       cooperationModel() {
         this.$router.push('cooperationModel')
       },
+      // 定时器
+      setTimer() {
+        return setTimeout(()=>{
+          this.datamodelList()
+        },1000)
+      },
       async datamodelList() {
         const params = {
           eq_runState: this.value,
@@ -430,18 +437,23 @@
               }
               if (item.runState == 1) {
                 item.runState = '等待运行'
+                this.setTimer()
               }
               if (item.runState == 2) {
                 item.runState = '运行中'
+                this.setTimer()
               }
               if (item.runState == 3) {
                 item.runState = '运行成功'
+                clearInterval(this.setTimer)
               }
               if (item.runState == 4) {
                 item.runState = '运行错误'
+                clearInterval(this.setTimer)
               }
               if (item.runState == -1) {
                 item.runState = '运行结束'
+                clearInterval(this.setTimer)
               }
             })
           } else {

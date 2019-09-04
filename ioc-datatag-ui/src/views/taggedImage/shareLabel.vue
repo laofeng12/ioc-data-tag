@@ -24,7 +24,7 @@
             <div v-else>暂无数据</div>
           </template>
           <el-table-column prop="tagsName" label="标签组名称"></el-table-column>
-          <el-table-column prop="source" label="使用热度" >
+          <el-table-column prop="source" label="选用热度" >
             <template slot-scope="scope">
               <div class="gress">
                 <div class="gressPercentage"><el-progress :percentage="scope.row.percentage" :show-text="false" :color="customColorMethod"></el-progress></div>
@@ -51,7 +51,7 @@
                 </router-link>
               </span>
               </el-tooltip>
-              <el-tooltip class="item" effect="dark" content="选用标签组" placement="top">
+              <el-tooltip class="item" effect="dark" content="选用为我的" placement="top">
               <span class="operationIcona">
                 <i class="el-icon-position iconLogo" @click="Selection(props.row.tagsId,props.row.tagsName)"></i>
               </span>
