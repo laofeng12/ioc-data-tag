@@ -23,6 +23,8 @@ public class GetHistoryColDTO {
     private List<DtTag> tags = new ArrayList<>();
     @ApiModelProperty("被选标签层")
     private DtTag selectTags;
+    @ApiModelProperty("被选标")
+    private DtTag selectTag;
     @ApiModelProperty("打标规制数据")
     private List<DtTagConditionDTO> condtion = new ArrayList<>();
 }
