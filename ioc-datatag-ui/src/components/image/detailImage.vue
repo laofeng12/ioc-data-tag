@@ -198,7 +198,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    left: -255px;
+    left: -266px;
   }
 
   .peopleDetail {

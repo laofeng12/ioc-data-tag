@@ -67,7 +67,7 @@
         showTable:true,
         showPicture:false,
         page: 0,
-        size: 15,
+        size: 20,
         totalnum: 0,
         doFalse: false,
         Loading: true,

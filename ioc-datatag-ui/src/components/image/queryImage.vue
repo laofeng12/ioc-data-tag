@@ -26,7 +26,7 @@
         <div class="numidContent">{{item.title}}</div>
         <div class="peopleContent">
           <el-tag class="people" v-for="(name,key) in item.lists" :key="key">{{name}}</el-tag>
-          <el-tag class="people" >....</el-tag>
+          <el-tag class="people" v-if="item.lists > 0">....</el-tag>
         </div>
         <div>
           <el-button type="text" @click="lookDetail(item.id,item.tableName)">查看详情</el-button>
