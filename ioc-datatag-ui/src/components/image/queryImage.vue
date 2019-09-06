@@ -1,7 +1,7 @@
 <template>
   <div class='app-container'>
     <div class="result">
-      <div class="queryTitle">画像查询</div>
+      <!--<div class="queryTitle">画像查询</div>-->
       <div class="queryIt">
         <el-input
           class="zxinp moduleOne"
@@ -10,7 +10,7 @@
           prefix-icon="el-icon-search"
           v-model="input2">
         </el-input>
-        <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">查询</el-button>
+        <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">画像查询</el-button>
       </div>
     </div>
     <div class="back">
@@ -26,7 +26,7 @@
         <div class="numidContent">{{item.title}}</div>
         <div class="peopleContent">
           <el-tag class="people" v-for="(name,key) in item.lists" :key="key">{{name}}</el-tag>
-          <el-tag class="people">....</el-tag>
+          <el-tag class="people" >....</el-tag>
         </div>
         <div>
           <el-button type="text" @click="lookDetail(item.id,item.tableName)">查看详情</el-button>

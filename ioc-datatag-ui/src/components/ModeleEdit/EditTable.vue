@@ -79,7 +79,7 @@
           </el-form-item>
           <el-form-item label="打标设置:" prop="tagSet">
             <el-col :span="9">
-              <el-select v-model="ruleForm.tagSet" filterable placeholder="请选择" size="small">
+              <el-select v-model="ruleForm.tagSet" filterable placeholder="请选择" size="small" @change="getLabel">
                 <el-option v-for="(item ,index) in tagSetList" :key="item.id" :label="item.tagName" :value="item.id">
                 </el-option>
               </el-select>
@@ -176,7 +176,7 @@
                         <div class="checkIt">
                           <div class="checkOne">
                             <el-checkbox-group v-model="item.checkList" @change="checkMarkChange(item)">
-                              <el-checkbox v-for="(colItem,cIndex) in  colList" :key='cIndex'
+                              <el-checkbox v-for="(colItem,cIndex) in colList" :key='cIndex'
                                            :label="colItem.markName"></el-checkbox>
                             </el-checkbox-group>
                           </div>
@@ -313,7 +313,7 @@
       },
       'tagSetList': {
         handler: function (newValue, oldValue) {
-          // this.tagSetList = newValue
+          this.tagSetList = newValue
         },
         deep: true
       },
@@ -351,6 +351,7 @@
     mounted() {
     },
     methods: {
+      getLabel(){},
       init() {
         this.ruleForm.tagTeam = ''
         this.treeLevdata = []
@@ -625,7 +626,6 @@
         this.tagTeamList.forEach(item => {
           if (item.id == id) {
             this.chooseTagTeamname = item.tagsName
-
           }
         })
       },
@@ -664,7 +664,7 @@
       async getTagLevList(id) {
         try {
           const data = await getTagLevData(id)
-          // console.log('选择标签组', data.childrenNode)
+          // console.log('选择标签层', data.childrenNode)
           this.treeLevdata = data.childrenNode
         } catch (e) {
 
@@ -682,6 +682,17 @@
           this.ruleForm.tagTeam = data.selectTagGroup.id
           //标签层数树
           this.getTagLevList(this.ruleForm.tagTeam)
+          //选择标签层
+          this.ruleForm.tagLev = data.selectTags.tagName
+          // 打标设置
+          // this.ruleForm.tagSet = data.selectTag.id
+          //历史数据
+          this.$refs.treeForm.setCheckedKeys([data.selectTags.id]);
+          const obj = {
+            tagName: data.selectTag.tagName,
+            id: data.selectTag.id
+          }
+          this.tagSetList.push(obj)
           //打标相关字段
           this.selfMarkList = this.deepClone(data.condtion)
           this.selfMarkList.map((item, index) => {
@@ -737,7 +748,8 @@
               this.setTagsDialog = false
               this.selfMarkList = []
           }catch (e) {
-            this.changeRed = e.data.message
+            console.log('e',e);
+            this.changeRed = e.data
           }
 
       },
@@ -847,11 +859,15 @@
   .makingContent {
     margin-top: 20px;
     min-height: 100px;
+    /*max-height: 300px;*/
+    /*overflow: auto;*/
+    padding-bottom: 10px;
   }
 
   .card {
     margin-bottom: 10px;
     cursor: pointer;
+    position: relative;
   }
 
   .chooseNum {

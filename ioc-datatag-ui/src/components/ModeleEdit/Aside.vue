@@ -19,6 +19,9 @@
       </el-tree>
     </div>
     <!--字段设置-->
+    <!--<el-dialog class="creat" title="字段设置" :visible.sync="colSetDialog" width="800px" center-->
+               <!--:modal-append-to-body="false" :close-on-click-modal="false"-->
+               <!--@close="close" @open="init">-->
     <el-dialog class="creat" title="字段设置" :visible.sync="colSetDialog" width="800px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close" @open="init">
@@ -35,7 +38,7 @@
                   </el-checkbox>
                 </div>
                 <ul class="contentNum">
-                  <li v-for="(item,index) in allList">
+                  <li v-for="(item,index) in list">
                     <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                       <el-checkbox :label="item.definition" :key="item.definition">
                         <span class="col-name-box">
@@ -56,7 +59,7 @@
                   <span class="allNametitle">{{resourceName}}</span>
                 </div>
                 <ul class="contentNum">
-                  <li v-for="(item,index) in list">
+                  <li v-for="(item,index) in allList">
                     <div class="col-name-box">
                       <div v-if="item.type==='string'" class="blue">Str.</div>
                       <div v-else-if="item.type==='number'" class="green">No.</div>
@@ -151,7 +154,7 @@
     getdatalakeLink
   } from '@/api/creatModel'
 
-  const colsOptions = [];
+  let colsOptions = [];
   export default {
     name: 'datasetAside',
     props: {
@@ -162,7 +165,7 @@
     },
     data() {
       return {
-        powerName:'',
+        powerName: '',
         activeName: 'first',
         openScope: '',
         modelId: '',
@@ -184,6 +187,7 @@
         searchText: '',
         checkAll: false,
         checkedCols: [],
+        checkIt:[],
         cols: colsOptions,
         isIndeterminate: true,
         tableData: [],
@@ -194,7 +198,7 @@
         resourceId: 0,
         resourceType: 0,
         columnData: [],
-        allcolumnData:[],
+        allcolumnData: [],
         myData: [],
         editData: [],
         checkTags: false,
@@ -308,6 +312,19 @@
           this.ruleForm.pkey = ''
           this.$refs.ruleForm.resetFields()
         }
+        // 编辑
+        if (this.routerName === 'editModel') {
+          this.modelData.colList.forEach(item => {
+            this.tableData.map(newItem => {
+              if (item.isMarking == true && newItem.definition == item.showCol) {
+                newItem.isMarking = true
+              }
+              if (item.sourceColId == newItem.id) {
+                Object.assign(newItem, {colId: item.colId})
+              }
+            })
+          })
+        }
       },
       handleCheckedColsChange(value) {
         let checkedCount = value.length;
@@ -376,9 +393,11 @@
       async setTags(type, node, data) {
         this.myData = []
         this.editData = []
+        colsOptions = []
         this.colSetDialog = true
         let colsData = {}
         let allcolsData = {}
+        let checkedColsarr = []
         if (type === 0) {
           //新建模型字段确认获取数据
           colsData = await getResourceInfoData(data.resourceId, data.type, 1)  // 有权限的字段
@@ -401,18 +420,19 @@
         this.columnData.forEach((item, index) => {
           colsOptions.push(item.definition)
         })
+        this.cols = colsOptions
         // 全部的字段权限显示
         this.allcolumnData.forEach((item, index) => {
-          if(item.viewable == false){
+          if (item.viewable == false) {
             this.powerName = '无权限'
             return
-          }else if (item.decryption == false){
+          } else if (item.decryption == false) {
             this.powerName = '加密'
             return
-          }else if (item.sensitived == false) {
+          } else if (item.sensitived == false) {
             this.powerName = '脱敏'
             return
-          }else {
+          } else {
             this.powerName = ''
           }
         })
@@ -567,7 +587,6 @@
               } else {
                 this.taggingModelId = ''
               }
-
               const params = {
                 'taggingModelId': this.taggingModelId,
                 'resourceId': this.resourceId,
@@ -578,7 +597,6 @@
                 'isNew': this.isNew,
                 'colList': colList
               }
-              //debugger
               this.setColData(params)
               this.saveLoading = false
             }
@@ -637,20 +655,20 @@
       handleClick(tab, event) {
         // console.log(tab, event);
       },
-      async getLink(){
-        try{
+      async getLink() {
+        try {
           const link = await getdatalakeLink(this.resourceId)
-          if(link.data.code == 200){
+          if (link.data.code == 200) {
             this.$message({
               message: link.data.message,
               type: 'success'
             });
-          }else if(link.data.code == 307){
+          } else if (link.data.code == 307) {
             window.location = link.data.dataLakeApplyPageUrl
-          }else {
+          } else {
 
           }
-        }catch (e) {
+        } catch (e) {
           console.log(e);
         }
 
@@ -794,7 +812,8 @@
   .btnMargin {
     margin-left: 5px;
   }
-  .subscribeData{
+
+  .subscribeData {
     font-size: 14px;
     text-align: center;
     height: 30px;
@@ -804,7 +823,8 @@
     border-color: #0486fe;
     cursor: pointer;
   }
-  .power{
+
+  .power {
     color: #b1b1b1;
   }
 </style>

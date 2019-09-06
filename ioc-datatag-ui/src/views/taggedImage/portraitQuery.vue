@@ -7,7 +7,7 @@
           class="zxinp moduleOne"
           size="small"
           clearable
-          placeholder="请输入需要查询的ID"
+          placeholder="请输入需要查询的画像主键"
           prefix-icon="el-icon-search"
           v-model="input2">
         </el-input>

@@ -1,8 +1,7 @@
 <template>
-  <!--<div class="app-container container">-->
   <div class="app-container">
     <div class="result">
-      <div class="queryTitle">画像查询</div>
+      <!--<div class="queryTitle">画像查询</div>-->
       <div class="queryIt">
         <el-input
           class="zxinp moduleOne"
@@ -11,11 +10,11 @@
           prefix-icon="el-icon-search"
           v-model="input2">
         </el-input>
-        <el-button class="zxlistBtn" size="small" type="primary" @click="goback">查询</el-button>
+        <el-button class="zxlistBtn" size="small" type="primary" @click="goback">画像查询</el-button>
       </div>
     </div>
     <div>
-      <p class="numDetail"><span>{{titleId}}</span><span>&nbsp&nbsp的画像详情</span></p>
+      <p class="numDetail"><span>{{titleId}}</span><span>的画像详情</span></p>
       <div class="circularContent">
         <div class="circular">
           <div class="circularOne">
