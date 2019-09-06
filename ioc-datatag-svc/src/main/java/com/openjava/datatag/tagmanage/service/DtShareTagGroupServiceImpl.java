@@ -73,7 +73,7 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
         DtTagGroup newTgg = new DtTagGroup();
         newTgg.setIsNew(true);
         newTgg.setId(newId);
-        newTgg.setTagsName(tgg.getTagsName());
+        newTgg.setTagsName(tgg.getTagsName()+"(选用)");
         newTgg.setIsShare(Constants.PUBLIC_NO);
         newTgg.setSynopsis(tgg.getSynopsis());
         newTgg.setPopularity(0L);
