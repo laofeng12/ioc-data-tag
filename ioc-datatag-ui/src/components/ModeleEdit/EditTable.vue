@@ -680,6 +680,7 @@
           // console.log('打标历史接口data', data)
           //被选标签组
           this.ruleForm.tagTeam = data.selectTagGroup.id
+          this.chooseTagTeam(data.selectTagGroup.id)
           //标签层数树
           this.getTagLevList(this.ruleForm.tagTeam)
           //选择标签层
