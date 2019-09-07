@@ -196,10 +196,11 @@ export function saveName(data) {
 }
 
 // 模型另存
-export function saveAs(taggingModelId) {
+export function saveAs(data) {
   return fetch({
-    url:'/datatag/tagmodel/dtTaggingModel/copy/'+taggingModelId,
+    url:'/datatag/tagmodel/dtTaggingModel/copy/'+data.taggingModelId,
     method:'post',
+    data
   })
 }
 

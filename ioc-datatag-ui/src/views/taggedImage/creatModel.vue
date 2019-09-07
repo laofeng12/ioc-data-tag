@@ -505,11 +505,10 @@
       },
       // 点击用户
       async markingPeople(zuserid, id, index) {
-        this.changeRed = index
-        this.helpId = zuserid
-        this.cooId = id
-        this.startDisable = false
-
+         this.changeRed = index
+         this.helpId = zuserid
+         this.cooId = id
+         this.startDisable = false
       },
       // table列表
       async markingTable() {
@@ -637,7 +636,11 @@
       async saveAsmodel() {
         this.saveasLoading = true
         try {
-          const res = await saveAs(this.taggingModelId)
+          const res = await saveAs({
+            taggingModelId:this.taggingModelId,
+            "modelDesc": this.ruleForm.textarea2,
+            "modelName": this.ruleForm.name
+          })
           this.$message({
             message: res.message,
             type: 'success'
