@@ -148,7 +148,12 @@
             <artifactId>reflections</artifactId>
             <version>0.9.10</version>
         </dependency>
-        <!-- 各类数据库连接 -->
+        <!-- 创慧公共工具类 -->
+<!--        <dependency>-->
+<!--            <groupId>com.chuanghui</groupId>-->
+<!--            <artifactId>ch-common-util</artifactId>-->
+<!--            <version>1.0.1</version>-->
+<!--        </dependency>-->
 
     </dependencies>
     <build>

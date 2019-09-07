@@ -95,7 +95,7 @@ public class DtSetCol implements Persistable<Long>,Serializable {
 	@Column(name = "IS_DELETED")
 	private Long isDeleted;
 	
-	@ApiModelProperty("是否手动打标字段")
+	@ApiModelProperty("是否主键")
 	@Max(1L)
 	@Column(name = "IS_P_KEY")
 	private Long isPKey;

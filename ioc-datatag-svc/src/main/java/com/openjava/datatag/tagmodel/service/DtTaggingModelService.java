@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
+import com.openjava.datatag.tagmodel.dto.DtTaggingModelCopyDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelRenameDTO;
 import org.ljdp.component.exception.APIException;
@@ -40,7 +41,7 @@ public interface DtTaggingModelService {
 	 * 克隆模型
 	 * @param id
 	 */
-	void copy(Long id,String ip)throws Exception;
+	void copy(DtTaggingModelCopyDTO id, String ip)throws Exception;
 
 	void doSoftDelete(DtTaggingModel taggingModel,Long userId,String ip);
 	/**
