@@ -174,10 +174,9 @@
                           <i slot="suffix" class="el-input__icon el-icon-search" @click="search"></i>
                         </el-input>
                         <div class="checkIt">
-                          <div class="checkOne">
+                          <div class="checkOne" v-for="(colItem,cIndex) in listCheck">
                             <el-checkbox-group v-model="item.checkList" @change="checkMarkChange(item)">
-                              <el-checkbox v-for="(colItem,cIndex) in colList" :key='cIndex'
-                                           :label="colItem.markName"></el-checkbox>
+                              <el-checkbox :key='cIndex' :label="colItem.markName"></el-checkbox>
                             </el-checkbox-group>
                           </div>
                         </div>
@@ -331,14 +330,6 @@
       //   },
       //   deep: true
       // },
-    },
-    computed: {
-      ...mapState({
-        theadData: state => state.image.tableArr
-      })
-      // theadData(){
-      //   return this.$store.state.image.tableArr
-      // }
     },
     created() {
       //获取标签组
@@ -761,6 +752,22 @@
         this.isHandle = item.isHandle
         this.conditionSetting = item.conditionSetting
       }
+    },
+    computed: {
+      ...mapState({
+        theadData: state => state.image.tableArr
+      }),
+      listCheck() {
+        const arr = []
+        this.colList.map(item => {
+          if (item.markName &&
+            (item.markName.toLowerCase().includes(this.searchWord) ||
+              item.markName.toUpperCase().includes(this.searchWord))) {
+            arr.push(item)
+          }
+        })
+        return arr
+      },
     },
   }
 </script>
