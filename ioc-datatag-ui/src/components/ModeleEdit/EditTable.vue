@@ -24,7 +24,7 @@
       <!--    <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
                               @sureClick="goPage"></element-pagination>-->
       <!--字段设置-->
-      <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="800px" center
+      <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" center
                  :modal-append-to-body="false" :close-on-click-modal="false"
                  @close="$emit('update:show', false)" @open="init">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -939,8 +939,10 @@
   }
 
   .card-handle {
-    display: flex;
+    /*display: flex;*/
+    display: -webkit-box;
     align-items: center; /*垂直居中*/
+    overflow: auto;
   }
 
   .conditions {
