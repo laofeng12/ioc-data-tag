@@ -16,7 +16,7 @@
     </div>
     <div class="back">
       <!--<el-button size="small" @click="goback" v-if="contentArr != ''">返回</el-button>-->
-      <el-button size="small" @click="goback">返回</el-button>
+      <!--<el-button size="small" @click="goback">返回</el-button>-->
     </div>
     <div class="queryCard">
       <el-card class="box-card card2" v-for="(item,index) in contentArr" :key="index">
@@ -68,9 +68,9 @@
           }
         })
       },
-      goback() {
-        this.$router.go(-1)
-      },
+      // goback() {
+      //   this.$router.go(-1)
+      // },
     },
     created() {
       this.input2 = this.$route.query.id
