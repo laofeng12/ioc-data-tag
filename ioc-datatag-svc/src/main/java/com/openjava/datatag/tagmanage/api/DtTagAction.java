@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 
@@ -67,6 +68,8 @@ public class DtTagAction {
         if (userInfo.getUserId().equals(tagGroup.getCreateUser().toString())) {
             if (body.getIsNew() == null || body.getIsNew()) {
                 dtTagService.doNew(body, userId, ip);
+                tagGroup.setModifyTime(new Date());
+                dtTagGroupService.doSave(tagGroup);
                 return new SuccessMessage("新建成功");
             } else {
                 DtTag db = dtTagService.get(body.getId());
@@ -77,8 +80,11 @@ public class DtTagAction {
                     throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请不要用此方法进行删除操作，请用DELETE方法");
                 }
                 dtTagService.doUpdate(body, db, userId, ip);
+                dtTagService.doNew(body, userId, ip);
+                tagGroup.setModifyTime(new Date());
                 return new SuccessMessage("修改成功");
             }
+
         } else {
             throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY, "无权限修改");
         }
