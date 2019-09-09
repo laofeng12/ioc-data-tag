@@ -167,7 +167,8 @@
                       <div class="self-mark-list" v-show="item.showSelfMark">
                         <el-input
                           size="small"
-                          placeholder="请输入内容"
+                          clearable
+                          placeholder="输入关键字搜索"
                           v-model="searchWord">
                           <i slot="suffix" class="el-input__icon el-icon-search" @click="search"></i>
                         </el-input>
