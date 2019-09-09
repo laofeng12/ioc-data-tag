@@ -325,7 +325,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             DtTaggingModel tag = dtTaggingModelService.get(taggmId);
 
             if (CollectionUtils.isEmpty(colLimit)) {
-                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数必传");
+                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请选择用户并添加协作打标字段");
             }
             if (tag == null) {
                 throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数不能为空");
@@ -410,7 +410,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         DtTaggingModel tag = dtTaggingModelService.get(req.getTaggmId());
 
         if (CollectionUtils.isEmpty(colLimit)) {
-            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数必传");
+            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请选择用户并添加协作打标字段");
         }
         if (tag == null) {
             throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数不能为空");
