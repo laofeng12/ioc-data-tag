@@ -31,6 +31,7 @@ import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.bag.SynchronizedSortedBag;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -656,7 +657,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
                 	if (resultList.get(i).get(j)!=null){
 						value = resultList.get(i).get(j).toString();
 					}
-                    ob += "\""+cols.get(j).getShowCol()+"\":\""+value+"\",";
+                    ob += "\""+cols.get(j).getShowCol()+"\":\""+ StringEscapeUtils.escapeJava(value) +"\",";
                 }
                 ob="{"+ob.substring(0,ob.length()-1)+"}";
                 tempData.add(JSONObject.parseObject(ob,Object.class));

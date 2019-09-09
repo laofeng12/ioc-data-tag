@@ -26,7 +26,9 @@
       </div>
       <div class="right" v-show="routerName==='editModel'">
         <div>
-          <div class="img" @click="saveAsto"></div>
+          <el-tooltip class="item" effect="light" content="另存为" placement="bottom-start">
+            <div class="img" @click="saveAsto"></div>
+          </el-tooltip>
         </div>
         <el-button class="button" type="primary" size="small" @click="runModel">模型调度</el-button>
         <!--<el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
@@ -182,7 +184,7 @@
           <div class="right2">
             <h3>选择协作打标字段</h3>
             <div class="marking">
-              <el-table class="my-table tableHeight" ref="multipleTable" :data="tableData" border stripe
+              <el-table class="my-table tableHeight" ref="multipleTable" :data="tableData" border
                         tooltip-effect="dark"
                         style="width: 100%;"
                         :header-cell-style="{background:'#f0f2f5'}">
@@ -503,11 +505,10 @@
       },
       // 点击用户
       async markingPeople(zuserid, id, index) {
-        this.changeRed = index
-        this.helpId = zuserid
-        this.cooId = id
-        this.startDisable = false
-
+         this.changeRed = index
+         this.helpId = zuserid
+         this.cooId = id
+         this.startDisable = false
       },
       // table列表
       async markingTable() {
@@ -635,7 +636,11 @@
       async saveAsmodel() {
         this.saveasLoading = true
         try {
-          const res = await saveAs(this.taggingModelId)
+          const res = await saveAs({
+            taggingModelId:this.taggingModelId,
+            "modelDesc": this.ruleForm.textarea2,
+            "modelName": this.ruleForm.name
+          })
           this.$message({
             message: res.message,
             type: 'success'

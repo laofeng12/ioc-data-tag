@@ -132,6 +132,10 @@ public class TagConditionUtils {
             }else{
                 values = "'"+values+"'";
             }
+        }else {
+            if ("LIKE".equals(symbool) || "NOT".equals(symbool)) {
+                values = "'%"+values+"%'";
+            }
         }
        return values;
     }

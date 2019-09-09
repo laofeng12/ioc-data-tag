@@ -199,7 +199,7 @@
                 size="small"
                 maxlength="25"
                 show-word-limit
-                placeholder="请输入内容"
+                placeholder="请输入标签组名称"
                 v-model="ruleForm.tagsName" style="width: 360px">
               </el-input>
             </el-form-item>
@@ -210,7 +210,7 @@
                 maxlength="100"
                 show-word-limit
                 :autosize="{ minRows: 2, maxRows: 4}"
-                placeholder="请输入内容"
+                placeholder="请输入标签组简介"
                 v-model="ruleForm.synopsis">
               </el-input>
             </el-form-item>

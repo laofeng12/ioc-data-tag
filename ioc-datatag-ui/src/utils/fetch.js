@@ -66,6 +66,10 @@ service.interceptors.response.use(
               duration: 5 * 1000
             })
           }
+          // 打标
+          if(code === -30002){
+            return Promise.reject(data)
+          }
           /* eslint-disable-next-line */
           return Promise.reject('new error')
         }
