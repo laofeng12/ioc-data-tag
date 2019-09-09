@@ -9,6 +9,7 @@
           clearable
           placeholder="请输入需要查询的画像主键"
           prefix-icon="el-icon-search"
+          @keyup.enter.native="queryDetail"
           v-model="input2">
         </el-input>
         <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">画像查询</el-button>
