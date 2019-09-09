@@ -6,6 +6,7 @@
         size="small"
         clearable
         placeholder="请输入模型名称"
+        @keyup.enter.native="modelQuery"
         prefix-icon="el-icon-search"
         v-model="input2">
       </el-input>
