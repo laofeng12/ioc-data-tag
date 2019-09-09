@@ -1,21 +1,23 @@
 <template>
   <div class='app-container'>
     <div class="result">
-      <div class="queryTitle">画像查询</div>
+      <!--<div class="queryTitle">画像查询</div>-->
       <div class="queryIt">
         <el-input
           class="zxinp moduleOne"
           size="small"
+          clearable
           placeholder="请输入内容"
           prefix-icon="el-icon-search"
+          @keyup.enter.native="queryDetail"
           v-model="input2">
         </el-input>
-        <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">查询</el-button>
+        <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">画像查询</el-button>
       </div>
     </div>
     <div class="back">
       <!--<el-button size="small" @click="goback" v-if="contentArr != ''">返回</el-button>-->
-      <el-button size="small" @click="goback">返回</el-button>
+      <!--<el-button size="small" @click="goback">返回</el-button>-->
     </div>
     <div class="queryCard">
       <el-card class="box-card card2" v-for="(item,index) in contentArr" :key="index">
@@ -26,7 +28,7 @@
         <div class="numidContent">{{item.title}}</div>
         <div class="peopleContent">
           <el-tag class="people" v-for="(name,key) in item.lists" :key="key">{{name}}</el-tag>
-          <el-tag class="people">....</el-tag>
+          <el-tag class="people" v-if="item.lists > 0">....</el-tag>
         </div>
         <div>
           <el-button type="text" @click="lookDetail(item.id,item.tableName)">查看详情</el-button>
@@ -67,9 +69,9 @@
           }
         })
       },
-      goback() {
-        this.$router.go(-1)
-      },
+      // goback() {
+      //   this.$router.go(-1)
+      // },
     },
     created() {
       this.input2 = this.$route.query.id

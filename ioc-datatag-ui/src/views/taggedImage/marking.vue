@@ -58,7 +58,7 @@
           <!--</el-col>-->
         </el-form-item>
         <el-form-item label="选择标签层:" prop="tagLev">
-          <el-col :span="11">
+          <el-col :span="7.5">
             <div class="allTree">
               <div class="sel">
                 <el-input style="width: 215px"
@@ -175,6 +175,8 @@
                       <span>已选</span>
                       <span class="num">{{item.checkList.length}}</span>
                       <span>条</span>
+                      <i class="el-icon-caret-top" v-if="item.showSelfMark==true"></i>
+                      <i class="el-icon-caret-bottom" v-else></i>
                     </div>
                     <div class="self-mark-list" v-show="item.showSelfMark">
                       <el-input
