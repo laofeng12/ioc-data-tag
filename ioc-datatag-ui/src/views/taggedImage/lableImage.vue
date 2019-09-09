@@ -565,7 +565,7 @@
       },
       lookImage(row,id,name){
         if(row.runState != '运行成功'){
-          this.$message.error('请先进行数据调度');
+          this.$message.error('请先进行数据调度成功之后再查看画像！');
         }else{
           this.$router.push({
             path:'/ImageDetail',
