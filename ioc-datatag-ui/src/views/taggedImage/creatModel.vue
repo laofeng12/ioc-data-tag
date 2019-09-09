@@ -184,7 +184,7 @@
           <div class="right2">
             <h3>选择协作打标字段</h3>
             <div class="marking">
-              <el-table class="my-table tableHeight" ref="multipleTable" :data="tableData" border stripe
+              <el-table class="my-table tableHeight" ref="multipleTable" :data="tableData" border
                         tooltip-effect="dark"
                         style="width: 100%;"
                         :header-cell-style="{background:'#f0f2f5'}">
