@@ -1052,8 +1052,9 @@
   }
 
   .card-handle {
-    display: flex;
+    display: -webkit-box;
     align-items: center; /*垂直居中*/
+    overflow: auto;
   }
 
   .conditions {
