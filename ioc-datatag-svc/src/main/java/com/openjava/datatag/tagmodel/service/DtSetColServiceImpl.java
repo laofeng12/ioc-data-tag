@@ -450,7 +450,12 @@ public class DtSetColServiceImpl implements DtSetColService {
 						} else {
 							checkSql += " SHOW_COL " + TagConditionUtils.toSqlSymbol(expression.getSymbol()) + " ";
 						}
-						resultSql += " \""+col.getShowCol() +"\" "+TagConditionUtils.toSqlSymbol(expression.getSymbol());
+						// 2019/9/9  适配pgsql不支持like的问题
+						resultSql += " \""+col.getShowCol() +"\" ";
+						if (("LIKE".equals(expression.getSymbol()) || "NOT".equals(expression.getSymbol())) && TagConditionUtils.isIntType(expression.getValuesType())) {
+							resultSql += " ::text ";
+						}
+						resultSql += TagConditionUtils.toSqlSymbol(expression.getSymbol());
 					}
 					if (StringUtils.isBlank(expression.getTheValues())) {
 						throw new APIException(MyErrorConstants.PUBLIC_ERROE,"值不能为空");
