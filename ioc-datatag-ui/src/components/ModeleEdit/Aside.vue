@@ -282,9 +282,9 @@
             item.isMarking = false
             if (item.colSort === '') {
               item.colSort = index + 1
-              if (item.colSort > 9) {
-                item.colSort = 1
-              }
+              // if (item.colSort > 9) {
+              //   item.colSort = 1
+              // }
             }
           })
         } else {
@@ -347,9 +347,9 @@
         this.tableData.forEach((item, index) => {
           if (item.colSort === '') {
             item.colSort = index + 1
-            if (item.colSort > 9) {
-              item.colSort = 1
-            }
+            // if (item.colSort > 9) {
+            //   item.colSort = 1
+            // }
           }
         })
         // xiala
