@@ -38,7 +38,7 @@
         </div>
       </div>
     </div>
-    <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="800px" center
+    <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="$emit('update:show', false)" @open="init">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -141,7 +141,7 @@
             <!--打标开始-->
             <div class="card" v-for="(item,index) in selfMarkList" :key="index" @click="chooseMark(item,index)"
                  :class="{acitve:curIndex===index}">
-              <el-card class="box-card">
+              <el-card class="box-card" :class="{borderColor:changeRed == index+1}">
                 <!--人工打标结构-->
                 <div class="card-handle" v-if="item.isHandle===0">
                   <i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i>
@@ -173,7 +173,7 @@
                   <div class="self-mark-choose-box">
                     <div class="chooseNum" @click="showSelf(item,$event)">
                       <span>已选</span>
-                      <span class="num">{{item.checkList.length}}</span>
+                      <span class="num">{{checkList.length}}</span>
                       <span>条</span>
                       <i class="el-icon-caret-top" v-if="item.showSelfMark==true"></i>
                       <i class="el-icon-caret-bottom" v-else></i>
@@ -186,10 +186,9 @@
                         <i slot="suffix" class="el-input__icon el-icon-search" @click="search"></i>
                       </el-input>
                       <div class="checkIt">
-                        <div class="checkOne">
-                          <el-checkbox-group v-model="item.checkList" @change="checkMarkChange(item)">
-                            <el-checkbox v-for="(colItem,cIndex) in  colList" :key='cIndex'
-                                         :label="colItem.markName"></el-checkbox>
+                        <div class="checkOne" v-for="(colItem,cIndex) in listCheck">
+                          <el-checkbox-group v-model="checkList" @change="checkMarkChange(item)">
+                            <el-checkbox :key='cIndex' :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span></el-checkbox>
                           </el-checkbox-group>
                         </div>
                       </div>
@@ -231,6 +230,7 @@
     name: 'marking',
     data() {
       return {
+        changeRed:-1,
         Loading: true,
         saveLoading2: true,
         fieldId: '',  // 打标字段ID
@@ -250,7 +250,7 @@
         defaultProps: {
           children: 'childrenNode', // 子集的属性
           label: 'tagName',
-          disabled: 'leaf'// 是否可以选择
+          disabled: 'notLeafParent'// 是否可以选择
         },
         saveLoading: false,
         ruleForm: {
@@ -349,11 +349,13 @@
       },
       dataMaking(row) {
         this.setTagsDialog = true
+        this.valuesType = row.sourceDataType
         this.fieldId = row.colId
         this.colId = row.colId
         this.sourceCol = row.sourceCol
         //获取标签组
         this.getMyTagGroupList(row.colId)
+        this.getHistoryColList(row.colId)
       },
       filterNode(value, data) {
         if (!value) return true;
@@ -459,14 +461,20 @@
         if (consLen === 1) {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         } else if (consLen === 2) {
-          this.selfMarkList[this.curIndex].conditionSetting.splice(1, 1)
+          if(item.codename==='('){
+            this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+          }else {
+            this.selfMarkList[this.curIndex].conditionSetting.splice(1, 1)
+            this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+          }
+
+        }else{
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         }
         this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
       },
       //选择运算符号
       chooseCountSymbol(item) {
-        //console.log(item)
         const conditionObj = {
           isConnectSymbol: 0,//是否有连接符号
           symbol: item.codename,//连接符名或者>,=
@@ -481,6 +489,8 @@
           this.selfMarkList[this.curIndex].conditionSetting = []
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         } else if (consLen === 2) {
+          this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+        }else {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         }
         this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
@@ -543,7 +553,7 @@
       },
       //选中自动打标内容
       checkMarkChange(item) {
-        this.checkList = item.checkList
+        // this.checkList = item.checkList
         item.conditionSetting[0].theValues = this.checkList.join(",")
       },
       //显示标签层
@@ -558,14 +568,10 @@
       showSelf(itemObj) {
         itemObj.showSelfMark = !itemObj.showSelfMark
         this.colList = []
-        console.log('666',this.sourceCol);
         const name = this.sourceCol
-        console.log('999',this.tableData);
         this.tableData.forEach((item, index) => {
-          console.log('888',item[name])
           const markName = item[name]
           this.colList.push({markName: markName})
-
         })
         const obj = {}
         //数组去重
@@ -611,18 +617,12 @@
       chooseTagTeam(id) {
         this.chooseTagTeamid = id
         this.getTagLevList(id)
+        this.tagTeamList.forEach(item => {
+          if (item.id == id) {
+            this.chooseTagTeamname = item.tagsName
+          }
+        })
       },
-      // 编辑标签组
-      editLabelgroup() {
-        if (this.chooseTagTeamid) {
-          this.$router.push({
-            path: '/editTree/' + this.chooseTagTeamid,
-          })
-        } else {
-          this.$message.error('请先选择标签组！');
-        }
-      },
-
       //关闭打标
       close() {
         this.showSelfMark = false
@@ -645,19 +645,14 @@
       async getTagLevList(id) {
         try {
           const data = await getTagLevData(id)
-          data.childrenNode.forEach(item => {
-            if (item.leaf == true) {
-              Object.assign(data.childrenNode, {disabled: true})
-            }
-          })
+          // console.log('选择标签层', data.childrenNode)
           this.treeLevdata = data.childrenNode
         } catch (e) {
-          console.log(e);
+
         }
       },
       // 查询打标历史接口
       async getHistoryColList(colId) {
-        // console.log('colId',colId)
         const params = {
           colId: colId
         }
@@ -666,13 +661,26 @@
           // console.log('打标历史接口data', data)
           //被选标签组
           this.ruleForm.tagTeam = data.selectTagGroup.id
+          // this.chooseTagTeam(data.selectTagGroup.id)
           //标签层数树
           this.getTagLevList(this.ruleForm.tagTeam)
-          //打标相关字段
+          //选择标签层
+          // this.ruleForm.tagLev = data.selectTags.tagName
+          // 打标设置
+          // this.ruleForm.tagSet = data.selectTag.tagName
+          //历史数据
+          // this.$refs.treeForm.setCheckedKeys([data.selectTags.id]);
+          // const obj = {
+          //   tagName: data.selectTag.tagName,
+          //   id: data.selectTag.id
+          // }
+          // this.tagSetList.push(obj)
+          //打标相关字段  this.checkList
           this.selfMarkList = this.deepClone(data.condtion)
           this.selfMarkList.map((item, index) => {
             item.showSelfMark = false
             item.checkList = item.conditionSetting[0].theValues.split(',')
+            this.checkList = item.conditionSetting[0].theValues.split(',')
             item.tagSetName = item.tagName
           })
           this.curIndex = this.selfMarkList.length - 1
@@ -697,22 +705,20 @@
       },
       //打标确认保存
       async getSaveMarkList() {
-        // console.log('this.selfMarkList',this.selfMarkList)
-        //console.log('this.valuesType',this.valuesType)
-        try {
-          let conditions = this.deepClone(this.selfMarkList)
-          conditions.forEach((obj, index) => {
-            delete obj.checkList
-            delete obj.sourceCol
-            delete obj.tagSetName
-            delete obj.showSelfMark
-            obj.colId = this.colId
-            return obj
-          })
-          const params = {
-            colId: this.colId,
-            condtion: conditions
-          }
+        let conditions = this.deepClone(this.selfMarkList)
+        conditions.forEach((obj, index) => {
+          delete obj.checkList
+          delete obj.sourceCol
+          delete obj.tagSetName
+          delete obj.showSelfMark
+          obj.colId = this.colId
+          return obj
+        })
+        const params = {
+          colId: this.colId,
+          condtion: conditions
+        }
+        try{
           const data = await saveMarkData(params)
           this.$message({
             showClose: true,
@@ -722,10 +728,11 @@
           })
           this.setTagsDialog = false
           this.selfMarkList = []
-
-        } catch (e) {
-
+        }catch (e) {
+          console.log('e',e);
+          this.changeRed = e.data
         }
+
       },
       //选中要打标条件修改
       chooseMark(item, index) {
@@ -733,7 +740,20 @@
         this.isHandle = item.isHandle
         this.conditionSetting = item.conditionSetting
       },
-    }
+    },
+    computed: {
+      listCheck() {
+        const arr = []
+        this.colList.map(item => {
+          if (item.markName &&
+            (item.markName.toLowerCase().includes(this.searchWord) ||
+              item.markName.toUpperCase().includes(this.searchWord))) {
+            arr.push(item)
+          }
+        })
+        return arr
+      },
+    },
   }
 </script>
 
@@ -1063,7 +1083,9 @@
 
     }
   }
-
+.borderColor{
+  border: 1px solid #ee0320;
+}
   .clearfix:after {
     content: '';
     display: block;

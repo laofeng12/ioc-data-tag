@@ -394,7 +394,6 @@
           valuesType: this.valuesType,
         }
         const consLen = this.selfMarkList[this.curIndex].conditionSetting.length
-        console.log('item.codename',item.codename)
         if (consLen === 1) {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         } else if (consLen === 2) {
@@ -502,7 +501,6 @@
         return arr.filter((markName) => !res.has(markName) && res.set(markName, 1))
       },
       //显示自动打标内容
-
       showSelf(itemObj) {
         itemObj.showSelfMark = !itemObj.showSelfMark
         this.colList = []
