@@ -133,8 +133,6 @@
                   <div class="card-handle" v-if="item.isHandle===0">
                     <i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i>
                     <div class="labelCard" :title="item.tagSetName">{{item.tagSetName}}</div>
-                    <!--<el-input style="width:100px" size="small" v-model="item.tagSetName" placeholder="请输入内容"-->
-                              <!--readonly></el-input>-->
                     <span class="chinese">{{item.sourceCol}}</span>
                     <div class="conditions">
                       <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
@@ -155,13 +153,13 @@
                     <div><i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i></div>
                     <div>
                       <div class="labelCard" :title="item.tagSetName">{{item.tagSetName}}</div>
-                      <!--<el-input style="width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" size="small" v-model="item.tagSetName" placeholder="请输入内容" readonly></el-input>-->
                     </div>
                     <div class="chinese">{{item.sourceCol}}</div>
                     <div class="self-mark-choose-box">
                       <div class="chooseNum" @click="showSelf(item,$event)">
                         <span>已选</span>
-                        <span class="num">{{item.checkList.length}}</span>
+                        <!--<span class="num">{{item.checkList.length}}</span>-->
+                        <span class="num">{{checkList.length}}</span>
                         <span>条</span>
                         <i class="el-icon-caret-top" v-if="item.showSelfMark==true"></i>
                         <i class="el-icon-caret-bottom" v-else></i>
@@ -175,8 +173,8 @@
                         </el-input>
                         <div class="checkIt">
                           <div class="checkOne" v-for="(colItem,cIndex) in listCheck">
-                            <el-checkbox-group v-model="item.checkList" @change="checkMarkChange(item)">
-                              <el-checkbox :key='cIndex' :label="colItem.markName"></el-checkbox>
+                            <el-checkbox-group v-model="checkList" @change="checkMarkChange(item)">
+                              <el-checkbox :key='cIndex' :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span></el-checkbox>
                             </el-checkbox-group>
                           </div>
                         </div>
@@ -218,10 +216,6 @@
     components: {ElementPagination},
     name: 'datasetEditable',
     props: {
-      // theadData: {
-      //   type: Array,
-      //   default: Array
-      // },
       modelId: {
         type: String,
         default: ''
@@ -323,13 +317,6 @@
         },
         deep: true
       },
-      // 'this.theadData': {
-      //   handler: function (newValue, oldValue) {
-      //     // this.theadData = newValue
-      //     // this.$set(this.theadData)
-      //   },
-      //   deep: true
-      // },
     },
     created() {
       //获取标签组
@@ -364,7 +351,6 @@
       //深度克隆
       deepClone(obj) {
         let newObj = Array.isArray(obj) ? [] : {}
-
         if (obj && typeof obj === 'object') {
           for (let key in obj) {
             if (obj.hasOwnProperty(key)) {
@@ -378,6 +364,7 @@
       nodeClick(data, checked, node) {
       },
       handleClick(data, checked, node) {
+        this.ruleForm.tagSet = ''
         if (checked === true) {
           this.tagSetList = []
           this.checkedId = data.id;
@@ -406,10 +393,18 @@
           valuesType: this.valuesType,
         }
         const consLen = this.selfMarkList[this.curIndex].conditionSetting.length
+        console.log('item.codename',item.codename)
         if (consLen === 1) {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         } else if (consLen === 2) {
-          this.selfMarkList[this.curIndex].conditionSetting.splice(1, 1)
+          if(item.codename==='('){
+            this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+          }else {
+            this.selfMarkList[this.curIndex].conditionSetting.splice(1, 1)
+            this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+          }
+
+        }else{
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         }
         this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
@@ -430,6 +425,8 @@
           this.selfMarkList[this.curIndex].conditionSetting = []
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         } else if (consLen === 2) {
+          this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
+        }else {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         }
         this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
@@ -492,9 +489,7 @@
       },
       //选中自动打标内容
       checkMarkChange(item) {
-        // console.log(value)
-        // console.log(item)
-        this.checkList = item.checkList
+        // this.checkList = item.checkList
         item.conditionSetting[0].theValues = this.checkList.join(",")
       },
       //显示标签层
@@ -512,10 +507,8 @@
         this.colList = []
         const name = this.sourceCol
         this.tableData.forEach((item, index) => {
-          //console.log(item[name])
           const markName = item[name]
           this.colList.push({markName: markName})
-
         })
         const obj = {}
         //数组去重
@@ -671,25 +664,26 @@
           // console.log('打标历史接口data', data)
           //被选标签组
           this.ruleForm.tagTeam = data.selectTagGroup.id
-          this.chooseTagTeam(data.selectTagGroup.id)
+          // this.chooseTagTeam(data.selectTagGroup.id)
           //标签层数树
           this.getTagLevList(this.ruleForm.tagTeam)
           //选择标签层
-          this.ruleForm.tagLev = data.selectTags.tagName
+          // this.ruleForm.tagLev = data.selectTags.tagName
           // 打标设置
-          // this.ruleForm.tagSet = data.selectTag.id
+          // this.ruleForm.tagSet = data.selectTag.tagName
           //历史数据
-          this.$refs.treeForm.setCheckedKeys([data.selectTags.id]);
-          const obj = {
-            tagName: data.selectTag.tagName,
-            id: data.selectTag.id
-          }
-          this.tagSetList.push(obj)
-          //打标相关字段
+          // this.$refs.treeForm.setCheckedKeys([data.selectTags.id]);
+          // const obj = {
+          //   tagName: data.selectTag.tagName,
+          //   id: data.selectTag.id
+          // }
+          // this.tagSetList.push(obj)
+          //打标相关字段  this.checkList
           this.selfMarkList = this.deepClone(data.condtion)
           this.selfMarkList.map((item, index) => {
             item.showSelfMark = false
             item.checkList = item.conditionSetting[0].theValues.split(',')
+            this.checkList = item.conditionSetting[0].theValues.split(',')
             item.tagSetName = item.tagName
           })
           this.curIndex = this.selfMarkList.length - 1

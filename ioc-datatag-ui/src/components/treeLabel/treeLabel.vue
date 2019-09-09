@@ -50,14 +50,14 @@
     <div class="tableContent">
       <el-form :model="ruleForm2" :rules="rules" ref="ruleForm2" label-width="100px" v-if="showContent">
         <el-form-item label="标签名称:" prop="name2" class="nameOne">
-          <el-input v-model="ruleForm2.name2"  maxlength="25" show-word-limit :disabled="lookContent" placeholder="请输入内容"></el-input>
+          <el-input v-model="ruleForm2.name2"  maxlength="25" show-word-limit :disabled="lookContent" placeholder="请输入标签名称"></el-input>
         </el-form-item>
         <el-form-item label="标签简介:" prop="textarea2" class="nameOne">
           <el-input
             class="area"
             type="textarea"
             :autosize="{ minRows: 8, maxRows: 4}"
-            placeholder="请输入内容"
+            placeholder="请输入标签简介"
             maxlength="100"
             show-word-limit
             :disabled="lookContent"
@@ -79,14 +79,14 @@
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
           <el-form-item label="标签名称:" prop="name" class="nameOne">
-            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入内容"></el-input>
+            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入标签名称"></el-input>
           </el-form-item>
           <el-form-item label="标签简介:" prop="textarea" class="nameOne">
             <el-input
               class="area"
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 4}"
-              placeholder="请输入内容"
+              placeholder="请输入标签简介"
               maxlength="100"
               show-word-limit
               v-model="ruleForm.textarea">
@@ -109,14 +109,14 @@
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
           <el-form-item label="标签名称:" prop="name" class="nameOne">
-            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入内容"></el-input>
+            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入标签名称"></el-input>
           </el-form-item>
           <el-form-item label="标签简介:" prop="textarea" class="nameOne">
             <el-input
               class="area"
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 4}"
-              placeholder="请输入内容"
+              placeholder="请输入标签简介"
               maxlength="100"
               show-word-limit
               v-model="ruleForm.textarea">

@@ -138,7 +138,7 @@
                 show-word-limit
                 class="zxinp moduleOne"
                 size="small"
-                placeholder="请输入内容"
+                placeholder="请输入标签组名称"
                 v-model="ruleForm.tagsName" style="width: 360px">
               </el-input>
             </el-form-item>
@@ -147,7 +147,7 @@
                 class="area"
                 type="textarea"
                 :autosize="{ minRows: 2, maxRows: 4}"
-                placeholder="请输入内容"
+                placeholder="请输入标签组简介"
                 maxlength="100"
                 show-word-limit
                 v-model="ruleForm.synopsis">
