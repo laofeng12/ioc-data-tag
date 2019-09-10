@@ -37,7 +37,7 @@ public class PortrayalServiceImpl implements PortrayalService {
         Map<String, String> tableNameForQuery = new LinkedHashMap<>(1);//表名
         tableNameForQuery.put(Constants.DT_SEARCH_TABLE_NAME,alias);
         mppPgExecuteUtil.setTableNameForQuery(tableNameForQuery);
-        mppPgExecuteUtil.setCondition(" where "+alias+".\""+Constants.DT_SEARCH_MODEL_PKEY+"\"='"+id+"'");
+        mppPgExecuteUtil.setCondition(" where "+alias+".\""+Constants.DT_SEARCH_MODEL_PKEY+"\"='"+id+"' ORDER BY \"create_time\" desc nulls last");
         Map<String, String> columnMapForQuery  = new LinkedHashMap<>();//列名
         columnMapForQuery.put(Constants.DT_SEARCH_MODEL_TABLE_NAME,alias);
         columnMapForQuery.put(Constants.DT_SEARCH_MODEL_PKEY,alias);

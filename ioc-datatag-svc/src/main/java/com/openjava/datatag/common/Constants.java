@@ -84,7 +84,9 @@ public class Constants {
     public static final String DT_SEARCH_TABLE_NAME ="DT_SEARCH";//画像结果中间表名称
     public static final String DT_SEARCH_MODEL_TABLE_NAME ="model_table_name";//模型表名称
     public static final String DT_SEARCH_MODEL_PKEY ="model_p_key";//模型的主键
-    public static final String DT_SEARCH_MODEL_PKEY_NAME ="model_p_key_col_name";//模型主键列名
+//    public static final String DT_SEARCH_MODEL_PKEY_NAME ="model_p_key_col_name";//模型主键列名
+    public static final String DT_SEARCH_CREATE_TIME ="create_time";//模型主键列名
+
 
     //===========   协作打标  ===========================================
     public static final Long DT_COOPERATION_NO = 0L;//进行中
