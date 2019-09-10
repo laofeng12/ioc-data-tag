@@ -414,9 +414,9 @@
       },
       // 定时器
       setTimer() {
-        return setTimeout(()=>{
+        return setInterval(()=>{
           this.datamodelList()
-        },1000)
+        },5000)
       },
       async datamodelList() {
         const params = {
