@@ -19,7 +19,7 @@
       <!--<el-button size="small" @click="goback" v-if="contentArr != ''">返回</el-button>-->
       <!--<el-button size="small" @click="goback">返回</el-button>-->
     </div>
-    <div class="queryCard">
+    <div class="queryCard" v-if="contentArr != ''">
       <el-card class="box-card card2" v-for="(item,index) in contentArr" :key="index">
         <div class="numId">
           <span>ID：</span>
@@ -34,6 +34,9 @@
           <el-button type="text" @click="lookDetail(item.id,item.tableName)">查看详情</el-button>
         </div>
       </el-card>
+    </div>
+    <div v-else>
+      <img class="noImage" src="../../assets/img/007.png" height="144" width="160"/>
     </div>
 
   </div>
@@ -52,7 +55,14 @@
     methods: {
       ...mapActions('tagPanel', ['getimageList','getarrList']),
       queryDetail() {
-        this.getimageList(this.input2)
+        if(this.input2){
+          this.getimageList(this.input2)
+        }else{
+          this.$message({
+            message: '请填写查询信息',
+            type: 'warning'
+          });
+        }
       },
       lookDetail(detailId,tableName) {
         localStorage.setItem('pKey',detailId)
@@ -109,7 +119,7 @@
   }
 
   .queryCard {
-    margin-top: 30px;
+    margin-top: 55px;
   }
 
   .numId {
@@ -139,10 +149,12 @@
   }
 
   .back {
-    /*text-align: center;*/
-    /*margin-top: 20px;*/
     display: flex;
     justify-content: flex-end;
     margin-top: -32px;
+  }
+  .noImage{
+    margin-top: 60px;
+    margin-left: 180px;
   }
 </style>
