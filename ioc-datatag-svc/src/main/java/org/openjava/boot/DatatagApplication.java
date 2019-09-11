@@ -22,7 +22,7 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
+import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 
 @EntityScan(basePackages= {
@@ -86,6 +86,13 @@ public class DatatagApplication {
 	@Bean("db.SessionFactoryRouter")
 	public JPASessionFactoryRouter sessionFactoryRouter() {
 		return new JPASessionFactoryRouter();
+	}
+
+	//==========开启websocket===========================
+	@Bean
+	public ServerEndpointExporter serverEndpointExporter() {
+		System.out.println("-------------------开启websocket---------------");
+		return new ServerEndpointExporter();
 	}
 
 	@Bean("web.UserProvider")
