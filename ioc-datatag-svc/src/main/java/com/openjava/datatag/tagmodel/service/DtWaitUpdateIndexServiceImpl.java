@@ -116,13 +116,13 @@ public class DtWaitUpdateIndexServiceImpl implements DtWaitUpdateIndexService {
 							temp.add(record);
 						});
 						temp.add(modelTableName);
-						temp.add(modelTableName);
+						temp.add(new Date());
 						data.add(temp);
 					}
 					Map<String, String> columnMap = new LinkedHashMap<>(1);
 					columnMap.put(Constants.DT_SEARCH_MODEL_PKEY,"模型的主键");
 					columnMap.put(Constants.DT_SEARCH_MODEL_TABLE_NAME,"模型表名称");
-					columnMap.put(Constants.DT_SEARCH_MODEL_PKEY_NAME,"模型主键列名");
+					columnMap.put(Constants.DT_SEARCH_CREATE_TIME,"创建时间");
 					mppUtil.setTableName(Constants.DT_SEARCH_TABLE_NAME);
 					mppUtil.setColumnMap(columnMap);
 					mppUtil.setDataList(data);

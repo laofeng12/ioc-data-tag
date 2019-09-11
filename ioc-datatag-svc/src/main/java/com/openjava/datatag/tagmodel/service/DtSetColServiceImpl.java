@@ -1,6 +1,7 @@
 package com.openjava.datatag.tagmodel.service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import com.openjava.datatag.common.Constants;
@@ -139,6 +140,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		DtTaggingModel taggingModel = new DtTaggingModel();//模型
+		body.setColList(sortList(body.getColList(),body.getPkey()));
 		List<DtSetCol> colList = body.getColList();//字段表
 
 		//如果taggingModelId为空则新建模型
@@ -227,6 +229,41 @@ public class DtSetColServiceImpl implements DtSetColService {
 		return body;
 	}
 
+	/**
+	 * 字段重新排序、主键排在第一位
+	 * @param
+	 * @param
+	 * @return
+	 */
+	private List<DtSetCol> sortList(List<DtSetCol> colList,String pkey){
+		Long keyIndex = null;
+		Long colId = null;
+		if (CollectionUtils.isNotEmpty(colList)){
+			for (DtSetCol col:colList) {
+				if (col.getSourceCol().equals(pkey)){
+					keyIndex = col.getColSort();
+					colId = col.getColId();
+				}
+			}
+			if (keyIndex == null || keyIndex == 1){
+				return colList;
+			}
+			for (DtSetCol col:colList) {
+				if (col.getColSort()!=null){
+					if (col.getColId().equals(colId)){
+						col.setColSort(1L);
+					}
+					if (col.getColSort() < keyIndex && !col.getColId().equals(colId)) {
+						col.setColSort(col.getColSort()+1);
+					}
+					if (col.getColSort() > keyIndex && !col.getColId().equals(colId)) {
+						col.setColSort(col.getColSort()-1);
+					}
+				}
+			}
+		}
+		return colList;
+	}
 
 	public  List<DtSetCol> getBySourceColAndTaggingModelId(Long taggingModelId,String SourceCol){
 		return dtSetColRepository
