@@ -80,8 +80,8 @@ public class DtTagAction {
                     throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请不要用此方法进行删除操作，请用DELETE方法");
                 }
                 dtTagService.doUpdate(body, db, userId, ip);
-                dtTagService.doNew(body, userId, ip);
                 tagGroup.setModifyTime(new Date());
+                dtTagGroupService.doSave(tagGroup);
                 return new SuccessMessage("修改成功");
             }
 
