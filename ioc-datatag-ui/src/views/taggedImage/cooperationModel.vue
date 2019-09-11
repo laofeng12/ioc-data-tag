@@ -43,11 +43,11 @@
             </template>
           </el-table-column>
           <el-table-column prop="completeTime" label="完成时间">-</el-table-column>
-          <el-table-column prop="people" label="修改人/修改时间">
+          <el-table-column prop="people" label="发起人/发起时间">
             <template slot-scope="scope">
               <div>
-                <div>{{scope.row.modifyUserName}}</div>
-                <div>{{scope.row.modifyTime}}</div>
+                <div>{{scope.row.createUserName}}</div>
+                <div>{{scope.row.createTime}}</div>
               </div>
             </template>
           </el-table-column>

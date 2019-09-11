@@ -6,6 +6,7 @@
         size="small"
         clearable
         placeholder="请输入模型名称"
+        @keyup.enter.native="modelQuery"
         prefix-icon="el-icon-search"
         v-model="input2">
       </el-input>
@@ -413,9 +414,9 @@
       },
       // 定时器
       setTimer() {
-        return setTimeout(()=>{
+        return setInterval(()=>{
           this.datamodelList()
-        },1000)
+        },5000)
       },
       async datamodelList() {
         const params = {

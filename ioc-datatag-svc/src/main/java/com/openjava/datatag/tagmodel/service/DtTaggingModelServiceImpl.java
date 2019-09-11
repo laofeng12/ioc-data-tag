@@ -600,9 +600,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		Map<String,Object> sourceMap  = new LinkedHashMap<>();//表头
 		DtTaggingModel taggingModel = get(taggingModelId);
 		for (int i = 0; i < cols.size(); i++) {
-			if (cols.get(i).getIsSource()==1) {
+//			if (cols.get(i).getIsSource()==1) {
 				sourceMap.put(cols.get(i).getSourceColId(),cols.get(i).getSourceCol());
-			}
+//			}
 		}
 		LjdpHttpClient client = new LjdpHttpClient();
 		String  token= tokenGenerator.createToken(taggingModel.getCreateUser());//模型创建者才有权限调用数据集接口
