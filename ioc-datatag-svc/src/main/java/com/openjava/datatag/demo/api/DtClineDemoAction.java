@@ -1,6 +1,7 @@
 package com.openjava.datatag.demo.api;
 
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.component.websocket.WebsocketServer;
 import com.openjava.datatag.log.domain.DtTagcolUpdateLog;
 import com.openjava.datatag.log.query.DtTagcolUpdateLogDBParam;
 import com.openjava.datatag.log.service.DtTagcolUpdateLogService;
@@ -42,10 +43,13 @@ import java.util.Date;
  * @author zmk
  *
  */
-//@Api(tags="demo")
+@Api(tags="demo")
 @RestController
 @RequestMapping("/datatag/demo/cline")
 public class DtClineDemoAction {
+
+	@Resource
+	WebsocketServer websocketServer;
 
 	@ApiOperation(value = "调用其他组件的例子", nickname="save", notes = "调用其他组件的例子")
 	@Security(session=false)
@@ -57,6 +61,16 @@ public class DtClineDemoAction {
 		String[][] data = u.getData();
 		DataApiResponse<Object> resp = new DataApiResponse();
 		resp.setData(data);
+		return resp;
+	}
+
+	@ApiOperation(value = "websocket", nickname="save", notes = "websocket调试")
+	@Security(session=false)
+	@RequestMapping(value="/sendWebSocket", method=RequestMethod.POST)
+	public DataApiResponse<Object> sendWebSocket(@RequestBody DtTaggingModelDTO body,
+											 HttpServletRequest request) throws Exception{
+		websocketServer.sendMessage(1L,1,"233",666);
+		DataApiResponse<Object> resp = new DataApiResponse();
 		return resp;
 	}
 	
