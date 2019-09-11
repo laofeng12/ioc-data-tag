@@ -945,7 +945,8 @@
   }
 
   .conditions {
-    display: flex;
+    /*display: flex;*/
+    display: -webkit-box;
     align-items: center; /*垂直居中*/
     .condition {
       position: relative;
