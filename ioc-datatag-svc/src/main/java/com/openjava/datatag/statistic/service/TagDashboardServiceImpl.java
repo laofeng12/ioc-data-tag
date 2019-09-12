@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,10 @@ public class TagDashboardServiceImpl implements TagDashboardService {
         Long lastMonthTagCount = tagDashboardRepository.lastMonthTagCount();
         Long lastMonthDataSetCount = tagDashboardRepository.lastMonthDataSetCount();
         if (lastMonthDataSetCount!=0) {
-            BigDecimal bigDecimal = new  BigDecimal(lastMonthTagCount).divide(new BigDecimal(lastMonthDataSetCount),2).setScale(0,BigDecimal.ROUND_UP);
+            BigDecimal bigDecimal = new  BigDecimal(lastMonthTagCount)
+                    .divide(new BigDecimal(lastMonthDataSetCount),2,BigDecimal.ROUND_UP)
+                    .multiply(new BigDecimal(100))
+                    .setScale(0,BigDecimal.ROUND_UP);
             tagThanDataSet = bigDecimal.toString()+"%";
         }
         return tagThanDataSet;
