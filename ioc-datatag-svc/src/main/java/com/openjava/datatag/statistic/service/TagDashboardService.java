@@ -8,7 +8,7 @@ public interface TagDashboardService {
     Long  lastMonthDataSetCount();
     int getLastMonthTagSum();
     String getTagThanDataSet();
-    List<Object> getMonthlyLabelChanges();
+    List<Object> getMonthlyLabelChanges()throws Exception;
     Map<String,String> getAllYearMonth();
     List<Object> getSamedayHotTags();
     List<Object> getYesterdayHotTags();

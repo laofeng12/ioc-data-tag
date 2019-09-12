@@ -1,12 +1,16 @@
 package com.openjava.datatag.statistic.service;
 
+import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.statistic.repository.TagDashboardRepository;
+import com.openjava.datatag.utils.MyTimeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +46,15 @@ public class TagDashboardServiceImpl implements TagDashboardService {
     }
 
     @Override
-    public List<Object> getMonthlyLabelChanges(){return tagDashboardRepository.getMonthlyLabelChanges();}
+    public List<Object> getMonthlyLabelChanges()throws Exception{
+        List<Object> list = new ArrayList<>();
+//        return tagDashboardRepository.getMonthlyLabelChanges();
+        Date[][] dates = MyTimeUtil.getThisYearEveryMoth(new Date());
+        for (Date[] beginAndEnd:dates) {
+            list.add(tagDashboardRepository.countByCreateTime(beginAndEnd[0],beginAndEnd[1]));
+        }
+        return list ;
+    }
 
     @Override
     //public List<Object> getAllYearMonth(){return tagDashboardRepository.getAllYearMonth();}
