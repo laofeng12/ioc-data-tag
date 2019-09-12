@@ -115,7 +115,35 @@ public class MyTimeUtil {
         result[1] = dateEnd;
         return result;
 	}
-	
+
+	/**
+	 * 获取当月的开始和结束时间
+	 * @param date
+	 * @return
+	 * @throws Exception
+	 */
+	public static  Date[] getMonthBeginAndEnd(Date date) throws Exception {
+		if(date==null) {
+			return null;
+		}
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//获取周一的日期
+		SimpleDateFormat begin = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+		SimpleDateFormat end = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		Date dateBegin = f.parse(begin.format(cal.getTime()));
+		cal.add(Calendar.MONTH,1);
+		cal.add(Calendar.DAY_OF_MONTH,-1);
+		Date dateEnd = f.parse(end.format(cal.getTime()));
+		Date[] result = new Date[2];
+//        System.out.println(dateBegin);
+//        System.out.println(dateEnd);
+		result[0] = dateBegin;
+		result[1] = dateEnd;
+		return result;
+	}
+
 	/**
 	 * 获取本年开始时间
 	 *
@@ -132,9 +160,25 @@ public class MyTimeUtil {
 		calendar.set(Calendar.MONTH,0);
 		return calendar.getTime();
 	}
+	/**
+	 * 获取本年12个月每个月的开始和结束时间
+	 */
+	public static Date[][] getThisYearEveryMoth(Date date) throws Exception{
+		Date[][] dates  = new Date[12][2];
+		Date yearBeginTime = getCurrentYearStartTime(date);
+		Date[] firstMonth = getMonthBeginAndEnd(yearBeginTime);
+		dates[0] = firstMonth;
+		for (int i = 1; i <12 ; i++) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(dates[i-1][0]);//上个月的开始时间
+			calendar.add(Calendar.MONTH, 1);
+			dates[i]= getMonthBeginAndEnd(calendar.getTime());
+		}
+		return dates;
+	}
 
 	/**
-	 * 获取本年开始时间
+	 * 获取本年结束时间
 	 *
 	 * @param date
 	 * @return
@@ -190,6 +234,6 @@ public class MyTimeUtil {
 
 		System.out.println(getTimeSlot(date));
 		getBeginAndEnd(date);
-		
+		Date[][] dates = getThisYearEveryMoth(new Date());
 	}
 }

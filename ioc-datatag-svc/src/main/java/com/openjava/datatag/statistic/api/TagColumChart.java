@@ -44,7 +44,7 @@ public class TagColumChart {
     @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getMonthlyLabelChanges",method = RequestMethod.GET)
-    public Object getMonthlyLabelChanges(){
+    public Object getMonthlyLabelChanges() throws Exception{
         List<Object> list = TagDashboardService.getMonthlyLabelChanges();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();
         apiResp.setData(list);

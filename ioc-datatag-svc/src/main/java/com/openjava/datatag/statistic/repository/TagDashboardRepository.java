@@ -3,7 +3,10 @@ package com.openjava.datatag.statistic.repository;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import org.ljdp.core.spring.data.DynamicJpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -110,50 +113,31 @@ public interface TagDashboardRepository extends DynamicJpaRepository<DtTaggingMo
             "                   1 / 86400 + 1\n" +
             "         group by extract(month from create_time), tag_name) t1\n" +
             " group by mt) t2 on dmt.mt=t2.mt order by dmt.mt ) t3")
-
-    public List<Object> getMonthlyLabelChanges();
+     List<Object> getMonthlyLabelChanges();
 
     /*
      *
      *获取标签变化左边数据列表
      * */
-    @Query(nativeQuery = true,value = "select *\n" +
-            "  from (select count(1) as all_tag_nb\n" +
-            "          from (select tag_name\n" +
-            "                  from (select ID, PREA_TAG_ID, create_time, tag_name\n" +
-            "                          from DT_TAG\n" +
-            "                         where connect_by_isleaf = 1\n" +
-            "                        CONNECT BY PRIOR ID = PREA_TAG_ID\n" +
-            "                               and is_deleted = 0) tb\n" +
-            "                 where connect_by_isleaf = 1\n" +
-            "                CONNECT BY PRIOR ID = PREA_TAG_ID\n" +
-            "                 group by tag_name) t3) t4\n" +
-            "join (\n" +
-            "select  count(1) as year_tag_nb\n" +
-            "  from (select tag_name\n" +
-            "          from (select ID, PREA_TAG_ID, create_time, tag_name\n" +
-            "                  from DT_TAG\n" +
-            "                 where is_deleted = 0\n" +
-            "                   and create_time >= trunc(add_months(sysdate, -12), 'year')\n" +
-            "                   and create_time <=\n" +
-            "                       last_day(add_months(trunc(sysdate, 'YYYY'), -1)) -\n" +
-            "                       1 / 86400 + 1) tb\n" +
-            "         where connect_by_isleaf = 1\n" +
-            "        CONNECT BY PRIOR ID = PREA_TAG_ID\n" +
-            "         group by tag_name) t1) tb on 1=1\n" +
-            "join (\n" +
-            "select count(1) as month_tag_nb\n" +
-            "  from (select tag_name\n" +
-            "          from (select ID, PREA_TAG_ID, create_time, tag_name\n" +
-            "                  from DT_TAG\n" +
-            "                 where is_deleted = 0\n" +
-            "                   and create_time >= trunc(add_months(sysdate, -1), 'mm')\n" +
-            "                   and create_time <=\n" +
-            "                       trunc(last_day(add_months(sysdate, -1))) - 1 / 86400 + 1) tb\n" +
-            "         where connect_by_isleaf = 1\n" +
-            "        CONNECT BY PRIOR ID = PREA_TAG_ID\n" +
-            "         group by tag_name) t5) tb1 on 1=1")
-    public Map<String,String> getAllYearMonth();
+    @Query(nativeQuery = true,value = "select * " +
+            "from (select count(1) as ALL_TAG_NB" +
+            "  from (SELECT DISTINCT ( TAG_NAME ) from DT_TAG" +
+            "        where PREA_TAG_ID >= 0 and is_deleted = 0))t1"+
+            " join (" +
+            "select  count(1) as YEAR_TAG_NB" +
+            "  from (SELECT DISTINCT ( TAG_NAME ) from DT_TAG" +
+            "        where PREA_TAG_ID >= 0 and is_deleted = 0" +
+            "              and create_time >= trunc(add_months(sysdate, -12), 'year')" +
+            "              and create_time <= last_day(add_months(trunc(sysdate, 'YYYY'), -1)) -1 / 86400 + 1))t2" +
+            " on 1=1" +
+            " join (" +
+            "select count(1) as MONTH_TAG_NB" +
+            "  from (SELECT DISTINCT ( TAG_NAME ) from DT_TAG" +
+            "        where PREA_TAG_ID >= 0 and is_deleted = 0" +
+            "              and create_time >= trunc(add_months(sysdate, -1), 'mm')\n" +
+            "                   and create_time <=trunc(last_day(add_months(sysdate, -1))) - 1 / 86400 + 1))t3" +
+            " on 1=1")
+    Map<String,String> getAllYearMonth();
 
 
 
@@ -276,4 +260,10 @@ public interface TagDashboardRepository extends DynamicJpaRepository<DtTaggingMo
             "and t.CREATE_TIME<= trunc(last_day(add_months(sysdate, -1))) - 1 / 86400 + 1" +
             "group by t.DATA_SET_ID,t.RESOURCE_TYPE)tagNameTable ")
     Long lastMonthDataSetCount();
+
+    /**
+     * 根据时间返回2、3级唯一标签数量
+     */
+    @Query(nativeQuery = true, value = "select count (1) from (select DISTINCT(TAG_NAME) from DT_TAG where IS_DELETED=0 AND PREA_TAG_ID >= 0 AND CREATE_TIME BETWEEN :beginTime and :endTime)")
+    Long countByCreateTime(@Param("beginTime")Date beginTime,@Param("endTime")Date endTime);
 }
