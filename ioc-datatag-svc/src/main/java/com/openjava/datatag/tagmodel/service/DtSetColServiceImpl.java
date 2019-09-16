@@ -243,6 +243,9 @@ public class DtSetColServiceImpl implements DtSetColService {
 				if (col.getSourceCol().equals(pkey)){
 					keyIndex = col.getColSort();
 					colId = col.getColId();
+					if (colId==null){
+						col.setColSort(1L);
+					}
 				}
 			}
 			if (keyIndex == null || keyIndex == 1){
@@ -250,7 +253,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 			}
 			for (DtSetCol col:colList) {
 				if (col.getColSort()!=null){
-					if (col.getColId().equals(colId)){
+					if (col.getColId()!=null && col.getColId().equals(colId)){
 						col.setColSort(1L);
 					}
 					if (col.getColSort() < keyIndex && !col.getColId().equals(colId)) {
