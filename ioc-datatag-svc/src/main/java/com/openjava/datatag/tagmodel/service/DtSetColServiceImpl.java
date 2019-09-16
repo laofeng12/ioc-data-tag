@@ -253,14 +253,23 @@ public class DtSetColServiceImpl implements DtSetColService {
 			}
 			for (DtSetCol col:colList) {
 				if (col.getColSort()!=null){
-					if (col.getColId()!=null && col.getColId().equals(colId)){
-						col.setColSort(1L);
-					}
-					if (col.getColSort() < keyIndex && !col.getColId().equals(colId)) {
-						col.setColSort(col.getColSort()+1);
-					}
-					if (col.getColSort() > keyIndex && !col.getColId().equals(colId)) {
-						col.setColSort(col.getColSort()-1);
+					if (col.getColId()==null){
+						if (col.getColSort() < keyIndex) {
+							col.setColSort(col.getColSort()+1);
+						}
+						if (col.getColSort() > keyIndex) {
+							col.setColSort(col.getColSort()-1);
+						}
+					}else {
+						if (col.getColId().equals(colId)){
+							col.setColSort(1L);
+						}
+						if (col.getColSort() < keyIndex && !col.getColId().equals(colId)) {
+							col.setColSort(col.getColSort()+1);
+						}
+						if (col.getColSort() > keyIndex && !col.getColId().equals(colId)) {
+							col.setColSort(col.getColSort()-1);
+						}
 					}
 				}
 			}
