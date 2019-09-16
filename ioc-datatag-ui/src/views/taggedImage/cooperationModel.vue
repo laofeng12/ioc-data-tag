@@ -248,11 +248,11 @@
       },
       handleCurrentChange(page){
         this.page = page-1
-        this.datamodelList()
+        this.modelQuery()
       },
       handleSizeChange (size) {
         this.size = size
-        this.datamodelList()
+        this.modelQuery()
       },
       goPage(){},
     },
