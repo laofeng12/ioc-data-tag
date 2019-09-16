@@ -34,7 +34,7 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="modelName" label="标签组名称"></el-table-column>
+          <el-table-column prop="modelName" label="模型名称"></el-table-column>
           <el-table-column prop="runState" label="状态">
             <template slot-scope="scope">
               <div class="state">
@@ -83,7 +83,7 @@
               maxlength="25"
               show-word-limit
               placeholder="请输入标签组名称"
-              v-model="ruleForm.tagsName" style="width: 360px">
+              v-model.trim="ruleForm.tagsName" style="width: 360px">
             </el-input>
           </el-form-item>
           <el-form-item label="标签组简介:" prop="synopsis" class="nameOne">
@@ -232,7 +232,7 @@
                   tagsName: this.ruleForm.tagsName
                 })
                 this.creatsaveLoading = false
-                this.$router.push('/labelcreatTree/' + data.id)
+                this.$router.push('/labelcreatTree/' + data.id +'/'+ data.tagsName)
               } catch (e) {
                 this.creatsaveLoading = false
                 console.log(e);
