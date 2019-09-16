@@ -15,7 +15,7 @@
     <div class="content">
       <div class="components">
         <div>
-          <p class="numDetail"><span>{{titleName}}</span><span>的画像详情</span></p>
+          <p class="numDetail"><span>{{pKey}}</span><span>的画像详情</span></p>
           <div class="circularContent">
             <div class="circular">
               <div class="circularOne">

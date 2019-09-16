@@ -10,7 +10,7 @@
           placeholder="请输入内容"
           prefix-icon="el-icon-search"
           @keyup.enter.native="queryDetail"
-          v-model="input2">
+          v-model.trim="input2">
         </el-input>
         <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">画像查询</el-button>
       </div>

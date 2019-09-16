@@ -140,7 +140,6 @@
       },
       // 查看画像
       async lookImage(row) {
-        const obj = row
         // console.log('44',row[this.pKey])
         this.$router.push({
           path: '/lookImagedetail',

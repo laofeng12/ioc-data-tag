@@ -19,9 +19,6 @@
       </el-tree>
     </div>
     <!--字段设置-->
-    <!--<el-dialog class="creat" title="字段设置" :visible.sync="colSetDialog" width="800px" center-->
-               <!--:modal-append-to-body="false" :close-on-click-modal="false"-->
-               <!--@close="close" @open="init">-->
     <el-dialog class="creat" title="字段设置" :visible.sync="colSetDialog" width="800px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close" @open="init">
@@ -187,10 +184,11 @@
         searchText: '',
         checkAll: false,
         checkedCols: [],
-        checkIt:[],
+        checkIt: [],
         cols: colsOptions,
         isIndeterminate: true,
         tableData: [],
+        totableData: [],
         resData: [],
         treeData: [],
         multipleSelection: [],
@@ -277,14 +275,13 @@
           this.columnData.map(item => {
             item.colSort = ''
           })
+          console.log('全选1', this.columnData);
+          console.log('全选2', this.tableData);
           this.tableData = this.columnData
           this.tableData.forEach((item, index) => {
             item.isMarking = false
             if (item.colSort === '') {
               item.colSort = index + 1
-              // if (item.colSort > 9) {
-              //   item.colSort = 1
-              // }
             }
           })
         } else {
@@ -343,13 +340,10 @@
             }
           })
         })
-        // console.log('排序', this.tableData)
+        console.log('排序', this.tableData)
         this.tableData.forEach((item, index) => {
           if (item.colSort === '') {
             item.colSort = index + 1
-            // if (item.colSort > 9) {
-            //   item.colSort = 1
-            // }
           }
         })
         // xiala
@@ -370,6 +364,10 @@
         }
         // 编辑
         if (this.routerName === 'editModel') {
+          console.log('modelData', this.modelData.colList);
+          console.log('tableData', this.tableData);
+          console.log('checkedCols', this.checkedCols);
+          console.log('columnData', this.columnData);
           this.modelData.colList.forEach(item => {
             this.tableData.map(newItem => {
               if (item.isMarking == true && newItem.definition == item.showCol) {
@@ -377,6 +375,9 @@
               }
               if (item.sourceColId == newItem.id) {
                 Object.assign(newItem, {colId: item.colId})
+              }
+              if (newItem.definition == item.showCol) {
+                newItem.definition = item.showCol
               }
             })
           })
@@ -397,7 +398,6 @@
         this.colSetDialog = true
         let colsData = {}
         let allcolsData = {}
-        let checkedColsarr = []
         if (type === 0) {
           //新建模型字段确认获取数据
           colsData = await getResourceInfoData(data.resourceId, data.type, 1)  // 有权限的字段
@@ -413,6 +413,7 @@
         this.allcolumnData = allcolsData.data.column
         // 有权限字段
         this.columnData = colsData.data.column
+        console.log('332有权限字段211', this.columnData);
         this.resourceName = colsData.data.resourceName
         this.resourceId = colsData.data.resourceId
         this.resourceType = colsData.data.type   // 0数据湖 1自建目录
@@ -440,11 +441,12 @@
           //获取主键值
           this.ruleForm.pkey = this.modelData.pkey
           //获取选中的字段，从接口来
+          console.log('JIEK', this.modelData.colList);
           this.modelData.colList.forEach((item, index) => {
             this.checkedCols.push(item.showCol)
             this.tableData.push({
               definition: item.showCol, isMarking: item.isMarking,
-              colId: item.colId, type: item.sourceDataType, colSort: item.colSort
+              colId: item.colId, type: item.sourceDataType, colSort: item.colSort, sourceColtion: item.sourceCol
             })
           })
           // 编辑下拉
@@ -563,6 +565,18 @@
         this.$refs['ruleForm'].validate((valid) => {
           if (valid) {
             const colList = []
+            if (this.routerName === 'editModel') {
+              console.log('=tableData==', this.tableData);
+              console.log('==modelData.colList=', this.modelData.colList);
+              this.tableData.map((item, index) => {
+                this.modelData.colList.forEach(modelitem => {
+                  if (item.definition == modelitem.showCol) {
+                    item.definition = modelitem.sourceCol
+                  }
+                })
+              })
+              console.log('66666666', this.tableData);
+            }
             this.tableData.map((item, index) => {
               colList.push({
                 sourceCol: item.definition,

@@ -7,6 +7,7 @@
         clearable
         placeholder="请输入内容"
         prefix-icon="el-icon-search"
+        @keyup.enter.native="modelQuery"
         v-model="input2">
       </el-input>
       <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
@@ -34,7 +35,7 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="modelName" label="标签组名称"></el-table-column>
+          <el-table-column prop="modelName" label="模型名称"></el-table-column>
           <el-table-column prop="runState" label="状态">
             <template slot-scope="scope">
               <div class="state">
@@ -83,7 +84,7 @@
               maxlength="25"
               show-word-limit
               placeholder="请输入标签组名称"
-              v-model="ruleForm.tagsName" style="width: 360px">
+              v-model.trim="ruleForm.tagsName" style="width: 360px">
             </el-input>
           </el-form-item>
           <el-form-item label="标签组简介:" prop="synopsis" class="nameOne">
@@ -232,7 +233,7 @@
                   tagsName: this.ruleForm.tagsName
                 })
                 this.creatsaveLoading = false
-                this.$router.push('/labelcreatTree/' + data.id)
+                this.$router.push('/labelcreatTree/' + data.id +'/'+ data.tagsName)
               } catch (e) {
                 this.creatsaveLoading = false
                 console.log(e);
@@ -248,11 +249,11 @@
       },
       handleCurrentChange(page){
         this.page = page-1
-        this.datamodelList()
+        this.modelQuery()
       },
       handleSizeChange (size) {
         this.size = size
-        this.datamodelList()
+        this.modelQuery()
       },
       goPage(){},
     },
