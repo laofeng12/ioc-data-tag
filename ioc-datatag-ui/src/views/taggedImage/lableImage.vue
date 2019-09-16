@@ -234,6 +234,7 @@
   import {getmodelList, getDispatch, getDelete, getDispatchdetail} from '@/api/lableImage.js'
   import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
+  import DMSocket from '@/utils/DMSocket'
 
   export default {
     components: {ElementPagination},
@@ -263,6 +264,7 @@
         percentage: 30,
         value1: '',
         textarea: '',
+        WebSocket:null,
         options: [{
           value: '',
           label: '全部'
@@ -414,7 +416,7 @@
       },
       // 定时器
       setTimer() {
-        return setInterval(()=>{
+        setInterval(()=>{
           this.datamodelList()
         },5000)
       },
@@ -438,23 +440,24 @@
               }
               if (item.runState == 1) {
                 item.runState = '等待运行'
-                this.setTimer()
+                // this.setTimer()
+                // this.getsocket()
               }
               if (item.runState == 2) {
                 item.runState = '运行中'
-                this.setTimer()
+                // this.setTimer()
               }
               if (item.runState == 3) {
                 item.runState = '运行成功'
-                clearInterval(this.setTimer)
+                // clearInterval(this.setTimer)
               }
               if (item.runState == 4) {
                 item.runState = '运行错误'
-                clearInterval(this.setTimer)
+                // clearInterval(this.setTimer)
               }
               if (item.runState == -1) {
                 item.runState = '运行结束'
-                clearInterval(this.setTimer)
+                // clearInterval(this.setTimer)
               }
             })
           } else {
@@ -576,10 +579,42 @@
             }
           })
         }
-      }
+      },
+      // zhujianxiong
+      getsocket(){
+        // let Socket = new WebSocket(url);
+        // const url = `/datatag/tagmodel/dtTaggingModel/search?eq_runState=${this.value}&ge_startTime=&le_startTime=&like_modelName=${this.input2}&page=${this.page}&size=${this.size}`
+        console.log('yonghu',this.$store.state.user.userInfo.userId);
+        const userId = this.$store.state.user.userInfo.userId
+        const url = '/datatag/websocket/server/' + userId
+        console.log('url',url);
+        // try {
+        //   this.WebSocket = DMSocket(url)
+        //   this.WebSocket.onopen = this.socketOnopen
+        //   this.WebSocket.onerror = this.socketOnerror
+        //   this.WebSocket.onmessage = this.socketOnmessage
+        //   this.WebSocket.onclose = this.socketOnclose
+        // } catch (e) {
+        //   console.log(e)
+        // }
+      },
+      socketOnopen () {
+        console.log('websocket 链接成功')
+      },
+      socketOnerror () {
+        console.log('websocket 链接错误')
+      },
+      socketOnmessage (e) {
+        console.log('WebSocket',e);
+      },
+      socketOnclose () {
+        console.log('websocket 关闭')
+      },
     },
     created() {
       this.datamodelList()
+      // console.log('yonghu',this.$store.state.user.userInfo.userId);
+      // this.getsocket()
     },
     computed: {},
     watch: {},
