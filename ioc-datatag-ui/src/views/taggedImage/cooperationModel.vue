@@ -7,6 +7,7 @@
         clearable
         placeholder="请输入内容"
         prefix-icon="el-icon-search"
+        @keyup.enter.native="modelQuery"
         v-model="input2">
       </el-input>
       <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
