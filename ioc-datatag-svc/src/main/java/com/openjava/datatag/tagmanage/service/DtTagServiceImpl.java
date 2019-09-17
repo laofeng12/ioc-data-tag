@@ -8,7 +8,10 @@ import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.query.DtTagDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagRepository;
 import com.openjava.datatag.log.repository.DtTagUpdateLogRepository;
+import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.sequence.SequenceService;
@@ -19,9 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * DT_TAG业务层
@@ -37,7 +38,9 @@ public class DtTagServiceImpl implements DtTagService {
 
 	@Resource
 	private DtTagUpdateLogService dtTagUpdateLogService;
-	
+	@Resource
+	DtTaggingModelService dtTaggingModelService;
+
 	public Page<DtTag> query(DtTagDBParam params, Pageable pageable){
 		Page<DtTag> pageresult = dtTagRepository.query(params, pageable);
 		return pageresult;
@@ -62,6 +65,9 @@ public class DtTagServiceImpl implements DtTagService {
 	}
 
 	public void doSoftDeleteByTagsID(Long id, Date now){
+		// TODO: 2019/9/16  删除标签组时删除画像
+		List<Long> ids = findIdsByTagsId(id);
+		dtTaggingModelService.stopModelByColIds(ids);//停止模型删除画像
 		dtTagRepository.doSoftDeleteByTagsID(id,now);
 	}
 
@@ -104,6 +110,9 @@ public class DtTagServiceImpl implements DtTagService {
 	}
 
 	public void doSoftDeleteByDtTag(DtTag db,Long userId,String ip){
+		// TODO: 2019/9/16   删除标签时删除画像
+		List<Long> ids =  findAllIdsByTagId(db.getId());
+		dtTaggingModelService.stopModelByColIds(ids);//停止模型删除画像
 		Date now = new Date();
 		//先删除子节点
 		doSoftDeleteByRootID(db.getId(),now);
@@ -111,7 +120,6 @@ public class DtTagServiceImpl implements DtTagService {
 		db.setIsDeleted(Constants.PUBLIC_YES);
 		db.setModifyTime(now);
 		doSave(db);
-
 		dtTagUpdateLogService.loggingDelete(db,userId,ip);
 	}
 
@@ -127,5 +135,17 @@ public class DtTagServiceImpl implements DtTagService {
 		return dtTagRepository.findByTagIds(tagIds);
 	}
 
-
+	/**
+	 * 根据标签id获取整颗数的节点id
+	 */
+	public List<Long> findAllIdsByTagId(Long tagId){
+		List<Long> tagIds = dtTagRepository.findAllIdsByRootId(tagId);
+		return tagIds;
+	}
+	/**
+	 * 根据标签组获取节点ID
+	 */
+	public List<Long> findIdsByTagsId( Long tagsId){
+		return dtTagRepository.findIdsByTagsId(tagsId);
+	}
 }

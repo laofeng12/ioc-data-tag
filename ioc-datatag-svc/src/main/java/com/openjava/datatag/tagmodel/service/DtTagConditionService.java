@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
 import com.openjava.datatag.tagmodel.query.DtTagConditionDBParam;
+import org.springframework.data.repository.query.Param;
 
 /**
  * 条件设置表业务层接口
@@ -26,4 +27,7 @@ public interface DtTagConditionService {
 	void doRemove(String ids)throws Exception;
 	List<DtTagCondition> findByColId(Long colId);
 	List<DtTagCondition> findByColIds(List<Long> colIds);
+
+	List<DtTagCondition> findByTaggingModelIdAndColId(Long taggingModelId ,Long tagId);
+	List<DtTagCondition> findByTagIds(List<Long> tagIds);
 }

@@ -80,4 +80,15 @@ public interface DtTaggingModelService {
 	 * @return List
 	 */
 	List rebuiltData(List<DtSetCol> cols, List<List<Object>> dataList, Object[] columnList, int type);
+
+	/**
+	 * 停止模型核心代码（删除画像）
+	 * @param taggingModelId
+	 * @param colId
+	 */
+	void stopModel(Long taggingModelId,Long colId);
+	/**
+	 * 根据标签停止模型删除画像
+	 */
+	void stopModelByColIds(List<Long> colIds);
 }
