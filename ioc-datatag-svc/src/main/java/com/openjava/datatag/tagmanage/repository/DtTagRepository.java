@@ -28,6 +28,11 @@ public interface DtTagRepository extends DynamicJpaRepository<DtTag, Long>, DtTa
     void doSoftDeleteByPreaTagId(@Param("id") Long id, @Param("now") Date now);
 
 
+    /**
+     * 查询该节点下的所有节点的父节点集（自己是叶子节点时不包括自己）
+     * @param rootId
+     * @return
+     */
     @Query(value = "SELECT distinct PREA_TAG_ID\n" +
             "FROM DT_TAG\n" +
             "where ID != :rootId \n" +
@@ -35,10 +40,34 @@ public interface DtTagRepository extends DynamicJpaRepository<DtTag, Long>, DtTa
             "CONNECT BY PRIOR ID = PREA_TAG_ID",nativeQuery = true)
     List<Long> findPIdByRootId(@Param("rootId") Long rootId);
 
+    /**
+     * 查询整颗表情树的所有id
+     * @param rootId
+     * @return
+     */
+    @Query(value = "SELECT ID\n" +
+            "FROM DT_TAG\n" +
+            "START WITH ID = :rootId\n" +
+            "CONNECT BY PRIOR ID = PREA_TAG_ID",nativeQuery = true)
+    List<Long> findAllIdsByRootId(@Param("rootId") Long rootId);
+
     List<DtTag> findByTagsIdAndIsDeleted(Long tagsID,Long isDeleted);
 
     List<DtTag> findByPreaTagIdAndIsDeleted(Long preaTagId,Long isDeteled);
 
     @Query("from DtTag t where t.isDeleted = 0 and t.id in(:ids)")
     List<DtTag> findByTagIds(@Param("ids") List<Long> ids);
+
+    /**
+     * 根据父节点获取子节点ID
+     * @param preaTagId
+     * @return
+     */
+    @Query("select t.id from DtTag t where t.isDeleted = 0 and t.preaTagId =:preaTagId")
+    List<Long> findIdsByPreaTagId(@Param("preaTagId") Long preaTagId);
+    /**
+     * 根据标签组获取节点ID
+     */
+    @Query("select t.id from DtTag t where t.isDeleted = 0 and tagsId = :tagsId")
+    List<Long> findIdsByTagsId(@Param("tagsId") Long tagsId);
 }

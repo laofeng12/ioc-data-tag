@@ -22,7 +22,7 @@ import java.util.*;
 
 @Service
 @Transactional
-@Data
+//@Data
 public class PortrayalServiceImpl implements PortrayalService {
     Logger logger = LogManager.getLogger(getClass());
     @Resource
@@ -149,6 +149,19 @@ public class PortrayalServiceImpl implements PortrayalService {
         return list;
     }
 
+    public void clearPortrayal(String tableName){
+        MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();
+        mppUtil.initValidDataSource(postgreSqlConfig);//初始化数据库
+        //第一步，先删中间表数据
+        String deleteSql = "delete from \""+Constants.DT_SEARCH_TABLE_NAME+"\" t where t.model_table_name = '"+tableName+"'";
+        List<String> deleteSqlList = new LinkedList<>();
+        deleteSqlList.add(deleteSql);
+        mppUtil.setUpdateSqlList(deleteSqlList);
+        mppUtil.updateDataList();
+        //第二步删除模型表
+        mppUtil.setTableName(tableName);//表名
+        mppUtil.dropTable();//删表
+    }
     public static void main(String[] args) {
         String [] prefixAndId = "DT_name".split("DT_");
         System.out.println(prefixAndId[0]);

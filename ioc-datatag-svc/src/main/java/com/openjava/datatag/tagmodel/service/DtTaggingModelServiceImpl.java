@@ -21,6 +21,7 @@ import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
 import com.openjava.datatag.tagmodel.repository.DtTagConditionRepository;
 import com.openjava.datatag.tagmodel.repository.DtTaggingModelRepository;
+import com.openjava.datatag.userprofile.service.PortrayalService;
 import com.openjava.datatag.utils.EntityClassUtil;
 import com.openjava.datatag.utils.MyTimeUtil;
 import com.openjava.datatag.utils.TagConditionUtils;
@@ -100,6 +101,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private PostgreSqlConfig postgreSqlConfig;
 	@Resource
 	private DtTaggingErrorLogService dtTaggingErrorLogService;
+	@Resource
+	private PortrayalService portrayalService;
 
 	public void copy(DtTaggingModelCopyDTO copy,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -276,10 +279,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		//检查Cycle 字段是否合理
 		if(checkCycle(body.getCycleEnum())){
 			if (body.getCycleEnum().equals(Constants.DT_DISPATCH_STOP)){
-				db.setRunState(Constants.DT_MODEL_END);
-				db.setStartTime(null);
-				db.setCycle(null);
-				db.setCycleEnum(null);
+//				db.setRunState(Constants.DT_MODEL_END);
+//				db.setStartTime(null);
+//				db.setCycle(null);
+//				db.setCycleEnum(null);
+				stopModel(db.getTaggingModelId(),null);
 			}else{
 				if (body.getStartTime() == null){
 					throw new APIException(MyErrorConstants.TAGM_DISPATCH_NONE_START_TIME,"未设置开始时间");
@@ -777,7 +781,49 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		return map;
 	}
 
+	/**
+	 * 停止模型核心代码（删除画像）
+	 * @param taggingModelId
+	 */
+	public void stopModel(Long taggingModelId,Long tagId){
+		DtTaggingModel model = get(taggingModelId);
+		model.setRunState(Constants.DT_MODEL_END);
+		model.setStartTime(null);
+		model.setCycle(null);
+		model.setCycleEnum(null);
+		model.setUpdateNum(0L);
+		model.setSuccessNum(0L);
+		//删除字段的打标设置
+		if (tagId!=null) {
+			List<DtTagCondition> conditionList = dtTagConditionService.findByTaggingModelIdAndColId(taggingModelId,tagId);
+			if (CollectionUtils.isNotEmpty(conditionList)){
+				for (DtTagCondition condition:conditionList) {
+					condition.setIsDeleted(Constants.PUBLIC_YES);
+					dtTagConditionService.doSave(condition);
+				}
+			}
+		}
+		//删除画像
+		portrayalService.clearPortrayal(Constants.DT_TABLE_PREFIX+model.getTaggingModelId());
+	}
 
+	public void stopModelByColIds(List<Long> tagids){
+		List<DtTaggingModel> models =  dtTaggingModelRepository.getModelByTagIds(tagids);
+		if (CollectionUtils.isNotEmpty(models)){
+			//停止模型删除画像
+			models.forEach(model->{
+				stopModel(model.getTaggingModelId(),null);
+			});
+			//删除字段的打标设置
+			List<DtTagCondition> conditionList = dtTagConditionService.findByTagIds(tagids);
+			if (CollectionUtils.isNotEmpty(conditionList)){
+				conditionList.forEach(condition->{
+					condition.setIsDeleted(Constants.PUBLIC_YES);
+					dtTagConditionService.doSave(condition);
+				});
+			}
+		}
+	}
 
 
 	public static void main(String[] args) {

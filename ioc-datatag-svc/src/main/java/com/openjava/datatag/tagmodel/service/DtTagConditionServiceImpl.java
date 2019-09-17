@@ -82,4 +82,12 @@ public class DtTagConditionServiceImpl implements DtTagConditionService {
 	public List<DtTagCondition> findByColIds(List<Long> colIds){
 		return dtTagConditionRepository.findByColIds(colIds);
 	}
+
+	public List<DtTagCondition> findByTagIds(List<Long> tagIds){
+		return dtTagConditionRepository.findByTagIds(tagIds);
+	}
+
+	public List<DtTagCondition> findByTaggingModelIdAndColId(Long taggingModelId ,Long tagId){
+		return dtTagConditionRepository.findByTaggingModelIdAndColId(taggingModelId,tagId);
+	}
 }
