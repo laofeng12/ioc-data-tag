@@ -862,6 +862,7 @@
     font-size: 18px;
     margin-right: 10px;
     cursor: pointer;
+    color: #409eff;
   }
 
   .makingEdit {
