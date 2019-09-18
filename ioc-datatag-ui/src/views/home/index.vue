@@ -1,4 +1,4 @@
-<template>
+  <template>
   <section class="w-carousel-wrapper">
     <nav class="nav-bar">
       <div class="plaform-name">大数据服务平台</div>
@@ -104,6 +104,7 @@ export default {
       height: 100%;
     }
     .w-bg-1 {
+      /*<!--background: url($baseUrl + '/img/bitmap_1.png') no-repeat center/1270px 744px;-->*/
       background: url($baseUrl + '/img/bitmap_1.png') no-repeat center/1270px 744px;
     }
     .w-bg-2 {
