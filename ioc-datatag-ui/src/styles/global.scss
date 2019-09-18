@@ -94,7 +94,8 @@ p {
 
 // 标签管理
 .treeBel .el-tree-node__expand-icon.is-leaf{
-  display: none;
+  //display: none;
+  color: transparent !important;
 }
 
 .treeBel .el-tree .el-tree-node__expand-icon.expanded{
