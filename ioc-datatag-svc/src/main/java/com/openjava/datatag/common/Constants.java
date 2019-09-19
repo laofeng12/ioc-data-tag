@@ -119,6 +119,8 @@ public class Constants {
     public static final Long DT_INDEX_RUN_STATUS_WAIT = 0L;//未开始
     public static final Long DT_INDEX_RUN_STATUS_RUNNING = 1L;//已开始
 
+    //=======  Redis消息订阅通道 ===============
+    public static final String DT_REDIS_MESSAGE_QUEUE_CHANL = "channel";
     /**
      * 数据库类型(0:Oracle;1:MySql高版本;2;Mysql低版本;3:PostgreSql)
      */
