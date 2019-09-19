@@ -42,4 +42,13 @@ public interface DtTagService {
 	 * @return
 	 */
 	List<DtTag> findByTagIds(List<Long> tagIds);
+
+	/**
+	 * 根据标签id获取整颗数的节点id
+	 */
+	List<Long> findAllIdsByTagId(Long tagId);
+	/**
+	 * 根据标签组获取节点ID
+	 */
+	List<Long> findIdsByTagsId( Long tagsId);
 }

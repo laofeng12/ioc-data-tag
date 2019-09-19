@@ -18,4 +18,9 @@ public interface PortrayalService {
      */
     List<PortrayalDetailDTO> searchPortrayal(String id, int type)throws Exception;
 
+    /**
+     * 清除画像结果
+     */
+    void clearPortrayal(String tableName);
+
 }

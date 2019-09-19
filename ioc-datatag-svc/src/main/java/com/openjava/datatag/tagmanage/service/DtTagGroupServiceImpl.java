@@ -40,7 +40,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 
 	@Resource
 	private DtTaggUpdateLogService dtTaggUpdateLogService;
-	
+
 	public Page<DtTagGroup> query(DtTagGroupDBParam params, Pageable pageable){
 		Page<DtTagGroup> pageresult = dtTagGroupRepository.query(params, pageable);
 		return pageresult;
