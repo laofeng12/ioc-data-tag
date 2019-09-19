@@ -365,7 +365,6 @@
       nodeClick(data, checked, node) {
       },
       handleClick(data, checked, node) {
-        this.ruleForm.tagSet = ''
         if (checked === true) {
           this.tagSetList = []
           this.checkedId = data.id;
@@ -665,6 +664,11 @@
           //被选标签组
           this.ruleForm.tagTeam = data.selectTagGroup.id
           // this.chooseTagTeam(data.selectTagGroup.id)
+          const dataid = data.selectTags.id
+          const che = true
+          this.$nextTick(()=>{
+              this.chooseTagTeam(data.selectTagGroup.id)
+          })
           //标签层数树
           this.getTagLevList(this.ruleForm.tagTeam)
           //选择标签层
