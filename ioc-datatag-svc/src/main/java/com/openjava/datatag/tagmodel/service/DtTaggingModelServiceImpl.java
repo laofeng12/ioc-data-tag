@@ -44,6 +44,7 @@ import org.ljdp.common.http.LjdpHttpClient;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -51,6 +52,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +75,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private String resourceDataUrl;
 	Logger logger = LogManager.getLogger(getClass());
 
+	@Autowired
+	private StringRedisTemplate stringRedisTemplate;
 	@Resource
 	private DtTaggingModelRepository dtTaggingModelRepository;
 	@Resource
@@ -591,7 +595,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		}
 		tagModel.setUpdateNum(totalCount);
 		tagModel.setSuccessNum(successCount);
-		doSave(tagModel);
+		tagModel = doSave(tagModel);
+		stringRedisTemplate.convertAndSend(Constants.DT_REDIS_MESSAGE_QUEUE_CHANL,JSONObject.toJSONString(tagModel));
 		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},成功数{%s},总耗时:{%s}毫秒",taggingModelId,totalCount,successCount,end.getTime()-begin.getTime()));
 	}
 

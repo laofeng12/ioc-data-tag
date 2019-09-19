@@ -1,4 +1,4 @@
-package com.openjava.datatag.component.websocket;
+package com.openjava.datatag.component;
 
 /**
  * @author zmk
@@ -66,15 +66,16 @@ public class WebsocketServer {
         //获取服务端到客户端的通道
         List<WebsocketServer> myWebSocketList =  WebSocketMapUtil.get(params);
         WebsocketServer myWebSocket =null;
+        if (CollectionUtils.isEmpty(myWebSocketList)){
+            return;
+        }
         for (WebsocketServer w:myWebSocketList) {
             if (w.getSession().getId().equals(session.getId())) {
                 myWebSocket = w;
             }
         }
-        logger.info("收到来自"+session.getId()+"的消息"+params);
-        String result = "收到来自"+session.getId()+"的消息"+params;
         //返回消息给Web Socket客户端（浏览器）
-        myWebSocket.sendMessage(Long.valueOf(params),1,"成功！",result);
+        myWebSocket.sendMessage(Long.valueOf(params),"已收到来自："+params+",的信息");
     }
 
     /**
@@ -89,19 +90,14 @@ public class WebsocketServer {
     /**
      * 实现服务器主动推送
      */
-    public void sendMessage(Long  userId,int status,String message,Object datas) throws IOException{
+    public void sendMessage(Long  userId,Object datas) throws IOException{
         JSONObject result = new JSONObject();
         List<WebsocketServer> websocketServerList =  WebSocketMapUtil.get(userId.toString());
         if (CollectionUtils.isNotEmpty(websocketServerList)){
-            result.put("status", status);
-            result.put("message", message);
             result.put("datas", datas);
             for (int i = 0; i < websocketServerList.size(); i++) {
                 websocketServerList.get(i).getSession().getBasicRemote().sendText(result.toString());
             }
         }
-
     }
-
-
 }
