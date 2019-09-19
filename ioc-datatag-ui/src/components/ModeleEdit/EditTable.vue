@@ -519,6 +519,7 @@
       delSelfMark(index) {
         // console.log(index)
         this.selfMarkList.splice(index, 1)
+        this.changeRed = -1
       },
       search() {
         // console.log("查询");
@@ -732,6 +733,7 @@
               })
               this.setTagsDialog = false
               this.selfMarkList = []
+              this.changeRed = -1
           }catch (e) {
             console.log('e',e);
             this.changeRed = e.data
