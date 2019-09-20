@@ -30,8 +30,10 @@
             <el-table-column v-for="(item,index) in headData" :key="index" :prop="item.sourceCol" min-width="300">
               <template slot="header" slot-scope="scope">
                 <span>{{item.showCol}}</span>
-                <i v-if="item.isMarking==1&&item.isCooField==1" class="el-icon-position  iconLogo"
+                <el-tooltip class="item" effect="dark" content="打标" placement="top">
+                <i v-if="item.isMarking==1&&item.isCooField==1" class="el-icon-price-tag  iconLogo"
                    @click="dataMaking(item)"></i>
+                </el-tooltip>
               </template>
             </el-table-column>
           </el-table>
@@ -860,6 +862,7 @@
     font-size: 18px;
     margin-right: 10px;
     cursor: pointer;
+    color: #409eff;
   }
 
   .makingEdit {

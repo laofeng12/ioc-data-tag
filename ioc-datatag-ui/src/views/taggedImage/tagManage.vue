@@ -70,7 +70,8 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <i class="el-icon-delete iconLogo" @click="delTag(row.id)"></i>
+                <!--<i class="el-icon-delete iconLogo" @click="delTag(row.id)"></i>-->
+                 <i class="el-icon-delete iconLogo" @click="delTaglabel(row)"></i>
               </span>
               </el-tooltip>
             </template>
@@ -165,6 +166,28 @@
           </div>
         </div>
       </el-dialog>
+
+      <el-dialog class="creat" title="删除提示" :visible.sync="deleteDialog" width="530px" center
+                 :close-on-click-modal="false"
+                 @close="closedelete">
+        <div class="del-dialog-cnt">
+          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" style="text-align: center">
+            <el-form-item>您正在删除{{this.tagName}}标签，使用过该标签的模型会停止运行，是否确认删除？</el-form-item>
+          </el-form>
+        </div>
+        <div slot="footer" class="dialog-footer device">
+          <div>
+            <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="delTag(delTreeId)">
+              确定删除
+            </el-button>
+            <el-button size="small" @click="cancelDelete">取消</el-button>
+          </div>
+        </div>
+      </el-dialog>
+
+
+
+
     </div>
   </div>
 </template>
@@ -188,7 +211,11 @@
         page: 0,
         size: 10,
         input2: '',
+        tagName:'',
+        delTreeId:'',
         Loading: true,
+        deleteDialog:false,
+        deleteLoading:false,
         saveLoading2: true,
         shareDialog: false,
         saveLoading: false,
@@ -401,6 +428,17 @@
       goPage() {
 
       },
+      delTaglabel(row){
+        this.deleteDialog = true
+        this.tagName = row.tagsName
+        this.delTreeId = row.id
+      },
+      closedelete() {
+        this.deleteDialog = false
+      },
+      cancelDelete(){
+        this.deleteDialog = false
+      },
       //删除
       async delTag(id) {
         try {
@@ -413,12 +451,14 @@
               type: 'success'
             });
             this.getTagsData()
+            this.deleteDialog = false
           } else {
             this.$message.error(data.message)
+            this.deleteDialog = false
           }
 
         } catch (e) {
-
+          this.deleteDialog = false
         }
       }
     },
