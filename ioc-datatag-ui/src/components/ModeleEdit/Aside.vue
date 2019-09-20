@@ -115,7 +115,7 @@
                 <el-table-column width="80" prop="type" label="类型">
                 </el-table-column>
                 <el-table-column
-                  label="选择打标字段" width="110">
+                  label="选择标签组" width="110">
                   <template slot-scope="scope">
                     <el-checkbox v-if="scope.row.definition===ruleForm.pkey || ruleForm.pkey==''"
                                  disabled></el-checkbox>

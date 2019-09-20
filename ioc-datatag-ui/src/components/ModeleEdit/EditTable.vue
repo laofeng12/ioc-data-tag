@@ -365,7 +365,6 @@
       nodeClick(data, checked, node) {
       },
       handleClick(data, checked, node) {
-        this.ruleForm.tagSet = ''
         if (checked === true) {
           this.tagSetList = []
           this.checkedId = data.id;
@@ -519,6 +518,7 @@
       delSelfMark(index) {
         // console.log(index)
         this.selfMarkList.splice(index, 1)
+        this.changeRed = -1
       },
       search() {
         // console.log("查询");
@@ -664,6 +664,11 @@
           //被选标签组
           this.ruleForm.tagTeam = data.selectTagGroup.id
           // this.chooseTagTeam(data.selectTagGroup.id)
+          const dataid = data.selectTags.id
+          const che = true
+          this.$nextTick(()=>{
+              this.chooseTagTeam(data.selectTagGroup.id)
+          })
           //标签层数树
           this.getTagLevList(this.ruleForm.tagTeam)
           //选择标签层
@@ -732,6 +737,7 @@
               })
               this.setTagsDialog = false
               this.selfMarkList = []
+              this.changeRed = -1
           }catch (e) {
             console.log('e',e);
             this.changeRed = e.data

@@ -139,7 +139,7 @@
                @close="closedelete">
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" style="text-align: center">
-          <el-form-item>您正在删除{{this.tagName}}，是否确认删除？</el-form-item>
+          <el-form-item>您正在删除{{this.tagName}}标签，使用过该标签的模型会停止运行，是否确认删除？</el-form-item>
         </el-form>
       </div>
       <div slot="footer" class="dialog-footer device">
@@ -147,7 +147,7 @@
           <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="delTree(delTreeId)">
             确定删除
           </el-button>
-          <el-button size="small" type="primary" class="queryBtn" @click="cancelDelete">取消</el-button>
+          <el-button size="small" @click="cancelDelete">取消</el-button>
         </div>
       </div>
     </el-dialog>
@@ -382,7 +382,11 @@
       },
 
       remove(node, data) {
-        this.delTree(data.id)
+        console.log('删除了',data)
+        this.deleteDialog = true
+        this.tagName = data.tagName
+        this.delTreeId = data.id
+        // this.delTree(data.id)
       },
       renderContent(h, {node, data, store}) {
         return (

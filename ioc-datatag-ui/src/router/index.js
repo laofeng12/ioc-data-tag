@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import Home from '@/views/home/index'
 import ContainerWrapper from '@/views/ContainerWrapper'
 import Login from '@/views/login/index'
-
 Vue.use(Router)
 export default new Router({
   mode: 'history',

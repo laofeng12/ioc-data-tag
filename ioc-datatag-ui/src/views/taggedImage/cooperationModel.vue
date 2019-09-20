@@ -56,7 +56,7 @@
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="打标" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-position iconLogo" @click="marking(props.row.taggingModelId,props.row.modelName)"></i>
+                    <i class="el-icon-price-tag iconLogo" @click="marking(props.row.taggingModelId,props.row.modelName)"></i>
                 </span>
               </el-tooltip>
             </template>
