@@ -18,7 +18,7 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
  */
 @Configuration
 @EnableCaching
-public class RedisConfig {
+public class RedisConfig2 {
     /**
      * Redis消息监听器容器
      *
