@@ -36,7 +36,8 @@
             <!--Append-->
             <i class="el-icon-plus"></i>
           </el-button>
-          <el-button type="text" size="mini" @click.stop="remove(node, data)" :disabled="node.level>2">
+          <!--<el-button type="text" size="mini" @click.stop="remove(node, data)" :disabled="node.level>2">-->
+          <el-button type="text" size="mini" @click.stop="remove(node, data)">
             <!--Delete-->
             <i class="el-icon-delete"></i>
           </el-button>
