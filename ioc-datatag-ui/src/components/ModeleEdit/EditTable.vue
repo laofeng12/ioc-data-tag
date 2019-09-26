@@ -23,7 +23,7 @@
       </el-table>
       <!--    <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
                               @sureClick="goPage"></element-pagination>-->
-      <!--字段设置-->
+      <!--数据打标-->
       <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" center
                  :modal-append-to-body="false" :close-on-click-modal="false"
                  @close="$emit('update:show', false)" @open="init">

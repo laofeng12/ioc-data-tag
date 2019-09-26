@@ -121,7 +121,7 @@
                                  disabled></el-checkbox>
                     <el-checkbox v-else-if='routerName == "creatModel"'
                                  @change="getCheckChange(scope.row,$event)"></el-checkbox>
-                    <el-checkbox :checked="scope.row.isMarking" v-else
+                    <el-checkbox  :checked="scope.row.isMarking" v-else
                                  @change="getCheckChange(scope.row,$event)"></el-checkbox>
                   </template>
                 </el-table-column>
@@ -237,7 +237,7 @@
       //初始化弹窗清空数据
       init() {
         this.searchText = ''
-        this.checkAll = false
+        // this.checkAll = false
         this.columnData = []
         this.isIndeterminate = false
         this.tableData = []
@@ -561,9 +561,9 @@
       },
       //确认选择
       setCols() {
-        this.saveLoading = true
         this.$refs['ruleForm'].validate((valid) => {
           if (valid) {
+            this.saveLoading = true
             const colList = []
             if (this.routerName === 'editModel') {
               console.log('=tableData==', this.tableData);
@@ -661,7 +661,8 @@
       },
       changeSel() {
         this.tableData.map(item => {
-          if (item.name == this.ruleForm.pkey) {
+          if (item.definition == this.ruleForm.pkey) {
+            console.log('item',item)
             item.isMarking = false
           }
         })
