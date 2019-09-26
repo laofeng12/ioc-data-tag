@@ -275,8 +275,6 @@
           this.columnData.map(item => {
             item.colSort = ''
           })
-          console.log('全选1', this.columnData);
-          console.log('全选2', this.tableData);
           this.tableData = this.columnData
           this.tableData.forEach((item, index) => {
             item.isMarking = false
@@ -340,7 +338,7 @@
             }
           })
         })
-        console.log('排序', this.tableData)
+        //console.log('排序', this.tableData)
         this.tableData.forEach((item, index) => {
           if (item.colSort === '') {
             item.colSort = index + 1
@@ -364,10 +362,6 @@
         }
         // 编辑
         if (this.routerName === 'editModel') {
-          console.log('modelData', this.modelData.colList);
-          console.log('tableData', this.tableData);
-          console.log('checkedCols', this.checkedCols);
-          console.log('columnData', this.columnData);
           this.modelData.colList.forEach(item => {
             this.tableData.map(newItem => {
               if (item.isMarking == true && newItem.definition == item.showCol) {
@@ -413,7 +407,6 @@
         this.allcolumnData = allcolsData.data.column
         // 有权限字段
         this.columnData = colsData.data.column
-        console.log('332有权限字段211', this.columnData);
         this.resourceName = colsData.data.resourceName
         this.resourceId = colsData.data.resourceId
         this.resourceType = colsData.data.type   // 0数据湖 1自建目录
@@ -441,7 +434,6 @@
           //获取主键值
           this.ruleForm.pkey = this.modelData.pkey
           //获取选中的字段，从接口来
-          console.log('JIEK', this.modelData.colList);
           this.modelData.colList.forEach((item, index) => {
             this.checkedCols.push(item.showCol)
             this.tableData.push({
@@ -545,7 +537,6 @@
       },
       //加载树节点
       loadNode(node, resolve) {
-        // console.log('node', node)
         if (node.level === 0) {
           return resolve([{orgName: '数据目录', id: '0'}])
         }
@@ -566,8 +557,6 @@
             this.saveLoading = true
             const colList = []
             if (this.routerName === 'editModel') {
-              console.log('=tableData==', this.tableData);
-              console.log('==modelData.colList=', this.modelData.colList);
               this.tableData.map((item, index) => {
                 this.modelData.colList.forEach(modelitem => {
                   if (item.definition == modelitem.showCol) {
@@ -575,7 +564,6 @@
                   }
                 })
               })
-              console.log('66666666', this.tableData);
             }
             this.tableData.map((item, index) => {
               colList.push({
@@ -662,7 +650,6 @@
       changeSel() {
         this.tableData.map(item => {
           if (item.definition == this.ruleForm.pkey) {
-            console.log('item',item)
             item.isMarking = false
           }
         })
