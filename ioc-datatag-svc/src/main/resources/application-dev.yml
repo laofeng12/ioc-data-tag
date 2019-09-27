@@ -1,12 +1,12 @@
 # 开发环境配置
-debug: true
+debug: false
 server:
   port: 8080 #tomcat运行端口
   servlet: 
     context-path: /
 
-mybatis:
-  config-location: classpath:mybatis-config.xml
+#mybatis:
+#  config-location: classpath:mybatis-config.xml
 #  typeAliasesPackage: com.openjava.example.mybatis.domain
 #  mapperLocations: 
 #    -classpath:com.openjava.example.*.mapper/*.xml
