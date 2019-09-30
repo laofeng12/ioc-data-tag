@@ -72,9 +72,10 @@
               <el-tooltip class="item" effect="dark" content="画像" placement="top">
                 <span class="operationIcona">
                     <!--<router-link :to="`/ImageDetail/${scope.row.taggingModelId}/${scope.row.modelName}`">-->
-                      <!--<i class="el-icon-user iconLogo"></i>-->
-                    <!--</router-link>-->
-                 <i class="el-icon-user iconLogo" @click="lookImage(scope.row,scope.row.taggingModelId,scope.row.modelName)"></i>
+                  <!--<i class="el-icon-user iconLogo"></i>-->
+                  <!--</router-link>-->
+                 <i class="el-icon-user iconLogo"
+                    @click="lookImage(scope.row,scope.row.taggingModelId,scope.row.modelName)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="导出数据" placement="top">
@@ -93,7 +94,7 @@
           </el-table-column>
         </el-table>
         <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
-                            <!--@sureClick="goPage"></element-pagination>-->
+        <!--@sureClick="goPage"></element-pagination>-->
         <element-pagination
           :pageSize="size"
           :currentPage="page+1"
@@ -235,12 +236,16 @@
   import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
   import DMSocket from '@/utils/DMSocket'
+  import createSocket from '@/utils/web'
 
   export default {
     components: {ElementPagination},
     name: "tagManage",
     data() {
       return {
+        tt:'',
+        lockReconnect:false,
+        webUserId: '',
         page: 0,
         size: 10,
         totalnum: 0,
@@ -264,7 +269,7 @@
         percentage: 30,
         value1: '',
         textarea: '',
-        WebSocket:null,
+        WebSocket: null,
         options: [{
           value: '',
           label: '全部'
@@ -306,18 +311,18 @@
           value: '5',
           label: '每年一次'
         }],
-        options3:[{
+        options3: [{
           value: '',
           label: '导出全部数据'
-        },{
+        }, {
           value: '1',
           label: '导出部分数据'
         }],
-        exportValue:'',
-        exportNum:'',
+        exportValue: '',
+        exportNum: '',
         value: '',
         ztableShowList: [],
-        timer:'',
+        timer: '',
         ruleForm: {
           region: null,
           date: null,
@@ -416,9 +421,9 @@
       },
       // 定时器
       setTimer() {
-        setInterval(()=>{
+        setInterval(() => {
           this.datamodelList()
-        },5000)
+        }, 5000)
       },
       async datamodelList() {
         const params = {
@@ -440,26 +445,22 @@
               }
               if (item.runState == 1) {
                 item.runState = '等待运行'
-                // this.setTimer()
-                // this.getsocket()
+                this.getsocket()
               }
               if (item.runState == 2) {
                 item.runState = '运行中'
-                // this.setTimer()
               }
               if (item.runState == 3) {
                 item.runState = '运行成功'
-                // clearInterval(this.setTimer)
               }
               if (item.runState == 4) {
                 item.runState = '运行错误'
-                // clearInterval(this.setTimer)
               }
               if (item.runState == -1) {
                 item.runState = '运行结束'
-                // clearInterval(this.setTimer)
               }
             })
+            // this.getsocket()
           } else {
             this.ztableShowList = []
             this.Loading = false
@@ -473,7 +474,7 @@
         this.page = page - 1
         this.datamodelList()
       },
-      handleSizeChange (size) {
+      handleSizeChange(size) {
         this.size = size
         this.datamodelList()
       },
@@ -510,6 +511,7 @@
               this.dispatchLoading = false
               this.controlDialog = false
               this.datamodelList()
+
             } catch (e) {
               console.log(e);
               this.dispatchLoading = false
@@ -553,7 +555,7 @@
                   tagsName: this.ruleForm.tagsName
                 })
                 this.creatsaveLoading = false
-                this.$router.push('/tree/' + data.id +'/'+ data.tagsName)
+                this.$router.push('/tree/' + data.id + '/' + data.tagsName)
               } catch (e) {
                 this.creatsaveLoading = false
                 console.log(e);
@@ -567,59 +569,47 @@
           console.log(e);
         }
       },
-      lookImage(row,id,name){
-        if(row.runState != '运行成功'){
+      lookImage(row, id, name) {
+        if (row.runState != '运行成功') {
           this.$message.error('请先进行数据调度成功之后再查看画像！');
-        }else{
+        } else {
           this.$router.push({
-            path:'/ImageDetail',
-            query:{
-              detailId:id,
-              imageName:name
+            path: '/ImageDetail',
+            query: {
+              detailId: id,
+              imageName: name
             }
           })
         }
       },
       // zhujianxiong
-      getsocket(){
-        // let Socket = new WebSocket(url);
-        // const url = `/datatag/tagmodel/dtTaggingModel/search?eq_runState=${this.value}&ge_startTime=&le_startTime=&like_modelName=${this.input2}&page=${this.page}&size=${this.size}`
-        console.log('yonghu',this.$store.state.user.userInfo.userId);
-        const userId = this.$store.state.user.userInfo.userId
-        const url = '/datatag/websocket/server/' + userId
-        console.log('url',url);
-        // try {
-        //   this.WebSocket = DMSocket(url)
-        //   this.WebSocket.onopen = this.socketOnopen
-        //   this.WebSocket.onerror = this.socketOnerror
-        //   this.WebSocket.onmessage = this.socketOnmessage
-        //   this.WebSocket.onclose = this.socketOnclose
-        // } catch (e) {
-        //   console.log(e)
-        // }
-      },
-      socketOnopen () {
-        console.log('websocket 链接成功')
-      },
-      socketOnerror () {
-        console.log('websocket 链接错误')
-      },
-      socketOnmessage (e) {
-        console.log('WebSocket',e);
-      },
-      socketOnclose () {
-        console.log('websocket 关闭')
+      getsocket() {
+        const url = '/datatag/websocket/server/' + this.webUserId
+        try {
+          //方法调用
+          const handler = (evt, ws) => {
+            //evt 是 websockett数据
+            var obj = JSON.parse(evt.data)
+            if(obj.datas != "已收到来自：392846190550001,的信息"){
+              //var obj2 = JSON.parse(obj.datas)
+              this.datamodelList()
+              wssCenter.close();  //断开连接
+            }
+          }
+          const wssCenter = createSocket(url, handler,this.webUserId)
+        } catch (e) {
+          console.log(e)
+          this.reconnect(url);
+        }
       },
     },
     created() {
+      this.webUserId = this.$store.state.user.userInfo.userId
       this.datamodelList()
-      // console.log('yonghu',this.$store.state.user.userInfo.userId);
-      // this.getsocket()
     },
     computed: {},
     watch: {},
-    mounted() {
-    }
+    mounted() {}
   }
 </script>
 
