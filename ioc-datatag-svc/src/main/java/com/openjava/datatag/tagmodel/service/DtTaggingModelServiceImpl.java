@@ -813,6 +813,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	}
 
 	public void stopModelByColIds(List<Long> tagids){
+		if (CollectionUtils.isEmpty(tagids)){
+			return;
+		}
 		List<DtTaggingModel> models =  dtTaggingModelRepository.getModelByTagIds(tagids);
 		if (CollectionUtils.isNotEmpty(models)){
 			//停止模型删除画像
