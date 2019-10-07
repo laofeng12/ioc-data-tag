@@ -146,7 +146,7 @@ public class DtCooperationAction {
 
             dtoList.add(dto);
         }
-        Page<DtCooperationModelDTO> showResult = new PageImpl<>(dtoList, pageable, dtoList.size());
+        Page<DtCooperationModelDTO> showResult = new PageImpl<>(dtoList, pageable, result.getTotalElements());
         return new TablePageImpl<>(showResult);
 
 
