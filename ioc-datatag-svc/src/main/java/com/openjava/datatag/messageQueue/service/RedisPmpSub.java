@@ -6,6 +6,7 @@ import com.openjava.datatag.component.RedisMsg;
  * redis消息处理器pojo
  * @author zmk
  */
+@Deprecated
 public class RedisPmpSub implements RedisMsg {
 
     /**
