@@ -128,6 +128,7 @@ public class DtCooperationAction {
             MyBeanUtils.copyPropertiesNotBlank(dto, model);
             dto.setRunState(coo.getState());
             dto.setCooUser(coo.getCooUser());
+            dto.setCompleteTime(coo.getCompleteTime());//完成时间
             if (dto.getCreateUser() != null) {
                 if (sysUserService.get(dto.getCreateUser()) != null) {
                     dto.setCreateUserName(sysUserService.get(dto.getCreateUser()).getFullname());

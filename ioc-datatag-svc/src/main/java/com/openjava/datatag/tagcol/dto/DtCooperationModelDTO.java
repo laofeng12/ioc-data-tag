@@ -85,4 +85,8 @@ public class DtCooperationModelDTO {
 	@ApiModelProperty("协作用户名")
 	private String cooUserName;
 
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
+	private Date completeTime;
+
 }
