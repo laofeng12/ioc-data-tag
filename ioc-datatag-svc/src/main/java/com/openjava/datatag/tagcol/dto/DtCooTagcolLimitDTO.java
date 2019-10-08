@@ -30,4 +30,6 @@ public class DtCooTagcolLimitDTO {
     private Long useTagGroup;
     @ApiModelProperty("模型的字段Id")
     private Long tagColId;
+    @ApiModelProperty("是否删除")
+    private Long isDelete;
 }
