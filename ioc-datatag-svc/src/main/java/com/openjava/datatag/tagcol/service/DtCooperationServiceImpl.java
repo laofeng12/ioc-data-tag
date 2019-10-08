@@ -374,13 +374,17 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                     throw new APIException(MyErrorConstants.PUBLIC_ERROE, "cooTagcolLimitList参数的cooId错误");
                 }
                 if (record.getId() != null) {
-                    newcolLimit = dtCooTagcolLimitService.get(record.getId());
-                    newcolLimit.setUseTagGroup(record.getUseTagGroup());
-                    newcolLimit.setTagColName(record.getTagColName());
-                    newcolLimit.setCooId(col.getId());
-                    newcolLimit.setTagColId(record.getTagColId());
-                    newcolLimit.setIsNew(false);
-                    newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
+                    if (record.getIsDelete()!=null && record.getIsDelete()==1){
+                        dtCooTagcolLimitService.doDelete(record.getId());
+                    }else {
+                        newcolLimit = dtCooTagcolLimitService.get(record.getId());
+                        newcolLimit.setUseTagGroup(record.getUseTagGroup());
+                        newcolLimit.setTagColName(record.getTagColName());
+                        newcolLimit.setCooId(col.getId());
+                        newcolLimit.setTagColId(record.getTagColId());
+                        newcolLimit.setIsNew(false);
+                        newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
+                    }
                 } else {
 
                     newcolLimit.setIsNew(true);
