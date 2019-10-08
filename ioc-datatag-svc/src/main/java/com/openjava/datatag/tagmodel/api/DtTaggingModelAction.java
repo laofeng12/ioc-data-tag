@@ -1,5 +1,6 @@
 package com.openjava.datatag.tagmodel.api;
 
+import java.io.*;
 import java.util.*;
 
 import javax.annotation.Resource;
@@ -16,6 +17,7 @@ import com.openjava.datatag.tagmodel.dto.DtTaggingModelRenameDTO;
 import com.openjava.datatag.tagmodel.service.DtSetColService;
 import com.openjava.datatag.utils.IpUtil;
 import com.openjava.datatag.user.service.SysUserService;
+import com.openjava.datatag.utils.export.ExportUtil;
 import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -331,7 +333,7 @@ public class DtTaggingModelAction {
 //			tfMap1.put(1, "状态1");
 //			tfMap1.put(2, "状态2");
 //			myBuilder.addProperty("userStatus", "用户状态",tfMap1);//写死静态字典翻译
-			
+
 //			myBuilder.buildSheet("标签模型", result.getContent());//放到第一个sheet
 //			Workbook wb = new XSSFWorkbook();
 			String filename = "标签模型("+DateFormater.formatDatetime_SHORT(new Date())+").xlsx";
@@ -354,6 +356,50 @@ public class DtTaggingModelAction {
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.setContentType("text/html;charset=utf-8");
+			try {
+				response.getWriter().write(e.getMessage());
+			} catch (Exception e2) {
+			}
+		}
+	}
+
+	/**
+	 * 导出Excel文件
+	 */
+	@ApiOperation(value = "导出到本地", nickname="dowloadToLocal")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "taggingModelId", value = "模型主键编码", dataType ="String", paramType = "path"),
+	})
+	@Security(session=false)
+	@RequestMapping(value="/dowloadToLocal/{taggingModelId}", method=RequestMethod.GET)
+	public void doExport(
+			@PathVariable(value="taggingModelId")String taggingModelId,
+			HttpServletResponse response) throws Exception{
+		try {
+			// path是指欲下载的文件的路径。
+			File file = ExportUtil.getZipLocalFile("1",taggingModelId);
+			// 取得文件名。
+			String filename = file.getName();
+			// 取得文件的后缀名。
+			String ext = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+
+			// 以流的形式下载文件。
+			InputStream fis = new BufferedInputStream(new FileInputStream(file));
+			byte[] buffer = new byte[fis.available()];
+			fis.read(buffer);
+			fis.close();
+			// 清空response
+			response.reset();
+			// 设置response的Header
+			response.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes("GBK"),"iso-8859-1"));
+			response.addHeader("Content-Length", "" + file.length());
+			OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
+			response.setContentType("text/html;charset=utf-8");
+			toClient.write(buffer);
+			toClient.flush();
+			toClient.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 			try {
 				response.getWriter().write(e.getMessage());
 			} catch (Exception e2) {
