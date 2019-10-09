@@ -244,6 +244,7 @@
     name: 'creatModel',
     data() {
       return {
+        selectD:0,
         openScope:'',
         showBtn:true,
         headColList: [],//打标字段头部数据
@@ -549,8 +550,25 @@
         }
         try {
           const groupRes = await labelGroup(params)
+          console.log('row',groupRes.rows)
           if (groupRes.rows && groupRes.rows.length > 0) {
-            this.options3 = groupRes.rows
+            const arr = [{
+              code: "",
+              createTime: "",
+              createUser: "",
+              id: "123456",
+              isDeleted: 1,
+              isNew: "",
+              isShare: 0,
+              message: "",
+              modifyTime: "",
+              percentage: "",
+              popularity: "",
+              popularityLevel: "",
+              synopsis: "",
+              tagsName: "请选择"
+            }]
+            this.options3 = arr.concat(groupRes.rows)
           }
         } catch (e) {
           console.log(e)
@@ -569,15 +587,49 @@
         }
       },
       // 下拉选中
-      chooseSelect(row, item) {
+      async chooseSelect(row, item) {
         row.cooUser = this.helpId
         row.id = this.cooId
         row.tagColId = row.colId
+        if(row.useTagGroup == '123456'){
+          row.isDeleted = 1
+          this.selectD = 1
+          const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId,isDeleted}) => {
+            return {
+              "cooId": id, //id
+              "id": cooFieldId,  //  cooFieldId
+              "tagColName": showCol, // 打标字段
+              useTagGroup,  // 标签组ID
+              isCooField,//是否选中
+              cooUser, //协作用户ID
+              tagColId: tagColId,  //
+              isDelete:isDeleted
+            }
+          })
+          tmp.forEach(item => {
+            if (item.useTagGroup) {
+              item.isCooField = true
+            }
+          })
+          for (let i = 0; i < tmp.length; i++) {
+            for (let j = 0; j < this.showPeoplelist.length; j++) {
+              if (this.showPeoplelist[j].cooUser == tmp[i].cooUser) {
+                this.showPeoplelist[j].cooTagcolLimitList = []
+                this.showPeoplelist[j].cooTagcolLimitList.push(tmp[i])
+              }
+            }
+          }
+          try {
+            await dosave(this.showPeoplelist)
+          } catch (e) {
+            console.log(e);
+          }
+        }
       },
       // save
       async getdosave() {
         this.saveLoading = true
-        const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId}) => {
+        const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId,isDeleted}) => {
           return {
             "cooId": id, //id
             "id": cooFieldId,  //  cooFieldId
@@ -585,7 +637,8 @@
             useTagGroup,  // 标签组ID
             isCooField,//是否选中
             cooUser, //协作用户ID
-            tagColId: tagColId  //
+            tagColId: tagColId,  //
+            isDelete:isDeleted
           }
         })
         tmp.forEach(item => {
