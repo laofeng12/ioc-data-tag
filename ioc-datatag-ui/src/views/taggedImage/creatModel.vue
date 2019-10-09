@@ -191,7 +191,7 @@
                 <el-table-column label="字段" prop="showCol"></el-table-column>
                 <el-table-column prop="sourceDataType" label="类型" width="100"></el-table-column>
                 <el-table-column
-                  label="选择打标字段">
+                  label="选择标签组">
                   <template slot-scope="scope">
                     <el-checkbox v-show="false"></el-checkbox>
                     <el-select class="controlChoose2" size="small" v-model="scope.row.useTagGroup" placeholder="请选择"
