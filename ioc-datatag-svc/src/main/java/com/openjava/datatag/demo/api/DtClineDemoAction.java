@@ -3,6 +3,7 @@ package com.openjava.datatag.demo.api;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.component.WebsocketServer;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
+import com.openjava.datatag.userprofile.service.PortrayalService;
 import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +34,8 @@ public class DtClineDemoAction {
 	WebsocketServer websocketServer;
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
+	@Resource
+	private PortrayalService portrayalService;
 
 	@ApiOperation(value = "调用其他组件的例子", nickname="save", notes = "调用其他组件的例子")
 	@Security(session=false)
@@ -65,4 +68,10 @@ public class DtClineDemoAction {
 		stringRedisTemplate.convertAndSend(Constants.DT_REDIS_MESSAGE_QUEUE_CHANL,String.valueOf(Math.random()));
 	}
 
+	@ApiOperation(value = "testDowload", nickname="save", notes = "redisMessageQueue调试")
+	@Security(session=false)
+	@RequestMapping(value="/testDowload", method=RequestMethod.GET)
+	public void testDowload(Long taggingModelId){
+		portrayalService.dowloadRunResult(100L,taggingModelId);
+	}
 }

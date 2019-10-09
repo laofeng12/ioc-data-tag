@@ -7,11 +7,15 @@ import org.springframework.data.repository.query.Param;
 
 import com.openjava.datatag.dowload.domain.DownloadQueue;
 
+import java.util.List;
+
 /**
  * 下载列表数据库访问层
  * @author zmk
  *
  */
 public interface DownloadQueueRepository extends DynamicJpaRepository<DownloadQueue, Long>, DownloadQueueRepositoryCustom{
-	
+    DownloadQueue findBybtypeAndBid(String btype,String bid);
+    @Query(value = "from DownloadQueue t where t.state=:state order by t.createTime desc")
+    List<DownloadQueue> findByState(Long state);
 }

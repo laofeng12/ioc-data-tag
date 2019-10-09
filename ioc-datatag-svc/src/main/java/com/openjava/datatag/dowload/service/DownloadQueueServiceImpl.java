@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.openjava.datatag.dowload.domain.DownloadQueue;
@@ -81,5 +82,20 @@ public class DownloadQueueServiceImpl implements DownloadQueueService {
 		for (int i = 0; i < items.length; i++) {
 			downloadQueueRepository.deleteById(new Long(items[i]));
 		}
+	}
+
+	/**
+	 * 单独事务的保存。会立即更新到数据库
+	 * @param m
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
+	public DownloadQueue doSaveNow(DownloadQueue m){
+		return downloadQueueRepository.save(m);
+	}
+	public  DownloadQueue findBybtypeAndBid(String btype,String bid){
+		return  downloadQueueRepository.findBybtypeAndBid(btype,bid);
+	}
+	public List<DownloadQueue> findByState(Long state){
+		return  downloadQueueRepository.findByState(state);
 	}
 }
