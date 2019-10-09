@@ -43,7 +43,14 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="completeTime" label="完成时间">-</el-table-column>
+          <el-table-column prop="completeTime" label="完成时间">
+            <template slot-scope="scope">
+              <div>
+                <div v-if="scope.row.completeTime">{{scope.row.completeTime}}</div>
+                <div v-else>-</div>
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column prop="people" label="发起人/发起时间">
             <template slot-scope="scope">
               <div>
