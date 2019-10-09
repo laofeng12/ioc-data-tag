@@ -2,22 +2,31 @@ package com.openjava.datatag.userprofile.service;
 
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.component.PostgreSqlConfig;
+import com.openjava.datatag.dowload.domain.DownloadQueue;
+import com.openjava.datatag.dowload.service.DownloadQueueService;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
 import com.openjava.datatag.userprofile.dto.PortrayalDetailDTO;
+import com.openjava.datatag.utils.export.ExportUtil;
 import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -29,6 +38,8 @@ public class PortrayalServiceImpl implements PortrayalService {
     private DtTaggingModelService dtTaggingModelService;
     @Resource
     private PostgreSqlConfig postgreSqlConfig;
+    @Resource
+    private DownloadQueueService downloadQueueService;
 
     public List<PortrayalDetailDTO> searchPortrayal(String id, int type)throws Exception{
         MppPgExecuteUtil mppPgExecuteUtil = new MppPgExecuteUtil();
@@ -162,6 +173,18 @@ public class PortrayalServiceImpl implements PortrayalService {
         mppUtil.setTableName(tableName);//表名
         mppUtil.dropTable();//删表
     }
+    /**
+     * 下载模型运行结果
+     * @param number 下载数量为空默认全部
+     * @param taggingModelId 模型id
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
+    public void dowloadRunResult(Long number,Long taggingModelId){
+
+    }
+
+
+
     public static void main(String[] args) {
         String [] prefixAndId = "DT_name".split("DT_");
         System.out.println(prefixAndId[0]);

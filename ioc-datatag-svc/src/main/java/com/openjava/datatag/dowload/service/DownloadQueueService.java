@@ -24,4 +24,14 @@ public interface DownloadQueueService {
 	
 	void doDelete(Long id);
 	void doRemove(String ids);
+
+	/**
+	 * 单独事务的保存。会立即更新到数据库
+	 * @param m
+	 */
+	DownloadQueue doSaveNow(DownloadQueue m);
+
+	DownloadQueue findBybtypeAndBid(String btype,String bid);
+
+	List<DownloadQueue> findByState(Long state);
 }

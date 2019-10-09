@@ -91,15 +91,15 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         //params.addQueryCondition(fieldB, "_gt_", value1);
         //编写查询HQL的主部分（不用写查询条件）
         //执行查询
-        String multiHql = "select t,o from DtTaggingModel t,DtCooTagcolLimit l , DtCooperation o where l.cooId = o.id and t.taggingModelId=o.taggmId and t.isDeleted=0 ";
+        String multiHql = "select t,o from DtTaggingModel t,DtCooTagcolLimit l , DtCooperation o,SysUser u where u.userid=t.modifyUser and l.cooId = o.id and t.taggingModelId=o.taggmId and t.isDeleted=0 ";
 //        QueryParamsUtil.dealLike(prodPrams);//要用些方法转化like的查询条件才可以模糊查询，不然只能全匹配查询
         if (StringUtils.isNotBlank(itemParams.getKeyWord())){
-            SysUser u = sysUserService.findByFullname(itemParams.getKeyWord());
-            if (u!=null) {
-                multiHql+= " and (t.modifyUser ="+u.getUserid() +" or t.modelName like '%"+itemParams.getKeyWord()+"%')";
-            }else{
-                multiHql+= " and t.modelName like '%"+itemParams.getKeyWord()+"%'";
-            }
+//            SysUser u = sysUserService.findByFullname(itemParams.getKeyWord());
+//            if (u!=null) {
+//                multiHql+= " and (t.modifyUser ="+u.getUserid() +" or t.modelName like '%"+itemParams.getKeyWord()+"%')";
+//            }else{
+                multiHql+= " and ( u.fullname like '%"+itemParams.getKeyWord()+"%' or t.modelName like '%"+itemParams.getKeyWord()+"%')";
+//            }
         }
         if(itemParams.getRunState()!=null){
             multiHql+= " and o.state = "+itemParams.getRunState();
@@ -323,10 +323,6 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             }
             List<DtCooTagcolLimitDTO> colLimit = dtos.getCooTagcolLimitList();
             DtTaggingModel tag = dtTaggingModelService.get(taggmId);
-
-            if (CollectionUtils.isEmpty(colLimit)) {
-                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请选择用户并添加协作打标字段");
-            }
             if (tag == null) {
                 throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数不能为空");
             }
@@ -363,6 +359,11 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 //EntityClassUtil.dealCreateInfo(col,userInfo);
                 col.setId(ConcurrentSequence.getInstance().getSequence());
                 col = dtCooperationRepository.save(col);
+            }
+
+            if (CollectionUtils.isEmpty(colLimit)) {
+//                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请选择用户并添加协作打标字段");
+                continue;
             }
             for (int i = 0; i < colLimit.size(); i++) {
                 DtCooTagcolLimitDTO record = colLimit.get(i);

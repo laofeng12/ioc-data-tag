@@ -121,6 +121,15 @@ public class Constants {
 
     //=======  Redis消息订阅通道 ===============
     public static final String DT_REDIS_MESSAGE_QUEUE_CHANL = "channel";
+
+    //=======  画像结果  ==============
+    public static final int DT_RESULT_DOWLOAD_LIMIT = 20000;//画像结果最高下载数量
+    public static final String DT_BTYPE_DATATAG = "1";//标签与画像
+    //======  下载状态  ===============
+    public static final Long DT_DOWLOAD_STATE_WAIT= 0L;//未开始
+    public static final Long DT_DOWLOAD_STATE_DOWLOADING = 1L;//下载中
+    public static final Long DT_DOWLOAD_STATE_ERROR = 2L;//下载失败
+    public static final Long DT_DOWLOAD_STATE_SUCCESS = 3L;//下载成功
     /**
      * 数据库类型(0:Oracle;1:MySql高版本;2;Mysql低版本;3:PostgreSql)
      */

@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class TestJob {
-
-
-
     private Logger logger=LoggerFactory.getLogger(TestJob.class);
 
     public void cronJob() throws Exception {

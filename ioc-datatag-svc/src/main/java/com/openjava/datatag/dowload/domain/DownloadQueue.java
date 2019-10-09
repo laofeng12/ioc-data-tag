@@ -35,6 +35,8 @@ public class DownloadQueue implements Persistable<Long>,Serializable {
 	
 	@ApiModelProperty("ID")
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commonseq")
+	@SequenceGenerator(name = "commonseq", sequenceName = "SEQ_COMMON_ID", allocationSize = 1)
 	@Column(name = "ID")
 	private Long id;
 	
@@ -67,7 +69,7 @@ public class DownloadQueue implements Persistable<Long>,Serializable {
 	@Max(99L)
 	@Column(name = "STATE")
 	private Long state;
-	@ApiModelProperty("状态(下载中、下载失败)名称")
+	@ApiModelProperty("状态(下载中、下载失败、下载成功)名称")
 	@Transient
 	private String stateName;
 	
