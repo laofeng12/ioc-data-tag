@@ -7,9 +7,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.baomidou.mybatisplus.extension.exceptions.ApiException;
 import com.commons.utils.QueryParamsUtil;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.dowload.domain.DownloadQueue;
+import com.openjava.datatag.dowload.service.DownloadQueueService;
 import com.openjava.datatag.tagmodel.dto.DtTaggingDispatchDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelCopyDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
@@ -69,6 +72,8 @@ public class DtTaggingModelAction {
 	private SysUserService sysUserService;
 	@Resource
 	private MppPgExecuteUtil mppPgExecuteUtil;
+	@Resource
+	private DownloadQueueService downloadQueueService;
 	/**
 	 * 用主键获取数据
 	 * @return
@@ -361,6 +366,43 @@ public class DtTaggingModelAction {
 			} catch (Exception e2) {
 			}
 		}
+	}
+
+	/**
+	 * 开始导出
+	 */
+	@ApiOperation(value = "开始导出", nickname="beginDowload")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "number", value = "导出数量", dataType ="Long", paramType = "query"),
+			@ApiImplicitParam(name = "taggingModelId", value = "模型id", dataType ="Long", paramType = "query"),
+	})
+	@Security(session=true)
+	@RequestMapping(value="/beginDowload", method=RequestMethod.GET)
+	public SuccessMessage beginDowload(
+			@RequestParam(value="number")Long number,@RequestParam(value="taggingModelId")Long taggingModelId) throws Exception{
+		DtTaggingModel model =  dtTaggingModelService.get(taggingModelId);
+		if (model==null){
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此模型");
+		}
+		DownloadQueue queue = downloadQueueService.findBybtypeAndBid(Constants.DT_BTYPE_DATATAG,taggingModelId.toString());
+		if (queue==null){
+			queue = new DownloadQueue();
+			queue.setIsNew(true);
+		}else {
+			queue.setIsNew(false);
+		}
+		queue.setState(Constants.DT_DOWLOAD_STATE_WAIT);
+		queue.setSpeedOfProgress("0");
+		queue.setBtype(Constants.DT_BTYPE_DATATAG);
+		queue.setBid(taggingModelId.toString());
+		queue.setBname(model.getModelName());
+		queue.setCreateTime(new Date());
+		queue.setCreateUser(SsoContext.getUserId());
+		queue.setFileSize(null);
+		queue.setDownloadUrl(null);
+		queue.setDownloadNum(null);
+		downloadQueueService.doSave(queue);
+		return new SuccessMessage("已开始导出");
 	}
 
 	/**

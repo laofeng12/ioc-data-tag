@@ -23,4 +23,11 @@ public interface PortrayalService {
      */
     void clearPortrayal(String tableName);
 
+    /**
+     * 下载画像结果
+     * @param number 下载数量为空默认全部
+     * @param taggingModelId 模型id
+     */
+    void dowloadRunResult(Long number,Long taggingModelId);
+
 }

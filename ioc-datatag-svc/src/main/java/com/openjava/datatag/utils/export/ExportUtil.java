@@ -51,7 +51,7 @@ public class ExportUtil {
             myBuilder.buildSheet(bid+"-"+page, Arrays.asList(value));//放到第一个sheet
             //开始导出
             myBuilder.finish();
-            System.out.println("导出成功");
+//            System.out.println("导出成功");
             return filePath+"\\"+fileName;
         }catch (Exception e){
             e.printStackTrace();
@@ -93,7 +93,7 @@ public class ExportUtil {
                 while ((len = in.read(buf)) != -1) {
                     zipOutputStream.write(buf, 0, len);
                 }
-                zipOutputStream.setComment("我是注释");
+                zipOutputStream.setComment("注释");
             }
             zipOutputStream.finish();
             return filePath+"\\"+zipFileName;
@@ -120,10 +120,13 @@ public class ExportUtil {
         }
         File filePath = new File(URLDecoder.decode(EXPORT_FILE_DIR,"utf-8")+btype+"/"+bid+"/");
         String[] filelist = filePath.list();
+        if (filelist==null){
+            return true;
+        }
         for (int i = 0; i < filelist.length; i++) {
             File delfile = new File(filePath.getPath()+"/" + filelist[i]);
             if (!delfile.isDirectory()) {
-                System.out.println(delfile.delete());
+                delfile.delete();
             } else if (delfile.isDirectory()) {
                 deleFile(btype,bid);//递归删
             }
