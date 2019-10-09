@@ -323,10 +323,6 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             }
             List<DtCooTagcolLimitDTO> colLimit = dtos.getCooTagcolLimitList();
             DtTaggingModel tag = dtTaggingModelService.get(taggmId);
-
-            if (CollectionUtils.isEmpty(colLimit)) {
-                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请选择用户并添加协作打标字段");
-            }
             if (tag == null) {
                 throw new APIException(MyErrorConstants.PUBLIC_ERROE, "查无此数据,taggmId参数不能为空");
             }
@@ -363,6 +359,11 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 //EntityClassUtil.dealCreateInfo(col,userInfo);
                 col.setId(ConcurrentSequence.getInstance().getSequence());
                 col = dtCooperationRepository.save(col);
+            }
+
+            if (CollectionUtils.isEmpty(colLimit)) {
+//                throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请选择用户并添加协作打标字段");
+                continue;
             }
             for (int i = 0; i < colLimit.size(); i++) {
                 DtCooTagcolLimitDTO record = colLimit.get(i);
