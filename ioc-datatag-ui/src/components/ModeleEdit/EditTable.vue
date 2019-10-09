@@ -49,6 +49,7 @@
               <div class="allTree">
                 <div class="sel">
                   <el-input size="small"
+                            readonly="readonly"
                             placeholder="请输入内容"
                             v-model="ruleForm.tagLev">
                     <i slot="suffix" class="el-input__icon el-icon-arrow-down" @click="showTree()"></i>
