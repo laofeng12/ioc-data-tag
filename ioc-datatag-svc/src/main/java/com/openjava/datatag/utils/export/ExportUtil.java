@@ -16,7 +16,8 @@ import java.util.zip.ZipOutputStream;
 import static org.springframework.util.FileCopyUtils.BUFFER_SIZE;
 
 public class ExportUtil {
-    private static final String EXPORT_FILE_DIR =ExportUtil.class.getResource("/").getPath()+"export_result/";
+//    private static final String EXPORT_FILE_DIR =ExportUtil.class.getResource("/").getPath()+"export_result/";
+    private static final String EXPORT_FILE_DIR ="c:/export_result/";
     private static final String ZIP_DIR = "/zip";
 
 
