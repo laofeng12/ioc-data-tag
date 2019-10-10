@@ -550,7 +550,6 @@
         }
         try {
           const groupRes = await labelGroup(params)
-          console.log('row',groupRes.rows)
           if (groupRes.rows && groupRes.rows.length > 0) {
             const arr = [{
               code: "",
@@ -591,10 +590,11 @@
         row.cooUser = this.helpId
         row.id = this.cooId
         row.tagColId = row.colId
+        let arrRow = []
+        arrRow.push(row)
         if(row.useTagGroup == '123456'){
           row.isDeleted = 1
-          this.selectD = 1
-          const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId,isDeleted}) => {
+          const tmp = arrRow.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId,isDeleted}) => {
             return {
               "cooId": id, //id
               "id": cooFieldId,  //  cooFieldId
@@ -611,16 +611,19 @@
               item.isCooField = true
             }
           })
-          for (let i = 0; i < tmp.length; i++) {
-            for (let j = 0; j < this.showPeoplelist.length; j++) {
-              if (this.showPeoplelist[j].cooUser == tmp[i].cooUser) {
-                this.showPeoplelist[j].cooTagcolLimitList = []
-                this.showPeoplelist[j].cooTagcolLimitList.push(tmp[i])
+          let obj_user = []
+          this.showPeoplelist.forEach(item_c =>{
+            tmp.map(item_d =>{
+              if(item_c.cooUser == item_d.cooUser){
+                obj_user.push(item_c)
+                item_c.cooTagcolLimitList = []
+                item_c.cooTagcolLimitList.push(item_d)
               }
-            }
-          }
+            })
+          })
           try {
-            await dosave(this.showPeoplelist)
+            await dosave(obj_user)
+            this.markingTable()
           } catch (e) {
             console.log(e);
           }
@@ -646,18 +649,31 @@
             item.isCooField = true
           }
         })
-        for (let i = 0; i < tmp.length; i++) {
-          for (let j = 0; j < this.showPeoplelist.length; j++) {
-            if (this.showPeoplelist[j].cooUser == tmp[i].cooUser) {
-              this.showPeoplelist[j].cooTagcolLimitList = []
-              this.showPeoplelist[j].cooTagcolLimitList.push(tmp[i])
+        const arrList = [...this.showPeoplelist]
+        const arr = []
+        let obj = []
+        tmp.map(item_a =>{
+          arr.push(item_a.cooUser)
+        })
+        let uniqueArr = [...new Set(arr)]
+        // 根据用户的id刷选用户
+        arrList.forEach(item_b =>{
+          uniqueArr.map(item_c =>{
+            if(item_b.cooUser == item_c){
+              item_b.cooTagcolLimitList = []
+              obj.push(item_b)
             }
-          }
-        }
-        // console.log('创建',this.showPeoplelist);
-        // console.log('创建',JSON.stringify(this.showPeoplelist));
+          })
+        })
+        tmp.forEach((item,index) => {
+          arrList.map((citem,cindex) =>{
+            if(item.cooUser == citem.cooUser){
+              citem.cooTagcolLimitList.push(item)
+            }
+          })
+        })
         try {
-          const saveRes = await dosave(this.showPeoplelist)
+          const saveRes = await dosave(obj)
           this.$message({
             message: saveRes.message,
             type: 'success'
