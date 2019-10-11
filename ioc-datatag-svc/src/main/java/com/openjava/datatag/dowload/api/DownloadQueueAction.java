@@ -1,5 +1,6 @@
 package com.openjava.datatag.dowload.api;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -10,6 +11,11 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.baomidou.mybatisplus.extension.exceptions.ApiException;
+import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.component.FtpUtil;
+import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
+import com.openjava.datatag.utils.export.ExportUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.file.ContentType;
 import org.ljdp.common.file.POIExcelBuilder;
@@ -55,7 +61,11 @@ public class DownloadQueueAction {
 	
 	@Resource
 	private DownloadQueueService downloadQueueService;
-	
+	@Resource
+	private FtpUtil ftpUtil;
+	@Resource
+	private DtTaggingModelService dtTaggingModelService;
+
 	/**
 	 * 用主键获取数据
 	 * @param id
@@ -151,5 +161,40 @@ public class DownloadQueueAction {
 		}
 		return new SuccessMessage("删除成功");//没有需要返回的数据，就直接返回一条消息
 	}
-	
+
+	/**
+	 * 导出Excel文件
+	 */
+	@ApiOperation(value = "导出到本地", nickname="dowloadToLocal")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "taggingModelId", value = "模型主键编码", dataType ="Long", paramType = "path"),
+	})
+	@Security(session=false)
+	@RequestMapping(value="/dowloadToLocal/{taggingModelId}", method=RequestMethod.GET)
+	public void doExport(
+			@PathVariable(value="taggingModelId")Long taggingModelId,
+			HttpServletResponse response) throws Exception{
+		try {
+
+//			ftpUtil.uploadFile("ioc-datatag\\1\\233","233.zip","C:\\export_result\\1\\1677352\\1677352.zip");
+			// 清空response
+			response.reset();
+			String path = ftpUtil.getLocalPath()+"\\"+ Constants.DT_BTYPE_DATATAG+"\\"+taggingModelId.toString();
+			String fileName = taggingModelId.toString()+".zip";
+			OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
+			boolean result =  ftpUtil.downloadFile(path,fileName,toClient);
+			if (!result){
+				throw new ApiException("下载失败！");
+			}
+			toClient.flush();
+			toClient.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			try {
+				response.getWriter().write(e.getMessage());
+			} catch (Exception e2) {
+			}
+		}
+	}
+
 }

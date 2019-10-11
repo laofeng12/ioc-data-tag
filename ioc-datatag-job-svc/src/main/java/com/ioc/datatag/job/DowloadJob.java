@@ -1,6 +1,9 @@
 package com.ioc.datatag.job;
 
+import com.baomidou.mybatisplus.extension.exceptions.ApiException;
 import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.component.FtpUtil;
 import com.openjava.datatag.component.PostgreSqlConfig;
 import com.openjava.datatag.dowload.domain.DownloadQueue;
 import com.openjava.datatag.dowload.service.DownloadQueueService;
@@ -40,6 +43,8 @@ public class DowloadJob {
     private DtTaggingModelService dtTaggingModelService;
     @Autowired
     private PostgreSqlConfig postgreSqlConfig;
+    @Autowired
+    private FtpUtil ftpUtil;
     @Scheduled(cron = "${schedule.dowload}")
     public void cronJob() throws Exception {
         List<DownloadQueue> downloadQueueList = downloadQueueService.findByState(Constants.DT_DOWLOAD_STATE_DOWLOADING);
@@ -49,7 +54,7 @@ public class DowloadJob {
         List<DownloadQueue> waitList = downloadQueueService.findByState(Constants.DT_DOWLOAD_STATE_WAIT);
         if (CollectionUtils.isNotEmpty(waitList)){
             DownloadQueue queue = waitList.get(0);
-            logger.info("开始导出模型id为："+queue.getBid()+"画像结果");
+            logger.info("开始导出模型id为："+queue.getBid()+"的画像结果");
             DtTaggingModel model = dtTaggingModelService.get(Long.valueOf(queue.getBid()));
             queue.setState(Constants.DT_DOWLOAD_STATE_DOWLOADING);
             queue = downloadQueueService.doSaveNow(queue);
@@ -90,7 +95,14 @@ public class DowloadJob {
                 //TODO 压缩文件并保存文件
                 ExportUtil.toZip(Constants.DT_BTYPE_DATATAG,model.getTaggingModelId().toString());
                 File file = ExportUtil.getZipLocalFile(Constants.DT_BTYPE_DATATAG,model.getTaggingModelId().toString());
-                queue.setDownloadUrl(file.getPath());
+                //上传到ftp
+                String path =ftpUtil.getLocalPath()+"\\"+Constants.DT_BTYPE_DATATAG+"\\"+model.getTaggingModelId().toString();
+                String fileName  = file.getName();
+                String localPath = file.getPath();
+                boolean uploadFtp =  ftpUtil.uploadFile(path,fileName,localPath);
+                if (!uploadFtp){
+                    throw new ApiException("画像结果压缩包上传到ftp失败！");
+                }
                 queue.setFileSize(file.length()/1024+"KB") ;
                 queue.setSpeedOfProgress("100");
                 queue.setState(Constants.DT_DOWLOAD_STATE_SUCCESS);
