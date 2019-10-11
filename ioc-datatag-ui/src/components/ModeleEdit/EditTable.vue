@@ -29,7 +29,7 @@
                  <!--@close="$emit('update:show', false)" @open="init">-->
       <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" center
                  :modal-append-to-body="false" :close-on-click-modal="false"
-                 @close="$emit('update:show', false)" @open="init">
+                 @close="closeSettags" @open="init">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
           <el-form-item label="选择标签组:" prop="tagTeam">
             <el-col :span="9">
@@ -329,12 +329,12 @@
       this.getConnectList('dt.tag.conditions.connect')
       this.getCountList('dt.tag.conditions.noconnect')
       this.tableHeight = document.body.clientHeight - 137
-
     },
     mounted() {
     },
     methods: {
       getLabel(){},
+      closeSettags(){},
       init() {
         this.ruleForm.tagTeam = ''
         this.treeLevdata = []
@@ -344,7 +344,6 @@
         this.$nextTick(() => {
           this.$refs['ruleForm'].clearValidate()
         });
-        this.$refs.treeForm.setCheckedKeys('');
       },
       //点击分页跳转
       handleCurrentChange(page) {
@@ -615,6 +614,9 @@
           if (item.id == id) {
             this.chooseTagTeamname = item.tagsName
           }
+        })
+        this.$nextTick(() => {
+          this.$refs.treeForm.setCheckedKeys([]);
         })
       },
       // 编辑标签组
