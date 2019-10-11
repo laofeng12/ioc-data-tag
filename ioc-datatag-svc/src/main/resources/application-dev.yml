@@ -72,10 +72,11 @@ ljdp:
     url: 120.77.146.174
     port: 6021
     mode: PASV
-    username: chjykj
+    username: ftpchjykj
     password: ljdp0769
     remote-path: /
     local-temp-path: C:/temp
+    localPath: ioc-datatag
   dfs:
     ftp2http-proxy: http://183.6.55.26:31075/ftp
     ftp2http-download: http://183.6.55.26:31075/ljdp/dfs/downloadByFid.act?fid=
