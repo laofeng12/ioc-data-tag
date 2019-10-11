@@ -155,7 +155,7 @@
                       <div class="count-symbol" v-if="conItem.isConnectSymbol===0">
                         <span class="smbol-len" v-show="conItem.symbol.length>2">{{conItem.symbol}}</span>
                         <span class="smbol" v-show="conItem.symbol.length<3">{{conItem.symbol}}</span>
-                        <el-input style="width:100px" size="small" v-model="conItem.theValues"
+                        <el-input style="width:100px" size="small" v-model="conItem.theValues" clearable
                                   placeholder="请输入内容"></el-input>
                       </div>
                       <div class="connect-symbol" v-else>

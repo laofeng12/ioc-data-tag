@@ -5,7 +5,7 @@
         class="zxinp moduleOne"
         size="small"
         clearable
-        placeholder="请输入内容"
+        placeholder="请输入模型名称或发起人"
         prefix-icon="el-icon-search"
         @keyup.enter.native="modelQuery"
         v-model="input2">
@@ -43,7 +43,14 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="completeTime" label="完成时间">-</el-table-column>
+          <el-table-column prop="completeTime" label="完成时间">
+            <template slot-scope="scope">
+              <div>
+                <div v-if="scope.row.completeTime">{{scope.row.completeTime}}</div>
+                <div v-else>-</div>
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column prop="people" label="发起人/发起时间">
             <template slot-scope="scope">
               <div>
