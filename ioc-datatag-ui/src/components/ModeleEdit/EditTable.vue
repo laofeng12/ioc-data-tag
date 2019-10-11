@@ -681,9 +681,16 @@
           // const obj = {
           //   tagName: data.selectTag.tagName,
           //   id: data.selectTag.id
-          // }
           // this.tagSetList.push(obj)
           //打标相关字段  this.checkList
+          data.condtion.forEach(item =>{
+            item.conditionSetting.map(itemIndex =>{
+              if(itemIndex.theValues == null){
+                itemIndex.theValues = ''
+              }
+            })
+
+          })
           this.selfMarkList = this.deepClone(data.condtion)
           this.selfMarkList.map((item, index) => {
             item.showSelfMark = false
@@ -714,7 +721,7 @@
       //打标确认保存
       async getSaveMarkList() {
         // console.log('this.selfMarkList',this.selfMarkList)
-        //console.log('this.valuesType',this.valuesType)
+        // console.log('this.valuesType',this.valuesType)
           let conditions = this.deepClone(this.selfMarkList)
           conditions.forEach((obj, index) => {
             delete obj.checkList
@@ -736,7 +743,7 @@
                 duration: 2000,
                 type: 'success'
               })
-              this.setTagsDialog = false
+             this.setTagsDialog = false
               this.selfMarkList = []
               this.changeRed = -1
           }catch (e) {
