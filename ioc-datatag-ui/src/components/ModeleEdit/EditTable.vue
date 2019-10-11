@@ -24,6 +24,9 @@
       <!--    <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
                               @sureClick="goPage"></element-pagination>-->
       <!--数据打标-->
+      <!--<el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" center-->
+                 <!--:modal-append-to-body="false" :close-on-click-modal="false"-->
+                 <!--@close="$emit('update:show', false)" @open="init">-->
       <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" center
                  :modal-append-to-body="false" :close-on-click-modal="false"
                  @close="$emit('update:show', false)" @open="init">
@@ -341,6 +344,7 @@
         this.$nextTick(() => {
           this.$refs['ruleForm'].clearValidate()
         });
+        this.$refs.treeForm.setCheckedKeys('');
       },
       //点击分页跳转
       handleCurrentChange(page) {
