@@ -714,6 +714,9 @@ public class JdbcDataProvider extends DataProvider implements Aggregatable, Init
     @Override
     public boolean executeUpdate() throws Exception {
         String queryStr = query.get(SQL);
+        if (queryStr.length()>1000){
+            queryStr = queryStr.substring(0,1000)+"...";
+        }
         LOG.info("Execute update: {}", queryStr);
         try (Connection con = getConnection();
              Statement ps = con.createStatement()) {

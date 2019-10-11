@@ -622,7 +622,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		req.setColumnIdList(sourceMap.keySet().stream().toArray());
 		req.setPage(pageable.getPageNumber());
 		req.setSize(pageable.getPageSize());
-		System.out.println( JSONObject.toJSONString(req));
+//		System.out.println( JSONObject.toJSONString(req));
 		HttpResponse resp = client.postJSON(resourceDataUrl+taggingModel.getResourceId()+"-"+taggingModel.getResourceType(), JSONObject.toJSONString(req));
 		String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
 		DataSetRspDTO data = JSONObject.parseObject(jsontext, DataSetRspDTO.class);
