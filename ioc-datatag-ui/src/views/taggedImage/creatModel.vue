@@ -191,7 +191,7 @@
                 <el-table-column label="字段" prop="showCol"></el-table-column>
                 <el-table-column prop="sourceDataType" label="类型" width="100"></el-table-column>
                 <el-table-column
-                  label="选择打标字段">
+                  label="选择标签组">
                   <template slot-scope="scope">
                     <el-checkbox v-show="false"></el-checkbox>
                     <el-select class="controlChoose2" size="small" v-model="scope.row.useTagGroup" placeholder="请选择"
@@ -244,6 +244,7 @@
     name: 'creatModel',
     data() {
       return {
+        selectD:0,
         openScope:'',
         showBtn:true,
         headColList: [],//打标字段头部数据
@@ -550,7 +551,23 @@
         try {
           const groupRes = await labelGroup(params)
           if (groupRes.rows && groupRes.rows.length > 0) {
-            this.options3 = groupRes.rows
+            const arr = [{
+              code: "",
+              createTime: "",
+              createUser: "",
+              id: "123456",
+              isDeleted: 1,
+              isNew: "",
+              isShare: 0,
+              message: "",
+              modifyTime: "",
+              percentage: "",
+              popularity: "",
+              popularityLevel: "",
+              synopsis: "",
+              tagsName: "请选择"
+            }]
+            this.options3 = arr.concat(groupRes.rows)
           }
         } catch (e) {
           console.log(e)
@@ -569,15 +586,53 @@
         }
       },
       // 下拉选中
-      chooseSelect(row, item) {
+      async chooseSelect(row, item) {
         row.cooUser = this.helpId
         row.id = this.cooId
         row.tagColId = row.colId
+        let arrRow = []
+        arrRow.push(row)
+        if(row.useTagGroup == '123456'){
+          row.isDeleted = 1
+          const tmp = arrRow.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId,isDeleted}) => {
+            return {
+              "cooId": id, //id
+              "id": cooFieldId,  //  cooFieldId
+              "tagColName": showCol, // 打标字段
+              useTagGroup,  // 标签组ID
+              isCooField,//是否选中
+              cooUser, //协作用户ID
+              tagColId: tagColId,  //
+              isDelete:isDeleted
+            }
+          })
+          tmp.forEach(item => {
+            if (item.useTagGroup) {
+              item.isCooField = true
+            }
+          })
+          let obj_user = []
+          this.showPeoplelist.forEach(item_c =>{
+            tmp.map(item_d =>{
+              if(item_c.cooUser == item_d.cooUser){
+                obj_user.push(item_c)
+                item_c.cooTagcolLimitList = []
+                item_c.cooTagcolLimitList.push(item_d)
+              }
+            })
+          })
+          try {
+            await dosave(obj_user)
+            this.markingTable()
+          } catch (e) {
+            console.log(e);
+          }
+        }
       },
       // save
       async getdosave() {
         this.saveLoading = true
-        const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId}) => {
+        const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId,isDeleted}) => {
           return {
             "cooId": id, //id
             "id": cooFieldId,  //  cooFieldId
@@ -585,7 +640,8 @@
             useTagGroup,  // 标签组ID
             isCooField,//是否选中
             cooUser, //协作用户ID
-            tagColId: tagColId  //
+            tagColId: tagColId,  //
+            isDelete:isDeleted
           }
         })
         tmp.forEach(item => {
@@ -593,18 +649,31 @@
             item.isCooField = true
           }
         })
-        for (let i = 0; i < tmp.length; i++) {
-          for (let j = 0; j < this.showPeoplelist.length; j++) {
-            if (this.showPeoplelist[j].cooUser == tmp[i].cooUser) {
-              this.showPeoplelist[j].cooTagcolLimitList = []
-              this.showPeoplelist[j].cooTagcolLimitList.push(tmp[i])
+        const arrList = [...this.showPeoplelist]
+        const arr = []
+        let obj = []
+        tmp.map(item_a =>{
+          arr.push(item_a.cooUser)
+        })
+        let uniqueArr = [...new Set(arr)]
+        // 根据用户的id刷选用户
+        arrList.forEach(item_b =>{
+          uniqueArr.map(item_c =>{
+            if(item_b.cooUser == item_c){
+              item_b.cooTagcolLimitList = []
+              obj.push(item_b)
             }
-          }
-        }
-        // console.log('创建',this.showPeoplelist);
-        // console.log('创建',JSON.stringify(this.showPeoplelist));
+          })
+        })
+        tmp.forEach((item,index) => {
+          arrList.map((citem,cindex) =>{
+            if(item.cooUser == citem.cooUser){
+              citem.cooTagcolLimitList.push(item)
+            }
+          })
+        })
         try {
-          const saveRes = await dosave(this.showPeoplelist)
+          const saveRes = await dosave(obj)
           this.$message({
             message: saveRes.message,
             type: 'success'
