@@ -656,6 +656,12 @@
           const data = await getTagLevData(id)
           // console.log('选择标签层', data.childrenNode)
           this.treeLevdata = data.childrenNode
+          this.ruleForm.tagLev = ''
+          this.ruleForm.tagSet = ''
+          this.tagSetList = []
+          this.$nextTick(() => {
+            this.$refs['ruleForm'].clearValidate()
+          });
         } catch (e) {
 
         }
@@ -671,8 +677,6 @@
           //被选标签组
           this.ruleForm.tagTeam = data.selectTagGroup.id
           // this.chooseTagTeam(data.selectTagGroup.id)
-          const dataid = data.selectTags.id
-          const che = true
           this.$nextTick(()=>{
               this.chooseTagTeam(data.selectTagGroup.id)
           })
