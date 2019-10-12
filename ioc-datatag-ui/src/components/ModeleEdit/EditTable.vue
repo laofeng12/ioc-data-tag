@@ -162,8 +162,8 @@
                     <div class="self-mark-choose-box">
                       <div class="chooseNum" @click="showSelf(item,$event)">
                         <span>已选</span>
-                        <!--<span class="num">{{item.checkList.length}}</span>-->
-                        <span class="num">{{checkList.length}}</span>
+                        <span class="num">{{item.checkList.length}}</span>
+                        <!--<span class="num">{{checkList.length}}</span>-->
                         <span>条</span>
                         <i class="el-icon-caret-top" v-if="item.showSelfMark==true"></i>
                         <i class="el-icon-caret-bottom" v-else></i>
@@ -178,9 +178,10 @@
                         </el-input>
                         <div class="checkIt">
                           <div class="checkOne" v-for="(colItem,cIndex) in listCheck">
-                            <el-checkbox-group v-model="checkList" @change="checkMarkChange(item)">
-                              <el-checkbox :key='cIndex' :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span></el-checkbox>
-                            </el-checkbox-group>
+                            <!--<el-checkbox-group v-model="item.checkList" @change="checkMarkChange(item)">-->
+                              <!--<el-checkbox :key='cIndex' :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span></el-checkbox>-->
+                            <!--</el-checkbox-group>-->
+                            <el-checkbox @change="checkMarkChange(item)"  v-model="item.checkList" :key='cIndex' :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span></el-checkbox>
                           </div>
                         </div>
                       </div>
@@ -440,7 +441,7 @@
         this.ruleForm.tagTeam = ''
         this.selfMarkList = []
       },
-      //点击自动打标按钮
+      //点击人工打标按钮
       selfMark() {
         let tagSetName = ''
         this.tagSetList.forEach((item) => {
@@ -460,14 +461,14 @@
           sourceCol: this.sourceCol,
           checkList: [],
           showSelfMark: false,
-          isHandle: 1,//自动打标
+          isHandle: 1,//人工打标
           conditionSetting: conditionSetting
         }
         this.selfMarkList.push(markObj)
         this.curIndex = this.selfMarkList.length - 1
         this.isHandle = 1
       },
-      //人工打标
+      //自动打标
       handleMark() {
         let tagSetName = ''
         //console.log('this.ruleForm.tagSet',this.ruleForm.tagSet)
@@ -483,7 +484,7 @@
           sourceCol: this.sourceCol,
           checkList: [],
           showSelfMark: false,
-          isHandle: 0,//人工打标
+          isHandle: 0,//自动打标
           conditionSetting: []
         }
         this.selfMarkList.push(markObj)
@@ -492,8 +493,11 @@
       },
       //选中自动打标内容
       checkMarkChange(item) {
-        // this.checkList = item.checkList
+        this.checkList = item.checkList
         item.conditionSetting[0].theValues = this.checkList.join(",")
+        // item.checkList = this.checkList
+        item.showSelfMark = false
+        this.showSelf(item)
       },
       //显示标签层
       showTree() {
@@ -705,7 +709,7 @@
           this.selfMarkList.map((item, index) => {
             item.showSelfMark = false
             item.checkList = item.conditionSetting[0].theValues.split(',')
-            this.checkList = item.conditionSetting[0].theValues.split(',')
+            // this.checkList = item.conditionSetting[0].theValues.split(',')
             item.tagSetName = item.tagName
           })
           this.curIndex = this.selfMarkList.length - 1
