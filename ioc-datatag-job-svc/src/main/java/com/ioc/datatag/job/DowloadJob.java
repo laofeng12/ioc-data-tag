@@ -47,7 +47,7 @@ public class DowloadJob {
     private FtpUtil ftpUtil;
     @Scheduled(cron = "${schedule.dowload}")
     public void cronJob() throws Exception {
-        logger.info("-----导出任务----");
+//        logger.info("-----导出任务----");
         List<DownloadQueue> downloadQueueList = downloadQueueService.findByState(Constants.DT_DOWLOAD_STATE_DOWLOADING);
         if (CollectionUtils.isNotEmpty(downloadQueueList)){
             return;
