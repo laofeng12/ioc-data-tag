@@ -115,14 +115,15 @@
                 <el-table-column width="80" prop="type" label="类型">
                 </el-table-column>
                 <el-table-column
-                  label="选择标签组" width="110">
+                  label="选择打标字段" width="110">
                   <template slot-scope="scope">
                     <el-checkbox v-if="scope.row.definition===ruleForm.pkey || ruleForm.pkey==''"
                                  disabled></el-checkbox>
-                    <el-checkbox v-else-if='routerName == "creatModel"'
-                                 @change="getCheckChange(scope.row,$event)"></el-checkbox>
-                    <el-checkbox  :checked="scope.row.isMarking" v-else
-                                 @change="getCheckChange(scope.row,$event)"></el-checkbox>
+                    <!--<el-checkbox v-else-if='routerName == "creatModel"'-->
+                                  <!--v-model="tableData[scope.$index].isMarking">{{scope.$index}}</el-checkbox>-->
+                    <!--<el-checkbox  :checked="scope.row.isMarking" v-else-->
+                                 <!--@change="getCheckChange(scope.row,$event)"></el-checkbox>-->
+                    <el-checkbox v-else @change="getCheckChange(scope.row,$event)" v-model="scope.row.isMarking"></el-checkbox>
                   </template>
                 </el-table-column>
               </el-table>
@@ -162,6 +163,7 @@
     },
     data() {
       return {
+        chooseBox:[],
         powerName: '',
         activeName: 'first',
         openScope: '',
@@ -187,7 +189,22 @@
         checkIt: [],
         cols: colsOptions,
         isIndeterminate: true,
-        tableData: [],
+        tableData: [{
+          colSort: 1,
+          columnAlias: "tb_0_ID",
+          comment: null,
+          decimal: 0,
+          definition: "tb_0_ID",
+          isDesens: 0,
+          isEncrypt: 0,
+          isMarking: false,
+          isPrimaryKey: 0,
+          length: 0,
+          name: null,
+          scope: 1,
+          sensitived: true,
+          type: "string",
+          viewable: true}],
         totableData: [],
         resData: [],
         treeData: [],
@@ -237,7 +254,7 @@
       //初始化弹窗清空数据
       init() {
         this.searchText = ''
-        // this.checkAll = false
+        this.checkAll = false
         this.columnData = []
         this.isIndeterminate = false
         this.tableData = []
@@ -325,20 +342,33 @@
         let checkedCount = value.length;
         this.checkAll = checkedCount === this.cols.length;
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
-        this.tableData = []
+        // this.tableData = []
         this.myData = []
         // 左边勾选的项 this.checkedCols
         // 左边全部字段项 this.columnData
+        this.tableData = this.tableData.filter(({definition}) => this.checkedCols.some(citem => citem === definition )) // 删除
+        // 本宝宝
         this.checkedCols.forEach((citem) => {
-          this.columnData.map((item, index) => {
-            item.isMarking = false
-            item.colSort = ''
-            if (item.definition == citem) {
-              this.tableData.push(item)
+          if ((this.tableData.length === 0 || this.tableData.every(({definition}) => definition !== citem))) {
+            const item_a = this.columnData.find(({definition}) => definition === citem)
+            if (item_a) {
+              item_a.isMarking = false
+              item_a.colSort = ''
+              this.tableData.push(JSON.parse(JSON.stringify(item_a)))
             }
-          })
+          }
         })
-        //console.log('排序', this.tableData)
+        // this.checkedCols.forEach((citem) => {
+        //   this.columnData.map((item) => {
+        //     if (item.definition == citem && (this.tableData.length === 0 || this.tableData.every(({definition}) => definition !== citem))) {
+        //       console.log('===============', this.tableData.some(({definition}) => definition !== citem), this.tableData, citem)
+        //       item.isMarking = false
+        //       item.colSort = ''
+        //       this.tableData.push(item)
+        //     }
+        //   })
+        // })
+        // console.log('排序', this.tableData)
         this.tableData.forEach((item, index) => {
           if (item.colSort === '') {
             item.colSort = index + 1
@@ -410,7 +440,7 @@
         this.resourceName = colsData.data.resourceName
         this.resourceId = colsData.data.resourceId
         this.resourceType = colsData.data.type   // 0数据湖 1自建目录
-        this.tableData = []
+        // this.tableData = []
         this.columnData.forEach((item, index) => {
           colsOptions.push(item.definition)
         })
@@ -633,11 +663,7 @@
       },
       //选择打标字段
       getCheckChange(row, $event) {
-        if (row.isMarking == false) {
-          row.isMarking = true
-        } else {
-          row.isMarking = false
-        }
+        this.tableData = JSON.parse(JSON.stringify(this.tableData))
       },
       delCol(index) {
         this.checkedCols.forEach((name, cindex) => {
