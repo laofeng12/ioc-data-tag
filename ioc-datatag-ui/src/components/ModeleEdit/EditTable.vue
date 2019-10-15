@@ -24,9 +24,6 @@
       <!--    <element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"
                               @sureClick="goPage"></element-pagination>-->
       <!--数据打标-->
-      <!--<el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" center-->
-                 <!--:modal-append-to-body="false" :close-on-click-modal="false"-->
-                 <!--@close="$emit('update:show', false)" @open="init">-->
       <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" center
                  :modal-append-to-body="false" :close-on-click-modal="false"
                  @close="closeSettags" @open="init">
@@ -53,7 +50,7 @@
                 <div class="sel">
                   <el-input size="small"
                             readonly="readonly"
-                            placeholder="请输入内容"
+                            placeholder="请选择标签层"
                             v-model="ruleForm.tagLev">
                     <i slot="suffix" class="el-input__icon el-icon-arrow-down" @click="showTree()"></i>
                   </el-input>
