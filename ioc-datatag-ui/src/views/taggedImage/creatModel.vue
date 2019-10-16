@@ -37,7 +37,7 @@
     <div class="content">
       <!--左边数据树目录结构-->
       <Aside :modelData="modelData" ref="tree" @commit="getModelDatalist"/>
-      <div class="components">
+      <div class="components" v-if="routerName==='creatModel'">
         <div class="top">
           <div class="left">
             {{modelData.resourceName}}
@@ -84,6 +84,54 @@
         </div>
 
       </div>
+      <div class="components" v-if="routerName==='editModel'" style="padding-left: 15px;">
+        <div class="top">
+          <div class="left">
+            {{modelData.resourceName}}
+            <el-button v-if="routerName==='editModel'" class="set-btn btnMargin" type="text" size="mini"
+                       @click.stop="editSetTags(1)">
+              <i class="el-icon-setting"></i>
+            </el-button>
+          </div>
+          <div class="right">
+            <span class="iconPeople"><i class="el-icon-user"></i></span>
+            <span class="cooperation">协作人员:</span>
+            <img class="imgPeople" src="../../assets/img/u163.png" height="25" width="25"/>
+            <span class="multiply">x</span>
+            <span class="num">{{peopleLength+1}}</span>
+            <span class="handlePeople"><i class="el-icon-arrow-down" @click="showIt"></i></span>
+          </div>
+          <div class="card" v-show="show">
+            <div class="clearfix">
+              <div class="peopleList">成员列表</div>
+              <div class="addPeople"><i class="el-icon-plus" @click="addPeople"></i></div>
+            </div>
+            <div class="peopleContent">
+              <div class="contentA clearfix">
+                <div>
+                  <img class="imgPeople2" src="../../assets/img/Uadmin.png" height="16" width="16"/>
+                  <img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName" :title="this.$store.state.user.userInfo.userName">
+                  {{this.$store.state.user.userInfo.userName}}
+                </div>
+              </div>
+              <div class="contentB clearfix" v-for="(item,index) in showPeoplelist" :key="index">
+                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                <div class="listName" :title="item.cooUserName">{{item.cooUserName}}</div>
+                <div class="head"><i class="el-icon-delete" @click="deleteList(item.id)"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-if="routerName==='editModel'">
+          <!--<EditTable :theadData="headColList" :tableData="modelTableData" :modelId="taggingModelId"-->
+          <!--@commit2="getModelDatalist"></EditTable>-->
+          <EditTable ref="ztable" :tableData="modelTableData" :modelId="taggingModelId"
+                     @commit2="getModelDatalist"></EditTable>
+        </div>
+
+      </div>
+
     </div>
 
     <!--另存-->
@@ -350,7 +398,8 @@
       //type=0,新增，type=1编辑
       editSetTags(type) {
         //调用子组件里面的方法
-        this.$refs['tree'].setTags(type)
+        // this.$refs['tree'].setTags(type)
+        this.$refs['tree'].handleNodeClick()
       },
       // 获取模型数据
       async getModelList(modelId) {
