@@ -18,4 +18,11 @@ public interface DtTaggChooseLogRepository extends DynamicJpaRepository<DtTaggCh
             "and to_char(CHOOSE_TIME,'yyyy-mm-dd') = to_char(sysdate,'yyyy-mm-dd')"
             ,nativeQuery = true)
     Long countChooseToday(Long userId,Long copiedTaggId);
+	
+    @Query(value = "SELECT count(id) " +
+            "from DT_TAGG_CHOOSE_LOG " +
+            "where COPIED_TAGG = :copiedTaggId " +
+            "and CHOOSE_USER = :userId "
+            ,nativeQuery = true)
+	Long countChoose(Long userId,Long copiedTaggId);
 }
