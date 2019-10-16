@@ -14,6 +14,9 @@ import java.util.List;
  */
 public interface DtTagGroupRepository extends DynamicJpaRepository<DtTagGroup, Long>, DtTagGroupRepositoryCustom{
 
+    @Query(value = "from DtTagGroup t where t.isDeleted=0 and  t.createUser=:createUser and  t.id=:groupId")
+    List<DtTagGroup> getMyTagGroupByGroupId(@Param("createUser") Long createUser,@Param("groupId")Long groupId);
+
     @Query(value = "from DtTagGroup t where t.isDeleted=0 and  t.createUser=:createUser")
     List<DtTagGroup> getMyTagGroup(@Param("createUser") Long createUser);
 
