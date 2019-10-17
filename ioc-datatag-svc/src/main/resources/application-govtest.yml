@@ -20,9 +20,9 @@ spring:
 #    password: Ch#123456
     # 用Oracle 
     driver-class-name: oracle.jdbc.OracleDriver
-    url: jdbc:oracle:thin:@nhc.smart-info.cn:8521:orcl
-    username: c##dgioc
-    password: bigdata@0769
+    url: ENC(FTFu5gxTmQ5lL8aXEAGovm3mKRHhjWM5hYqHunezVjTXevsfdOPQ7cTEiALoOAilT6TgKJbU3fQ=)
+    username: ENC(d6EfBImsJThWtN5tcSZ4//75KioUpNwk)
+    password: ENC(oIHxQRkxxfxmuxio3qxBXhxSuSZFO/+r)
     druid:
       initial-size: 1
       max-active: 100
@@ -78,8 +78,8 @@ ljdp:
     local-temp-path: /tmp
     localPath: /ioc-datatag
   dfs:
-    ftp2http-proxy: http://183.6.55.26:31075/ftp
-    ftp2http-download: http://183.6.55.26:31075/ljdp/dfs/downloadByFid.act?fid=
+    ftp2http-proxy: http://19.104.40.34:31075/ftp
+    ftp2http-download: http://19.104.40.34:31075/ljdp/dfs/downloadByFid.act?fid=
   fileupload:
     # 覆盖batch.fileupload.path配置
     local-path: /tmp
