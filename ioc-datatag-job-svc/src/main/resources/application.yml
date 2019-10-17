@@ -3,7 +3,9 @@ spring:
   profiles:
       active: dev
 
-
+jasypt:
+  encryptor:
+    password: Lt4U6EgL19D2k_HY-AcD7-VAmq1OeLGqDdTTayXtH88
 
 
 
