@@ -81,9 +81,9 @@ p {
   background: transparent;
 }
 // 树结构横向滚动条
-.treeCode .el-tree-node>.el-tree-node__children{
-  overflow: inherit !important;
-}
+//.treeCode .el-tree-node>.el-tree-node__children{
+//  overflow: inherit !important;
+//}
 
 
 // 叶子节点去掉图标
@@ -102,3 +102,10 @@ p {
   transform: rotate(90deg) !important;
 }
 
+// 创建模型
+.treeCode .el-tree .el-tree-node__expand-icon.expanded{
+  transform: rotate(90deg) !important;
+}
+.treeCode .el-tree-node__expand-icon.is-leaf{
+  color: transparent !important;
+}
