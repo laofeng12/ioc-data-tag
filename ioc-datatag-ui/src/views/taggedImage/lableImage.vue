@@ -22,7 +22,7 @@
       <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
       <el-button size="small" type="primary" @click="createModel">创建模型</el-button>
       <el-button size="small" type="primary" @click="cooperationModel">协作模型</el-button>
-      <!--<el-button size="small" type="primary" >下载管理</el-button>-->
+      <el-button size="small" type="primary" @click="down">下载管理</el-button>
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -171,6 +171,7 @@
         <div slot="footer" class="dialog-footer device">
           <div>
             <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定导出</el-button>
+            <el-button size="small" type="primary" class="queryBtn" @click="cancleExport">取消</el-button>
           </div>
         </div>
       </el-dialog>
@@ -232,7 +233,7 @@
 </template>
 
 <script>
-  import {getmodelList, getDispatch, getDelete, getDispatchdetail} from '@/api/lableImage.js'
+  import {getmodelList, getDispatch, getDelete, getDispatchdetail,startDown} from '@/api/lableImage.js'
   import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
   import DMSocket from '@/utils/DMSocket'
@@ -397,7 +398,11 @@
       },
       closeDownload() {
         this.downloadDialog = false
-        this.$refs.ruleForm.resetFields()
+        this.exportNum = ''
+      },
+      cancleExport(){
+        this.downloadDialog = false
+        this.exportNum = ''
       },
       handleDelete(name, id) {
         this.deleteDialog = true
@@ -418,6 +423,9 @@
       },
       cooperationModel() {
         this.$router.push('cooperationModel')
+      },
+      down() {
+        this.$router.push('download')
       },
       // 定时器
       setTimer() {
