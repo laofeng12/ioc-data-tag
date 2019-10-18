@@ -53,6 +53,12 @@ export default new Router({
           component: () => import('@/views/taggedImage/cooperationModel.vue')
         },
         {
+          path: '/download',
+          name: 'download',
+          meta: {title: '下载管理'},
+          component: () => import('@/views/taggedImage/download.vue')
+        },
+        {
           path: '/tagPanel',
           name: 'tagPanel',
           meta: {title: '标签仪表盘'},
