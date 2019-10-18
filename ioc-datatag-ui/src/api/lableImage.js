@@ -93,3 +93,15 @@ export function getlist({taggingModelId,page,size}) {
     method:'get'
   })
 }
+
+/**
+ *开始导出
+ * @param data
+ */
+export function startDown(params) {
+  return fetch ({
+    url:"/datatag/tagmodel/dtTaggingModel/beginDowload",
+    method:'get',
+    params
+  })
+}
