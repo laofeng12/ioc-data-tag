@@ -32,4 +32,6 @@ mybatis-plus:
     call-setters-on-nulls: true
     jdbc-type-for-null: 'null'
 
-
+jasypt:
+  encryptor:
+    password: Lt4U6EgL19D2k_HY-AcD7-VAmq1OeLGqDdTTayXtH88

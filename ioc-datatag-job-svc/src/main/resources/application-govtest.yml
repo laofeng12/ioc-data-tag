@@ -17,9 +17,9 @@ spring:
 #    username: alitest
 #    password: Ch#123456
     driver-class-name: oracle.jdbc.OracleDriver
-    url: jdbc:oracle:thin:@19.104.9.109:1521:C88IOC
-    username: platformtest
-    password: ch#123456
+    url: ENC(FTFu5gxTmQ5lL8aXEAGovm3mKRHhjWM5hYqHunezVjTXevsfdOPQ7cTEiALoOAilT6TgKJbU3fQ=)
+    username: ENC(d6EfBImsJThWtN5tcSZ4//75KioUpNwk)
+    password: ENC(oIHxQRkxxfxmuxio3qxBXhxSuSZFO/+r)
     druid:
       initial-size: 1
       max-active: 600

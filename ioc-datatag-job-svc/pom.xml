@@ -63,6 +63,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>2.1.2</version>
+        </dependency>
         <!-- hibernate validator -->
         <dependency>
             <groupId>org.hibernate</groupId>

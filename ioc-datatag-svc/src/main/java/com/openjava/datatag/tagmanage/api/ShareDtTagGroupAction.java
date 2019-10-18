@@ -2,6 +2,7 @@ package com.openjava.datatag.tagmanage.api;
 
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.log.service.DtTaggChooseLogService;
 import com.openjava.datatag.tagmanage.domain.DtShareTagGroup;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.service.DtShareTagGroupService;
@@ -9,6 +10,7 @@ import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.utils.IpUtil;
 import io.swagger.annotations.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.user.BaseUserInfo;
@@ -24,6 +26,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Api(tags="共享标签组列表")
 @RestController
@@ -37,6 +40,8 @@ public class ShareDtTagGroupAction {
 
     @Resource
     private DtTagService dtTagService;
+    @Resource
+    private DtTaggChooseLogService dtTaggChooseLogService;
 
     @ApiOperation(value = "标签组列表分页查询(共享)", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
     @ApiImplicitParams({
@@ -77,6 +82,11 @@ public class ShareDtTagGroupAction {
         }
         if (db.getCreateUser().equals(Long.valueOf(userInfo.getUserId()))){
             throw new APIException(MyErrorConstants.CAN_NOT_CHOOSE, "不能选用自己的标签组");
+        }
+
+        Long count = dtTaggChooseLogService.countChoose(Long.valueOf(userInfo.getUserId()),id);
+        if (count!=null && count>0){
+            throw new APIException(MyErrorConstants.CAN_NOT_CHOOSE, "该便签组已选用，不能重复选用");
         }
         dtShareTagGroupService.choose(id,Long.parseLong(userInfo.getUserId()),ip);
         return new SuccessMessage("选用成功");

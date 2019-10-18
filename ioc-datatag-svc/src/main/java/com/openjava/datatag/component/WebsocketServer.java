@@ -75,7 +75,7 @@ public class WebsocketServer {
             }
         }
         //返回消息给Web Socket客户端（浏览器）
-        myWebSocket.sendMessage(Long.valueOf(params),"已收到来自："+params+",的信息");
+        myWebSocket.sendMessage(Long.valueOf(params),"-1");
     }
 
     /**

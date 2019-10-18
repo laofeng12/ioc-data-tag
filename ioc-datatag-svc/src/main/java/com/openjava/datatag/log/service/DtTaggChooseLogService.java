@@ -25,7 +25,7 @@ public interface DtTaggChooseLogService {
 	DtTaggChooseLog doSave(DtTaggChooseLog m);
 
 	Long countChooseToday(Long userId,Long copiedTaggId);
-
+	Long countChoose(Long userId,Long copiedTaggId);
 	DtTaggChooseLog loggingChoose(Long fromTaggId, DtTagGroup db, Long userId, String ip);
 	
 }

@@ -1,21 +1,23 @@
 <template>
-  <div>
-  <div class="aside treeCode" v-show="this.routerName === 'creatModel'">
+  <div class="aside treeCode">
     <el-input placeholder="输入关键词搜索" v-model="filterText" class="search" size="small"
               suffix-icon="el-icon-search"></el-input>
     <div class="tree-box">
-      <el-tree class="tree" :props="props" :highlight-current="true"
+      <el-tree icon-class="el-icon-folder" class="tree" :props="props" :highlight-current="true"
                :filter-node-method="filterNode" ref="tree"
                node-key="id"
-               @node-click="handleNodeClick"
+               :default-expanded-keys="[1,2]"
+               :default-checked-keys="[1,2]"
                :load="loadNode" lazy>
         <div class="custom-tree-node" slot-scope="{ node, data }">
-          <i v-if="data.isTable===true" class="el-icon-coin iconImg"></i>
           <div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>
+          <el-button class="set-btn btnMargin" type="text" size="mini" :disabled="routerName==='editModel'"
+                     v-if="data.isTable===true" @click.stop="setTags(0,node,data)" :title="openScope">
+            <i class="el-icon-setting"></i>
+          </el-button>
         </div>
       </el-tree>
     </div>
-  </div>
     <!--字段设置-->
     <el-dialog class="creat" title="字段设置" :visible.sync="colSetDialog" width="800px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
@@ -106,6 +108,7 @@
                   label="排序" width="50">
                   <template slot-scope="scope">
                     <div v-model="scope.row.colSort">{{scope.row.colSort}}</div>
+                    <!--<el-input class="sort" size="small" v-model="scope.row.colSort" placeholder="请输入内容"></el-input>-->
                   </template>
                 </el-table-column>
                 <el-table-column label="字段" prop="definition"></el-table-column>
@@ -116,6 +119,10 @@
                   <template slot-scope="scope">
                     <el-checkbox v-if="scope.row.definition===ruleForm.pkey || ruleForm.pkey==''"
                                  disabled></el-checkbox>
+                    <!--<el-checkbox v-else-if='routerName == "creatModel"'-->
+                                  <!--v-model="tableData[scope.$index].isMarking">{{scope.$index}}</el-checkbox>-->
+                    <!--<el-checkbox  :checked="scope.row.isMarking" v-else-->
+                                 <!--@change="getCheckChange(scope.row,$event)"></el-checkbox>-->
                     <el-checkbox v-else @change="getCheckChange(scope.row,$event)" v-model="scope.row.isMarking"></el-checkbox>
                   </template>
                 </el-table-column>
@@ -131,7 +138,7 @@
         </div>
       </div>
     </el-dialog>
-    </div>
+  </div>
 </template>
 
 <script>
@@ -173,8 +180,8 @@
         filterText: '',
         props: {
           label: 'orgName',
-          children: 'children',
-          isLeaf: 'leaf',
+          children: 'child',
+          isLeaf: 'leaf'
         },
         searchText: '',
         checkAll: false,
@@ -393,25 +400,23 @@
         return data.orgName.indexOf(value) !== -1
       },
       //对字段进行选择确认,type=0,新建模型，type=1编辑模型
-      async handleNodeClick(data) {
-        console.log(data)
+      async setTags(type, node, data) {
         this.myData = []
         this.editData = []
         colsOptions = []
         this.colSetDialog = true
         let colsData = {}
         let allcolsData = {}
-        if (this.routerName === 'creatModel' && data.isTable===true) {
+        if (type === 0) {
           //新建模型字段确认获取数据
           colsData = await getResourceInfoData(data.resourceId, data.type, 1)  // 有权限的字段
           allcolsData = await getResourceInfoData(data.resourceId, data.type, 0)  // 全部的字段
-        }
-        if (this.routerName === 'editModel') {
-            //编辑模型字段确认获取数据
-            const resourceId = this.modelData.resourceId
-            const type = this.modelData.resourceType
-            colsData = await getResourceInfoData(resourceId, type, 1)  // 有权限的字段
-            allcolsData = await getResourceInfoData(resourceId, type, 0)  // 全部的字段
+        } else {
+          //编辑模型字段确认获取数据
+          const resourceId = this.modelData.resourceId
+          const type = this.modelData.resourceType
+          colsData = await getResourceInfoData(resourceId, type, 1)  // 有权限的字段
+          allcolsData = await getResourceInfoData(resourceId, type, 0)  // 全部的字段
         }
         // 全部字段
         this.allcolumnData = allcolsData.data.column
@@ -471,28 +476,16 @@
         }
       },
       // 获取1-3级树数据
-      async getOneZtreeData(resolve) {
+      async getOneZtreeData() {
         try {
-          const { data } = await getOneZtreeData()
-          this.dataLakeDirectoryName = data.dataLakeDirectoryName
-          this.dataSetDirectoryName = data.dataSetDirectoryName
-          this.dataLakeDirectoryTree = data.dataLakeDirectoryTree
-          this.dataSetDirectoryTree = data.dataSetDirectoryTree
-          // resolve([{ orgName: this.dataSetDirectoryName, id: 1 }])
-          // resolve([{orgName:this.dataSetDirectoryTree}])
-          resolve(this.dataSetDirectoryTree)
+          const data = await getOneZtreeData()
+          this.oneNodeData = data.data
+          this.dataLakeDirectoryName = this.oneNodeData.dataLakeDirectoryName
+          this.dataSetDirectoryName = this.oneNodeData.dataSetDirectoryName
+          this.dataLakeDirectoryTree = this.oneNodeData.dataLakeDirectoryTree
+          this.dataSetDirectoryTree = this.oneNodeData.dataSetDirectoryTree
         } catch (e) {
-          console.log('error', e)
-        }
-      },
-      //加载树节点
-      async loadNode(node, resolve) {
-        if (node.level === 0) {
-          this.getOneZtreeData(resolve)
-        } else if (node.level === 1) {
-          this.getChildTreeData(node.data, resolve)
-        }else {
-          return resolve([])
+
         }
       },
       // 获取4级树数据
@@ -513,7 +506,6 @@
                 Object.assign(item, {leaf: true})
               })
             }
-            console.log('resData',resData);
             // 状态
             if (resData.openScope == '1') {
               this.openScope = '全部对外公开'
@@ -531,13 +523,13 @@
                 orgName: item.resourceName,
                 resourceId: item.resourceId,
                 type: data.type,
-                isTable: item.isTable,
-                leaf: true
+                isTable: item.isTable
               })
             })
             allData = this.treeData.concat(this.resData)
           }
           resolve(allData)
+
         } catch (e) {
           resolve([])
         }
@@ -557,6 +549,21 @@
       getChildTreeData(data, resolve) {
         // console.log('点击当前的数据',data)
         this.getChildtreeData(data, resolve)
+      },
+      //加载树节点
+      loadNode(node, resolve) {
+        if (node.level === 0) {
+          return resolve([{orgName: '数据目录', id: '0'}])
+        }
+        else if (node.level === 1) {
+          return resolve([{orgName: this.dataLakeDirectoryName, id: '1'}, {
+            orgName: this.dataSetDirectoryName, id: '2'
+          }])
+        } else if (node.level === 2) {
+          this.getThreeChild(node.data.id, resolve)
+        } else {
+          this.getChildTreeData(node.data, resolve)
+        }
       },
       //确认选择
       setCols() {
@@ -682,7 +689,7 @@
       }
     },
     created() {
-      // this.getOneZtreeData()
+      this.getOneZtreeData()
       if (this.$route.name == 'editModel') {
         this.modelId = this.$route.params.id
       }
@@ -759,107 +766,57 @@
       display: flex;
       align-items: baseline;
     }
-    /*.col-set-box {*/
-      /*.left {*/
-        /*border-right: 1px solid #eee;*/
-        /*padding: 0 10px;*/
-        /*color: #000000;*/
-      /*}*/
-      /*h3 {*/
-        /*font-weight: normal;*/
-        /*font-size: 14px;*/
-        /*line-height: 32px;*/
-        /*border-bottom: 1px solid #eee;*/
-      /*}*/
-      /*.h4 {*/
-        /*margin-top: 10px;*/
-        /*padding: 5px 10px;*/
-        /*background-color: #f4f9fb;*/
-        /*border: 1px solid #eee;*/
-        /*font-weight: bold;*/
-        /*.allNametitle {*/
-          /*padding-left: 10px;*/
-          /*font-size: 14px;*/
-          /*color: #606266;*/
-          /*font-weight: 500;*/
-        /*}*/
-      /*}*/
-      /*ul {*/
-        /*margin: 0;*/
-        /*padding: 0;*/
-        /*li {*/
-          /*margin: 0;*/
-          /*padding: 5px 10px;*/
-          /*border: 1px solid #eee;*/
-          /*border-top: none;*/
-          /*.blue {*/
-            /*color: #0486fe;*/
-          /*}*/
-          /*.green {*/
-            /*color: green;*/
-          /*}*/
-          /*.orange {*/
-            /*color: orange;*/
-          /*}*/
-        /*}*/
-      /*}*/
-    /*}*/
-    /*.right {*/
-      /*min-width: 400px;*/
-      /*padding: 0 10px;*/
-    /*}*/
-  }
-//
-  .col-set-box {
-    .left {
-      border-right: 1px solid #eee;
-      padding: 0 10px;
-      color: #000000;
-    }
-    h3 {
-      font-weight: normal;
-      font-size: 14px;
-      line-height: 32px;
-      border-bottom: 1px solid #eee;
-    }
-    .h4 {
-      margin-top: 10px;
-      padding: 5px 10px;
-      background-color: #f4f9fb;
-      border: 1px solid #eee;
-      font-weight: bold;
-      .allNametitle {
-        padding-left: 10px;
+    .col-set-box {
+      .left {
+        border-right: 1px solid #eee;
+        padding: 0 10px;
+        color: #000000;
+      }
+      h3 {
+        font-weight: normal;
         font-size: 14px;
-        color: #606266;
-        font-weight: 500;
+        line-height: 32px;
+        border-bottom: 1px solid #eee;
       }
-    }
-    ul {
-      margin: 0;
-      padding: 0;
-      li {
-        margin: 0;
+      .h4 {
+        margin-top: 10px;
         padding: 5px 10px;
+        background-color: #f4f9fb;
         border: 1px solid #eee;
-        border-top: none;
-        .blue {
-          color: #0486fe;
+        font-weight: bold;
+        .allNametitle {
+          padding-left: 10px;
+          font-size: 14px;
+          color: #606266;
+          font-weight: 500;
         }
-        .green {
-          color: green;
-        }
-        .orange {
-          color: orange;
+      }
+      ul {
+        margin: 0;
+        padding: 0;
+        li {
+          margin: 0;
+          padding: 5px 10px;
+          border: 1px solid #eee;
+          border-top: none;
+          .blue {
+            color: #0486fe;
+          }
+          .green {
+            color: green;
+          }
+          .orange {
+            color: orange;
+          }
         }
       }
     }
+    .right {
+      min-width: 400px;
+      padding: 0 10px;
+    }
   }
-  .right {
-    min-width: 400px;
-    padding: 0 10px;
-  }
-  //
+
   .contentNum {
     height: 300px;
     overflow: auto;
@@ -882,11 +839,6 @@
 
   .power {
     color: #b1b1b1;
-  }
-  .iconImg{
-    font-size: 16px;
-    color: #1296DB;
-    margin-right: 5px;
   }
 </style>
 <style lang="stylus" scoped>

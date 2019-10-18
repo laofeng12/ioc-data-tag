@@ -52,6 +52,9 @@ public class DtTaggChooseLogServiceImpl implements DtTaggChooseLogService {
 	public Long countChooseToday(Long userId,Long copiedTaggId){
 		return dtTaggChooseLogRepository.countChooseToday(userId,copiedTaggId);
 	}
+	public Long countChoose(Long userId,Long copiedTaggId){
+		return dtTaggChooseLogRepository.countChoose(userId,copiedTaggId);
+	}
 
 	public DtTaggChooseLog loggingChoose(Long fromTaggId, DtTagGroup db,Long userId,String ip){
 		//日志记录
