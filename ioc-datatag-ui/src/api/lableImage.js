@@ -101,6 +101,7 @@ export function getlist({taggingModelId,page,size}) {
 export function startDown(params) {
   return fetch ({
     url:"/datatag/tagmodel/dtTaggingModel/beginDowload",
-    method:'get'
+    method:'get',
+    params
   })
 }

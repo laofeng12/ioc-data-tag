@@ -15,9 +15,8 @@ export function getdownList (params) {
  */
 export function exportList (params) {
   return fetch({
-    url: `/datatag/dowload/downloadQueue/dowloadToLocal/`+{taggingModelId},
-    method: 'get',
-    params
+    url: `/datatag/dowload/downloadQueue/dowloadToLocal/`+params,
+    method: 'get'
   })
 }
 

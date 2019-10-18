@@ -80,7 +80,7 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="导出数据" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-download iconLogo" @click="download"></i>
+                    <i class="el-icon-download iconLogo" @click="download(scope.row.taggingModelId)"></i>
                 </span>
               </el-tooltip>
 
@@ -170,7 +170,7 @@
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定导出</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="handleExport">确定导出</el-button>
             <el-button size="small" type="primary" class="queryBtn" @click="cancleExport">取消</el-button>
           </div>
         </div>
@@ -247,6 +247,7 @@
         tt:'',
         lockReconnect:false,
         webUserId: '',
+        downloadId:'',
         page: 0,
         size: 10,
         totalnum: 0,
@@ -313,7 +314,7 @@
           label: '每年一次'
         }],
         options3: [{
-          value: '',
+          value: '0',
           label: '导出全部数据'
         }, {
           value: '1',
@@ -393,8 +394,9 @@
         this.controlDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      download() {
+      download(id) {
         this.downloadDialog = true
+        this.downloadId = id
       },
       closeDownload() {
         this.downloadDialog = false
@@ -426,6 +428,29 @@
       },
       down() {
         this.$router.push('download')
+      },
+      async handleExport(){
+        this.saveLoading = true
+        if(this.exportValue == 1 && this.exportNum != '' || this.exportValue == 0){
+            const params = {
+              number:this.exportNum,
+              taggingModelId:this.downloadId
+            }
+            try{
+              const res = await startDown(params)
+              this.$message({
+                message: res.message,
+                type: 'success'
+              });
+              this.saveLoading = false
+              this.downloadDialog = false
+            }catch (e) {
+              console.log(e);
+            }
+        }else{
+          this.$message.error('请填写导出部分数据的数量');
+          this.saveLoading = false
+        }
       },
       // 定时器
       setTimer() {

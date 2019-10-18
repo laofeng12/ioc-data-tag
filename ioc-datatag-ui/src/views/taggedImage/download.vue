@@ -5,7 +5,7 @@
         class="zxinp moduleOne"
         size="small"
         clearable
-        placeholder="请输入内容"
+        placeholder="请输入查询名称"
         prefix-icon="el-icon-search"
         @keyup.enter.native="getQuireData"
         v-model="input2">
@@ -24,25 +24,24 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="tagsName" label="名称"></el-table-column>
-          <el-table-column prop="isShare" label="下载数据量"></el-table-column>
-          <el-table-column prop="modifyTime" label="下载时间"></el-table-column>
-          <el-table-column prop="synopsis" label="文件大小"></el-table-column>
-          <el-table-column prop="source" label="打包进度">
+          <el-table-column prop="bname" label="名称"></el-table-column>
+          <el-table-column prop="downloadNum" label="下载数据量"></el-table-column>
+          <el-table-column prop="createTime" label="下载时间"></el-table-column>
+          <el-table-column prop="fileSize" label="文件大小"></el-table-column>
+          <el-table-column prop="speedOfProgress" label="打包进度">
             <template slot-scope="scope">
               <div class="gress">
                 <div class="gressPercentage">
-                  <el-progress :percentage="scope.row.percentage" :show-text="false"
+                  <el-progress :percentage="scope.row.speedOfProgress"
                                :color="customColorMethod"></el-progress>
                 </div>
-                <div>{{scope.row.popularity}}</div>
               </div>
             </template>
           </el-table-column>
           <el-table-column label="操作" width="180px">
             <template slot-scope="scope">
               <div>
-                <div v-if="scope.row.completeTime">{{scope.row.completeTime}}</div>
+                <div v-if="scope.row.speedOfProgress == '100'" class="export" @click="exportData(scope.row.bname,scope.row.bid)">导出到本地</div>
                 <div v-else>-</div>
               </div>
             </template>
@@ -104,35 +103,20 @@
         this.$router.go(-1)
       },
       // 我的标签列表数据
-      async getTagsData() {
+      async gettableList() {
         const params = {
-          eq_isShare: this.eq_isShare,
-          keyword: this.keyword,
+          like_bname: this.input2,
           page: this.page,
           size: this.size
         }
         try {
-          const data = await getTagsData(params)
+          const data = await getdownList(params)
           if (data.rows && data.rows.length > 0) {
+            data.rows.map(item=>{
+              item.speedOfProgress = JSON.parse(item.speedOfProgress)
+            })
             this.ztableShowList = data.rows
             this.totalnum = data.total
-            data.rows.map(item => {
-              if (item.popularityLevel == 0) {
-                item.popularityLevel = 0
-              }
-              if (item.popularityLevel == 1) {
-                item.popularityLevel = 25
-              }
-              if (item.popularityLevel == 2) {
-                item.popularityLevel = 50
-              }
-              if (item.popularityLevel == 3) {
-                item.popularityLevel = 75
-              }
-              if (item.popularityLevel == 4) {
-                item.popularityLevel = 100
-              }
-            })
           } else {
             this.ztableShowList = []
             this.Loading = false
@@ -146,24 +130,38 @@
       //查询
       getQuireData() {
         this.page = 0
-        this.eq_isShare = this.value
-        this.keyword = this.input2
-        this.getTagsData()
+        this.gettableList()
       },
       //点击分页跳转
       handleCurrentChange(page) {
         this.page = page - 1
-        this.getTagsData()
+        this.gettableList()
       },
       handleSizeChange (size) {
         this.size = size
-        this.getTagsData()
+        this.gettableList()
       },
       //点击分页确认
       goPage() {},
+      async exportData(name,taggingModelId){
+        try {
+          let link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = '/datatagweb/datatag/dowload/downloadQueue/dowloadToLocal/'+taggingModelId
+          link.setAttribute('download', name + '.zip')
+          document.body.appendChild(link)
+          link.click()
+          this.$message({
+            message: '导出成功',
+            type: 'success'
+          })
+        } catch (e) {
+          this.$message.error('导出失败,请重新操作！');
+        }
+      }
     },
     created() {
-      this.getTagsData()
+      this.gettableList()
     },
     computed: {},
     watch: {},
@@ -201,7 +199,10 @@
   .gressPercentage {
     width: 60%;
   }
-
+.export{
+  cursor: pointer;
+  color: #0479e5;
+}
   .iconLogo {
     font-size: 18px;
     margin-left: 24px;
