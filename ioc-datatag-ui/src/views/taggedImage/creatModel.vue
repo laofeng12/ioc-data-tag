@@ -256,14 +256,14 @@
                 </el-table-column>
               </el-table>
             </div>
+            <div slot="footer" class="dialog-footer device">
+            <div>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="getdosave">确认添加
+            </el-button>
+            </div>
+            </div>
           </div>
         </el-container>
-      </div>
-      <div slot="footer" class="dialog-footer device">
-        <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="getdosave">确认添加
-          </el-button>
-        </div>
       </div>
     </el-dialog>
   </div>
@@ -527,11 +527,10 @@
         }
         try {
           const addRes = await addPeople(param)
-          this.$message({
-            // message: addRes.message,
-            message: '添加成功',
-            type: 'success'
-          });
+          // this.$message({
+          //   message: '添加成功',
+          //   type: 'success'
+          // });
           this.getpeopleList()
         } catch (e) {
           console.log(e);
@@ -1448,5 +1447,9 @@
   .editTwo{
     margin-left: 15px;
     cursor: pointer;
+  }
+  .device{
+    text-align: center;
+    margin-top: 35px;
   }
 </style>
