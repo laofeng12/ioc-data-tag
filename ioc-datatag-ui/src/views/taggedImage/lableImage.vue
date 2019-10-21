@@ -161,7 +161,7 @@
               <el-input
                 class="controlChoose"
                 size="small"
-                placeholder="请输入内容"
+                placeholder="请输入需要导出的数据条目数量"
                 v-model="exportNum">
               </el-input>
             </el-form-item>
@@ -448,7 +448,7 @@
               console.log(e);
             }
         }else{
-          this.$message.error('请填写导出部分数据的数量');
+          this.$message.error('请输入需要导出的数据条目数量');
           this.saveLoading = false
         }
       },
