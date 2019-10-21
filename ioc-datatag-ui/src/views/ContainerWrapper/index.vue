@@ -32,7 +32,7 @@
     data () {
       return {
         dropdownItemList: [{ icon: 'notice', itemName: '公告', itemChild: [{ itemChildName: '消息', itemChildNum: 3, path: '/', link: 'https://www.baidu.com' }] }],
-        portalInfo: { logo: require('../../assets/img/logo.png'), portalTitle: '大数据服务平台' },
+        portalInfo: { logo: require('../../assets/img/logo.png'), portalName: '大数据服务平台' },
         svgArr: []
       }
     },

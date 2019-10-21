@@ -1,5 +1,5 @@
 <template>
-  <ch-login :bgData="bgData" :loading="loading" :login="login" :sliderInfos="sliderInfos" :autoplay="10000" :loginInfo="loginInfo"></ch-login>
+  <ch-login :bgData="bgData" :loading="loading" :login="login" :sliderInfos="sliderInfos" :autoplay="10000" :portalInfo="portalInfo"></ch-login>
 </template>
 
 <script>
@@ -19,7 +19,7 @@
           { title: '可视化组件', describe: '自己的展示自己定' }
         ],
         loading: false,
-        loginInfo: { logo: require('../../assets/img/logo.png') }
+        portalInfo: { logo: require('@/assets/img/logo.png'), portalName: '大数据服务平台' }
       }
     },
     methods: {
