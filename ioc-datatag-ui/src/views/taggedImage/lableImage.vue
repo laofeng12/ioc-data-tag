@@ -320,7 +320,7 @@
           value: '1',
           label: '导出部分数据'
         }],
-        exportValue: '',
+        exportValue: '0',
         exportNum: '',
         value: '',
         ztableShowList: [],
@@ -431,7 +431,9 @@
       },
       async handleExport(){
         this.saveLoading = true
-        if(this.exportValue == 1 && this.exportNum != '' || this.exportValue == 0){
+        console.log('9999',this.exportValue);
+        console.log('==',this.exportNum);
+        if((this.exportValue == 1 && this.exportNum != '') || this.exportValue == 0){
             const params = {
               number:this.exportNum,
               taggingModelId:this.downloadId
