@@ -161,7 +161,7 @@
               <el-input
                 class="controlChoose"
                 size="small"
-                placeholder="请输入内容"
+                placeholder="请输入需要导出的数据条目数量"
                 v-model="exportNum">
               </el-input>
             </el-form-item>
@@ -320,7 +320,7 @@
           value: '1',
           label: '导出部分数据'
         }],
-        exportValue: '',
+        exportValue: '0',
         exportNum: '',
         value: '',
         ztableShowList: [],
@@ -431,7 +431,7 @@
       },
       async handleExport(){
         this.saveLoading = true
-        if(this.exportValue == 1 && this.exportNum != '' || this.exportValue == 0){
+        if((this.exportValue == 1 && this.exportNum != '') || this.exportValue == 0){
             const params = {
               number:this.exportNum,
               taggingModelId:this.downloadId
@@ -448,7 +448,7 @@
               console.log(e);
             }
         }else{
-          this.$message.error('请填写导出部分数据的数量');
+          this.$message.error('请输入需要导出的数据条目数量');
           this.saveLoading = false
         }
       },
