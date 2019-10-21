@@ -109,3 +109,7 @@ p {
 .treeCode .el-tree-node__expand-icon.is-leaf{
   color: transparent !important;
 }
+
+.sel .el-input__inner{
+  cursor: pointer;
+}

@@ -60,7 +60,7 @@
             <template slot-scope="{row,$index}" class="caozuo">
               <el-tooltip class="item" effect="dark" content="设置" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-document iconLogo" @click="handleShare(row,$index)"></i>
+                    <i class="el-icon-setting iconLogo" @click="handleShare(row,$index)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">

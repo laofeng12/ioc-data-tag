@@ -33,7 +33,7 @@
               <div class="gress">
                 <div class="gressPercentage">
                   <el-progress :percentage="scope.row.speedOfProgress"
-                               :color="customColorMethod"></el-progress>
+                               :color="customColorMethod" :format="format"></el-progress>
                 </div>
               </div>
             </template>
@@ -99,6 +99,9 @@
           return '#67c23a';
         }
       },
+      format(percentage) {
+        return percentage === 100 ? '完成' : `${percentage}%`;
+      },
       goback(){
         this.$router.go(-1)
       },
@@ -114,6 +117,9 @@
           if (data.rows && data.rows.length > 0) {
             data.rows.map(item=>{
               item.speedOfProgress = JSON.parse(item.speedOfProgress)
+              // if(item.speedOfProgress == 100){
+              //   item.speedOfProgress = '完成'
+              // }
             })
             this.ztableShowList = data.rows
             this.totalnum = data.total

@@ -534,7 +534,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		long totalCount = 0;//更新总数
 		long successCount = 0;//成功数
 		long totalPage = 0;
-		int size = 20000;
+		int size = 5000;
 		try	{
 			List<Object> data = new LinkedList<>();
 			Pageable pageable = PageRequest.of(0,size);
