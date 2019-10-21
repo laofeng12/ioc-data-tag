@@ -1,6 +1,6 @@
 <template>
   <div class="table-box">
-    <div class="showCon">
+    <div class="showCon" @click="hidePanel">
       <el-table border class="my-table" :data="tableData" style="width: 100%;" :height="tableHeight">
         <el-table-column v-for="(item,index) in theadData" :prop="item.sourceCol" :key="index" min-width="300">
           <template slot="header" slot-scope="scope">
@@ -48,31 +48,37 @@
             <el-col :span="7.5">
               <div class="allTree">
                 <div class="sel">
-                  <el-input size="small"
-                            readonly="readonly"
-                            placeholder="请选择标签层"
-                            v-model="ruleForm.tagLev">
-                    <i slot="suffix" class="el-input__icon el-icon-arrow-down" @click="showTree()"></i>
-                  </el-input>
+                  <div @click="showTree()">
+                    <el-input size="small"
+                              readonly="readonly"
+                              placeholder="请选择标签层"
+                              id="handle"
+                              v-model="ruleForm.tagLev">
+                      <i slot="suffix" class="el-input__icon el-icon-arrow-down"></i>
+                    </el-input>
+                  </div>
                   <div class="treeBoder" v-show="showLevTree">
-                    <el-input size="small" v-model="ruleForm.tag" placeholder="请输入关键字查询" style="margin-bottom:10px;"/>
-                    <el-tree
-                      :data="treeLevdata"
-                      :props="defaultProps"
-                      node-key="id"
-                      ref="treeForm"
-                      show-checkbox
-                      default-expand-all
-                      check-strictly
-                      :filter-node-method="filterNode"
-                      @check-change="handleClick"
-                      @node-click="nodeClick">
+                    <div>
+                      <el-input size="small" v-model="ruleForm.tag" placeholder="请输入关键字查询" style="margin-bottom:10px;"/>
+                      <el-tree
+                        :data="treeLevdata"
+                        :props="defaultProps"
+                        node-key="id"
+                        ref="treeForm"
+                        show-checkbox
+                        default-expand-all
+                        check-strictly
+                        :filter-node-method="filterNode"
+                        @check-change="handleClick"
+                        @node-click="nodeClick">
                       <span class="slot-t-node span-ellipsis" slot-scope="{ node, data }">
                       <i :class="{ 'fa fa-folder': !node.expanded, 'fa fa-folder-open':node.expanded}"
                          style="color: #fcd568;"/>
                         <span :title="data.tagName">{{ data.tagName }}</span>
                       </span>
-                    </el-tree>
+                      </el-tree>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -769,6 +775,14 @@
         //console.log('选中要打标的项',item)
         this.isHandle = item.isHandle
         this.conditionSetting = item.conditionSetting
+      },
+      hidePanel (event) {
+        let sp2 = document.getElementById("handle");
+        if (sp2) {
+          if (!sp2.contains(event.target)) {
+            this.showLevTree = false;
+          }
+        }
       }
     },
     computed: {
