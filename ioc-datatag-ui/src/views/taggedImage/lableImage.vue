@@ -80,7 +80,7 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="导出数据" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-download iconLogo" @click="download(scope.row.taggingModelId)"></i>
+                    <i class="el-icon-download iconLogo" @click="download(scope.row.taggingModelId,scope.row.runResult)"></i>
                 </span>
               </el-tooltip>
 
@@ -244,6 +244,7 @@
     name: "tagManage",
     data() {
       return {
+        loadNum:'',
         tt:'',
         lockReconnect:false,
         webUserId: '',
@@ -394,9 +395,14 @@
         this.controlDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      download(id) {
-        this.downloadDialog = true
-        this.downloadId = id
+      download(id,num) {
+        if(num === '0/0'){
+          this.$message.error('调度成功数量为0，无法导出！');
+          return
+        }else {
+          this.downloadDialog = true
+          this.downloadId = id
+        }
       },
       closeDownload() {
         this.downloadDialog = false
@@ -431,7 +437,7 @@
       },
       async handleExport(){
         this.saveLoading = true
-        if((this.exportValue == 1 && this.exportNum != '') || this.exportValue == 0){
+          if((this.exportValue == 1 && this.exportNum != '') || this.exportValue == 0){
             const params = {
               number:this.exportNum,
               taggingModelId:this.downloadId
@@ -447,10 +453,10 @@
             }catch (e) {
               console.log(e);
             }
-        }else{
-          this.$message.error('请输入需要导出的数据条目数量');
-          this.saveLoading = false
-        }
+          }else{
+            this.$message.error('请输入需要导出的数据条目数量');
+            this.saveLoading = false
+          }
       },
       // 定时器
       setTimer() {
