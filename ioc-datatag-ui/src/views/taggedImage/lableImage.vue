@@ -431,8 +431,6 @@
       },
       async handleExport(){
         this.saveLoading = true
-        console.log('9999',this.exportValue);
-        console.log('==',this.exportNum);
         if((this.exportValue == 1 && this.exportNum != '') || this.exportValue == 0){
             const params = {
               number:this.exportNum,
