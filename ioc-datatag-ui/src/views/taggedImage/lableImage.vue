@@ -623,8 +623,7 @@
           const handler = (evt, ws) => {
             //evt 是 websockett数据
             var obj = JSON.parse(evt.data)
-            if(obj.datas != "已收到来自：392846190550001,的信息"){
-              //var obj2 = JSON.parse(obj.datas)
+            if(obj.datas != "-1"){
               this.datamodelList()
               wssCenter.close();  //断开连接
             }
