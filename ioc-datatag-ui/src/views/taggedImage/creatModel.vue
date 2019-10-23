@@ -1102,7 +1102,7 @@
   .head {
     font-size: 14px;
     float: right;
-    margin-right: 8px;
+    margin-right: 11px;
   }
 
   .contentA {
@@ -1339,7 +1339,7 @@
   .head {
     font-size: 14px;
     float: right;
-    margin-right: 8px;
+    margin-right: 11px;
   }
 
   .contentA, .contentB {
