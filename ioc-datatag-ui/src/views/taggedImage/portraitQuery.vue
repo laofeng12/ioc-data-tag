@@ -78,7 +78,7 @@
     display: flex;
     transform: translate(-50%,-50%);
     position: absolute;
-    top: 40%;
+    top: 30%;
     left: 50%;
   }
 </style>

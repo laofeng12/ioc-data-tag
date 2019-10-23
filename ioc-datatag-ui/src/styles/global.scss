@@ -113,3 +113,22 @@ p {
 .sel .el-input__inner{
   cursor: pointer;
 }
+
+// 暂时为了迁就菜单组件问题使用
+.el-table{
+  padding: 0px !important;
+  margin-top: 20px !important;
+  padding-bottom: 16px !important;
+}
+// 暂时为了标签树的样式
+.temporary .el-button{
+  padding: 0px !important;
+ }
+
+// 暂时
+.peopleName{
+  width: 165px !important;
+}
+.components .el-button{
+  padding: 0px !important;
+}

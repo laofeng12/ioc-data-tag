@@ -1,7 +1,7 @@
 <template>
   <div>
   <div class="treeContainer">
-    <div class="treelabel treeBel">
+    <div class="treelabel treeBel temporary">
       <div class="labelTitle">
         <div class="labelName"><i class="el-icon-folder iconLabel"></i>{{groupName}}</div>
         <div v-show="topaddLabel"><i class="el-icon-plus add" @click="openOne"></i></div>
