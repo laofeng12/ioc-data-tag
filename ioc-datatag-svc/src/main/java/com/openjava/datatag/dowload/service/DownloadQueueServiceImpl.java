@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,9 @@ public class DownloadQueueServiceImpl implements DownloadQueueService {
 	
 	public Page<DownloadQueue> query(DownloadQueueDBParam params, Pageable pageable){
 //		params.setTableAlias("t");
+		if (StringUtils.isNotBlank(params.getLike_bname())){
+			params.setLike_bname("%"+params.getLike_bname()+"%");
+		}
 		pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
 				Sort.by(Sort.Order.desc("createTime")));
 		Page<DownloadQueue> pageresult = downloadQueueRepository.query(params, pageable);
