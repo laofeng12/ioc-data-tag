@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "ch-vue-portal-layout": "^0.0.59",
+    "ch-vue-portal-layout": "^0.0.64",
     "echarts": "^4.2.1",
     "echarts-wordcloud": "^1.1.3",
     "element-ui": "^2.8.2",
