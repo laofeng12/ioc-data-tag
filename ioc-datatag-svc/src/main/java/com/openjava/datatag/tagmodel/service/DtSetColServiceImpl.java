@@ -161,8 +161,9 @@ public class DtSetColServiceImpl implements DtSetColService {
 			//记录以前的模样
 			oldColsContent = JSONObject.toJSONString(getByTaggingModelId(taggingModel.getTaggingModelId()));
 			oldtagModelContent = JSONObject.toJSONString(taggingModel);
-
+			String modelName = taggingModel.getModelName();
 			MyBeanUtils.copyPropertiesNotNull(taggingModel,body);
+			taggingModel.setModelName(modelName);
 			EntityClassUtil.dealModifyInfo(taggingModel,userInfo);
 			taggingModel = dtTaggingModelService.doSave(taggingModel);
 
