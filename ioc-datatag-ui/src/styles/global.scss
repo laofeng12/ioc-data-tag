@@ -115,6 +115,7 @@ p {
 }
 
 // 暂时为了迁就菜单组件问题使用
+// 开始
 .el-table{
   padding: 0px !important;
   margin-top: 20px !important;
@@ -132,3 +133,8 @@ p {
 .components .el-button{
   padding: 0px !important;
 }
+// 暂时字段设置
+.formClass .el-form{
+  padding: 0px !important;
+}
+// 结束
