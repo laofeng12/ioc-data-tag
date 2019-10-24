@@ -70,7 +70,7 @@
           </el-aside>
           <div class="right" style="width: 100%;">
             <h3>已择字段</h3>
-            <div>
+            <div class="formClass">
               <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
                 <el-form-item label="选择主键" prop="pkey">
                   <el-select v-model="ruleForm.pkey" filterable placeholder="请选择主键" size="small" @change="changeSel">
