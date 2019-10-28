@@ -74,6 +74,10 @@ public class DowloadJob {
                 totalCount = Long.valueOf(count[1][0]);//总记录数
                 if (number!=null && number<=totalCount) {
                     totalCount = number;
+                    if (number <=pageSize){
+                        pageSize = number.intValue();
+                        pageable = PageRequest.of(0, number.intValue());
+                    }
                 }
                 List<Object> data = new ArrayList<>();
                 String alias = "t";//别名
