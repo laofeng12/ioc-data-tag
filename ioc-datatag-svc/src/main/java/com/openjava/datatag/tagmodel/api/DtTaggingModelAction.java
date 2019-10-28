@@ -400,7 +400,7 @@ public class DtTaggingModelAction {
 		queue.setCreateUser(SsoContext.getUserId());
 		queue.setFileSize(null);
 		queue.setDownloadUrl(null);
-		queue.setDownloadNum(null);
+		queue.setDownloadNum(number);
 		downloadQueueService.doSave(queue);
 		return new SuccessMessage("已开始导出");
 	}
