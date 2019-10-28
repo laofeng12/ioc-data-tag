@@ -394,52 +394,107 @@
       },
       //对字段进行选择确认,type=0,新建模型，type=1编辑模型
       async handleNodeClick(data) {
-        console.log(data)
         this.myData = []
         this.editData = []
         colsOptions = []
-        this.colSetDialog = true
+        // this.colSetDialog = true
         let colsData = {}
         let allcolsData = {}
         if (this.routerName === 'creatModel' && data.isTable===true) {
+          this.colSetDialog = true
           //新建模型字段确认获取数据
           colsData = await getResourceInfoData(data.resourceId, data.type, 1)  // 有权限的字段
           allcolsData = await getResourceInfoData(data.resourceId, data.type, 0)  // 全部的字段
+          // 全部字段
+          this.allcolumnData = allcolsData.data.column
+          // 有权限字段
+          this.columnData = colsData.data.column
+          this.resourceName = colsData.data.resourceName
+          this.resourceId = colsData.data.resourceId
+          this.resourceType = colsData.data.type   // 0数据湖 1自建目录
+          // this.tableData = []
+          this.columnData.forEach((item, index) => {
+            colsOptions.push(item.definition)
+          })
+          this.cols = colsOptions
+          // 全部的字段权限显示
+          this.allcolumnData.forEach((item, index) => {
+            if (item.viewable == false) {
+              this.powerName = '无权限'
+              return
+            } else if (item.decryption == false) {
+              this.powerName = '加密'
+              return
+            } else if (item.sensitived == false) {
+              this.powerName = '脱敏'
+              return
+            } else {
+              this.powerName = ''
+            }
+          })
         }
         if (this.routerName === 'editModel') {
+          this.colSetDialog = true
             //编辑模型字段确认获取数据
             const resourceId = this.modelData.resourceId
             const type = this.modelData.resourceType
             colsData = await getResourceInfoData(resourceId, type, 1)  // 有权限的字段
             allcolsData = await getResourceInfoData(resourceId, type, 0)  // 全部的字段
+          // 全部字段
+          this.allcolumnData = allcolsData.data.column
+          // 有权限字段
+          this.columnData = colsData.data.column
+          this.resourceName = colsData.data.resourceName
+          this.resourceId = colsData.data.resourceId
+          this.resourceType = colsData.data.type   // 0数据湖 1自建目录
+          // this.tableData = []
+          this.columnData.forEach((item, index) => {
+            colsOptions.push(item.definition)
+          })
+          this.cols = colsOptions
+          // 全部的字段权限显示
+          this.allcolumnData.forEach((item, index) => {
+            if (item.viewable == false) {
+              this.powerName = '无权限'
+              return
+            } else if (item.decryption == false) {
+              this.powerName = '加密'
+              return
+            } else if (item.sensitived == false) {
+              this.powerName = '脱敏'
+              return
+            } else {
+              this.powerName = ''
+            }
+          })
         }
-        // 全部字段
-        this.allcolumnData = allcolsData.data.column
-        // 有权限字段
-        this.columnData = colsData.data.column
-        this.resourceName = colsData.data.resourceName
-        this.resourceId = colsData.data.resourceId
-        this.resourceType = colsData.data.type   // 0数据湖 1自建目录
-        // this.tableData = []
-        this.columnData.forEach((item, index) => {
-          colsOptions.push(item.definition)
-        })
-        this.cols = colsOptions
-        // 全部的字段权限显示
-        this.allcolumnData.forEach((item, index) => {
-          if (item.viewable == false) {
-            this.powerName = '无权限'
-            return
-          } else if (item.decryption == false) {
-            this.powerName = '加密'
-            return
-          } else if (item.sensitived == false) {
-            this.powerName = '脱敏'
-            return
-          } else {
-            this.powerName = ''
-          }
-        })
+        // // 全部字段
+        // this.allcolumnData = allcolsData.data.column
+        // // 有权限字段
+        // this.columnData = colsData.data.column
+        // this.resourceName = colsData.data.resourceName
+        // this.resourceId = colsData.data.resourceId
+        // this.resourceType = colsData.data.type   // 0数据湖 1自建目录
+        // // this.tableData = []
+        // this.columnData.forEach((item, index) => {
+        //   colsOptions.push(item.definition)
+        // })
+        // this.cols = colsOptions
+        // // 全部的字段权限显示
+        // this.allcolumnData.forEach((item, index) => {
+        //   if (item.viewable == false) {
+        //     this.powerName = '无权限'
+        //     return
+        //   } else if (item.decryption == false) {
+        //     this.powerName = '加密'
+        //     return
+        //   } else if (item.sensitived == false) {
+        //     this.powerName = '脱敏'
+        //     return
+        //   } else {
+        //     this.powerName = ''
+        //   }
+        // })
         if (this.routerName === 'editModel') {
           //获取主键值
           this.ruleForm.pkey = this.modelData.pkey
@@ -513,7 +568,6 @@
                 Object.assign(item, {leaf: true})
               })
             }
-            console.log('resData',resData);
             // 状态
             if (resData.openScope == '1') {
               this.openScope = '全部对外公开'
