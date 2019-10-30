@@ -70,8 +70,6 @@
             len += 0.5;
           }
         }
-          console.log('len',len)
-          console.log('str',str)
           if(len < 8 ){
             const numOne = {
               "name": str,

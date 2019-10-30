@@ -24,7 +24,7 @@
       <!--<el-button size="small" @click="goback">返回</el-button>-->
     </div>
     <div class="queryCard" v-if="contentArr != ''">
-      <div class="cart_list" id="boxFixed" v-loading="loadings">
+      <div class="cart_list">
         <el-row :gutter="24">
           <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" v-for="(item, index) in contentArr" :key="index">
             <el-card>
