@@ -62,7 +62,7 @@ export default new Router({
           path: '/tagPanel',
           name: 'tagPanel',
           meta: {title: '标签仪表盘'},
-          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tagPanel.vue')
+          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/tagPanel备份.vue')
         }, {
           path: '/tagManage',
           name: 'tagManage',

@@ -3,16 +3,20 @@
     <div>
       <!--<div class="queryTitle">画像查询</div>-->
       <div class="queryIt">
-        <el-input
-          class="zxinp moduleOne"
-          size="small"
-          clearable
-          placeholder="请输入需要查询的画像主键"
-          prefix-icon="el-icon-search"
-          @keyup.enter.native="queryDetail"
-          v-model="input2">
-        </el-input>
-        <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">画像查询</el-button>
+        <div class="name">画像查询</div>
+        <div class="queryInp">
+          <el-input
+            class="zxinp moduleOne"
+            size="small"
+            clearable
+            placeholder="请输入需要查询的画像主键"
+            prefix-icon="el-icon-search"
+            @keyup.enter.native="queryDetail"
+            v-model="input2">
+          </el-input>
+          <el-button class="zxlistBtn" size="small" type="primary" @click="queryDetail">查询</el-button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -54,13 +58,9 @@
 
 <style scoped>
   .zxinp {
-    width: 500px;
+    /*width: 500px;*/
+    width: 482px;
   }
-
-  .zxlistBtn {
-    margin-left: 10px;
-  }
-
   .queryTitle {
     font-size: 24px;
     font-weight: 700;
@@ -68,17 +68,17 @@
     text-align: center;
     margin-top: 194px;
   }
-
-  .queryIt {
-    /*display: flex;*/
-    /*justify-content: center;*/
-    /*margin-top: 25px;*/
+  .name{
+    font-size: 36px;
+    color: #262626;
+    letter-spacing: 30px;
+    font-family: PingFangSC-Medium;
   }
-  .queryIt{
-    display: flex;
-    transform: translate(-50%,-50%);
-    position: absolute;
-    top: 30%;
-    left: 50%;
+  .queryIt {
+    text-align: center;
+    margin-top: 200px;
+  }
+  .queryInp{
+    margin-top: 24px;
   }
 </style>

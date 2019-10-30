@@ -157,7 +157,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="导出数据数量:" prop="exportNum" class="controlChoose">
+            <el-form-item v-show="exportValue === '1'" label="导出数据数量:" prop="exportNum" class="controlChoose">
               <el-input
                 class="controlChoose"
                 size="small"
