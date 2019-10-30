@@ -124,8 +124,6 @@
           </div>
         </div>
         <div v-if="routerName==='editModel'">
-          <!--<EditTable :theadData="headColList" :tableData="modelTableData" :modelId="taggingModelId"-->
-          <!--@commit2="getModelDatalist"></EditTable>-->
           <EditTable ref="ztable" :tableData="modelTableData" :modelId="taggingModelId"
                      @commit2="getModelDatalist"></EditTable>
         </div>
@@ -199,7 +197,7 @@
       </div>
     </el-dialog>
     <!--协作添加-->
-    <el-dialog class="creat addCreat" title="添加成员" :visible.sync="addSetDialog" width="1100px" center
+    <el-dialog class="creat addCreat" title="添加成员333" :visible.sync="addSetDialog" width="1100px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close">
       <div class="col-set-box">
@@ -225,7 +223,7 @@
                 <div class="peopleName" :title="item.cooUserName" @click="markingPeople(item.cooUser,item.id,index)">
                   {{item.cooUserName}}
                 </div>
-                <div><i class="el-icon-delete addIcon" @click="deleteList(item.id)"></i></div>
+                <div><i class="el-icon-delete addIcon" @click="deleteList(item.id,index)"></i></div>
               </div>
             </div>
           </el-aside>
@@ -292,6 +290,9 @@
     name: 'creatModel',
     data() {
       return {
+        sureIt:0,
+        userIdarr:[],
+        groupId:[],
         selectD:0,
         openScope:'',
         showBtn:true,
@@ -330,7 +331,7 @@
         modelTableData: [],
         options3: [],
         selectVal: '',
-        changeRed: -1,
+        changeRed: -3,
         startDisable: true,
         helpId: '',  // 协作用户id
         cooId: '',
@@ -437,8 +438,34 @@
         }
 
       },
-      close() {
+      async close() {
         this.addSetDialog = false
+        // 关闭操作去掉已选用户
+        this.groupId = []
+        this.tableData.map(item => item.useTagGroup).every(async _item =>{
+          if(_item != null){
+            this.groupId.push(_item)
+          }
+      })
+        if(this.groupId == ''){
+          let obj = ''
+          this.showPeoplelist.map(item =>{
+            this.userIdarr.push(item.id)
+            obj += item.id + ','
+          })
+          if (obj.length > 0) {
+            obj = obj.substr(0,obj.length - 1);
+          }
+          try {
+            const res = await deletePeople({
+              ids : obj
+            })
+            this.getpeopleList()
+            this.markingTable()
+          } catch (e) {
+            console.log(e);
+          }
+        }
       },
       // 获取模型数据
       async getModelColsList(modelId, page, size, type) {
@@ -537,7 +564,7 @@
         }
       },
       // 删除
-      async deleteList(id) {
+      async deleteList(id,index) {
         try {
           const res = await deletePeople({
             id: id,
@@ -547,7 +574,11 @@
             message: res.message,
             type: 'success'
           });
+          if(this.changeRed === index){
+            this.changeRed = -3
+          }
           this.getpeopleList()
+          this.markingTable()
         } catch (e) {
           console.log(e);
         }
@@ -728,6 +759,7 @@
           });
           this.saveLoading = false
           this.addSetDialog = false
+          this.sureIt = 1
         } catch (e) {
           this.saveLoading = false
         }
