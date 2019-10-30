@@ -68,6 +68,7 @@
     name: "download",
     data() {
       return {
+        timer:null,
         labelId: 0,
         isShare: false,
         labelName: '',
@@ -117,9 +118,6 @@
           if (data.rows && data.rows.length > 0) {
             data.rows.map(item=>{
               item.speedOfProgress = JSON.parse(item.speedOfProgress)
-              // if(item.speedOfProgress == 100){
-              //   item.speedOfProgress = '完成'
-              // }
             })
             this.ztableShowList = data.rows
             this.totalnum = data.total
@@ -164,10 +162,19 @@
         } catch (e) {
           this.$message.error('导出失败,请重新操作！');
         }
-      }
+      },
+      Timer() {
+        this.timer = setInterval(() => {
+          this.gettableList()
+        }, 8000)
+      },
+    },
+    destroyed(){
+      clearInterval(this.timer)
     },
     created() {
       this.gettableList()
+      this.Timer()
     },
     computed: {},
     watch: {},

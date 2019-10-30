@@ -450,6 +450,7 @@
               });
               this.saveLoading = false
               this.downloadDialog = false
+              this.$router.push('download')
             }catch (e) {
               console.log(e);
             }

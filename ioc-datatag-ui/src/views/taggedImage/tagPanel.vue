@@ -1,90 +1,99 @@
 <template>
-  <div class="app-container">
+  <!--<div class="app-container">-->
+  <div class="">
     <div class="content">
       <div class="dataChange">
         <div class="changeOne">
           <div class="distance">
             <div class="title">使用数据集</div>
-            <div>
-              <!--<span><i class="el-icon-plus iconSize"></i></span>-->
-              <span class="num">{{growth.growthOne}}</span>
-              <!--<span class="percentage">%</span>-->
-            </div>
             <div class="name">上个月的统计数据</div>
+          </div>
+          <div>
+            <span class="num numA">{{growth.growthOne}}</span>
           </div>
         </div>
         <div class="changeTwo">
           <div class="distance">
             <div class="title">使用标签/使用数据集</div>
-            <div>
-              <span class="num">{{growth.growthTwo}}</span>
-            </div>
             <div class="name">上个月的统计数据</div>
+          </div>
+          <div>
+            <span class="num numB">{{growth.growthTwo}}</span>
           </div>
         </div>
         <div class="changeThree">
           <div class="distance">
             <div class="title">新增唯一标签</div>
-            <div>
-              <span class="num">{{growth.growthThree}}</span>
-            </div>
             <div class="name">上个月的统计数据</div>
+          </div>
+          <div>
+            <span class="num numC">{{growth.growthThree}}</span>
           </div>
         </div>
       </div>
       <div class="histogram">
-        <div class="tag">
+        <div class="histogramTag">
           <div class="labelchangeTitle">标签变化</div>
-          <div class="labelchangeOne">
-            <span>全部标签：</span>
-            <span>{{num.numOne}}</span>
-          </div>
-          <div class="labelchangeTwo">
-            <span>过去一年：</span>
-            <span>{{num.numThree}}</span>
-          </div>
-          <div class="labelchangeThree">
-            <span>过去一个月：</span>
-            <span>{{num.numTwo}}</span>
+          <div class="labelTag">
+            <div class="labelchangeOne clearfix">
+              <div class="labelName">全部标签</div>
+              <div class="labelNum">{{num.numOne}}</div>
+            </div>
+            <div class="labelchangeTwo clearfix">
+              <div class="labelName">过去一年</div>
+              <div class="labelNum">{{num.numThree}}</div>
+            </div>
+            <div class="labelchangeThree clearfix">
+              <div class="labelName">过去一个月</div>
+              <div class="labelNum">{{num.numTwo}}</div>
+            </div>
           </div>
         </div>
-        <div class=" barGraph">
+        <div class="barGraph">
           <chart></chart>
         </div>
       </div>
       <div class="label">
-        <div class="tag">
-          <div class="labelchangeTitle">热门标签</div>
-        </div>
-        <div class=" barGraph">
-          <div class="barGraphOne">
-            <div class="titleName">今天</div>
-            <div class="contentBtn">
-              <div class="contentSpacing" v-for="(item,index) in tablelistOne" :key="index"><span class="titleContent">{{item}}</span></div>
+        <div class="labelchangeTitle">热门标签</div>
+        <div class="hotLabel">
+            <div class="hotOne hotOneleft">
+              <div class="barGraphOne">
+                <div class="titleName">今天</div>
+                <div class="modelLabel">
+                  <div class="contentSpacing" v-for="(item,index) in tablelistOne" :key="index"><span class="titleContent">{{item}}</span></div>
+                </div>
+              </div>
+            </div>
+          <div class="hotOne">
+            <div class="barGraphOne">
+              <div class="titleName">昨天</div>
+              <div class="modelLabel">
+                <div class="contentSpacing" v-for="(item,index) in tablelistTwo" :key="index"><span class="titleContent">{{item}}</span></div>
+              </div>
             </div>
           </div>
-          <div class="barGraphOne">
-            <div class="titleName">昨天</div>
-            <div class="contentBtn">
-              <div class="contentSpacing" v-for="(item,index) in tablelistTwo" :key="index"><span class="titleContent">{{item}}</span></div>
+          <div class="hotOne">
+            <div class="barGraphOne">
+              <div class="titleName">最近一个星期</div>
+              <div class="modelLabel">
+                <div class="contentSpacing" v-for="(item,index) in tablelistThree" :key="index"><span class="titleContent">{{item}}</span></div>
+              </div>
             </div>
           </div>
-          <div class="barGraphOne">
-            <div class="titleName">最近一个星期</div>
-            <div class="contentBtn">
-              <div class="contentSpacing" v-for="(item,index) in tablelistThree" :key="index"><span class="titleContent">{{item}}</span></div>
+          <div class="hotOne">
+            <div class="barGraphOne">
+              <div class="titleName">最近一个月</div>
+              <div class="modelLabel">
+                <div class="contentSpacing" v-for="(item,index) in tablelistFouth" :key="index"><span class="titleContent">{{item}}</span></div>
+              </div>
             </div>
           </div>
-          <div class="barGraphOne">
-            <div class="titleName">最近一个月</div>
-            <div class="contentBtn">
-              <div class="contentSpacing" v-for="(item,index) in tablelistFouth" :key="index"><span class="titleContent">{{item}}</span></div>
-            </div>
-          </div>
-          <div class="barGraphOne">
-            <div class="titleName">最近一年</div>
-            <div class="contentBtn">
-              <div class="contentSpacing" v-for="(item,index) in tablelistFifth" :key="index"><span class="titleContent">{{item}}</span></div>
+          <div class="hotOne hotOneright">
+            <div class="barGraphOne">
+              <div class="titleName">最近一年</div>
+              <div class="modelLabel">
+                <div class="contentSpacing" v-for="(item,index) in tablelistFifth" :key="index"><span class="titleContent">{{item}}</span></div>
+              </div>
             </div>
           </div>
         </div>
@@ -165,112 +174,154 @@
   .content {
     width: 100%;
     height: 100%;
-    padding-left: 40px;
-    padding-right: 40px;
     text-align: center;
   }
 
   .dataChange {
     display: flex;
     justify-content: space-between;
+    background-color: #fff;
+    padding: 24px;
   }
 
   .changeOne, .changeTwo, .changeThree {
     display: flex;
     align-items: center;
-    width: 300px;
-    height: 160px;
-  }
-
-  .changeOne {
-    background-color: rgba(255, 204, 51, 1);
-  }
-
-  .changeTwo {
-    background-color: rgba(102, 153, 255, 1);
-  }
-
-  .changeThree {
-    background-color: rgba(43, 192, 72, 1);
+    width: 100%;
+    height: 120px;
+    justify-content: center;
+    background: #FFFFFF;
+    border: 1px solid #D9D9D9;
   }
 
   .title {
     font-size: 16px;
     color: #ffffff;
+    padding-bottom: 8px;
+    font-family: PingFangSC-Regular;
+    color: #262626;
   }
 
-  .iconSize, .name {
-    font-size: 16px;
-    color: #ffffff;
+  .name {
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #999999;
   }
 
-  .num, .percentage {
+  .num {
     font-size: 26px;
     color: #ffffff;
+    margin-left: 24px;
+  }
+  .numA{
+    color: #FFCC33;
+  }
+  .numB{
+    color: #6699FD;
+  }
+  .numC{
+    color: #2CC048;
   }
 
-  .distance {
-    line-height: 40px;
-    width: 300px;
+  .histogram{
+    display: flex;
   }
-
+  .label{
+    text-align: left;
+  }
   .histogram, .label {
     width: 100%;
-    display: flex;
-    margin-top: 50px;
+    margin-top: 16px;
+    background-color: #fff;
+    padding: 24px;
   }
+.histogramTag{
+  font-family: PingFangSC-Medium;
+  font-size: 16px;
+  color: #262626;
+  text-align: left;
+}
 
-  .tag {
-    width: 15%;
-    text-align: left;
-    font-size: 14px;
-    color: #a7a7a7;
-  }
+.labelTag{
+  width: 240px;
+  height: 208px;
+  background: #F6F8FA;
+  padding: 24px;
+  margin-top: 16px;
+}
 
+.hotLabel{
+  width: 100%;
+  margin-top: 16px;
+  display: flex;
+}
+.hotOneleft{
+  margin-left: 0px !important;
+}
+.hotOneright{
+  margin-right: 0px !important;
+}
+.hotOne{
+  width: 345px;
+  min-height: 208px;
+  background: #F6F8FA;
+  margin: 0px 12px;
+}
   .barGraph {
-    width: 85%;
-    display: flex;
+    width: 100%;
   }
 
   .labelchangeTitle {
+    font-family: PingFangSC-Medium;
     font-size: 16px;
-    color: #333333;
+    color: #262626;
+    margin-left: -8px;
+    margin-top: -8px;
   }
 
-  .labelchangeTitle, .labelchangeOne, .labelchangeTwo, .labelchangeThree {
-    margin-top: 8px;
+  .labelName{
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #303133;
+    margin-bottom: 20px;
+    float: left;
   }
-
-  .barGraphOne {
-    width: 20%;
+  .labelNum{
+    float: right;
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #0486FE;
   }
 
   .titleName {
+    font-family: PingFangSC-Regular;
     font-size: 14px;
-    color: #a7a7a7;
-    margin-top: 5px;
+    color: #303133;
+    text-align: center;
+    padding-top: 14px;
+    margin-bottom: 40px;
   }
 
   .titleContent {
-    text-align: center;
+    font-family: PingFangSC-Regular;
     font-size: 12px;
-    background-color: rgba(0, 204, 204, 1);
-    color: #fff;
-    padding: 4px 6px;
-    border-radius: 4px;
+    color: #0486FE;
+    background: #F4FAFF;
+    border: 1px solid #0486FE;
+    padding: 4px 14px;
   }
-
+  .modelLabel{
+    padding: 0px 14px;
+  }
   .contentSpacing {
-    margin-top: 8px;
+    margin-bottom: 12px;
+    display: inline-block;
+    margin-left: 16px;
+  }
+  .clearfix:after{
+    content: '';
+    display: block;
+    clear: both;
   }
 
-  .contentBtn {
-    padding-bottom: 10px;
-  }
-
-  @media (max-width:1300px) {
-    .changeOne, .changeTwo, .changeThree {
-      width: 250px;
-    }
-  }
 </style>
