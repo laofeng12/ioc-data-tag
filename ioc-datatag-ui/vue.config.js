@@ -12,21 +12,21 @@ module.exports = {
   devServer: {
     proxy: {
       '/admin': {
-        target: 'http://183.6.55.26:31075', // 公司测试环境
+        target: 'http://219.135.182.2:31075', // 公司测试环境
         changeOrigin: true
       },
       '/datatagweb/datatag': {
-        target: 'http://183.6.55.26:30003', // test
+        target: 'http://219.135.182.2:30003', // test
         changeOrigin: true,
         pathRewrite: { '^/datatagweb/datatag/datatag': '/datatag/datatag' }
       },
       '/datatagweb/pds': {
-        target: 'http://183.6.55.26:31013', // 公司测试环境
+        target: 'http://219.135.182.2:31013', // 公司测试环境
         pathRewrite: { '^/datatagweb/pds': '/pds' },
         changeOrigin: true
       },
       '/datatagweb/framework': {
-        target: 'http://183.6.55.26:30003', // test
+        target: 'http://219.135.182.2:30003', // test
         changeOrigin: true,
         pathRewrite: { '^/datatagweb/framework': '/datatagweb/framework' },
       }
