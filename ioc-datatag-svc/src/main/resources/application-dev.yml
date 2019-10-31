@@ -43,7 +43,7 @@ spring:
       # redis数据库索引（默认为0），我们使用索引为3的数据库，避免和其他数据库冲突
       database: 3
       # redis服务器地址（默认为localhost）
-      host: 183.6.55.26
+      host: 219.135.182.2
       # redis端口（默认为6379）
       port: 6379
       # redis访问密码（默认为空）
@@ -78,8 +78,8 @@ ljdp:
     local-temp-path: C:/temp
     localPath: ioc-datatag
   dfs:
-    ftp2http-proxy: http://183.6.55.26:31075/ftp
-    ftp2http-download: http://183.6.55.26:31075/ljdp/dfs/downloadByFid.act?fid=
+    ftp2http-proxy: http://219.135.182.2:31075/ftp
+    ftp2http-download: http://219.135.182.2:31075/ljdp/dfs/downloadByFid.act?fid=
   fileupload:
     # 覆盖batch.fileupload.path配置
     local-path: C:/temp/ftp
@@ -101,7 +101,7 @@ searchjob: #更新模型中间表定时任务
 
 
 dataSet: #数据集相关
-  resourceDataUrl: http://183.6.55.26:31013/pds/datalake/dataLake/resourceData/
+  resourceDataUrl: http://219.135.182.2:31013/pds/datalake/dataLake/resourceData/
 
 pgconfig:
   username: mppuser

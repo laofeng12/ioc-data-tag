@@ -168,7 +168,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 			taggingModel = dtTaggingModelService.doSave(taggingModel);
 
 			//处理 显示/打标列部分
-			List<DtSetCol> dbSourceSetCol = getSourceSetColByTaggingModelId(taggingModel.getId());
+			List<DtSetCol> dbSourceSetCol = getByTaggingModelId(taggingModel.getId());
 			//遍历修改/新增 显示/打标列
 			for (DtSetCol col : colList){
 				//新建
@@ -196,16 +196,18 @@ public class DtSetColServiceImpl implements DtSetColService {
 					MyBeanUtils.copyPropertiesNotNull(oldCol,col);
 					EntityClassUtil.dealModifyInfo(oldCol,userInfo);
 					col = doSave(oldCol);
-					//显示列未勾选 允许打标的，克隆的列删除
 					if (col.getIsMarking().equals(Constants.PUBLIC_NO)){
-						List<DtSetCol> delCols =
-								getBySourceColAndTaggingModelId(taggingModel.getTaggingModelId(),col.getSourceCol());
-						for (DtSetCol delCol:delCols){
-							if (!delCol.getColId().equals(col.getColId())){
-								doDelete(delCol.getColId(),ip);
-								removeCols.add(delCol);//日志记录
-							}
-						}
+						//级联删除条件设置表
+						List<DtTagCondition> conditions = dtTagConditionService.findByColId(col.getColId());
+						conditions.forEach(record->{
+							record.setIsDeleted(Constants.PUBLIC_YES);
+							EntityClassUtil.dealModifyInfo(record,userInfo);
+							dtFilterExpressionService.doRemoveByTagConditionId(record.getTagConditionId());
+							dtTagConditionService.doSave(record);
+						});
+						String content = "{\"delConditions\":" + JSONObject.toJSONString(conditions)+"}";
+						//记录（打标显示）字段的删除
+						dtTagcolUpdateLogService.loggingDelete(content,col,ip);
 					}
 				}
 			}
@@ -214,12 +216,8 @@ public class DtSetColServiceImpl implements DtSetColService {
 				if(delSCol.getSourceCol().equals(taggingModel.getPkey())){
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"主键必须勾选！");
 				}
-				List<DtSetCol> delCols =
-						getBySourceColAndTaggingModelId(taggingModel.getTaggingModelId(),delSCol.getSourceCol());
-				for (DtSetCol delCol:delCols){
-					doDelete(delCol.getColId(),ip);
-				}
-				removeCols.addAll(delCols);//日志记录
+				doDelete(delSCol.getColId(),ip);
+				removeCols.add(delSCol);//日志记录
 			}
 			//日志记录
 			String content = "{\"reqParam\":" + reqParams + ",\"removeCol\":" + JSONObject.toJSONString(removeCols) + "}";
