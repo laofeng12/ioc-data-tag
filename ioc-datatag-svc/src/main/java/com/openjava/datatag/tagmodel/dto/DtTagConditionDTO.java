@@ -20,6 +20,8 @@ public class DtTagConditionDTO {
     private Long tagId;
     @ApiModelProperty("标签名")
     private String tagName;
+    @ApiModelProperty("标签组id")
+    private Long tagsId;
     @ApiModelProperty("是否手动设置")
     private Long isHandle;
     @ApiModelProperty("逻辑语句")
