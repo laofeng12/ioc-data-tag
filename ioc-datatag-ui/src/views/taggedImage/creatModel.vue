@@ -24,11 +24,7 @@
         </div>
       </div>
       <div class="right" v-show="routerName==='editModel'">
-        <div>
-          <el-tooltip class="item" effect="light" content="另存为" placement="bottom-start">
-            <div class="img" @click="saveAsto"></div>
-          </el-tooltip>
-        </div>
+        <el-button class="button" type="primary" size="small" @click="saveAsto">另存模型</el-button>
         <el-button class="button" type="primary" size="small" @click="runModel">模型调度</el-button>
         <!--<el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
       </div>
