@@ -182,9 +182,11 @@
                         <div class="checkIt">
                           <div class="checkOne" v-for="(colItem,cIndex) in listCheck">
                             <!--<el-checkbox-group v-model="item.checkList" @change="checkMarkChange(item)">-->
-                              <!--<el-checkbox :key='cIndex' :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span></el-checkbox>-->
+                            <!--<el-checkbox :key='cIndex' :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span></el-checkbox>-->
                             <!--</el-checkbox-group>-->
-                            <el-checkbox @change="checkMarkChange(item)"  v-model="item.checkList" :key='cIndex' :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span></el-checkbox>
+                            <el-checkbox @change="checkMarkChange(item)" v-model="item.checkList" :key='cIndex'
+                                         :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span>
+                            </el-checkbox>
                           </div>
                         </div>
                       </div>
@@ -236,8 +238,8 @@
     },
     data() {
       return {
-        changeRed:-1,
-        znumber:'',
+        changeRed: -1,
+        znumber: '',
         ztheadData: '',
         tableHeight: '',
         totalnum: 20,
@@ -332,13 +334,15 @@
       this.getMyTagGroupList()
       this.getConnectList('dt.tag.conditions.connect')
       this.getCountList('dt.tag.conditions.noconnect')
-      this.tableHeight = document.body.clientHeight - 137
+      this.tableHeight = document.body.clientHeight - 190
     },
     mounted() {
     },
     methods: {
-      getLabel(){},
-      closeSettags(){},
+      getLabel() {
+      },
+      closeSettags() {
+      },
       init() {
         this.ruleForm.tagTeam = ''
         this.treeLevdata = []
@@ -404,14 +408,14 @@
         if (consLen === 1) {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         } else if (consLen === 2) {
-          if(item.codename==='('){
+          if (item.codename === '(') {
             this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
-          }else {
+          } else {
             this.selfMarkList[this.curIndex].conditionSetting.splice(1, 1)
             this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
           }
 
-        }else{
+        } else {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         }
         this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
@@ -433,7 +437,7 @@
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         } else if (consLen === 2) {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
-        }else {
+        } else {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         }
         this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
@@ -684,8 +688,8 @@
           //被选标签组
           this.ruleForm.tagTeam = data.selectTagGroup.id
           // this.chooseTagTeam(data.selectTagGroup.id)
-          this.$nextTick(()=>{
-              this.chooseTagTeam(data.selectTagGroup.id)
+          this.$nextTick(() => {
+            this.chooseTagTeam(data.selectTagGroup.id)
           })
           //标签层数树
           this.getTagLevList(this.ruleForm.tagTeam)
@@ -700,9 +704,9 @@
           //   id: data.selectTag.id
           // this.tagSetList.push(obj)
           //打标相关字段  this.checkList
-          data.condtion.forEach(item =>{
-            item.conditionSetting.map(itemIndex =>{
-              if(itemIndex.theValues == null){
+          data.condtion.forEach(item => {
+            item.conditionSetting.map(itemIndex => {
+              if (itemIndex.theValues == null) {
                 itemIndex.theValues = ''
               }
             })
@@ -739,34 +743,34 @@
       async getSaveMarkList() {
         // console.log('this.selfMarkList',this.selfMarkList)
         // console.log('this.valuesType',this.valuesType)
-          let conditions = this.deepClone(this.selfMarkList)
-          conditions.forEach((obj, index) => {
-            delete obj.checkList
-            delete obj.sourceCol
-            delete obj.tagSetName
-            delete obj.showSelfMark
-            obj.colId = this.colId
-            return obj
+        let conditions = this.deepClone(this.selfMarkList)
+        conditions.forEach((obj, index) => {
+          delete obj.checkList
+          delete obj.sourceCol
+          delete obj.tagSetName
+          delete obj.showSelfMark
+          obj.colId = this.colId
+          return obj
+        })
+        const params = {
+          colId: this.colId,
+          condtion: conditions
+        }
+        try {
+          const data = await saveMarkData(params)
+          this.$message({
+            showClose: true,
+            message: '打标成功',
+            duration: 2000,
+            type: 'success'
           })
-          const params = {
-            colId: this.colId,
-            condtion: conditions
-          }
-          try{
-            const data = await saveMarkData(params)
-              this.$message({
-                showClose: true,
-                message: '打标成功',
-                duration: 2000,
-                type: 'success'
-              })
-             this.setTagsDialog = false
-              this.selfMarkList = []
-              this.changeRed = -1
-          }catch (e) {
-            console.log('e',e);
-            this.changeRed = e.data
-          }
+          this.setTagsDialog = false
+          this.selfMarkList = []
+          this.changeRed = -1
+        } catch (e) {
+          console.log('e', e);
+          this.changeRed = e.data
+        }
 
       },
       //选中要打标条件修改
@@ -776,7 +780,7 @@
         this.isHandle = item.isHandle
         this.conditionSetting = item.conditionSetting
       },
-      hidePanel (event) {
+      hidePanel(event) {
         let sp2 = document.getElementById("handle");
         if (sp2) {
           if (!sp2.contains(event.target)) {
@@ -1027,14 +1031,15 @@
     background-image: none;
     border-radius: 4px;
     border: 1px solid #dcdfe6;
-    color:#606266;
-    padding:0 15px;
+    color: #606266;
+    padding: 0 15px;
     font-size: 12px;
     overflow: hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .borderColor{
+
+  .borderColor {
     border: 1px solid #ee0320;
   }
 </style>

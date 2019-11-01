@@ -1,21 +1,136 @@
 <template>
   <div>
-  <div class="aside treeCode" v-show="this.routerName === 'creatModel'">
-    <el-input placeholder="输入关键词搜索" v-model="filterText" class="search" size="small"
-              suffix-icon="el-icon-search"></el-input>
-    <div class="tree-box">
-      <el-tree class="tree" :props="props" :highlight-current="true"
-               :filter-node-method="filterNode" ref="tree"
-               node-key="id"
-               @node-click="handleNodeClick"
-               :load="loadNode" lazy>
-        <div class="custom-tree-node" slot-scope="{ node, data }">
-          <i v-if="data.isTable===true" class="el-icon-coin iconImg"></i>
-          <div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>
+    <div v-show="this.routerName === 'creatModel'">
+      <div class="aside">
+        <el-input placeholder="输入关键词搜索" v-model="filterText" class="search" size="small"
+                  suffix-icon="el-icon-search"></el-input>
+        <div class="tree-box treeCode">
+          <el-tree class="tree" :props="props" :highlight-current="true"
+                   :filter-node-method="filterNode"
+                   ref="tree"
+                   node-key="id"
+                   @node-click="handleNodeClick"
+                   :load="loadNode" lazy>
+            <div class="custom-tree-node" slot-scope="{ node, data }">
+              <i v-if="data.isTable===true" class="el-icon-coin iconImg"></i>
+              <div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>
+            </div>
+          </el-tree>
         </div>
-      </el-tree>
+      </div>
+      <div class="aside treeCode">
+        <div class="col-set-box">
+          <el-container class="">
+            <el-aside width="250px" class="leftNew">
+              <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tab-pane label="可用字段" name="first">
+                  <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
+                            suffix-icon="el-icon-search"></el-input>
+                  <div class="h4">
+                    <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
+                      {{resourceName}}
+                    </el-checkbox>
+                  </div>
+                  <ul class="contentNumheight">
+                    <li v-for="(item,index) in list">
+                      <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
+                        <el-checkbox :label="item.definition" :key="item.definition">
+                        <span class="col-name-box">
+                          <span v-if="item.type==='string'" class="blue">Str.</span>
+                          <span v-else-if="item.type==='number'" class="green">No.</span>
+                          <span v-else="item.type==='date'" class="orange">Date.</span>
+                          <span class="col-name" :title="item.definition">{{item.definition}}</span>
+                        </span>
+                        </el-checkbox>
+                      </el-checkbox-group>
+                    </li>
+                  </ul>
+                </el-tab-pane>
+                <el-tab-pane label="全部字段" name="second" class="">
+                  <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
+                            suffix-icon="el-icon-search"></el-input>
+                  <div class="h4">
+                    <span class="allNametitle">{{resourceName}}</span>
+                  </div>
+                  <ul class="contentNumheight">
+                    <li v-for="(item,index) in allList">
+                      <div class="col-name-box">
+                        <div v-if="item.type==='string'" class="blue">Str.</div>
+                        <div v-else-if="item.type==='number'" class="green">No.</div>
+                        <div v-else="item.type==='date'" class="orange">Date.</div>
+                        <div class="col-name" :title="item.definition">{{item.definition}}</div>
+                        <div class="power"><span>{{powerName}}</span></div>
+                      </div>
+                    </li>
+                  </ul>
+                  <!--<div class="subscribeData" v-if="this.resourceType == 0" @click="getLink">订阅数据</div>-->
+                </el-tab-pane>
+              </el-tabs>
+            </el-aside>
+
+            <div class="formClass">
+              <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+                <el-form-item label="选择主键" prop="pkey">
+                  <el-select v-model="ruleForm.pkey" filterable placeholder="请选择主键" size="small" @change="changeSel">
+                    <el-option
+                      v-for="(item,index) in myData"
+                      :key="item.sourceColId"
+                      :label="item.definition"
+                      :value="item.definition">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+
+              <el-table class="my-table tableNew" border :style="contentStyleObj"
+                        :data="tableData"
+                        tooltip-effect="dark">
+                <el-table-column width="60" align="center">
+                  <template slot="header" slot-scope="scope">
+                    <i class="el-icon-delete"></i>
+                  </template>
+                  <template slot-scope="scope">
+                    <el-button v-if="scope.row.definition == ruleForm.pkey" class="set-btn" type="text"
+                               :disabled="true">
+                      <i class="el-icon-delete"></i>
+                    </el-button>
+                    <el-button v-else class="set-btn" type="text">
+                      <i class="el-icon-delete" @click="delCol(scope.$index)"></i>
+                    </el-button>
+
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  label="排序" width="60">
+                  <template slot-scope="scope">
+                    <div v-model="scope.row.colSort">{{scope.row.colSort}}</div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="字段" prop="definition"></el-table-column>
+                <el-table-column prop="type" label="类型">
+                </el-table-column>
+                <el-table-column
+                  label="选择打标字段">
+                  <template slot-scope="scope">
+                    <el-checkbox v-if="scope.row.definition===ruleForm.pkey || ruleForm.pkey==''"
+                                 disabled></el-checkbox>
+                    <el-checkbox v-else @change="getCheckChange(scope.row,$event)"
+                                 v-model="scope.row.isMarking"></el-checkbox>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+
+          </el-container>
+        </div>
+      </div>
+      <div class="btnNew">
+        <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="setCols">确认选择
+        </el-button>
+      </div>
+
     </div>
-  </div>
+
     <!--字段设置-->
     <el-dialog class="creat" title="字段设置" :visible.sync="colSetDialog" width="800px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
@@ -116,7 +231,8 @@
                   <template slot-scope="scope">
                     <el-checkbox v-if="scope.row.definition===ruleForm.pkey || ruleForm.pkey==''"
                                  disabled></el-checkbox>
-                    <el-checkbox v-else @change="getCheckChange(scope.row,$event)" v-model="scope.row.isMarking"></el-checkbox>
+                    <el-checkbox v-else @change="getCheckChange(scope.row,$event)"
+                                 v-model="scope.row.isMarking"></el-checkbox>
                   </template>
                 </el-table-column>
               </el-table>
@@ -131,7 +247,7 @@
         </div>
       </div>
     </el-dialog>
-    </div>
+  </div>
 </template>
 
 <script>
@@ -156,7 +272,10 @@
     },
     data() {
       return {
-        chooseBox:[],
+        contentStyleObj: {
+          width: ''
+        },
+        chooseBox: [],
         powerName: '',
         activeName: 'first',
         openScope: '',
@@ -324,7 +443,7 @@
         this.myData = []
         // 左边勾选的项 this.checkedCols
         // 左边全部字段项 this.columnData
-        this.tableData = this.tableData.filter(({definition}) => this.checkedCols.some(citem => citem === definition )) // 删除
+        this.tableData = this.tableData.filter(({definition}) => this.checkedCols.some(citem => citem === definition)) // 删除
         // 本宝宝
         this.checkedCols.forEach((citem) => {
           if ((this.tableData.length === 0 || this.tableData.every(({definition}) => definition !== citem))) {
@@ -400,8 +519,8 @@
         // this.colSetDialog = true
         let colsData = {}
         let allcolsData = {}
-        if (this.routerName === 'creatModel' && data.isTable===true) {
-          this.colSetDialog = true
+        if (this.routerName === 'creatModel' && data.isTable === true) {
+          // this.colSetDialog = true
           //新建模型字段确认获取数据
           colsData = await getResourceInfoData(data.resourceId, data.type, 1)  // 有权限的字段
           allcolsData = await getResourceInfoData(data.resourceId, data.type, 0)  // 全部的字段
@@ -435,11 +554,11 @@
         }
         if (this.routerName === 'editModel') {
           this.colSetDialog = true
-            //编辑模型字段确认获取数据
-            const resourceId = this.modelData.resourceId
-            const type = this.modelData.resourceType
-            colsData = await getResourceInfoData(resourceId, type, 1)  // 有权限的字段
-            allcolsData = await getResourceInfoData(resourceId, type, 0)  // 全部的字段
+          //编辑模型字段确认获取数据
+          const resourceId = this.modelData.resourceId
+          const type = this.modelData.resourceType
+          colsData = await getResourceInfoData(resourceId, type, 1)  // 有权限的字段
+          allcolsData = await getResourceInfoData(resourceId, type, 0)  // 全部的字段
           // 全部字段
           this.allcolumnData = allcolsData.data.column
           // 有权限字段
@@ -468,33 +587,6 @@
             }
           })
         }
-        // // 全部字段
-        // this.allcolumnData = allcolsData.data.column
-        // // 有权限字段
-        // this.columnData = colsData.data.column
-        // this.resourceName = colsData.data.resourceName
-        // this.resourceId = colsData.data.resourceId
-        // this.resourceType = colsData.data.type   // 0数据湖 1自建目录
-        // // this.tableData = []
-        // this.columnData.forEach((item, index) => {
-        //   colsOptions.push(item.definition)
-        // })
-        // this.cols = colsOptions
-        // // 全部的字段权限显示
-        // this.allcolumnData.forEach((item, index) => {
-        //   if (item.viewable == false) {
-        //     this.powerName = '无权限'
-        //     return
-        //   } else if (item.decryption == false) {
-        //     this.powerName = '加密'
-        //     return
-        //   } else if (item.sensitived == false) {
-        //     this.powerName = '脱敏'
-        //     return
-        //   } else {
-        //     this.powerName = ''
-        //   }
-        // })
         if (this.routerName === 'editModel') {
           //获取主键值
           this.ruleForm.pkey = this.modelData.pkey
@@ -528,7 +620,7 @@
       // 获取1-3级树数据
       async getOneZtreeData(resolve) {
         try {
-          const { data } = await getOneZtreeData()
+          const {data} = await getOneZtreeData()
           this.dataLakeDirectoryName = data.dataLakeDirectoryName
           this.dataSetDirectoryName = data.dataSetDirectoryName
           this.dataLakeDirectoryTree = data.dataLakeDirectoryTree
@@ -546,7 +638,7 @@
           this.getOneZtreeData(resolve)
         } else if (node.level === 1) {
           this.getChildTreeData(node.data, resolve)
-        }else {
+        } else {
           return resolve([])
         }
       },
@@ -614,6 +706,7 @@
       },
       //确认选择
       setCols() {
+        console.log('9999')
         this.$refs['ruleForm'].validate((valid) => {
           if (valid) {
             this.saveLoading = true
@@ -733,9 +826,14 @@
         }
 
 
+      },
+      getHeight() {
+        this.contentStyleObj.width = window.innerWidth - 614 + 'px';
       }
     },
     created() {
+      window.addEventListener('resize', this.getHeight);
+      this.getHeight()
       // this.getOneZtreeData()
       if (this.$route.name == 'editModel') {
         this.modelId = this.$route.params.id
@@ -771,7 +869,7 @@
   }
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="scss" >
   .col-name-box {
     display: flex;
     .col-name {
@@ -786,16 +884,14 @@
     width: 250px;
     flex-shrink: 0;
     position: fixed;
-    top: 60px;
-    bottom: 0;
-    left: 0;
-    color: #ffffff;
-    background: rgba(62, 71, 96, 1);
     padding: 10px;
+    margin-top: 40px;
+    box-shadow: 5px 0 10px 0 rgba(0, 0, 0, 0.05);
+    margin-left: 16px;
     box-sizing: border-box;
     z-index: 2;
     .tree {
-      height: calc(100vh - 130px);
+      height: calc(75vh - 80px);
       overflow: auto;
     }
     .search {
@@ -813,60 +909,15 @@
       display: flex;
       align-items: baseline;
     }
-    /*.col-set-box {*/
-      /*.left {*/
-        /*border-right: 1px solid #eee;*/
-        /*padding: 0 10px;*/
-        /*color: #000000;*/
-      /*}*/
-      /*h3 {*/
-        /*font-weight: normal;*/
-        /*font-size: 14px;*/
-        /*line-height: 32px;*/
-        /*border-bottom: 1px solid #eee;*/
-      /*}*/
-      /*.h4 {*/
-        /*margin-top: 10px;*/
-        /*padding: 5px 10px;*/
-        /*background-color: #f4f9fb;*/
-        /*border: 1px solid #eee;*/
-        /*font-weight: bold;*/
-        /*.allNametitle {*/
-          /*padding-left: 10px;*/
-          /*font-size: 14px;*/
-          /*color: #606266;*/
-          /*font-weight: 500;*/
-        /*}*/
-      /*}*/
-      /*ul {*/
-        /*margin: 0;*/
-        /*padding: 0;*/
-        /*li {*/
-          /*margin: 0;*/
-          /*padding: 5px 10px;*/
-          /*border: 1px solid #eee;*/
-          /*border-top: none;*/
-          /*.blue {*/
-            /*color: #0486fe;*/
-          /*}*/
-          /*.green {*/
-            /*color: green;*/
-          /*}*/
-          /*.orange {*/
-            /*color: orange;*/
-          /*}*/
-        /*}*/
-      /*}*/
-    /*}*/
-    /*.right {*/
-      /*min-width: 400px;*/
-      /*padding: 0 10px;*/
-    /*}*/
   }
-//
+
   .col-set-box {
     .left {
       border-right: 1px solid #eee;
+      padding: 0 10px;
+      color: #000000;
+    }
+    .leftNew {
       padding: 0 10px;
       color: #000000;
     }
@@ -909,14 +960,33 @@
       }
     }
   }
+
   .right {
     min-width: 400px;
     padding: 0 10px;
   }
-  //
+
+  .rightNew {
+    padding-left: 24px;
+  }
+
+  .tableNew {
+    height: calc(65vh);
+    overflow: auto;
+  }
+
   .contentNum {
     height: 300px;
     overflow: auto;
+  }
+
+  .contentNumheight {
+    height: calc(66vh - 80px);
+    overflow: auto;
+  }
+
+  .treeCode {
+    left: 282px;
   }
 
   .btnMargin {
@@ -937,10 +1007,33 @@
   .power {
     color: #b1b1b1;
   }
-  .iconImg{
+
+  .iconImg {
     font-size: 16px;
     color: #1296DB;
     margin-right: 5px;
+  }
+
+  .creatTable {
+    height: calc(75vh - 80px);
+    overflow-y: auto;
+  }
+
+  .btnNew {
+    position: absolute;
+    bottom: 24px;
+    text-align: center;
+    left: 0px;
+    right: 0px;
+    z-index: 9;
+  }
+
+  .formClass {
+    margin-left: 20px;
+  }
+
+  .formClass .el-form {
+    background-color: transparent !important;
   }
 </style>
 <style lang="stylus" scoped>

@@ -10,7 +10,7 @@
           <div class="text">
             <div class="zedit" v-if="routerName==='editModel'">
               <!--<el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容"-->
-                        <!--@blur="getsaveName"></el-input>-->
+              <!--@blur="getsaveName"></el-input>-->
               <el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容" maxlength="25"
                         show-word-limit></el-input>
               <span v-show="showBtn">模型名称：{{runModelname}}</span>
@@ -18,7 +18,6 @@
                 <i v-show="showBtn" class="el-icon-edit" @click="rename"></i>
                 <el-button v-show="!showBtn" size="mini" type="primary" @click="getsaveName">确定</el-button>
               </div>
-
             </div>
             <span v-else> 模型名称：未命名</span>
           </div>
@@ -34,104 +33,102 @@
         <!--<el-button class="button" type="primary" size="small" @click="saveModel">保存模型</el-button>-->
       </div>
     </div>
-    <div class="content">
-      <!--左边数据树目录结构-->
-      <Aside :modelData="modelData" ref="tree" @commit="getModelDatalist"/>
-      <div class="components" v-if="routerName==='creatModel'">
-        <div class="top">
-          <div class="left">
-            {{modelData.resourceName}}
-            <el-button v-if="routerName==='editModel'" class="set-btn btnMargin" type="text" size="mini"
-                       @click.stop="editSetTags(1)">
-              <i class="el-icon-setting"></i>
-            </el-button>
-          </div>
-          <div class="right">
-            <span class="iconPeople"><i class="el-icon-user"></i></span>
-            <span class="cooperation">协作人员:</span>
-            <img class="imgPeople" src="../../assets/img/u163.png" height="25" width="25"/>
-            <span class="multiply">x</span>
-            <span class="num">{{peopleLength+1}}</span>
-            <span class="handlePeople"><i class="el-icon-arrow-down" @click="showIt"></i></span>
-          </div>
-          <div class="card" v-show="show">
-            <div class="clearfix">
-              <div class="peopleList">成员列表</div>
-              <div class="addPeople"><i class="el-icon-plus" @click="addPeople"></i></div>
+    <div class="allContent">
+      <div class="content">
+        <!--左边数据树目录结构-->
+        <Aside :modelData="modelData" ref="tree" @commit="getModelDatalist"/>
+        <div class="components" v-if="routerName==='creatModel'">
+          <div class="top">
+            <div class="headLeft">字段设置</div>
+            <div class="left">
+              {{modelData.resourceName}}
+              <el-button v-if="routerName==='editModel'" class="set-btn btnMargin" type="text" size="mini"
+                         @click.stop="editSetTags(1)">
+                <i class="el-icon-setting"></i>
+              </el-button>
             </div>
-            <div class="peopleContent">
-              <div class="contentA clearfix">
-                <div>
-                  <img class="imgPeople2" src="../../assets/img/Uadmin.png" height="16" width="16"/>
-                  <img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName" :title="this.$store.state.user.userInfo.userName">
-                  {{this.$store.state.user.userInfo.userName}}
+            <div class="right rightNew2">
+              <span class="cooperation">协作人员:</span>
+              <img class="imgPeople" src="../../assets/img/icon_default.png" height="18" width="18"/>
+              <span class="multiply">x</span>
+              <span class="num">{{peopleLength+1}}</span>
+              <span class="handlePeople"><i class="el-icon-arrow-down" @click="showIt"></i></span>
+            </div>
+            <div class="card" v-show="show">
+              <div class="clearfix">
+                <div class="peopleList">成员列表</div>
+                <div class="addPeople"><i class="el-icon-plus" @click="addPeople"></i></div>
+              </div>
+              <div class="peopleContent">
+                <div class="contentA clearfix">
+                  <div>
+                    <img class="imgPeople2" src="../../assets/img/Uadmin.png" height="16" width="16"/>
+                    <img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                  <div class="listName" :title="this.$store.state.user.userInfo.userName">
+                    {{this.$store.state.user.userInfo.userName}}
+                  </div>
+                </div>
+                <div class="contentB clearfix" v-for="(item,index) in showPeoplelist" :key="index">
+                  <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                  <div class="listName" :title="item.cooUserName">{{item.cooUserName}}</div>
+                  <div class="head"><i class="el-icon-delete" @click="deleteList(item.id)"></i></div>
                 </div>
               </div>
-              <div class="contentB clearfix" v-for="(item,index) in showPeoplelist" :key="index">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName" :title="item.cooUserName">{{item.cooUserName}}</div>
-                <div class="head"><i class="el-icon-delete" @click="deleteList(item.id)"></i></div>
+            </div>
+          </div>
+          <div v-if="routerName==='editModel'">
+            <EditTable ref="ztable" :tableData="modelTableData" :modelId="taggingModelId"
+                       @commit2="getModelDatalist"></EditTable>
+          </div>
+
+        </div>
+        <div class="components" v-if="routerName==='editModel'">
+          <div class="top">
+            <div class="left">
+              {{modelData.resourceName}}
+              <el-button v-if="routerName==='editModel'" class="set-btn btnMargin" type="text" size="mini"
+                         @click.stop="editSetTags(1)">
+                <i class="el-icon-setting"></i>
+              </el-button>
+            </div>
+            <div class="right rightNew">
+              <span class="cooperation">协作人员:</span>
+              <img class="imgPeople" src="../../assets/img/icon_default.png" height="18" width="18"/>
+              <span class="multiply">x</span>
+              <span class="num">{{peopleLength+1}}</span>
+              <span class="handlePeople"><i class="el-icon-arrow-down" @click="showIt"></i></span>
+            </div>
+            <div class="card" v-show="show">
+              <div class="clearfix">
+                <div class="peopleList">成员列表</div>
+                <div class="addPeople"><i class="el-icon-plus" @click="addPeople"></i></div>
+              </div>
+              <div class="peopleContent">
+                <div class="contentA clearfix">
+                  <div>
+                    <img class="imgPeople2" src="../../assets/img/Uadmin.png" height="16" width="16"/>
+                    <img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                  <div class="listName" :title="this.$store.state.user.userInfo.userName">
+                    {{this.$store.state.user.userInfo.userName}}
+                  </div>
+                </div>
+                <div class="contentB clearfix" v-for="(item,index) in showPeoplelist" :key="index">
+                  <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
+                  <div class="listName" :title="item.cooUserName">{{item.cooUserName}}</div>
+                  <div class="head"><i class="el-icon-delete" @click="deleteList(item.id)"></i></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div v-if="routerName==='editModel'">
-          <!--<EditTable :theadData="headColList" :tableData="modelTableData" :modelId="taggingModelId"-->
-                     <!--@commit2="getModelDatalist"></EditTable>-->
-          <EditTable ref="ztable" :tableData="modelTableData" :modelId="taggingModelId"
-                     @commit2="getModelDatalist"></EditTable>
+          <div v-if="routerName==='editModel'">
+            <EditTable ref="ztable" :tableData="modelTableData" :modelId="taggingModelId"
+                       @commit2="getModelDatalist"></EditTable>
+          </div>
+
         </div>
 
       </div>
-      <div class="components" v-if="routerName==='editModel'" style="padding-left: 15px;">
-        <div class="top">
-          <div class="left">
-            {{modelData.resourceName}}
-            <el-button v-if="routerName==='editModel'" class="set-btn btnMargin" type="text" size="mini"
-                       @click.stop="editSetTags(1)">
-              <i class="el-icon-setting"></i>
-            </el-button>
-          </div>
-          <div class="right">
-            <span class="iconPeople"><i class="el-icon-user"></i></span>
-            <span class="cooperation">协作人员:</span>
-            <img class="imgPeople" src="../../assets/img/u163.png" height="25" width="25"/>
-            <span class="multiply">x</span>
-            <span class="num">{{peopleLength+1}}</span>
-            <span class="handlePeople"><i class="el-icon-arrow-down" @click="showIt"></i></span>
-          </div>
-          <div class="card" v-show="show">
-            <div class="clearfix">
-              <div class="peopleList">成员列表</div>
-              <div class="addPeople"><i class="el-icon-plus" @click="addPeople"></i></div>
-            </div>
-            <div class="peopleContent">
-              <div class="contentA clearfix">
-                <div>
-                  <img class="imgPeople2" src="../../assets/img/Uadmin.png" height="16" width="16"/>
-                  <img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName" :title="this.$store.state.user.userInfo.userName">
-                  {{this.$store.state.user.userInfo.userName}}
-                </div>
-              </div>
-              <div class="contentB clearfix" v-for="(item,index) in showPeoplelist" :key="index">
-                <div><img class="imgPeople2" src="../../assets/img/u163.png" height="25" width="25"/></div>
-                <div class="listName" :title="item.cooUserName">{{item.cooUserName}}</div>
-                <div class="head"><i class="el-icon-delete" @click="deleteList(item.id)"></i></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-if="routerName==='editModel'">
-          <EditTable ref="ztable" :tableData="modelTableData" :modelId="taggingModelId"
-                     @commit2="getModelDatalist"></EditTable>
-        </div>
-
-      </div>
-
     </div>
-
     <!--另存-->
     <el-dialog class="creat" title="另存模型" :visible.sync="editDialog" width="530px" center :close-on-click-modal="false"
                @close="closeSaveas">
@@ -255,10 +252,10 @@
               </el-table>
             </div>
             <div slot="footer" class="dialog-footer device">
-            <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="getdosave">确认添加
-            </el-button>
-            </div>
+              <div>
+                <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="getdosave">确认添加
+                </el-button>
+              </div>
             </div>
           </div>
         </el-container>
@@ -290,12 +287,12 @@
     name: 'creatModel',
     data() {
       return {
-        sureIt:0,
-        userIdarr:[],
-        groupId:[],
-        selectD:0,
-        openScope:'',
-        showBtn:true,
+        sureIt: 0,
+        userIdarr: [],
+        groupId: [],
+        selectD: 0,
+        openScope: '',
+        showBtn: true,
         headColList: [],//打标字段头部数据
         modelData: {},//获取模型数据
         taggingModelId: 0,//模型id
@@ -393,14 +390,15 @@
     mounted() {
     },
     methods: {
-      rename(){
+      rename() {
         this.showBtn = false
       },
       //type=0,新增，type=1编辑
       editSetTags(type) {
         //调用子组件里面的方法
         // this.$refs['tree'].setTags(type)
-        this.$refs['tree'].handleNodeClick()
+        // this.$refs['tree'].handleNodeClick()
+        this.$refs.tree.handleNodeClick()
       },
       // 获取模型数据
       async getModelList(modelId) {
@@ -442,23 +440,23 @@
         this.addSetDialog = false
         // 关闭操作去掉已选用户
         this.groupId = []
-        this.tableData.map(item => item.useTagGroup).every(async _item =>{
-          if(_item != null){
+        this.tableData.map(item => item.useTagGroup).every(async _item => {
+          if (_item != null) {
             this.groupId.push(_item)
           }
-      })
-        if(this.groupId == ''){
+        })
+        if (this.groupId == '') {
           let obj = ''
-          this.showPeoplelist.map(item =>{
+          this.showPeoplelist.map(item => {
             this.userIdarr.push(item.id)
             obj += item.id + ','
           })
           if (obj.length > 0) {
-            obj = obj.substr(0,obj.length - 1);
+            obj = obj.substr(0, obj.length - 1);
           }
           try {
             const res = await deletePeople({
-              ids : obj
+              ids: obj
             })
             this.getpeopleList()
             this.markingTable()
@@ -554,17 +552,13 @@
         }
         try {
           const addRes = await addPeople(param)
-          // this.$message({
-          //   message: '添加成功',
-          //   type: 'success'
-          // });
           this.getpeopleList()
         } catch (e) {
           console.log(e);
         }
       },
       // 删除
-      async deleteList(id,index) {
+      async deleteList(id, index) {
         try {
           const res = await deletePeople({
             id: id,
@@ -574,7 +568,7 @@
             message: res.message,
             type: 'success'
           });
-          if(this.changeRed === index){
+          if (this.changeRed === index) {
             this.changeRed = -3
           }
           this.getpeopleList()
@@ -585,10 +579,10 @@
       },
       // 点击用户
       async markingPeople(zuserid, id, index) {
-         this.changeRed = index
-         this.helpId = zuserid
-         this.cooId = id
-         this.startDisable = false
+        this.changeRed = index
+        this.helpId = zuserid
+        this.cooId = id
+        this.startDisable = false
       },
       // table列表
       async markingTable() {
@@ -671,9 +665,9 @@
         row.tagColId = row.colId
         let arrRow = []
         arrRow.push(row)
-        if(row.useTagGroup == '123456'){
+        if (row.useTagGroup == '123456') {
           row.isDeleted = 1
-          const tmp = arrRow.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId,isDeleted}) => {
+          const tmp = arrRow.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId, isDeleted}) => {
             return {
               "cooId": id, //id
               "id": cooFieldId,  //  cooFieldId
@@ -682,7 +676,7 @@
               isCooField,//是否选中
               cooUser, //协作用户ID
               tagColId: tagColId,  //
-              isDelete:isDeleted
+              isDelete: isDeleted
             }
           })
           tmp.forEach(item => {
@@ -691,9 +685,9 @@
             }
           })
           let obj_user = []
-          this.showPeoplelist.forEach(item_c =>{
-            tmp.map(item_d =>{
-              if(item_c.cooUser == item_d.cooUser){
+          this.showPeoplelist.forEach(item_c => {
+            tmp.map(item_d => {
+              if (item_c.cooUser == item_d.cooUser) {
                 obj_user.push(item_c)
                 item_c.cooTagcolLimitList = []
                 item_c.cooTagcolLimitList.push(item_d)
@@ -711,7 +705,7 @@
       // save
       async getdosave() {
         this.saveLoading = true
-        const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId,isDeleted}) => {
+        const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId, isDeleted}) => {
           return {
             "cooId": id, //id
             "id": cooFieldId,  //  cooFieldId
@@ -720,7 +714,7 @@
             isCooField,//是否选中
             cooUser, //协作用户ID
             tagColId: tagColId,  //
-            isDelete:isDeleted
+            isDelete: isDeleted
           }
         })
         tmp.forEach(item => {
@@ -731,22 +725,22 @@
         const arrList = [...this.showPeoplelist]
         const arr = []
         let obj = []
-        tmp.map(item_a =>{
+        tmp.map(item_a => {
           arr.push(item_a.cooUser)
         })
         let uniqueArr = [...new Set(arr)]
         // 根据用户的id刷选用户
-        arrList.forEach(item_b =>{
-          uniqueArr.map(item_c =>{
-            if(item_b.cooUser == item_c){
+        arrList.forEach(item_b => {
+          uniqueArr.map(item_c => {
+            if (item_b.cooUser == item_c) {
               item_b.cooTagcolLimitList = []
               obj.push(item_b)
             }
           })
         })
-        tmp.forEach((item,index) => {
-          arrList.map((citem,cindex) =>{
-            if(item.cooUser == citem.cooUser){
+        tmp.forEach((item, index) => {
+          arrList.map((citem, cindex) => {
+            if (item.cooUser == citem.cooUser) {
               citem.cooTagcolLimitList.push(item)
             }
           })
@@ -786,7 +780,7 @@
         this.saveasLoading = true
         try {
           const res = await saveAs({
-            taggingModelId:this.taggingModelId,
+            taggingModelId: this.taggingModelId,
             "modelDesc": this.ruleForm.textarea2,
             "modelName": this.ruleForm.name
           })
@@ -1081,6 +1075,16 @@
     align-items: center;
   }
 
+  .rightNew {
+    border: 1px solid #D9D9D9;
+    padding: 2px 2px;
+  }
+
+  .rightNew2 {
+    padding: 4px;
+    border: 1px solid #D9D9D9;
+  }
+
   .card {
     width: 200px;
     border: 1px solid #dedede;
@@ -1273,9 +1277,9 @@
     .components {
       width: 100%;
       position: absolute;
-      top: 60px;
+      top: 0px;
       bottom: 0;
-      padding: 10px 10px 10px 260px;
+      padding: 10px 24px 10px 24px;
       box-sizing: border-box;
       overflow-x: hidden;
       .top {
@@ -1472,16 +1476,45 @@
   .btnMargin {
     margin-left: 5px;
   }
-  .zedit{
+
+  .zedit {
     display: flex;
     align-items: center;
   }
-  .editTwo{
+
+  .editTwo {
     margin-left: 15px;
     cursor: pointer;
   }
-  .device{
+
+  .device {
     text-align: center;
     margin-top: 35px;
+  }
+
+  .table-container {
+    width: 100%;
+    height: 100%;
+    background-color: #F2F2F2;
+  }
+
+  .allContent {
+    width: calc(100vw - 48px);
+    height: calc(100vh - 108px);
+    background-color: #fff;
+    margin: 24px;
+    position: relative;
+  }
+
+  .headLeft {
+    font-family: PingFangSC-Medium;
+    font-size: 16px;
+    color: #262626;
+  }
+
+  .clearfix:after {
+    content: '';
+    display: block;
+    clear: both;
   }
 </style>
