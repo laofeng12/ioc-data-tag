@@ -911,7 +911,7 @@
         background-size: 100% 100%;
       }
       .button {
-        width: 80px;
+        /*width: 80px;*/
       }
     }
   }
@@ -1242,7 +1242,7 @@
         background-size: 100% 100%;
       }
       .button {
-        width: 80px;
+        /*width: 80px;*/
       }
     }
   }
