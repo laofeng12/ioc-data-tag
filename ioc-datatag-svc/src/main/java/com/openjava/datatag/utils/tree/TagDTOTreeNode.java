@@ -2,18 +2,26 @@ package com.openjava.datatag.utils.tree;
 
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.dto.DtTagDTO;
+import com.openjava.datatag.tagmanage.dto.DtTagDTO2;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class TagDTOTreeNode {
     private DtTagDTO tag;
+    private DtTagDTO2 tag2;
     private List<TagDTOTreeNode> childrenNode;
     public static final Long ROOT_ID = 0L;
 
 
     public TagDTOTreeNode(DtTagDTO tag){
         this.tag = tag;
+        DtTagDTO2 t2 = new DtTagDTO2();
+        t2.setValue(tag.getId().toString());
+        t2.setLabel(tag.getTagName());
+        this.tag2 = t2;
         childrenNode = new ArrayList<TagDTOTreeNode>();
     }
 
