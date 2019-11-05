@@ -84,6 +84,10 @@ public class DtTag implements Persistable<Long>,Serializable {
 	@Column(name = "LVL")
 	private Long lvl;
 
+	@ApiModelProperty("标签名")
+	@Column(name = "ID_PATH")
+	private String idPath;
+
 
 	@ApiModelProperty("是否新增")
 	@Transient

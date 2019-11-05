@@ -5,6 +5,7 @@ import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.log.domain.DtTagUpdateLog;
 import com.openjava.datatag.log.service.DtTagUpdateLogService;
 import com.openjava.datatag.tagmanage.domain.DtTag;
+import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagRepository;
 import com.openjava.datatag.log.repository.DtTagUpdateLogRepository;
@@ -40,7 +41,8 @@ public class DtTagServiceImpl implements DtTagService {
 	private DtTagUpdateLogService dtTagUpdateLogService;
 	@Resource
 	DtTaggingModelService dtTaggingModelService;
-
+	@Resource
+	private DtTagGroupService dtTagGroupService;
 	public Page<DtTag> query(DtTagDBParam params, Pageable pageable){
 		Page<DtTag> pageresult = dtTagRepository.query(params, pageable);
 		return pageresult;
@@ -79,7 +81,7 @@ public class DtTagServiceImpl implements DtTagService {
 		return dtTagRepository.findByPreaTagIdAndIsDeleted(pId,Constants.PUBLIC_NO);
 	}
 
-	public void doNew(DtTag body,Long userId,String ip){
+	public DtTag doNew(DtTag body,Long userId,String ip){
 		String modifyContent = JSONObject.toJSONString(body);
 		//新增，记录创建时间等
 		//设置主键(请根据实际情况修改)
@@ -92,9 +94,10 @@ public class DtTagServiceImpl implements DtTagService {
 		body.setModifyTime(now);
 		DtTag db = doSave(body);
 		dtTagUpdateLogService.loggingNew(modifyContent,db,userId,ip);
+		return db;
 	}
 
-	public void doUpdate(DtTag body,DtTag db,Long userId, String ip){
+	public DtTag doUpdate(DtTag body,DtTag db,Long userId, String ip){
 		String oldContent = JSONObject.toJSONString(db);
 		String modifyContent = JSONObject.toJSONString(body);
 		//不允许修改父节点，层级和创建时间
@@ -104,9 +107,9 @@ public class DtTagServiceImpl implements DtTagService {
 		body.setModifyTime(new Date());
 		MyBeanUtils.copyPropertiesNotBlank(db, body);
 		db.setIsNew(false);//执行update
-		doSave(db);
+		db = doSave(db);
 		dtTagUpdateLogService.loggingUpdate(modifyContent,oldContent,db,userId,ip);
-
+		return db;
 	}
 
 	public void doSoftDeleteByDtTag(DtTag db,Long userId,String ip){
@@ -147,5 +150,24 @@ public class DtTagServiceImpl implements DtTagService {
 	 */
 	public List<Long> findIdsByTagsId( Long tagsId){
 		return dtTagRepository.findIdsByTagsId(tagsId);
+	}
+	/**
+	 * 获取标签所在的id路径
+	 * 例如:标签的id：3，父级id：2,2的父级id:1,则路径为：1,2,3
+	 */
+	public String getIdpPath(Long tagId){
+		String idpath = null;
+		DtTag tag = get(tagId);
+		if (tag != null){
+			if (tag.getPreaTagId()!=null){
+				idpath = this.getIdpPath(tag.getPreaTagId());
+				idpath += ","+tag.getId();
+			}else {
+				DtTagGroup tagGroup = dtTagGroupService.get(tag.getTagsId());
+				idpath = tagGroup.getId()+","+tag.getId();
+			}
+
+		}
+		return idpath;
 	}
 }
