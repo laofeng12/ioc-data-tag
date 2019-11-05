@@ -651,8 +651,13 @@
       //打标确认保存
       async getSaveMarkList() {
         this.selfMarkList.map(item =>{
-          const arrId = item.tagId.pop()
-          item.tagId = arrId
+          if(this.changeRed == -1){
+            const arrId = item.tagId.pop()
+            item.tagId = arrId
+          }else {
+            // console.log('item22',item);
+            // console.log('item555',item.tagId);
+          }
         })
         // console.log('this.valuesType',this.valuesType)
         let conditions = this.deepClone(this.selfMarkList)

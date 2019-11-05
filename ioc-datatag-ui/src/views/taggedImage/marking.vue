@@ -578,10 +578,12 @@
           })
           this.selfMarkList = this.deepClone(data.condtion)
           this.selfMarkList.map((item, index) => {
-            const arrPath = item.idPath.split(',')
             item.showSelfMark = false
             item.checkList = item.conditionSetting[0].theValues.split(',')
-            item.tagId = arrPath
+            if(item.idPath){
+              const arrPath = item.idPath.split(',')
+              item.tagId = arrPath
+            }
           })
           this.curIndex = this.selfMarkList.length - 1
           this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
@@ -604,8 +606,14 @@
       //打标确认保存
       async getSaveMarkList() {
         this.selfMarkList.map(item =>{
-          const arrId = item.tagId.pop()
-          item.tagId = arrId
+          if(this.changeRed == -1){
+            const arrId = item.tagId.pop()
+            item.tagId = arrId
+          }else {
+            // console.log('item22',item);
+            // console.log('item555',item.tagId);
+          }
+
         })
         let conditions = this.deepClone(this.selfMarkList)
         conditions.forEach((obj, index) => {
