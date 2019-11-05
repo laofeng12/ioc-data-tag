@@ -26,9 +26,9 @@ public interface DtTagService {
 
 	DtTag doSave(DtTag m);
 
-	void doNew(DtTag tag,Long userId,String ip);
+	DtTag doNew(DtTag tag,Long userId,String ip);
 
-	void doUpdate(DtTag tag,DtTag db,Long userId,String ip);
+	DtTag doUpdate(DtTag tag,DtTag db,Long userId,String ip);
 
 	void doSoftDeleteByTagsID(Long id, Date now);
 
@@ -51,4 +51,9 @@ public interface DtTagService {
 	 * 根据标签组获取节点ID
 	 */
 	List<Long> findIdsByTagsId( Long tagsId);
+	/**
+	 * 获取标签所在的id路径
+	 * 例如:标签的id：3，父级id：2,2的父级id:1,则路径为：1,2,3
+	 */
+	String getIdpPath(Long tagId);
 }

@@ -337,6 +337,7 @@ public class DtSetColServiceImpl implements DtSetColService {
 			DtTag dtTag = dtTagService.get(record.getTagId());
 			dto.setTagName(dtTag.getTagName());
 			dto.setTagsId(dtTag.getTagsId());
+			dto.setIdPath(dtTag.getIdPath());
 			List<DtFilterExpression> conditionSetting = dtFilterExpressionService.findByTagConditionId(record.getTagConditionId());
 			List<SaveConditionDtFilterExpressionDTO> conditionSettingDTO = new ArrayList<>();
 			conditionSetting.forEach(setting->{

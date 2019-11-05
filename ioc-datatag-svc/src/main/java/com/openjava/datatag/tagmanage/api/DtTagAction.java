@@ -75,10 +75,14 @@ public class DtTagAction {
         String ip = IpUtil.getRealIP(request);
         DtTagGroup tagGroup = dtTagGroupService.get(body.getTagsId());
         if (userInfo.getUserId().equals(tagGroup.getCreateUser().toString())) {
+            String idpath = null;
             if (body.getIsNew() == null || body.getIsNew()) {
-                dtTagService.doNew(body, userId, ip);
+                body = dtTagService.doNew(body, userId, ip);
                 tagGroup.setModifyTime(new Date());
                 dtTagGroupService.doSave(tagGroup);
+                idpath = dtTagService.getIdpPath(body.getId());
+                body.setIdPath(idpath);
+                dtTagService.doSave(body);
                 return new SuccessMessage("新建成功");
             } else {
                 DtTag db = dtTagService.get(body.getId());
@@ -88,7 +92,10 @@ public class DtTagAction {
                 if (body.getIsDeleted() != null && body.getIsDeleted().equals(Constants.PUBLIC_YES)) {
                     throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请不要用此方法进行删除操作，请用DELETE方法");
                 }
-                dtTagService.doUpdate(body, db, userId, ip);
+                body = dtTagService.doUpdate(body, db, userId, ip);
+                idpath = dtTagService.getIdpPath(body.getId());
+                body.setIdPath(idpath);
+                dtTagService.doSave(body);
                 tagGroup.setModifyTime(new Date());
                 dtTagGroupService.doSave(tagGroup);
                 return new SuccessMessage("修改成功");

@@ -41,7 +41,8 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
 
     @Resource
     private DtTaggChooseLogService dtTaggChooseLogService;
-
+    @Resource
+    private DtTagService dtTagService;
 
     public Page<DtShareTagGroup> findList(String searchKey, Pageable pageable){
         Page<DtShareTagGroup> result = dtShareTagGroupRepository.findList("%" + searchKey+ "%", pageable);
@@ -122,7 +123,8 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
             newRoot.setIsDeleted(Constants.PUBLIC_NO);
             newRoot.setIsNew(true);
             newRoot.setPreaTagId(pId);
-            dtTagRepository.save(newRoot);
+            newRoot = dtTagRepository.save(newRoot);
+            newRoot.setIdPath(dtTagService.getIdpPath(newRoot.getId()));
             //子标签的父标签id设置为新的标签的id
             for (TagDTOTreeNode cTree: tree.getChildrenNode()){
                 setNewIdAndSave(cTree,newRoot.getId(),tagsId,now);
