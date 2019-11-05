@@ -105,3 +105,15 @@ export function startDown(params) {
     params
   })
 }
+
+
+/**
+ *查看错误日记
+ * @param data
+ */
+export function getError(taggingModelId) {
+  return fetch ({
+    url:`/datatag/tagmodel/dtTaggingErrorlog/${taggingModelId}`,
+    method:'get'
+  })
+}
