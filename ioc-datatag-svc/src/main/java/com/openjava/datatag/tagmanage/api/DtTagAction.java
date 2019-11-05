@@ -7,6 +7,7 @@ import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.dto.DtTagDTO;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.dto.DtTagTableDTO;
+import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.utils.IpUtil;
@@ -21,11 +22,17 @@ import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.annotation.Security;
 import org.ljdp.secure.sso.SsoContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -164,45 +171,57 @@ public class DtTagAction {
     }
 
     /**
-     * 用主键获取数据
+     * 获取所有标签组和树
      *
-     * @param id
      * @return
      */
-    @ApiOperation(value = "根据标签组ID获取", notes = "单个对象查询", nickname = "tagsId")
+    @ApiOperation(value = "获取所有标签组和树", notes = "单个对象查询", nickname = "tagsId")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "tagsId", value = "标签组编码", required = true, dataType = "string", paramType = "path"),
+            @ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
     })
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效"),
-            @io.swagger.annotations.ApiResponse(code = MyErrorConstants.TAG_GROUP_NOT_FOUND, message = "无此标签组或已被删除"),
-            @io.swagger.annotations.ApiResponse(code = MyErrorConstants.PUBLIC_NO_AUTHORITY, message = "无权限查看")
     })
     @Security(session = true)
-    @RequestMapping(value = "/getTreeByTagsId/{tagsId}", method = RequestMethod.GET)
-    public TagDTOTreeNodeShow2 getTreeByTagsId(@PathVariable("tagsId") Long tagsId) throws APIException {
+    @RequestMapping(value = "/getAllTree", method = RequestMethod.GET)
+    public List<TagDTOTreeNodeShow2> getTreeByTagsId(@ApiIgnore() Pageable pageable) throws APIException {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-        DtTagGroup db = dtTagGroupService.get(tagsId);
-        if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)) {
-            throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND, "无此标签组或已被删除");
-        }
-        //查找当前用户是否配置有该标签组的协作权限
-        Long cooUserTagGroupCount = dtCooperationService.findCooUserTagGroup(VoUtils.toLong(userInfo.getUserId()), tagsId);
-        //自己的和共享的标签组可以查看
-        if (userInfo.getUserId().equals(db.getCreateUser().toString()) || db.getIsShare().equals(Constants.PUBLIC_YES) || cooUserTagGroupCount > 0) {
-            List<DtTag> tagList = dtTagService.findByTagsId(tagsId);
-            DtTagDTO root = new DtTagDTO();
-            root.setId(TagDTOTreeNode.ROOT_ID);
-            TagDTOTreeNode treeNode = new TagDTOTreeNode(TagDTOTreeNode.toDtTagDTO(tagList), root);
-            TagDTOTreeNodeShow2 treeNodeShow = new TagDTOTreeNodeShow2(treeNode);
-            if (treeNodeShow!=null && CollectionUtils.isNotEmpty(treeNodeShow.getChildren())){
-                treeNodeShow = treeNodeShow.getChildren().get(0);
+        Long id = Long.parseLong(userInfo.getUserId());
+        DtTagGroupDBParam params = new DtTagGroupDBParam();
+        params.setEq_createUser(id);
+        params.setEq_isDeleted(Constants.PUBLIC_NO);
+        Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));
+        Page<DtTagGroup> results =  dtTagGroupService.searchMyTagGroup(params, mypage);
+        List<TagDTOTreeNodeShow2> resultsList = new ArrayList<>();
+        if (results!=null && CollectionUtils.isNotEmpty(results.getContent())){
+            for (DtTagGroup group:results.getContent()) {
+                Long tagsId = group.getId();
+                DtTagGroup db = dtTagGroupService.get(tagsId);
+                //查找当前用户是否配置有该标签组的协作权限
+                Long cooUserTagGroupCount = dtCooperationService.findCooUserTagGroup(VoUtils.toLong(userInfo.getUserId()), tagsId);
+                //自己的和共享的标签组可以查看
+                if (userInfo.getUserId().equals(db.getCreateUser().toString()) || db.getIsShare().equals(Constants.PUBLIC_YES) || cooUserTagGroupCount > 0) {
+                    List<DtTag> tagList = dtTagService.findByTagsId(tagsId);
+                    if (CollectionUtils.isEmpty(tagList)){
+                        TagDTOTreeNodeShow2 father = new TagDTOTreeNodeShow2();
+                        father.setLabel(group.getTagsName());
+                        father.setValue(group.getId().toString());
+                        resultsList.add(father);
+                        continue;
+                    }
+                    DtTagDTO root = new DtTagDTO();
+                    root.setId(TagDTOTreeNode.ROOT_ID);
+                    TagDTOTreeNode treeNode = new TagDTOTreeNode(TagDTOTreeNode.toDtTagDTO(tagList), root);
+                    TagDTOTreeNodeShow2 treeNodeShow = new TagDTOTreeNodeShow2(treeNode);
+                    treeNodeShow.setValue(group.getId().toString());
+                    treeNodeShow.setLabel(group.getTagsName());
+                    resultsList.add(treeNodeShow);
+                }
             }
-            return treeNodeShow;
-        } else {
-            throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY, "无权限查看");
         }
-
+        return resultsList;
     }
 
     /**
