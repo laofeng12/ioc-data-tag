@@ -46,7 +46,7 @@ public class DtTaggingErrorLog implements Persistable<Long>,Serializable {
 	
 	@ApiModelProperty("报错信息")
 	@Column(name = "ERROR_INFO")
-	private byte[] errorInfo;
+	private String errorInfo;
 	
 	@ApiModelProperty("报错时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")

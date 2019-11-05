@@ -57,4 +57,7 @@ public class DtTaggingErrorLogServiceImpl implements DtTaggingErrorLogService {
 			dtTaggingErrorLogRepository.deleteById(new Long(items[i]));
 		}
 	}
+	public DtTaggingErrorLog getByTaggingModelIdOrderByErrorTimeDesc(Long taggingModelId){
+		return dtTaggingErrorLogRepository.getByTaggingModelIdOrderByErrorTimeDesc(taggingModelId);
+	}
 }
