@@ -12,6 +12,10 @@ public class TagDTOTreeNodeShow2 {
     private String value;
     private String label;
     List<TagDTOTreeNodeShow2> children ;
+    public TagDTOTreeNodeShow2(){
+
+    }
+
     public TagDTOTreeNodeShow2(TagDTOTreeNode tree){
         this.value = tree.getTag2().getValue();
         this.label = tree.getTag2().getLabel();
