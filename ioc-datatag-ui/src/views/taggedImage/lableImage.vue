@@ -50,14 +50,16 @@
             </template>
           </el-table-column>
           <el-table-column prop="runResult" label="调度总量/成功数量"></el-table-column>
-          <el-table-column prop="people" label="修改人/修改时间">
-            <template slot-scope="scope">
-              <div>
-                <div>{{scope.row.modifyUserName}}</div>
-                <div>{{scope.row.modifyTime}}</div>
-              </div>
-            </template>
-          </el-table-column>
+          <!--<el-table-column prop="people" label="修改人/修改时间">-->
+            <!--<template slot-scope="scope">-->
+              <!--<div>-->
+                <!--<div>{{scope.row.modifyUserName}}</div>-->
+                <!--<div>{{scope.row.modifyTime}}</div>-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <el-table-column prop="modifyUserName" label="修改人"></el-table-column>
+          <el-table-column prop="modifyTime" label="修改时间"></el-table-column>
           <el-table-column label="操作" width="260px">
             <template slot-scope="scope" class="caozuo">
               <el-tooltip class="item" effect="dark" content="调度" placement="top">

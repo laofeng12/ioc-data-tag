@@ -34,14 +34,16 @@
           </el-table-column>
           <el-table-column prop="level1" label="单位" ></el-table-column>
           <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
-          <el-table-column prop="people" label="共享人/更新时间" >
-            <template slot-scope="scope">
-              <div>
-                <div>{{scope.row.shareUserName}}</div>
-                <div>{{scope.row.modifyTime}}</div>
-              </div>
-            </template>
-          </el-table-column>
+          <!--<el-table-column prop="people" label="共享人/更新时间" >-->
+            <!--<template slot-scope="scope">-->
+              <!--<div>-->
+                <!--<div>{{scope.row.shareUserName}}</div>-->
+                <!--<div>{{scope.row.modifyTime}}</div>-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <el-table-column prop="shareUserName" label="共享人" ></el-table-column>
+          <el-table-column prop="modifyTime" label="更新时间" ></el-table-column>
           <el-table-column label="操作" width="125px">
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="查看" placement="top">
