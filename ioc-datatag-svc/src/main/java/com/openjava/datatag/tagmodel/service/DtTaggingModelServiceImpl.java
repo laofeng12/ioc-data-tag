@@ -42,6 +42,7 @@ import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.common.http.HttpClientUtils;
 import org.ljdp.common.http.LjdpHttpClient;
 import org.ljdp.component.exception.APIException;
+import org.ljdp.component.result.Result;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -486,6 +487,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	 */
 	public void calculation(DtTaggingModel tagModel) {
 		Long taggingModelId = tagModel.getTaggingModelId();
+		Result mppResult;
 		List<DtSetCol> cols= dtSetColService.getByTaggingModelId(taggingModelId);
 		if (CollectionUtils.isEmpty(cols)){
 			return ;
@@ -495,7 +497,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		MppPgExecuteUtil mppPgExecuteUtil = new MppPgExecuteUtil();
 		mppPgExecuteUtil.initValidDataSource(postgreSqlConfig);//初始化数据库
 		mppPgExecuteUtil.setTableName(tagModel.getDataTableName());//表名
-		mppPgExecuteUtil.dropTable();//删表
+		mppResult = mppPgExecuteUtil.dropTable();//删表
 		//第二步、建表
 		mppPgExecuteUtil.setTableKey(tagModel.getPkey());//主键
 		Map<String,String> colmap  = new LinkedHashMap<>();//字段，注释(用于建表)
@@ -526,7 +528,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				cloTypeMap.put(Constants.DT_COL_PREFIX+record.getShowCol(),"varchar");
 			}
 		});
-		mppPgExecuteUtil.createTable(colmap,cloTypeMap);
+		mppResult = mppPgExecuteUtil.createTable(colmap,cloTypeMap);
 		//第三步、获取数据集数据并同步到mpp
 		mppPgExecuteUtil.setColumnMap(insertCloTypeMap);
 		mppPgExecuteUtil.setColumnTypeMap(insertCloTypeMap);
@@ -556,7 +558,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 					List<Object> nextData = new LinkedList<>();
 					nextData.addAll(nextResult.getContent());
 					mppPgExecuteUtil.setDataList(nextData);
-					mppPgExecuteUtil.insertDataList();
+					mppResult = mppPgExecuteUtil.insertDataList();
 					successCount+=nextResult.getNumberOfElements();
 				}
 			}
@@ -564,10 +566,12 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			e.printStackTrace();
 			logger.info(e.getMessage());
 			DtTaggingErrorLog errorLog = new DtTaggingErrorLog();
+//			Base64.deco
+//			decoder.de
 			try {
-                errorLog.setErrorInfo(e.getMessage().getBytes("utf-8"));
+                errorLog.setErrorInfo(e.getMessage());
             }catch (Exception e2){
-                errorLog.setErrorInfo(e.getMessage().getBytes());
+                errorLog.setErrorInfo(e.getMessage());
             }
 			errorLog.setErrorTime(new Date());
 			errorLog.setTaggingModelId(taggingModelId);
@@ -590,8 +594,21 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		waitUpdateIndex.setTaggingModelId(taggingModelId);
 		dtWaitUpdateIndexService.doSave(waitUpdateIndex);
 		tagModel.setRunState(Constants.DT_MODEL_SUCCESS);
-		if (successCount<totalCount||successCount==0) {
+		if (successCount<totalCount||successCount==0||(mppResult!=null && mppResult.getCode()!=200)) {
 			tagModel.setRunState(Constants.DT_MODEL_ERROR);
+			if (StringUtils.isNotBlank(mppResult.getMessage())){
+				DtTaggingErrorLog errorLog = new DtTaggingErrorLog();
+				try {
+					errorLog.setErrorInfo(mppResult.getMessage());
+				}catch (Exception e2){
+					errorLog.setErrorInfo(mppResult.getMessage());
+				}
+				errorLog.setErrorTime(new Date());
+				errorLog.setTaggingModelId(taggingModelId);
+				dtTaggingErrorLogService.doSave(errorLog);
+			}else {
+
+			}
 		}
 		tagModel.setUpdateNum(totalCount);
 		tagModel.setSuccessNum(successCount);

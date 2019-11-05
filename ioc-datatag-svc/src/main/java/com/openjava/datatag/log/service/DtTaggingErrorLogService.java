@@ -24,4 +24,5 @@ public interface DtTaggingErrorLogService {
 	
 	void doDelete(Long id);
 	void doRemove(String ids);
+	DtTaggingErrorLog getByTaggingModelIdOrderByErrorTimeDesc(Long taggingModelId);
 }
