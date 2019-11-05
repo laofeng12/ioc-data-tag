@@ -208,6 +208,7 @@ public class DtTagAction {
                         TagDTOTreeNodeShow2 father = new TagDTOTreeNodeShow2();
                         father.setLabel(group.getTagsName());
                         father.setValue(group.getId().toString());
+                        father.setChildren(new ArrayList<>());
                         resultsList.add(father);
                         continue;
                     }
