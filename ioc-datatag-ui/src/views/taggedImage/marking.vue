@@ -40,73 +40,10 @@
         </div>
       </div>
     </div>
-    <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" center
+    <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" left
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="closeSettags" @open="init">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="选择标签组:" prop="tagTeam">
-          <el-col :span="9">
-            <el-select v-model="ruleForm.tagTeam" filterable placeholder="请选择标签组" size="small"
-                       @change="chooseTagTeam">
-              <el-option
-                v-for="item in tagTeamList"
-                :key="item.id"
-                :label="item.tagsName"
-                :value="item.id">
-              </el-option>
-            </el-select>
-          </el-col>
-        </el-form-item>
-        <el-form-item label="选择标签层:" prop="tagLev">
-          <el-col :span="7.5">
-            <div class="allTree">
-              <div class="sel">
-                <el-input size="small"
-                          readonly="readonly"
-                          placeholder="请输入内容"
-                          v-model="ruleForm.tagLev">
-                  <i slot="suffix" class="el-input__icon el-icon-arrow-down" @click="showTree()"></i>
-                </el-input>
-                <div class="treeBoder" v-show="showLevTree">
-                  <el-input size="small" v-model="ruleForm.tag" placeholder="请输入关键字查询" style="margin-bottom:10px;"/>
-                  <el-tree
-                    :data="treeLevdata"
-                    :props="defaultProps"
-                    node-key="id"
-                    ref="treeForm"
-                    show-checkbox
-                    default-expand-all
-                    check-strictly
-                    :filter-node-method="filterNode"
-                    @check-change="handleClick"
-                    @node-click="nodeClick">
-                      <span class="slot-t-node span-ellipsis" slot-scope="{ node, data }">
-                      <i :class="{ 'fa fa-folder': !node.expanded, 'fa fa-folder-open':node.expanded}"
-                         style="color: #fcd568;"/>
-                        <span :title="data.tagName">{{ data.tagName }}</span>
-                      </span>
-                  </el-tree>
-                </div>
-              </div>
-            </div>
-          </el-col>
-        </el-form-item>
-        <el-form-item label="打标设置:" prop="tagSet">
-          <el-col :span="9">
-            <el-select v-model="ruleForm.tagSet" filterable placeholder="请选择" size="small" @change="getLabel">
-              <el-option v-for="(item ,index) in tagSetList" :key="item.id" :label="item.tagName" :value="item.id">
-              </el-option>
-            </el-select>
-          </el-col>
-          <el-col :span="10">
-            <el-row>
-              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="handleMark">添加自动打标
-              </el-button>
-              <el-button type="primary" size="small" :disabled="ruleForm.tagSet===''" @click="selfMark">添加人工打标
-              </el-button>
-            </el-row>
-          </el-col>
-        </el-form-item>
         <div class="lookContent">
           <div class="contentTop" v-show="isHandle===0">
             <div class="connect-smbol-box">
@@ -121,6 +58,10 @@
                    :key="'count'+index" @click="chooseCountSymbol(item)">{{item.codename}}
               </div>
             </div>
+            <el-row class="autoBtn">
+              <el-button type="primary" size="small" @click="selfMark">添加手动</el-button>
+              <el-button type="primary" size="small" @click="handleMark">添加自动</el-button>
+            </el-row>
           </div>
           <!--自动打标不可操作-->
           <div class="contentTop" v-show="isHandle===1">
@@ -136,6 +77,10 @@
                    :key="'count'+index">{{item.codename}}
               </div>
             </div>
+            <el-row class="autoBtn">
+              <el-button type="primary" size="small" @click="selfMark">添加手动</el-button>
+              <el-button type="primary" size="small" @click="handleMark">添加自动</el-button>
+            </el-row>
           </div>
           <!--自动打标不可操作-->
           <div class="makingContent">
@@ -143,10 +88,11 @@
             <div class="card" v-for="(item,index) in selfMarkList" :key="index" @click="chooseMark(item,index)"
                  :class="{acitve:curIndex===index}">
               <el-card class="box-card" :class="{borderColor:changeRed == index+1}">
-                <!--人工打标结构-->
+                <!--自动打标结构-->
                 <div class="card-handle" v-if="item.isHandle===0">
-                  <i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i>
-                  <div class="labelCard" :title="item.tagSetName">{{item.tagSetName}}</div>
+                  <div class="auto">自动</div>
+                  <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
+                               :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
                   <span class="chinese">{{item.sourceCol}}</span>
                   <div class="conditions">
                     <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
@@ -161,22 +107,28 @@
                       </div>
                     </div>
                   </div>
+                  <div class="autoDelete" @click="delSelfMark(index)">删除</div>
                 </div>
-                <!--自动打标结构-->
+                <!--手动打标结构-->
                 <div class="card2" v-else>
-                  <div><i class="el-icon-circle-close deleteContent" @click="delSelfMark(index)"></i></div>
                   <div>
-                    <div class="labelCard" :title="item.tagSetName">{{item.tagSetName}}</div>
+                    <div class="auto">手动</div>
+                  </div>
+                  <div>
+                    <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
+                                 :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
                   </div>
                   <div class="chinese">{{item.sourceCol}}</div>
                   <div class="self-mark-choose-box">
-                    <div class="chooseNum" @click="showSelf(item,$event)">
+                    <div class="chooseNum" @click="showSelf(item,$event)" id="handle">
                       <span>已选</span>
                       <span class="num">{{item.checkList.length}}</span>
+                      <!--<span class="num">{{checkList.length}}</span>-->
                       <span>条</span>
                       <i class="el-icon-caret-top" v-if="item.showSelfMark==true"></i>
                       <i class="el-icon-caret-bottom" v-else></i>
                     </div>
+
                     <div class="self-mark-list" v-show="item.showSelfMark">
                       <el-input
                         size="small"
@@ -187,12 +139,17 @@
                       </el-input>
                       <div class="checkIt">
                         <div class="checkOne" v-for="(colItem,cIndex) in listCheck">
-                          <el-checkbox @change="checkMarkChange(item)"  v-model="item.checkList" :key='cIndex' :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span></el-checkbox>
+                          <!--<el-checkbox-group v-model="item.checkList" @change="checkMarkChange(item)">-->
+                          <!--<el-checkbox :key='cIndex' :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span></el-checkbox>-->
+                          <!--</el-checkbox-group>-->
+                          <el-checkbox @change="checkMarkChange(item)" v-model="item.checkList" :key='cIndex'
+                                       :label="colItem.markName"><span class="col-name" :title="colItem.markName">{{colItem.markName}}</span>
+                          </el-checkbox>
                         </div>
                       </div>
                     </div>
                   </div>
-
+                  <div class="autoDelete" @click="delSelfMark(index)">删除</div>
                 </div>
 
               </el-card>
@@ -202,8 +159,9 @@
         </div>
 
       </el-form>
-      <div slot="footer" class="dialog-footer device">
-        <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="saveMark">确认打标
+      <div slot="footer" class="dialog-footer device" style="text-align: center">
+        <el-button size="small" class="queryBtn cancleBtn" :loading="saveLoading" @click="canselMark">取消</el-button>
+        <el-button size="small" type="primary" class="queryBtn  sureBtn" :loading="saveLoading" @click="saveMark">确定
         </el-button>
       </div>
     </el-dialog>
@@ -221,13 +179,16 @@
     delCol,
     cloneCol,
     getSymolsData,
-    getModelColsData
+    getModelColsData,
+    getListalldata
   } from '@/api/creatModel'
 
   export default {
     name: 'marking',
     data() {
       return {
+        defaultParams: {},
+        arrtest: [],
         changeRed:-1,
         Loading: true,
         saveLoading2: true,
@@ -309,7 +270,6 @@
       },
       'tagSetList': {
         handler: function (newValue, oldValue) {
-          // console.log('tagSetlist',newValue)
           this.tagSetList = newValue
         },
         deep: true
@@ -330,6 +290,8 @@
       },
     },
     created() {
+      //获取标签组
+      this.allData()
       this.modeleId = this.$route.query.id
       this.modelName = this.$route.query.modelName
       this.getlistTable()
@@ -341,6 +303,10 @@
     mounted() {
     },
     methods: {
+      // 取消
+      canselMark() {
+        this.setTagsDialog = false
+      },
       getLabel(){},
       closeSettags(){},
       closeControl() {
@@ -354,7 +320,7 @@
         this.colId = row.colId
         this.sourceCol = row.sourceCol
         //获取标签组
-        this.getMyTagGroupList(row.colId)
+        // this.getMyTagGroupList(row.colId)
         this.getHistoryColList(row.colId)
       },
       filterNode(value, data) {
@@ -362,7 +328,7 @@
         return data.label.indexOf(value) !== -1;
       },
       search() {
-        console.log("查询");
+        // console.log("查询");
       },
       async getlistTable() {
         try {
@@ -424,29 +390,6 @@
         }
         return newObj
       },
-      //选择标签层拿树
-      nodeClick(data, checked, node) {
-      },
-      handleClick(data, checked, node) {
-        if (checked === true) {
-          this.tagSetList = []
-          this.checkedId = data.id;
-          this.$refs.treeForm.setCheckedKeys([data.id]);
-          if (data.childrenNode) {
-            data.childrenNode.map(item => {
-              if (item.leafParent == false) {
-                this.tagSetList.push(item)
-              }
-            })
-          }
-          this.ruleForm.tagLev = data.tagName
-          this.showLevTree = false
-        } else {
-          if (this.checkedId == data.id) {
-            this.$refs.treeForm.setCheckedKeys([data.id]);
-          }
-        }
-      },
       //选择连接符号
       chooseConnectSymbo(item) {
         const conditionObj = {
@@ -479,7 +422,6 @@
           theValues: '',
           valuesType: this.valuesType,
         }
-        //console.log('this.selfMarkList',this.selfMarkList)
         const consLen = this.selfMarkList[this.curIndex].conditionSetting.length
         if (consLen === 0) {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
@@ -529,8 +471,6 @@
       //自动打标
       handleMark() {
         let tagSetName = ''
-        //console.log('this.ruleForm.tagSet',this.ruleForm.tagSet)
-        //console.log('this.tagSetList', this.tagSetList)
         this.tagSetList.forEach((item) => {
           if (item.id === this.ruleForm.tagSet) {
             return tagSetName = item.tagName
@@ -582,7 +522,6 @@
         }, [])
       },
       delSelfMark(index) {
-        // console.log(index)
         this.selfMarkList.splice(index, 1)
         this.changeRed = -1
       },
@@ -616,52 +555,10 @@
         } catch (e) {
         }
       },
-      //选择标签组
-      chooseTagTeam(id) {
-        this.chooseTagTeamid = id
-        this.getTagLevList(id)
-        this.tagTeamList.forEach(item => {
-          if (item.id == id) {
-            this.chooseTagTeamname = item.tagsName
-          }
-        })
-        this.$nextTick(() => {
-          this.$refs.treeForm.setCheckedKeys([]);
-        })
-      },
       //关闭打标
       close() {
         this.showSelfMark = false
         this.colList = []
-      },
-      // 协作选择标签组
-      async getMyTagGroupList(fieldId) {
-        try {
-          const params = {
-            colField: fieldId,
-            modelId: this.modeleId
-          }
-          const data = await getTaggroup(params)
-          this.tagTeamList = data.rows
-        } catch (e) {
-          console.log(e);
-        }
-      },
-      // 标签层数据
-      async getTagLevList(id) {
-        try {
-          const data = await getTagLevData(id)
-          // console.log('选择标签层', data.childrenNode)
-          this.treeLevdata = data.childrenNode
-          this.ruleForm.tagLev = ''
-          this.ruleForm.tagSet = ''
-          this.tagSetList = []
-          this.$nextTick(() => {
-            this.$refs['ruleForm'].clearValidate()
-          });
-        } catch (e) {
-
-        }
       },
       // 查询打标历史接口
       async getHistoryColList(colId) {
@@ -670,25 +567,6 @@
         }
         try {
           const data = await getHistoryColData(params)
-          // console.log('打标历史接口data', data)
-          //被选标签组
-          this.ruleForm.tagTeam = data.selectTagGroup.id
-          // this.chooseTagTeam(data.selectTagGroup.id)
-          this.$nextTick(()=>{
-            this.chooseTagTeam(data.selectTagGroup.id)
-          })
-          //标签层数树
-          this.getTagLevList(this.ruleForm.tagTeam)
-          //选择标签层
-          // this.ruleForm.tagLev = data.selectTags.tagName
-          // 打标设置
-          // this.ruleForm.tagSet = data.selectTag.tagName
-          //历史数据
-          // this.$refs.treeForm.setCheckedKeys([data.selectTags.id]);
-          // const obj = {
-          //   tagName: data.selectTag.tagName,
-          //   id: data.selectTag.id
-          // this.tagSetList.push(obj)
           //打标相关字段  this.checkList
           data.condtion.forEach(item =>{
             item.conditionSetting.map(itemIndex =>{
@@ -700,15 +578,13 @@
           })
           this.selfMarkList = this.deepClone(data.condtion)
           this.selfMarkList.map((item, index) => {
+            const arrPath = item.idPath.split(',')
             item.showSelfMark = false
             item.checkList = item.conditionSetting[0].theValues.split(',')
-            // this.checkList = item.conditionSetting[0].theValues.split(',')
-            item.tagSetName = item.tagName
+            item.tagId = arrPath
           })
           this.curIndex = this.selfMarkList.length - 1
-          //console.log('this.selfMarkList',this.selfMarkList)
           this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
-          // console.log('this.conditionSetting',this.conditionSetting)
         } catch (e) {
 
         }
@@ -727,8 +603,10 @@
       },
       //打标确认保存
       async getSaveMarkList() {
-        // console.log('this.selfMarkList',this.selfMarkList)
-        // console.log('this.valuesType',this.valuesType)
+        this.selfMarkList.map(item =>{
+          const arrId = item.tagId.pop()
+          item.tagId = arrId
+        })
         let conditions = this.deepClone(this.selfMarkList)
         conditions.forEach((obj, index) => {
           delete obj.checkList
@@ -742,7 +620,7 @@
           colId: this.colId,
           condtion: conditions
         }
-        try{
+        try {
           const data = await saveMarkData(params)
           this.$message({
             showClose: true,
@@ -753,11 +631,10 @@
           this.setTagsDialog = false
           this.selfMarkList = []
           this.changeRed = -1
-        }catch (e) {
-          console.log('e',e);
+        } catch (e) {
+          console.log('e', e);
           this.changeRed = e.data
         }
-
       },
       //选中要打标条件修改
       chooseMark(item, index) {
@@ -765,6 +642,11 @@
         //console.log('选中要打标的项',item)
         this.isHandle = item.isHandle
         this.conditionSetting = item.conditionSetting
+      },
+      // 打标所有的数据
+      async allData(){
+        const resData = await getListalldata()
+        this.arrtest = resData
       }
     },
     computed: {
@@ -950,13 +832,15 @@
 
   .lookContent {
     border: 1px solid #dcdfe6;
-    padding: 0px 10px;
     border-radius: 4px;
+    background: #F3F3F3;
   }
 
   .contentTop {
     display: flex;
     border-bottom: 1px solid #dcdfe6;
+    position: relative;
+    background-color: #fff;
     .connect-smbol-box {
       display: flex;
     }
@@ -967,9 +851,9 @@
 
   .topOne {
     width: 40px;
-    height: 32px;
+    height: 40px;
     text-align: center;
-    line-height: 32px;
+    line-height: 40px;
     font-size: 12px;
     color: #0486fe;
     cursor: pointer;
@@ -995,19 +879,18 @@
   }
 
   .makingContent {
-    margin-top: 20px;
-    min-height: 100px;
+    min-height: 200px;
+    max-height: 400px;
+    overflow: auto;
+    padding-bottom: 10px;
+    padding: 0px 10px;
+    background: #F3F3F3;
   }
 
   .card {
     margin-bottom: 10px;
     cursor: pointer;
-    &.acitve {
-      /*      box-shadow: 0 2px 12px 0 #0486fe;
-            box-shadow: 0 2px 12px 0 #86fe00;*/
-      /*  border: 1px solid #0486fe;*/
-
-    }
+    position: relative;
   }
 
   .chooseNum {
@@ -1055,6 +938,7 @@
   .card2 {
     display: flex;
     align-items: center;
+    padding: 8px 0px;
   }
 
   .checkIt {
@@ -1118,5 +1002,68 @@
     content: '';
     display: block;
     clear: both;
+  }
+</style>
+<style>
+  .creat .el-dialog__title {
+    font-family: PingFangSC-Medium;
+    font-size: 16px;
+    color: #262626;
+  }
+
+  .creat .el-dialog__body {
+    padding: 18px 20px !important;
+  }
+
+  .creat .el-button {
+    padding: 0 16px !important;
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #0486FE;
+    background-color: #fff !important;
+  }
+
+  .creat .sureBtn {
+    color: #fff;
+    background-color: #0486fe !important;
+  }
+
+  .creat .cancleBtn {
+    border: 1px solid #0486FE;
+  }
+
+  .creat .card-handle {
+    min-height: 50px;
+  }
+
+  .creat .el-card__body {
+    padding: 6px 70px 3px 9px !important;
+  }
+
+  .auto {
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #999999;
+    margin-right: 14px;
+  }
+
+  .autoDelete {
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #FF7374;
+    position: absolute;
+    right: 20px;
+    line-height: 50px;
+  }
+
+  .autoBtn {
+    position: absolute;
+    right: 11px;
+    top: 7px;
+  }
+
+  .autoBtn .el-button {
+    height: 26px !important;
+    line-height: 26px !important;
   }
 </style>
