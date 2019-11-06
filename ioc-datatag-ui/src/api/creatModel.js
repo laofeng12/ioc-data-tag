@@ -235,3 +235,25 @@ export function getdatalakeLink(resourceId) {
     method:'get'
   })
 }
+
+/**
+ * 新修改的数据打标接口
+ * @param tagsId
+ */
+// export function getListdata(tagsId) {
+//   return fetch ({
+//     url:'/datatag/tagmanage/dtTag/getTreeByTagsId/' + tagsId,
+//     method:'get'
+//   })
+// }
+
+/**
+ * 新修改的数据打标获取全部数据接口
+ * @param
+ */
+export function getListalldata() {
+  return fetch ({
+    url:'/datatag/tagmanage/dtTag/getAllTree',
+    method:'get'
+  })
+}
