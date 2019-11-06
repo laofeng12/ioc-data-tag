@@ -7,6 +7,7 @@
           clearable
           placeholder="请输入内容"
           prefix-icon="el-icon-search"
+          @keyup.enter.native="shareQuery"
           v-model="input2">
         </el-input>
         <el-button class="zxlistBtn" size="small" type="primary" @click="shareQuery">查询</el-button>
