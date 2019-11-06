@@ -193,7 +193,7 @@
           <div>
             <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="sureDelete">确定删除
             </el-button>
-            <el-button size="small" type="primary" class="queryBtn" @click="cancelDelete">取消</el-button>
+            <el-button size="small" plain  @click="cancelDelete">取消</el-button>
           </div>
         </div>
       </el-dialog>
