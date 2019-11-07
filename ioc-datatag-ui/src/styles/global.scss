@@ -114,7 +114,7 @@ p {
   cursor: pointer;
 }
 
-// 暂时为了迁就菜单组件问题使用
+// 暂时为了菜单组件问题使用
 // 开始
 .el-table{
   padding: 0px !important;
@@ -135,6 +135,10 @@ p {
 }
 // 暂时字段设置
 .formClass .el-form{
+  padding: 0px !important;
+}
+
+.creat .el-form{
   padding: 0px !important;
 }
 // 结束

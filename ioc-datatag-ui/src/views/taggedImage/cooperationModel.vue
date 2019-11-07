@@ -51,14 +51,16 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="people" label="发起人/发起时间">
-            <template slot-scope="scope">
-              <div>
-                <div>{{scope.row.createUserName}}</div>
-                <div>{{scope.row.createTime}}</div>
-              </div>
-            </template>
-          </el-table-column>
+          <!--<el-table-column prop="people" label="发起人/发起时间">-->
+            <!--<template slot-scope="scope">-->
+              <!--<div>-->
+                <!--<div>{{scope.row.createUserName}}</div>-->
+                <!--<div>{{scope.row.createTime}}</div>-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <el-table-column prop="createUserName" label="发起人"></el-table-column>
+          <el-table-column prop="createTime" label="发起时间"></el-table-column>
           <el-table-column label="操作" width="60px">
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="打标" placement="top">

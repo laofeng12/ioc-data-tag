@@ -39,21 +39,27 @@
           <el-table-column prop="createUserName" label="创建者"></el-table-column>
           <el-table-column prop="state" label="状态">
             <template slot-scope="scope">
-              <div class="state">
+              <div class="state" v-if="scope.row.runState !== '运行错误'">
+                <div class="spot" :style="spotColor(scope.row.runState)"></div>
+                <div class="stateName" :style="stateColor(scope.row.runState)">{{scope.row.runState}}</div>
+              </div>
+              <div class="state errorState" v-else @click="handleError(scope.row.taggingModelId)">
                 <div class="spot" :style="spotColor(scope.row.runState)"></div>
                 <div class="stateName" :style="stateColor(scope.row.runState)">{{scope.row.runState}}</div>
               </div>
             </template>
           </el-table-column>
           <el-table-column prop="runResult" label="调度总量/成功数量"></el-table-column>
-          <el-table-column prop="people" label="修改人/修改时间">
-            <template slot-scope="scope">
-              <div>
-                <div>{{scope.row.modifyUserName}}</div>
-                <div>{{scope.row.modifyTime}}</div>
-              </div>
-            </template>
-          </el-table-column>
+          <!--<el-table-column prop="people" label="修改人/修改时间">-->
+            <!--<template slot-scope="scope">-->
+              <!--<div>-->
+                <!--<div>{{scope.row.modifyUserName}}</div>-->
+                <!--<div>{{scope.row.modifyTime}}</div>-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <el-table-column prop="modifyUserName" label="修改人"></el-table-column>
+          <el-table-column prop="modifyTime" label="修改时间"></el-table-column>
           <el-table-column label="操作" width="260px">
             <template slot-scope="scope" class="caozuo">
               <el-tooltip class="item" effect="dark" content="调度" placement="top">
@@ -187,7 +193,7 @@
           <div>
             <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="sureDelete">确定删除
             </el-button>
-            <el-button size="small" type="primary" class="queryBtn" @click="cancelDelete">取消</el-button>
+            <el-button size="small" plain  @click="cancelDelete">取消</el-button>
           </div>
         </div>
       </el-dialog>
@@ -228,12 +234,24 @@
           </div>
         </div>
       </el-dialog>
+      <!--查看错误日志-->
+      <el-dialog class="creat" title="错误日志" :visible.sync="errorDialog" width="600px" center
+                 :close-on-click-modal="false">
+        <div class="del-dialog-cnt">
+          <div class="errorContent">{{errorContent}}</div>
+        </div>
+        <div slot="footer" class="dialog-footer device">
+          <div>
+            <el-button size="small" type="primary" class="queryBtn" @click="cancelError">关闭</el-button>
+          </div>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
-  import {getmodelList, getDispatch, getDelete, getDispatchdetail,startDown} from '@/api/lableImage.js'
+  import {getmodelList, getDispatch, getDelete, getDispatchdetail,startDown,getError} from '@/api/lableImage.js'
   import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
   import DMSocket from '@/utils/DMSocket'
@@ -244,8 +262,7 @@
     name: "tagManage",
     data() {
       return {
-        loadNum:'',
-        tt:'',
+        errorContent:'',
         lockReconnect:false,
         webUserId: '',
         downloadId:'',
@@ -259,6 +276,7 @@
         deleteName: '',
         deleteId: '',
         input2: '',
+        errorDialog:false,
         Loading: true,
         saveLoading2: true,
         controlDialog: false,
@@ -641,6 +659,15 @@
           this.reconnect(url);
         }
       },
+      // 查看错误日记
+      async handleError(taggingModelId){
+        this.errorDialog = true
+        const res = await getError(taggingModelId)
+        this.errorContent = res
+      },
+      cancelError(){
+        this.errorDialog = false
+      }
     },
     created() {
       this.webUserId = this.$store.state.user.userInfo.userId
@@ -694,11 +721,21 @@
     display: flex;
     align-items: center;
   }
-
+  .errorState{
+    cursor: pointer;
+  }
   .stateName {
     color: #00CC33;
   }
-
+  .errorContent{
+    width: 100%;
+    height: 300px;
+    overflow-y: auto;
+    padding: 12px;
+    background-color: rgba(51, 51, 51, 1);
+    color: #ffffff;
+    line-height: 25px;
+  }
   .area {
     width: 360px;
   }
