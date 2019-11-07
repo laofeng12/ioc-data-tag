@@ -381,10 +381,10 @@ public class DtSetColServiceImpl implements DtSetColService {
 			for (int i = 0; i < saveconditions.size(); i++) {
 				DtTagConditionDTO record =saveconditions.get(i);
 				if (record.getTagId()==null||dtTagService.get(record.getTagId())==null) {
-					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"condtion参数的tagId为空或查无此标签");
+					throw new APIException(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR,(i+1)+"");//i参数可以告知前端第几个条件设置错误了
 				}
 				if (!record.getColId().equals(req.getColId())) {
-					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"conditions参数的colI错误");
+					throw new APIException(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR,(i+1)+"");//i参数可以告知前端第几个条件设置错误了
 				}
 				//校验条件是否合法
 				String filterExpression = null;
