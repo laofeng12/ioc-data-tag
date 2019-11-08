@@ -592,53 +592,38 @@
         }
       },
       //确认打标按钮保存
-      saveMark() {
+      async saveMark() {
         this.saveLoading = true
-        this.$refs.ruleForm.validate(async (valid) => {
-          if (valid) {
-            this.selfMarkList.map(item =>{
-              if(this.changeRed == -1 && item.tagId.length > 1){
-                const arrId = item.tagId.pop()
-                item.tagId = arrId
-              }else {
-                // console.log('item22',item);
-                // console.log('item555',item.tagId);
-              }
-
-            })
-            let conditions = this.deepClone(this.selfMarkList)
-            conditions.forEach((obj, index) => {
-              delete obj.checkList
-              delete obj.sourceCol
-              delete obj.tagSetName
-              delete obj.showSelfMark
-              obj.colId = this.colId
-              return obj
-            })
-            const params = {
-              colId: this.colId,
-              condtion: conditions
-            }
-            try {
-              const data = await saveMarkData(params)
-              this.$message({
-                showClose: true,
-                message: '打标成功',
-                duration: 2000,
-                type: 'success'
-              })
-              this.setTagsDialog = false
-              this.selfMarkList = []
-              this.changeRed = -1
-            } catch (e) {
-              console.log('e', e);
-              this.changeRed = e.data
-            }
-            this.saveLoading = false
-          } else {
-            this.saveLoading = false
+        try {
+          let conditions = this.deepClone(this.selfMarkList)
+          conditions.forEach((obj, index) => {
+            delete obj.checkList
+            delete obj.sourceCol
+            delete obj.tagSetName
+            delete obj.showSelfMark
+            obj.colId = this.colId
+            obj.tagId = obj.tagId && obj.tagId.pop()
+            return obj
+          })
+          const params = {
+            colId: this.colId,
+            condtion: conditions
           }
-        });
+          const data = await saveMarkData(params)
+          this.$message({
+            showClose: true,
+            message: '打标成功',
+            duration: 2000,
+            type: 'success'
+          })
+          this.setTagsDialog = false
+          this.selfMarkList = []
+          this.changeRed = -1
+        } catch (e) {
+          console.log('e', e);
+          this.changeRed = e.data
+        }
+        this.saveLoading = false
       },
       //选中要打标条件修改
       chooseMark(item, index) {
