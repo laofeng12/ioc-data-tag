@@ -113,11 +113,11 @@
     name: 'tagPanel',
     data() {
       return {
-        tablelistOne:[],
-        tablelistTwo:[],
-        tablelistThree:[],
-        tablelistFouth:[],
-        tablelistFifth:[],
+        tablelistOne:[], // 今天
+        tablelistTwo:[], // 昨天
+        tablelistThree:[], // 最近一个星期
+        tablelistFouth:[], // 最近一个月
+        tablelistFifth:[], // 最近一年
         num:{
           numOne:'',
           numTwo:'',
@@ -130,9 +130,9 @@
       async labelNum(){
         try{
           const res = await labelNum()
-          this.num.numOne = res.data.ALL_TAG_NB
-          this.num.numTwo = res.data.MONTH_TAG_NB
-          this.num.numThree = res.data.YEAR_TAG_NB
+          this.num.numOne = res.data.ALL_TAG_NB  //全部标签
+          this.num.numTwo = res.data.MONTH_TAG_NB //过去一个月
+          this.num.numThree = res.data.YEAR_TAG_NB //过去一年
         }catch (e) {
           console.log(e);
         }
@@ -144,11 +144,11 @@
           const weekList = await getWeek()
           const monthList = await getMonth()
           const yearList = await getYear()
-          this.tablelistOne = todayList.data
-          this.tablelistTwo = yesterdayList.data
-          this.tablelistThree = weekList.data
-          this.tablelistFouth = monthList.data
-          this.tablelistFifth = yearList.data
+          this.tablelistOne = todayList.data  // 今天
+          this.tablelistTwo = yesterdayList.data  // 昨天
+          this.tablelistThree = weekList.data  // 最近一个星期
+          this.tablelistFouth = monthList.data // 最近一个月
+          this.tablelistFifth = yearList.data // 最近一年
         }catch (e) {
           console.log(e);
         }

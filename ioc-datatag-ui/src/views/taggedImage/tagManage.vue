@@ -70,15 +70,12 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
-                <!--<i class="el-icon-delete iconLogo" @click="delTag(row.id)"></i>-->
                  <i class="el-icon-delete iconLogo" @click="delTaglabel(row)"></i>
               </span>
               </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
-        <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
-                            <!--@sureClick="goPage"></element-pagination>-->
         <element-pagination
           :pageSize="size"
           :currentPage="page+1"
@@ -258,6 +255,7 @@
           return '#67c23a';
         }
       },
+      // 设置
       handleShare(row, index) {
         this.shareDialog = true
         this.ruleForm.labelName = row.tagsName
@@ -268,13 +266,13 @@
           this.isShare = true
         }
         this.labelId = row.id
-        // console.log(this.isShare)
-
       },
+      // 关闭
       closeShare() {
         this.shareDialog = false
         this.$refs.ruleForm.resetFields()
       },
+      // 取消
       closeShare2() {
         this.shareDialog = false
         this.$refs.ruleForm.resetFields()
@@ -298,9 +296,11 @@
         });
 
       },
+      // 创建标签组
       createLabel() {
         this.labelcreatDialog = true
       },
+      // 确认
       sureCreat() {
         try {
           this.creatsaveLoading = true
@@ -329,14 +329,17 @@
           console.log(e);
         }
       },
+      // 关闭
       closeCreat() {
         this.$refs.ruleForm.resetFields();
         this.labelcreatDialog = false
       },
+      // 取消
       cancleCreat() {
         this.$refs.ruleForm.resetFields();
         this.labelcreatDialog = false
       },
+      // 共享标签组
       shareLabel() {
         this.$router.push('/shareLabel')
       },
@@ -424,6 +427,7 @@
       goPage() {
 
       },
+      // 删除
       delTaglabel(row){
         this.deleteDialog = true
         this.tagName = row.tagsName

@@ -35,14 +35,6 @@
           </el-table-column>
           <el-table-column prop="level1" label="单位" ></el-table-column>
           <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
-          <!--<el-table-column prop="people" label="共享人/更新时间" >-->
-            <!--<template slot-scope="scope">-->
-              <!--<div>-->
-                <!--<div>{{scope.row.shareUserName}}</div>-->
-                <!--<div>{{scope.row.modifyTime}}</div>-->
-              <!--</div>-->
-            <!--</template>-->
-          <!--</el-table-column>-->
           <el-table-column prop="shareUserName" label="共享人" ></el-table-column>
           <el-table-column prop="modifyTime" label="更新时间" ></el-table-column>
           <el-table-column label="操作" width="125px">
@@ -62,7 +54,6 @@
             </template>
           </el-table-column>
         </el-table>
-        <!--<element-pagination :pageSize="size"  :total="totalnum"  @handleCurrentChange="handleCurrentChange" @sureClick="goPage"></element-pagination>-->
         <element-pagination
           :pageSize="size"
           :currentPage="page+1"
@@ -106,8 +97,8 @@
         shareDialog:false,
         saveLoading:false,
         labelDialog:false,
-        selectionId:'',
-        selectiontagsName:'',
+        selectionId:'', // 选用id
+        selectiontagsName:'', // 选用名称
         percentage: 0,
         ztableShowList:[],
       }
@@ -137,9 +128,11 @@
         this.shareDialog = false
         this.$refs.ruleForm.resetFields()
       },
+      // 我的标签组
       createLabel(){
         this.$router.push('tagManage')
       },
+      // 列表
       async handleSearch(){
         try{
           const search = await shareSearch({
@@ -179,11 +172,13 @@
         this.size = size
         this.handleSearch()
       },
+      // 查询
       shareQuery(){
         this.page = 0
         this.handleSearch()
       },
       goPage(){},
+      // 选用
       Selection(id,name){
         this.labelDialog = true
         this.selectionId = id
@@ -192,6 +187,7 @@
       closelabelDialog(){
         this.labelDialog = false
       },
+      // 确认选用
       async sureOk(){
         this.saveLoading = true
         try{
