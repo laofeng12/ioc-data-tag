@@ -26,7 +26,7 @@
                 <el-tab-pane label="可用字段" name="first">
                   <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
                             suffix-icon="el-icon-search"></el-input>
-                  <div class="h4">
+                  <div class="h4" v-show="list.length > 0">
                     <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
                       {{resourceName}}
                     </el-checkbox>
