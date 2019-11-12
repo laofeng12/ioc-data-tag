@@ -28,15 +28,10 @@
         <span class="custom-tree-node" slot-scope="{ node, data }">
         <span class="labelLength" :title="node.label">{{ node.label }}</span>
         <span v-show="addLabel">
-          <!--<el-button-->
-          <!--type="text"-->
-          <!--size="mini"-->
-          <!--@click="() => append(data)">-->
           <el-button class="addBtn" type="text" size="mini" @click.stop="addTwo(node,data)" :disabled="node.level>2">
             <!--Append-->
             <i class="el-icon-plus"></i>
           </el-button>
-          <!--<el-button type="text" size="mini" @click.stop="remove(node, data)" :disabled="node.level>2">-->
           <el-button type="text" size="mini" @click.stop="remove(node, data)">
             <!--Delete-->
             <i class="el-icon-delete"></i>
@@ -362,6 +357,7 @@
         if (!value) return true;
         return data.tagName.indexOf(value) !== -1;
       },
+      // 获取标签信息
       async handleNodeClick(data) {
         this.ruleForm2.name2 = data.tagName
         this.ruleForm2.textarea2 = data.synopsis
@@ -374,6 +370,7 @@
           this.Loading2 = false
         }
       },
+      // 增加
       append(data) {
         const newChild = {id: id++, label: 'testtest', children: []};
         if (!data.children) {
@@ -381,13 +378,11 @@
         }
         data.children.push(newChild);
       },
-
+      // 删除
       remove(node, data) {
-        console.log('删除了',data)
         this.deleteDialog = true
         this.tagName = data.tagName
         this.delTreeId = data.id
-        // this.delTree(data.id)
       },
       renderContent(h, {node, data, store}) {
         return (
