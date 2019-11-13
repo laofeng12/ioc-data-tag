@@ -31,8 +31,8 @@
               <template slot="header" slot-scope="scope">
                 <span>{{item.showCol}}</span>
                 <el-tooltip class="item" effect="dark" content="打标" placement="top">
-                <i v-if="item.isMarking==1&&item.isCooField==1" class="el-icon-price-tag  iconLogo"
-                   @click="dataMaking(item)"></i>
+                  <i v-if="item.isMarking==1&&item.isCooField==1" class="el-icon-price-tag  iconLogo"
+                     @click="dataMaking(item)"></i>
                 </el-tooltip>
               </template>
             </el-table-column>
@@ -40,7 +40,7 @@
         </div>
       </div>
     </div>
-    <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" left
+    <el-dialog class="creat newData" title="数据打标" :visible.sync="setTagsDialog" width="900px" left
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="closeSettags" @open="init">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -91,8 +91,9 @@
                 <!--自动打标结构-->
                 <div class="card-handle" v-if="item.isHandle===0">
                   <div class="auto">自动</div>
-                  <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
-                               :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
+                  <el-cascader ref="myCascader" v-model="item.tagId" size="small"
+                               :options="arrtest" :props="defaultParams" :clearable="true"
+                               :show-all-levels="false"></el-cascader>
                   <span class="chinese">{{item.sourceCol}}</span>
                   <div class="conditions">
                     <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
@@ -115,8 +116,9 @@
                     <div class="auto">手动</div>
                   </div>
                   <div>
-                    <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
-                                 :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
+                    <el-cascader ref="myCascader" v-model="item.tagId" size="small"
+                                 :options="arrtest" :props="defaultParams" :clearable="true"
+                                 :show-all-levels="false"></el-cascader>
                   </div>
                   <div class="chinese">{{item.sourceCol}}</div>
                   <div class="self-mark-choose-box">
@@ -160,7 +162,7 @@
 
       </el-form>
       <div slot="footer" class="dialog-footer device" style="text-align: center">
-        <el-button size="small" class="queryBtn cancleBtn" :loading="saveLoading" @click="canselMark">取消</el-button>
+        <el-button size="small" class="queryBtn cancleBtn" @click="canselMark">取消</el-button>
         <el-button size="small" type="primary" class="queryBtn  sureBtn" :loading="saveLoading" @click="saveMark">确定
         </el-button>
       </div>
@@ -189,7 +191,7 @@
       return {
         defaultParams: {},
         arrtest: [],
-        changeRed:-1,
+        changeRed: -1,
         Loading: true,
         saveLoading2: true,
         fieldId: '',  // 打标字段ID
@@ -241,11 +243,11 @@
         showLevTree: false,
         showSelfMark: false,
         valuesType: '',
-        sourceCol: '',//打标字段名称
+        sourceCol: '',// 打标字段名称
         searchWord: '',// 搜索自动打标值
-        colList: [],//对应字段列内容
+        colList: [],// 对应字段列内容
         checkList: [],
-        selfMarkList: [],//所有自动打标数据
+        selfMarkList: [],// 所有自动打标数据
         condition: [],
         conditionSetting: [],
         isHandle: 1,
@@ -290,7 +292,7 @@
       },
     },
     created() {
-      //获取标签组
+      // 获取标签组
       this.allData()
       this.modeleId = this.$route.query.id
       this.modelName = this.$route.query.modelName
@@ -307,8 +309,10 @@
       canselMark() {
         this.setTagsDialog = false
       },
-      getLabel(){},
-      closeSettags(){},
+      getLabel() {
+      },
+      closeSettags() {
+      },
       closeControl() {
         this.makingDialog = false
         this.$refs.ruleForm.resetFields()
@@ -319,7 +323,7 @@
         this.fieldId = row.colId
         this.colId = row.colId
         this.sourceCol = row.sourceCol
-        //获取标签组
+        // 获取标签组
         // this.getMyTagGroupList(row.colId)
         this.getHistoryColList(row.colId)
       },
@@ -333,7 +337,7 @@
       async getlistTable() {
         try {
           const list = await getSearchcoofield({
-            modelId: this.modeleId,
+            modelId: this.modeleId, // 模型id
             // modelId: '1643371',
             userId: ''
           })
@@ -348,9 +352,9 @@
         try {
           const data = await getModelColsData(this.modeleId, 0, 100, 1)
           // console.log('表格数据', data)
-          if(data.data.content && data.data.content.length >0){
+          if (data.data.content && data.data.content.length > 0) {
             this.tableData = data.data.content
-          }else{
+          } else {
             this.tableData = []
             this.Loading = false
           }
@@ -359,7 +363,7 @@
         }
       },
 
-      // dabiao
+      // 初始化打标的数据，先清空
       init() {
         this.ruleForm.tagTeam = ''
         this.treeLevdata = []
@@ -370,15 +374,15 @@
           this.$refs['ruleForm'].clearValidate()
         });
       },
-      //点击分页跳转
+      // 点击分页跳转
       handleCurrentChange(page) {
         this.page = page - 1
       },
-      //点击分页确认
+      // 点击分页确认
       goPage() {
 
       },
-      //深度克隆
+      // 深度克隆
       deepClone(obj) {
         let newObj = Array.isArray(obj) ? [] : {}
         if (obj && typeof obj === 'object') {
@@ -390,7 +394,7 @@
         }
         return newObj
       },
-      //选择连接符号
+      // 选择连接符号
       chooseConnectSymbo(item) {
         const conditionObj = {
           isConnectSymbol: 1,//是否有连接符号
@@ -402,23 +406,23 @@
         if (consLen === 1) {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         } else if (consLen === 2) {
-          if(item.codename==='('){
+          if (item.codename === '(') {
             this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
-          }else {
+          } else {
             this.selfMarkList[this.curIndex].conditionSetting.splice(1, 1)
             this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
           }
 
-        }else{
+        } else {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         }
         this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
       },
-      //选择运算符号
+      // 选择运算符号
       chooseCountSymbol(item) {
         const conditionObj = {
-          isConnectSymbol: 0,//是否有连接符号
-          symbol: item.codename,//连接符名或者>,=
+          isConnectSymbol: 0,// 是否有连接符号
+          symbol: item.codename,// 连接符名或者>,=
           theValues: '',
           valuesType: this.valuesType,
         }
@@ -430,7 +434,7 @@
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         } else if (consLen === 2) {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
-        }else {
+        } else {
           this.selfMarkList[this.curIndex].conditionSetting.push(conditionObj)
         }
         this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
@@ -441,7 +445,7 @@
         this.ruleForm.tagTeam = ''
         this.selfMarkList = []
       },
-      //点击人工打标按钮
+      // 点击人工打标按钮
       selfMark() {
         let tagSetName = ''
         this.tagSetList.forEach((item) => {
@@ -450,7 +454,7 @@
           }
         })
         const conditionSetting = [{
-          isConnectSymbol: 0,//是否有连接符号
+          isConnectSymbol: 0,// 是否有连接符号
           symbol: 'IN',
           theValues: '',
           valuesType: this.valuesType,
@@ -461,14 +465,14 @@
           sourceCol: this.sourceCol,
           checkList: [],
           showSelfMark: false,
-          isHandle: 1,//人工打标
+          isHandle: 1,// 人工打标
           conditionSetting: conditionSetting
         }
         this.selfMarkList.push(markObj)
         this.curIndex = this.selfMarkList.length - 1
         this.isHandle = 1
       },
-      //自动打标
+      // 自动打标
       handleMark() {
         let tagSetName = ''
         this.tagSetList.forEach((item) => {
@@ -482,14 +486,14 @@
           sourceCol: this.sourceCol,
           checkList: [],
           showSelfMark: false,
-          isHandle: 0,//自动打标
+          isHandle: 0,// 自动打标
           conditionSetting: []
         }
         this.selfMarkList.push(markObj)
         this.curIndex = this.selfMarkList.length - 1
         this.isHandle = 0
       },
-      //选中自动打标内容
+      // 选中自动打标内容
       checkMarkChange(item) {
         this.checkList = item.checkList
         item.conditionSetting[0].theValues = this.checkList.join(",")
@@ -497,7 +501,7 @@
         item.showSelfMark = false
         this.showSelf(item)
       },
-      //显示标签层
+      // 显示标签层
       showTree() {
         this.showLevTree = !this.showLevTree
       },
@@ -505,7 +509,7 @@
         const res = new Map()
         return arr.filter((markName) => !res.has(markName) && res.set(markName, 1))
       },
-      //显示自动打标内容
+      // 显示自动打标内容
       showSelf(itemObj) {
         itemObj.showSelfMark = !itemObj.showSelfMark
         this.colList = []
@@ -515,7 +519,7 @@
           this.colList.push({markName: markName})
         })
         const obj = {}
-        //数组去重
+        // 数组去重
         this.colList = this.colList.reduce((item, next) => {
           obj[next.markName] ? '' : obj[next.markName] = true && item.push(next)
           return item
@@ -528,7 +532,7 @@
       search() {
         // console.log("查询");
       },
-      ///过滤树
+      // 过滤树
       filterNode(value, data) {
         if (!value) return true;
         return data.tagName.indexOf(value) !== -1;
@@ -555,7 +559,7 @@
         } catch (e) {
         }
       },
-      //关闭打标
+      // 关闭打标
       close() {
         this.showSelfMark = false
         this.colList = []
@@ -567,10 +571,10 @@
         }
         try {
           const data = await getHistoryColData(params)
-          //打标相关字段  this.checkList
-          data.condtion.forEach(item =>{
-            item.conditionSetting.map(itemIndex =>{
-              if(itemIndex.theValues == null){
+          // 打标相关字段  this.checkList
+          data.condtion.forEach(item => {
+            item.conditionSetting.map(itemIndex => {
+              if (itemIndex.theValues == null) {
                 itemIndex.theValues = ''
               }
             })
@@ -580,7 +584,7 @@
           this.selfMarkList.map((item, index) => {
             item.showSelfMark = false
             item.checkList = item.conditionSetting[0].theValues.split(',')
-            if(item.idPath){
+            if (item.idPath) {
               const arrPath = item.idPath.split(',')
               item.tagId = arrPath
             }
@@ -591,44 +595,24 @@
 
         }
       },
-      //确认打标按钮
-      saveMark() {
+      // 确认打标按钮保存
+      async saveMark() {
         this.saveLoading = true
-        this.$refs.ruleForm.validate((valid) => {
-          if (valid) {
-            this.getSaveMarkList()
-            this.saveLoading = false
-          } else {
-            this.saveLoading = false
-          }
-        });
-      },
-      //打标确认保存
-      async getSaveMarkList() {
-        this.selfMarkList.map(item =>{
-          if(this.changeRed == -1){
-            const arrId = item.tagId.pop()
-            item.tagId = arrId
-          }else {
-            // console.log('item22',item);
-            // console.log('item555',item.tagId);
-          }
-
-        })
-        let conditions = this.deepClone(this.selfMarkList)
-        conditions.forEach((obj, index) => {
-          delete obj.checkList
-          delete obj.sourceCol
-          delete obj.tagSetName
-          delete obj.showSelfMark
-          obj.colId = this.colId
-          return obj
-        })
-        const params = {
-          colId: this.colId,
-          condtion: conditions
-        }
         try {
+          let conditions = this.deepClone(this.selfMarkList)
+          conditions.forEach((obj, index) => {
+            delete obj.checkList
+            delete obj.sourceCol
+            delete obj.tagSetName
+            delete obj.showSelfMark
+            obj.colId = this.colId
+            obj.tagId = obj.tagId && obj.tagId.pop()
+            return obj
+          })
+          const params = {
+            colId: this.colId,
+            condtion: conditions
+          }
           const data = await saveMarkData(params)
           this.$message({
             showClose: true,
@@ -643,8 +627,9 @@
           console.log('e', e);
           this.changeRed = e.data
         }
+        this.saveLoading = false
       },
-      //选中要打标条件修改
+      // 选中要打标条件修改
       chooseMark(item, index) {
         this.curIndex = index
         //console.log('选中要打标的项',item)
@@ -652,7 +637,7 @@
         this.conditionSetting = item.conditionSetting
       },
       // 打标所有的数据
-      async allData(){
+      async allData() {
         const resData = await getListalldata()
         this.arrtest = resData
       }
@@ -1003,9 +988,11 @@
 
     }
   }
-.borderColor{
-  border: 1px solid #ee0320;
-}
+
+  .borderColor {
+    border: 1px solid #ee0320;
+  }
+
   .clearfix:after {
     content: '';
     display: block;
@@ -1013,17 +1000,17 @@
   }
 </style>
 <style>
-  .creat .el-dialog__title {
+  .newData .el-dialog__title {
     font-family: PingFangSC-Medium;
     font-size: 16px;
     color: #262626;
   }
 
-  .creat .el-dialog__body {
+  .newData .el-dialog__body {
     padding: 18px 20px !important;
   }
 
-  .creat .el-button {
+  .newData .el-button {
     padding: 0 16px !important;
     font-family: PingFangSC-Regular;
     font-size: 14px;
@@ -1031,20 +1018,20 @@
     background-color: #fff !important;
   }
 
-  .creat .sureBtn {
+  .newData .sureBtn {
     color: #fff;
     background-color: #0486fe !important;
   }
 
-  .creat .cancleBtn {
+  .newData .cancleBtn {
     border: 1px solid #0486FE;
   }
 
-  .creat .card-handle {
+  .newData .card-handle {
     min-height: 50px;
   }
 
-  .creat .el-card__body {
+  .newData .el-card__body {
     padding: 6px 70px 3px 9px !important;
   }
 

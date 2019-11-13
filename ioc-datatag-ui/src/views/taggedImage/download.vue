@@ -41,7 +41,9 @@
           <el-table-column label="操作" width="180px">
             <template slot-scope="scope">
               <div>
-                <div v-if="scope.row.speedOfProgress == '100'" class="export" @click="exportData(scope.row.bname,scope.row.bid)">导出到本地</div>
+                <div v-if="scope.row.speedOfProgress == '100'" class="export"
+                     @click="exportData(scope.row.bname,scope.row.bid)">导出到本地
+                </div>
                 <div v-else>-</div>
               </div>
             </template>
@@ -68,7 +70,7 @@
     name: "download",
     data() {
       return {
-        timer:null,
+        timer: null,
         labelId: 0,
         isShare: false,
         labelName: '',
@@ -78,8 +80,8 @@
         page: 0,
         size: 10,
         input2: '',
-        tagName:'',
-        delTreeId:'',
+        tagName: '',
+        delTreeId: '',
         Loading: true,
         saveLoading2: true,
         shareDialog: false,
@@ -103,7 +105,7 @@
       format(percentage) {
         return percentage === 100 ? '完成' : `${percentage}%`;
       },
-      goback(){
+      goback() {
         this.$router.go(-1)
       },
       // 我的标签列表数据
@@ -116,7 +118,7 @@
         try {
           const data = await getdownList(params)
           if (data.rows && data.rows.length > 0) {
-            data.rows.map(item=>{
+            data.rows.map(item => {
               item.speedOfProgress = JSON.parse(item.speedOfProgress)
             })
             this.ztableShowList = data.rows
@@ -131,27 +133,34 @@
 
         }
       },
-      //查询
+      // 查询
       getQuireData() {
         this.page = 0
         this.gettableList()
       },
-      //点击分页跳转
+      // 点击分页跳转
       handleCurrentChange(page) {
         this.page = page - 1
         this.gettableList()
       },
-      handleSizeChange (size) {
+      handleSizeChange(size) {
         this.size = size
         this.gettableList()
       },
-      //点击分页确认
-      goPage() {},
-      async exportData(name,taggingModelId){
+      // 点击分页确认
+      goPage() {
+      },
+      /**
+       * 数据导出
+       * @param name
+       * @param taggingModelId
+       * @returns {Promise<void>}
+       */
+      async exportData(name, taggingModelId) {
         try {
           let link = document.createElement('a')
           link.style.display = 'none'
-          link.href = '/datatagweb/datatag/dowload/downloadQueue/dowloadToLocal/'+taggingModelId
+          link.href = '/datatagweb/datatag/dowload/downloadQueue/dowloadToLocal/' + taggingModelId
           link.setAttribute('download', name + '.zip')
           document.body.appendChild(link)
           link.click()
@@ -169,7 +178,7 @@
         }, 8000)
       },
     },
-    destroyed(){
+    destroyed() {
       clearInterval(this.timer)
     },
     created() {
@@ -212,10 +221,12 @@
   .gressPercentage {
     width: 60%;
   }
-.export{
-  cursor: pointer;
-  color: #0479e5;
-}
+
+  .export {
+    cursor: pointer;
+    color: #0479e5;
+  }
+
   .iconLogo {
     font-size: 18px;
     margin-left: 24px;

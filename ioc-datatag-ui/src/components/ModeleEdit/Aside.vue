@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div v-show="this.routerName === 'creatModel'">
-      <div class="aside">
+    <div v-show="this.routerName === 'creatModel'" class="newAside">
+      <div class="asideTwo">
         <el-input placeholder="输入关键词搜索" v-model="filterText" class="search" size="small"
                   suffix-icon="el-icon-search"></el-input>
         <div class="tree-box treeCode">
@@ -18,7 +18,7 @@
           </el-tree>
         </div>
       </div>
-      <div class="aside treeCode">
+      <div class="asideTwo treeCode" style="height:calc(70vh);">
         <div class="col-set-box">
           <el-container class="">
             <el-aside width="250px" class="leftNew">
@@ -26,7 +26,7 @@
                 <el-tab-pane label="可用字段" name="first">
                   <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
                             suffix-icon="el-icon-search"></el-input>
-                  <div class="h4">
+                  <div class="h4" v-show="list.length > 0">
                     <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
                       {{resourceName}}
                     </el-checkbox>
@@ -124,13 +124,11 @@
           </el-container>
         </div>
       </div>
-      <div class="btnNew">
-        <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="setCols">确认选择
-        </el-button>
-      </div>
-
     </div>
-
+    <div class="btnNew" v-show="this.routerName === 'creatModel'">
+      <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="setCols">确认选择
+      </el-button>
+    </div>
     <!--字段设置-->
     <el-dialog class="creat" title="字段设置" :visible.sync="colSetDialog" width="800px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
@@ -348,7 +346,7 @@
       },
     },
     methods: {
-      //初始化弹窗清空数据
+      // 初始化弹窗清空数据
       init() {
         this.searchText = ''
         this.checkAll = false
@@ -378,7 +376,7 @@
         })
         return arr
       },
-      //全选
+      // 标签全选操作
       handleCheckAllChange(val) {
         this.tableData = []
         this.myData = []
@@ -471,7 +469,7 @@
             item.colSort = index + 1
           }
         })
-        // xiala
+        // 下拉框填写内容
         if (this.resourceType == 0) {
           this.tableData.forEach((item, index) => {
             if (item.isPrimaryKey == 1) {
@@ -506,12 +504,12 @@
       },
       close() {
       },
-      //树过滤
+      // 树过滤
       filterNode(value, data) {
         if (!value) return true;
         return data.orgName.indexOf(value) !== -1
       },
-      //对字段进行选择确认,type=0,新建模型，type=1编辑模型
+      // 对字段进行选择确认,type=0,新建模型，type=1编辑模型
       async handleNodeClick(data) {
         this.myData = []
         this.editData = []
@@ -521,7 +519,7 @@
         let allcolsData = {}
         if (this.routerName === 'creatModel' && data.isTable === true) {
           // this.colSetDialog = true
-          //新建模型字段确认获取数据
+          // 新建模型字段确认获取数据
           colsData = await getResourceInfoData(data.resourceId, data.type, 1)  // 有权限的字段
           allcolsData = await getResourceInfoData(data.resourceId, data.type, 0)  // 全部的字段
           // 全部字段
@@ -554,7 +552,7 @@
         }
         if (this.routerName === 'editModel') {
           this.colSetDialog = true
-          //编辑模型字段确认获取数据
+          // 编辑模型字段确认获取数据
           const resourceId = this.modelData.resourceId
           const type = this.modelData.resourceType
           colsData = await getResourceInfoData(resourceId, type, 1)  // 有权限的字段
@@ -588,9 +586,9 @@
           })
         }
         if (this.routerName === 'editModel') {
-          //获取主键值
+          // 获取主键值
           this.ruleForm.pkey = this.modelData.pkey
-          //获取选中的字段，从接口来
+          // 获取选中的字段，从接口来
           this.modelData.colList.forEach((item, index) => {
             this.checkedCols.push(item.showCol)
             this.tableData.push({
@@ -632,7 +630,7 @@
           console.log('error', e)
         }
       },
-      //加载树节点
+      // 加载树节点
       async loadNode(node, resolve) {
         if (node.level === 0) {
           this.getOneZtreeData(resolve)
@@ -646,12 +644,12 @@
       async getChildtreeData(data, resolve) {
         try {
           let allData = []
-          //获取资源树
+          // 获取资源树
           if (data.hasOwnProperty('orgId')) {
             const treeData = await getChildZtreeData(data.orgId, data.databaseType)
             this.treeData = treeData.data
           }
-          //获取资源树里面表
+          // 获取资源树里面表
           if (data.hasOwnProperty('orgId')) {
             this.resData = []
             const resData = await getResourceListData(data.orgId, data.type, data.databaseType)
@@ -688,9 +686,9 @@
           resolve([])
         }
       },
-      //获取3级树子节点
+      // 获取3级树子节点
       getThreeChild(id, resolve) {
-        //这里可以替换成向后台发起的请求修改data,为了演示我用的是写死的数据,获取到data后,resolve出去就好了
+        // 这里可以替换成向后台发起的请求修改data,为了演示我用的是写死的数据,获取到data后,resolve出去就好了
         if (id === '1') {
           const data = this.dataLakeDirectoryTree
           resolve(data)
@@ -699,14 +697,13 @@
           resolve(data)
         }
       },
-      //获取4级树子节点
+      // 获取4级树子节点
       getChildTreeData(data, resolve) {
         // console.log('点击当前的数据',data)
         this.getChildtreeData(data, resolve)
       },
-      //确认选择
+      // 确认选择
       setCols() {
-        console.log('9999')
         this.$refs['ruleForm'].validate((valid) => {
           if (valid) {
             this.saveLoading = true
@@ -786,7 +783,7 @@
         }
 
       },
-      //选择打标字段
+      // 选择打标字段
       getCheckChange(row, $event) {
         this.tableData = JSON.parse(JSON.stringify(this.tableData))
       },
@@ -869,7 +866,7 @@
   }
 </script>
 
-<style scoped lang="scss" >
+<style scoped lang="scss">
   .col-name-box {
     display: flex;
     .col-name {
@@ -880,18 +877,54 @@
     }
   }
 
-  .aside {
+  .newAside {
+    display: flex;
+  }
+
+  .asideTwo {
     width: 250px;
     flex-shrink: 0;
-    position: fixed;
+    /*position: fixed;*/
     padding: 10px;
-    margin-top: 40px;
+    /*margin-top: 40px;*/
     box-shadow: 5px 0 10px 0 rgba(0, 0, 0, 0.05);
     margin-left: 16px;
     box-sizing: border-box;
     z-index: 2;
     .tree {
-      height: calc(75vh - 80px);
+      height: calc(75vh - 116px);
+      overflow: auto;
+    }
+    .search {
+      margin-bottom: 20px;
+    }
+    .cus-node-title {
+      display: inline-block;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #606266;
+      font-size: 14px;
+    }
+    .custom-tree-node {
+      display: flex;
+      align-items: baseline;
+    }
+  }
+
+  .aside {
+    width: 250px;
+    flex-shrink: 0;
+    position: fixed;
+    padding: 10px;
+    /*margin-top: 40px;*/
+    box-shadow: 5px 0 10px 0 rgba(0, 0, 0, 0.05);
+    margin-left: 16px;
+    box-sizing: border-box;
+    z-index: 2;
+    .tree {
+      /*height: calc(75vh - 80px);*/
+      height: calc(75vh - 116px);
       overflow: auto;
     }
     .search {
@@ -971,7 +1004,7 @@
   }
 
   .tableNew {
-    height: calc(65vh);
+    height: calc(58vh);
     overflow: auto;
   }
 
@@ -981,12 +1014,13 @@
   }
 
   .contentNumheight {
-    height: calc(66vh - 80px);
+    height: calc(66vh - 140px);
     overflow: auto;
   }
 
   .treeCode {
     left: 282px;
+    /*height: calc(68vh);*/
   }
 
   .btnMargin {
