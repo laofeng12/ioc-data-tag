@@ -190,7 +190,7 @@
       </div>
     </el-dialog>
     <!--协作添加-->
-    <el-dialog class="creat addCreat" title="添加成员333" :visible.sync="addSetDialog" width="1100px" center
+    <el-dialog class="creat addCreat" title="添加成员" :visible.sync="addSetDialog" width="1100px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close">
       <div class="col-set-box">
@@ -1500,6 +1500,7 @@
     background-color: #fff;
     margin: 24px;
     position: relative;
+    overflow-y: auto;
   }
 
   .headLeft {
