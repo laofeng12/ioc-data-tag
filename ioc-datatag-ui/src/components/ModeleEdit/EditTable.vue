@@ -74,7 +74,7 @@
                   <div class="card-handle" v-if="item.isHandle===0">
                     <div class="auto">自动</div>
                     <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
-                                 :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
+                                 :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false" @change="changeCascader"></el-cascader>
                     <span class="chinese">{{item.sourceCol}}</span>
                     <div class="conditions">
                       <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
@@ -98,7 +98,7 @@
                     </div>
                     <div>
                       <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
-                                   :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
+                                   :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false" @change="changeCascader"></el-cascader>
                     </div>
                     <div class="chinese">{{item.sourceCol}}</div>
                     <div class="self-mark-choose-box">
@@ -289,10 +289,15 @@
       getLabel() {
       },
       closeSettags() {
+        this.changeRed = -1
       },
       // 取消
       canselMark() {
         this.setTagsDialog = false
+        this.changeRed = -1
+      },
+      changeCascader(){
+        this.changeRed = -1
       },
       init() {
         this.ruleForm.tagTeam = ''
