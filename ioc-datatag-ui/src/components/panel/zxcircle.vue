@@ -32,8 +32,8 @@
             // 越往后的数据延迟越大
             return idx * 100;
           },
-          animationEasingUpdate: 'bounceIn',
-          color: ['#fff', '#fff', '#fff'],
+          animationEasingUpdate: 'bounceIn',  // 画圆的形状
+          color: ['#fff', '#fff', '#fff'],   // 颜色
           series: [{
             type: 'graph',
             layout: 'force',
@@ -46,7 +46,7 @@
               normal: {
                 show: true,
                 fontSize: 12,
-                formatter: val => {
+                formatter: val => {  // 要显示的内容
                   const name = val.name
                   const threshold = 7
                   return name.length > threshold ? name.substring(0, threshold) + '\n\n' + name.substring(threshold) : name
@@ -71,6 +71,7 @@
             len += 0.5;
           }
         }
+        // 开始根据后台数据的传值进行画圆
         if (len < 8) {
           const numOne = {
             "name": str,
