@@ -56,19 +56,21 @@
       <div class="label">
         <div class="labelchangeTitle">热门标签</div>
         <div class="hotLabel">
-            <div class="hotOne hotOneleft">
-              <div class="barGraphOne">
-                <div class="titleName">今天</div>
-                <div class="modelLabel">
-                  <div class="contentSpacing" v-for="(item,index) in tablelistOne" :key="index"><span class="titleContent">{{item}}</span></div>
-                </div>
+          <div class="hotOne hotOneleft">
+            <div class="barGraphOne">
+              <div class="titleName">今天</div>
+              <div class="modelLabel">
+                <div class="contentSpacing" v-for="(item,index) in tableOne" :key="index"><span
+                  class="titleContent">{{item}}</span></div>
               </div>
             </div>
+          </div>
           <div class="hotOne">
             <div class="barGraphOne">
               <div class="titleName">昨天</div>
               <div class="modelLabel">
-                <div class="contentSpacing" v-for="(item,index) in tablelistTwo" :key="index"><span class="titleContent">{{item}}</span></div>
+                <div class="contentSpacing" v-for="(item,index) in tableTwo" :key="index"><span
+                  class="titleContent">{{item}}</span></div>
               </div>
             </div>
           </div>
@@ -76,7 +78,8 @@
             <div class="barGraphOne">
               <div class="titleName">最近一个星期</div>
               <div class="modelLabel">
-                <div class="contentSpacing" v-for="(item,index) in tablelistThree" :key="index"><span class="titleContent">{{item}}</span></div>
+                <div class="contentSpacing" v-for="(item,index) in tableThree" :key="index"><span
+                  class="titleContent">{{item}}</span></div>
               </div>
             </div>
           </div>
@@ -84,7 +87,8 @@
             <div class="barGraphOne">
               <div class="titleName">最近一个月</div>
               <div class="modelLabel">
-                <div class="contentSpacing" v-for="(item,index) in tablelistFouth" :key="index"><span class="titleContent">{{item}}</span></div>
+                <div class="contentSpacing" v-for="(item,index) in tableFouth" :key="index"><span
+                  class="titleContent">{{item}}</span></div>
               </div>
             </div>
           </div>
@@ -92,7 +96,8 @@
             <div class="barGraphOne">
               <div class="titleName">最近一年</div>
               <div class="modelLabel">
-                <div class="contentSpacing" v-for="(item,index) in tablelistFifth" :key="index"><span class="titleContent">{{item}}</span></div>
+                <div class="contentSpacing" v-for="(item,index) in tableFifth" :key="index"><span
+                  class="titleContent">{{item}}</span></div>
               </div>
             </div>
           </div>
@@ -105,7 +110,8 @@
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
   import chart from '@/components/panel/chart'
-  import {labelNum,getToday,getYesterday,getWeek,getMonth,getYear} from '@/api/tagPanel.js'
+  import {labelNum, getToday, getYesterday, getWeek, getMonth, getYear} from '@/api/tagPanel.js'
+
   export default {
     components: {
       chart
@@ -113,43 +119,48 @@
     name: 'tagPanel',
     data() {
       return {
-        tablelistOne:[],
-        tablelistTwo:[],
-        tablelistThree:[],
-        tablelistFouth:[],
-        tablelistFifth:[],
-        num:{
-          numOne:'',
-          numTwo:'',
-          numThree:''
+        tableOne: [], // 今天
+        tableTwo: [], // 昨天
+        tableThree: [], // 最近一个星期
+        tableFouth: [], // 最近一个月
+        tableFifth: [], // 最近一年
+        num: {
+          numOne: '',
+          numTwo: '',
+          numThree: ''
         }
       }
     },
     methods: {
-      ...mapActions('tagPanel', ['getgrowthOne','getgrowthTwo','getgrowthThree','getlabelChange']),
-      async labelNum(){
-        try{
+      ...mapActions('tagPanel', ['getgrowthOne', 'getgrowthTwo', 'getgrowthThree', 'getlabelChange']),
+      // 标签变化
+      async labelNum() {
+        try {
           const res = await labelNum()
-          this.num.numOne = res.data.ALL_TAG_NB
-          this.num.numTwo = res.data.MONTH_TAG_NB
-          this.num.numThree = res.data.YEAR_TAG_NB
-        }catch (e) {
+          this.num.numOne = res.data.ALL_TAG_NB  // 全部标签
+          this.num.numTwo = res.data.MONTH_TAG_NB // 过去一个月
+          this.num.numThree = res.data.YEAR_TAG_NB // 过去一年
+        } catch (e) {
           console.log(e);
         }
       },
-      async labelDate(){
-        try{
+      /**
+       * 标签仪表盘热门标签
+       * @returns {Promise<void>}
+       */
+      async labelDate() {
+        try {
           const todayList = await getToday()
           const yesterdayList = await getYesterday()
           const weekList = await getWeek()
           const monthList = await getMonth()
           const yearList = await getYear()
-          this.tablelistOne = todayList.data
-          this.tablelistTwo = yesterdayList.data
-          this.tablelistThree = weekList.data
-          this.tablelistFouth = monthList.data
-          this.tablelistFifth = yearList.data
-        }catch (e) {
+          this.tableOne = todayList.data  // 今天
+          this.tableTwo = yesterdayList.data  // 昨天
+          this.tableThree = weekList.data  // 最近一个星期
+          this.tableFouth = monthList.data // 最近一个月
+          this.tableFifth = yearList.data // 最近一年
+        } catch (e) {
           console.log(e);
         }
       }
@@ -162,7 +173,7 @@
       this.labelDate()
     },
     computed: {
-      ...mapState('tagPanel', ['growth','labelChange']),
+      ...mapState('tagPanel', ['growth', 'labelChange']),
     },
     mounted() {
 
@@ -213,60 +224,70 @@
     color: #ffffff;
     margin-left: 24px;
   }
-  .numA{
+
+  .numA {
     color: #FFCC33;
   }
-  .numB{
+
+  .numB {
     color: #6699FD;
   }
-  .numC{
+
+  .numC {
     color: #2CC048;
   }
 
-  .histogram{
+  .histogram {
     display: flex;
   }
-  .label{
+
+  .label {
     text-align: left;
   }
+
   .histogram, .label {
     width: 100%;
     margin-top: 16px;
     background-color: #fff;
     padding: 24px;
   }
-.histogramTag{
-  font-family: PingFangSC-Medium;
-  font-size: 16px;
-  color: #262626;
-  text-align: left;
-}
 
-.labelTag{
-  width: 240px;
-  height: 208px;
-  background: #F6F8FA;
-  padding: 24px;
-  margin-top: 16px;
-}
+  .histogramTag {
+    font-family: PingFangSC-Medium;
+    font-size: 16px;
+    color: #262626;
+    text-align: left;
+  }
 
-.hotLabel{
-  width: 100%;
-  margin-top: 16px;
-  display: flex;
-}
-.hotOneleft{
-  margin-left: 0px !important;
-}
-.hotOneright{
-  margin-right: 0px !important;
-}
-.hotOne{
-  width: 345px;
-  min-height: 208px;
-  background: #F6F8FA;
-  margin: 0px 12px;
-}
+  .labelTag {
+    width: 240px;
+    height: 208px;
+    background: #F6F8FA;
+    padding: 24px;
+    margin-top: 16px;
+  }
+
+  .hotLabel {
+    width: 100%;
+    margin-top: 16px;
+    display: flex;
+  }
+
+  .hotOneleft {
+    margin-left: 0px !important;
+  }
+
+  .hotOneright {
+    margin-right: 0px !important;
+  }
+
+  .hotOne {
+    width: 345px;
+    min-height: 208px;
+    background: #F6F8FA;
+    margin: 0px 12px;
+  }
+
   .barGraph {
     width: 100%;
   }
@@ -279,14 +300,15 @@
     margin-top: -8px;
   }
 
-  .labelName{
+  .labelName {
     font-family: PingFangSC-Regular;
     font-size: 14px;
     color: #303133;
     margin-bottom: 20px;
     float: left;
   }
-  .labelNum{
+
+  .labelNum {
     float: right;
     font-family: PingFangSC-Regular;
     font-size: 14px;
@@ -310,15 +332,18 @@
     border: 1px solid #0486FE;
     padding: 4px 14px;
   }
-  .modelLabel{
+
+  .modelLabel {
     padding: 0px 14px;
   }
+
   .contentSpacing {
     margin-bottom: 12px;
     display: inline-block;
     margin-left: 16px;
   }
-  .clearfix:after{
+
+  .clearfix:after {
     content: '';
     display: block;
     clear: both;

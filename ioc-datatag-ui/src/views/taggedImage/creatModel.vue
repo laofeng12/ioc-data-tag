@@ -190,7 +190,7 @@
       </div>
     </el-dialog>
     <!--协作添加-->
-    <el-dialog class="creat addCreat" title="添加成员333" :visible.sync="addSetDialog" width="1100px" center
+    <el-dialog class="creat addCreat" title="添加成员" :visible.sync="addSetDialog" width="1100px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close">
       <div class="col-set-box">
@@ -450,15 +450,20 @@
           if (obj.length > 0) {
             obj = obj.substr(0, obj.length - 1);
           }
-          try {
-            const res = await deletePeople({
-              ids: obj
-            })
-            this.getpeopleList()
-            this.markingTable()
-          } catch (e) {
-            console.log(e);
+          if (obj){
+            try {
+              const res = await deletePeople({
+                ids: obj
+              })
+              this.getpeopleList()
+              this.markingTable()
+            } catch (e) {
+              console.log(e);
+            }
+          } else {
+            return
           }
+
         }
       },
       // 获取模型数据
@@ -918,6 +923,10 @@
 
   .content {
     display: flex;
+    height: calc(100vh - 189px);
+    /*overflow: auto;*/
+    /*border: 1px solid red;*/
+    padding-top: 40px;
     .aside {
       width: 250px;
       flex-shrink: 0;
@@ -1249,6 +1258,10 @@
 
   .content {
     display: flex;
+    height: calc(100vh - 189px);
+    /*overflow: auto;*/
+    /*border: 1px solid red;*/
+    padding-top: 40px;
     .aside {
       width: 250px;
       flex-shrink: 0;
@@ -1500,6 +1513,7 @@
     background-color: #fff;
     margin: 24px;
     position: relative;
+    overflow-y: auto;
   }
 
   .headLeft {

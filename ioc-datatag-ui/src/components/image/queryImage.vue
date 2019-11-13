@@ -7,7 +7,7 @@
         <div class="nameImage">画像查询</div>
         <div class="queryInput">
           <el-input
-            class="zxinp moduleOne"
+            class="inputBtn moduleOne"
             size="small"
             clearable
             placeholder="请输入内容"
@@ -32,24 +32,25 @@
                 <img src="@/assets/img/icon_default.png" alt="">
                 <el-form>
                   <div class="numId">
-                  <span>ID：</span>
-                  <span>{{item.id}}</span>
+                    <span>ID：</span>
+                    <span>{{item.id}}</span>
                   </div>
-                  <div class="numidContent">{{item.title}}</div>
+                  <div class="idContent">{{item.title}}</div>
                   <div class="peopleContent">
                     <span class="people peopleHeight" v-for="(name,key) in item.lists" :key="key">{{name}}</span>
                   </div>
                 </el-form>
               </div>
               <div class="bottoms">
-                <el-button style="padding: 3px 0;font-size:15px;" type="text" @click="lookDetail(item.id,item.tableName)">
+                <el-button style="padding: 3px 0;font-size:15px;" type="text"
+                           @click="lookDetail(item.id,item.tableName)">
                   <i class="ch-button-icon el-icon-ch-view_s"></i>查看详情
                 </el-button>
               </div>
             </el-card>
           </el-col>
         </el-row>
-       </div>
+      </div>
     </div>
     <div v-else>
       <img class="noImage" src="../../assets/img/007.png" height="144" width="160"/>
@@ -60,6 +61,7 @@
 
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
+
   export default {
     components: {},
     name: "queryImage",
@@ -69,57 +71,54 @@
       }
     },
     methods: {
-      ...mapActions('tagPanel', ['getimageList','getarrList']),
+      ...mapActions('tagPanel', ['getimageList', 'getarrList']),
+      // 画像根据输入内容查询
       queryDetail() {
-        if(this.input2){
+        if (this.input2) {
           this.getimageList(this.input2)
-        }else{
+        } else {
           this.$message({
             message: '请填写查询信息',
             type: 'warning'
           });
         }
       },
-      lookDetail(detailId,tableName) {
-        localStorage.setItem('pKey',detailId)
-        localStorage.setItem('tableName',tableName)
+      /**
+       * 画像查询详情
+       * @param detailId
+       * @param tableName
+       */
+      lookDetail(detailId, tableName) {
+        localStorage.setItem('pKey', detailId)
+        localStorage.setItem('tableName', tableName)
         this.getarrList({
-          pKey:detailId,
-          tableName:tableName
+          pKey: detailId,
+          tableName: tableName
         })
         this.$router.push({
-          path:'/detailImage',
-          query:{
-            detailId:detailId,
-            id:this.input2
+          path: '/detailImage',
+          query: {
+            detailId: detailId,
+            id: this.input2
           }
         })
       },
-      // goback() {
-      //   this.$router.go(-1)
-      // },
     },
     created() {
       this.input2 = this.$route.query.id
       this.queryDetail()
     },
     computed: {
-      ...mapState('tagPanel', ['contentArr','listArr'])
+      ...mapState('tagPanel', ['contentArr', 'listArr'])
     },
     watch: {},
-    mounted() {
-    }
+    mounted() {}
   }
 </script>
 
 <style lang="stylus" scoped>
-  .zxinp {
-    /*width: 500px;*/
+  .inputBtn {
     width: 482px;
-  }
-
-  .zxlistBtn {
-    /*margin-left: 10px;*/
   }
 
   .queryTitle {
@@ -146,17 +145,16 @@
     color: #333333;
   }
 
-  .numidContent {
+  .idContent {
     font-size: 14px;
     color: #333333;
     margin-top: 10px;
     overflow: hidden;
-    text-overflow:ellipsis;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .people {
-    /*background-color: rgba(0, 204, 204, 1);*/
     color: #0486FE;
     background: #F4FAFF;
     border: 1px solid #0486FE;
@@ -181,66 +179,69 @@
     justify-content: flex-end;
     margin-top: -32px;
   }
-  .noImage{
+
+  .noImage {
     margin-top: 60px;
     margin-left: 180px;
   }
 
-  .nameImage{
+  .nameImage {
     font-size: 16px;
     color: #262626;
     font-family: PingFangSC-Medium;
     margin-left: -4px;
   }
-  .queryInput{
+
+  .queryInput {
     display: flex;
     margin-left: 8px;
     margin-top: 16px;
   }
-  .cart_list{
-    >>>.el-form-item__content{
+
+  .cart_list {
+    >>> .el-form-item__content {
       overflow: hidden;
-      text-overflow:ellipsis;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
-    >>>.el-card__body{
-      padding 0!important
+    >>> .el-card__body {
+      padding 0 !important
       height: 248px;
       position: relative;
     }
-    .contents{
+    .contents {
       padding 20px
       display flex
-      img{
+      img {
         flex 0 0 50px
         width 50px
         height 50px
         border-radius 50%
         background-size cover
       }
-      .el-form{
+      .el-form {
         margin-left 15px
         flex 1
-        .el-form-item{
+        .el-form-item {
           margin-bottom 0
-          >>>.el-form-item__label{
-            color: rgba(0,0,0,0.45)
+          >>> .el-form-item__label {
+            color: rgba(0, 0, 0, 0.45)
             font-size 14px
           }
-          >>>.el-form-item__content{
-            color: rgba(0,0,0,0.45)
+          >>> .el-form-item__content {
+            color: rgba(0, 0, 0, 0.45)
             font-size 14px
           }
         }
-        .tit_head{
-          >>>.el-form-item__content{
+        .tit_head {
+          >>> .el-form-item__content {
             font-size 16px
-            color: rgba(0,0,0,0.85)!important
+            color: rgba(0, 0, 0, 0.85) !important
           }
         }
       }
     }
-    .bottoms{
+    .bottoms {
       height 50px
       background: #F7F9FA
       border: 1px solid #E9E9E9
@@ -250,35 +251,38 @@
       position: absolute
       width: 100%
       bottom: 0px
-      .el-button{
+      .el-button {
         flex 1
         text-align center
-        color: rgba(0,0,0,0.45)
+        color: rgba(0, 0, 0, 0.45)
         border-radius 0
         color #0486FE
       }
-      >>>.subChecked{
+      >>> .subChecked {
         color #989898
       }
-      >>>.nosubChecked{
+      >>> .nosubChecked {
         color #0486FE
       }
     }
   }
 
   .cart_list .el-form {
-    padding:0px !important;
+    padding: 0px !important;
   }
-  .peopleHeight{
+
+  .peopleHeight {
     height: 22px;
     padding: 4px 10px;
     margin-bottom: 12px;
   }
-  .cart_list >>> .el-card.is-always-shadow{
-    box-shadow:0 0px 0px 0 transparent !important
+
+  .cart_list >>> .el-card.is-always-shadow {
+    box-shadow: 0 0px 0px 0 transparent !important
   }
-  .cart_list >>> .el-card{
-    border:none !important
-    border-radius:0px !important
+
+  .cart_list >>> .el-card {
+    border: none !important
+    border-radius: 0px !important
   }
 </style>
