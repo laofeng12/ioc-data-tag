@@ -450,7 +450,7 @@
           if (obj.length > 0) {
             obj = obj.substr(0, obj.length - 1);
           }
-          if (obj) {
+          if (obj){
             try {
               const res = await deletePeople({
                 ids: obj
@@ -923,6 +923,10 @@
 
   .content {
     display: flex;
+    height: calc(100vh - 189px);
+    /*overflow: auto;*/
+    /*border: 1px solid red;*/
+    padding-top: 40px;
     .aside {
       width: 250px;
       flex-shrink: 0;
@@ -1254,6 +1258,10 @@
 
   .content {
     display: flex;
+    height: calc(100vh - 189px);
+    /*overflow: auto;*/
+    /*border: 1px solid red;*/
+    padding-top: 40px;
     .aside {
       width: 250px;
       flex-shrink: 0;
