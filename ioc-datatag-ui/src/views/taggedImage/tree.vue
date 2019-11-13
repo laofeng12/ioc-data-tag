@@ -2,7 +2,7 @@
   <div class="app-container">
     <treeLabel></treeLabel>
     <!--<div class="back">-->
-      <!--<el-button @click="goback">返回</el-button>-->
+    <!--<el-button @click="goBack">返回</el-button>-->
     <!--</div>-->
   </div>
 </template>
@@ -16,15 +16,14 @@
     },
     name: 'tree',
     data() {
-      return {
-      }
+      return {}
     },
     mounted() {
 
     },
     methods: {
-      goback(){
-       // this.$router.push('/lableImage')
+      goBack() {
+        // this.$router.push('/lableImage')
         this.$router.go(-1)
       }
     }
@@ -32,8 +31,8 @@
 </script>
 
 <style scoped>
-.back{
-  text-align: center;
-  margin-top: 30px;
-}
+  .back {
+    text-align: center;
+    margin-top: 30px;
+  }
 </style>

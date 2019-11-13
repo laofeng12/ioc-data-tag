@@ -73,15 +73,16 @@
                   <!--自动打标结构-->
                   <div class="card-handle" v-if="item.isHandle===0">
                     <div class="auto">自动</div>
-                    <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
-                                 :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
+                    <el-cascader ref="myCascader" v-model="item.tagId" size="small"
+                                 :options="arrtest" :props="defaultParams" :clearable="true" :show-all-levels="false"
+                                 @change="changeCascader"></el-cascader>
                     <span class="chinese">{{item.sourceCol}}</span>
                     <div class="conditions">
                       <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
                         <div class="count-symbol" v-if="conItem.isConnectSymbol===0">
                           <span class="smbol-len" v-show="conItem.symbol.length>2">{{conItem.symbol}}</span>
                           <span class="smbol" v-show="conItem.symbol.length<3">{{conItem.symbol}}</span>
-                          <el-input style="width:100px" size="small" v-model="conItem.theValues" clearable
+                          <el-input style="width:135px" size="small" v-model="conItem.theValues" clearable
                                     placeholder="请输入内容"></el-input>
                         </div>
                         <div class="connect-symbol" v-else>
@@ -97,8 +98,9 @@
                       <div class="auto">手动</div>
                     </div>
                     <div>
-                      <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
-                                   :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
+                      <el-cascader ref="myCascader" v-model="item.tagId" size="small"
+                                   :options="arrtest" :props="defaultParams" :clearable="true" :show-all-levels="false"
+                                   @change="changeCascader"></el-cascader>
                     </div>
                     <div class="chinese">{{item.sourceCol}}</div>
                     <div class="self-mark-choose-box">
@@ -142,7 +144,7 @@
 
         </el-form>
         <div slot="footer" class="dialog-footer device" style="text-align: center">
-          <el-button size="small" class="queryBtn cancleBtn"  @click="canselMark">取消</el-button>
+          <el-button size="small" class="queryBtn cancleBtn" @click="canselMark">取消</el-button>
           <el-button size="small" type="primary" class="queryBtn  sureBtn" :loading="saveLoading" @click="saveMark">确定
           </el-button>
         </div>
@@ -289,10 +291,15 @@
       getLabel() {
       },
       closeSettags() {
+        this.changeRed = -1
       },
       // 取消
       canselMark() {
         this.setTagsDialog = false
+        this.changeRed = -1
+      },
+      changeCascader() {
+        this.changeRed = -1
       },
       init() {
         this.ruleForm.tagTeam = ''
@@ -581,36 +588,36 @@
       //确认打标按钮
       async saveMark() {
         this.saveLoading = true
-            try {
-              let conditions = this.deepClone(this.selfMarkList)
-              conditions.forEach((obj, index) => {
-                delete obj.checkList
-                delete obj.sourceCol
-                delete obj.tagSetName
-                delete obj.showSelfMark
-                obj.colId = this.colId
-                obj.tagId = obj.tagId && obj.tagId.pop()
-                return obj
-              })
-              const params = {
-                colId: this.colId,
-                condtion: conditions
-              }
-              const data = await saveMarkData(params)
-              this.$message({
-                showClose: true,
-                message: '打标成功',
-                duration: 2000,
-                type: 'success'
-              })
-              this.setTagsDialog = false
-              this.selfMarkList = []
-              this.changeRed = -1
-            } catch (e) {
-              console.log('e', e);
-              this.changeRed = e.data
-            }
-            this.saveLoading = false
+        try {
+          let conditions = this.deepClone(this.selfMarkList)
+          conditions.forEach((obj, index) => {
+            delete obj.checkList
+            delete obj.sourceCol
+            delete obj.tagSetName
+            delete obj.showSelfMark
+            obj.colId = this.colId
+            obj.tagId = obj.tagId && obj.tagId.pop()
+            return obj
+          })
+          const params = {
+            colId: this.colId,
+            condtion: conditions
+          }
+          const data = await saveMarkData(params)
+          this.$message({
+            showClose: true,
+            message: '打标成功',
+            duration: 2000,
+            type: 'success'
+          })
+          this.setTagsDialog = false
+          this.selfMarkList = []
+          this.changeRed = -1
+        } catch (e) {
+          console.log('e', e);
+          this.changeRed = e.data
+        }
+        this.saveLoading = false
       },
       //选中要打标条件修改
       chooseMark(item, index) {
@@ -628,7 +635,7 @@
         }
       },
       // 打标所有的数据
-      async allData(){
+      async allData() {
         const resData = await getListalldata()
         this.arrtest = resData
       }

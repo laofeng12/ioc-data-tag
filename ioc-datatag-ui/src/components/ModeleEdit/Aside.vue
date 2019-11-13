@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div v-show="this.routerName === 'creatModel'">
-      <div class="aside">
+    <div v-show="this.routerName === 'creatModel'" class="newAside">
+      <div class="asideTwo">
         <el-input placeholder="输入关键词搜索" v-model="filterText" class="search" size="small"
                   suffix-icon="el-icon-search"></el-input>
         <div class="tree-box treeCode">
@@ -18,7 +18,7 @@
           </el-tree>
         </div>
       </div>
-      <div class="aside treeCode">
+      <div class="asideTwo treeCode" style="height:calc(70vh);">
         <div class="col-set-box">
           <el-container class="">
             <el-aside width="250px" class="leftNew">
@@ -26,7 +26,7 @@
                 <el-tab-pane label="可用字段" name="first">
                   <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
                             suffix-icon="el-icon-search"></el-input>
-                  <div class="h4">
+                  <div class="h4" v-show="list.length > 0">
                     <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
                       {{resourceName}}
                     </el-checkbox>
@@ -124,13 +124,11 @@
           </el-container>
         </div>
       </div>
-      <div class="btnNew">
-        <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="setCols">确认选择
-        </el-button>
-      </div>
-
     </div>
-
+    <div class="btnNew" v-show="this.routerName === 'creatModel'">
+      <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="setCols">确认选择
+      </el-button>
+    </div>
     <!--字段设置-->
     <el-dialog class="creat" title="字段设置" :visible.sync="colSetDialog" width="800px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
@@ -879,19 +877,52 @@
       white-space: nowrap;
     }
   }
-
+  .newAside{
+      display: flex;
+  }
+  .asideTwo{
+      width: 250px;
+      flex-shrink: 0;
+      /*position: fixed;*/
+      padding: 10px;
+      /*margin-top: 40px;*/
+      box-shadow: 5px 0 10px 0 rgba(0, 0, 0, 0.05);
+      margin-left: 16px;
+      box-sizing: border-box;
+      z-index: 2;
+      .tree {
+        height: calc(75vh - 116px);
+        overflow: auto;
+      }
+      .search {
+        margin-bottom: 20px;
+      }
+      .cus-node-title {
+        display: inline-block;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #606266;
+        font-size: 14px;
+      }
+      .custom-tree-node {
+        display: flex;
+        align-items: baseline;
+      }
+  }
   .aside {
     width: 250px;
     flex-shrink: 0;
     position: fixed;
     padding: 10px;
-    margin-top: 40px;
+    /*margin-top: 40px;*/
     box-shadow: 5px 0 10px 0 rgba(0, 0, 0, 0.05);
     margin-left: 16px;
     box-sizing: border-box;
     z-index: 2;
     .tree {
-      height: calc(75vh - 80px);
+      /*height: calc(75vh - 80px);*/
+      height: calc(75vh - 116px);
       overflow: auto;
     }
     .search {
@@ -971,7 +1002,7 @@
   }
 
   .tableNew {
-    height: calc(65vh);
+    height: calc(58vh);
     overflow: auto;
   }
 
@@ -981,12 +1012,13 @@
   }
 
   .contentNumheight {
-    height: calc(66vh - 80px);
+    height: calc(66vh - 140px);
     overflow: auto;
   }
 
   .treeCode {
     left: 282px;
+    /*height: calc(68vh);*/
   }
 
   .btnMargin {
