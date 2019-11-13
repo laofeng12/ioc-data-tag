@@ -450,15 +450,20 @@
           if (obj.length > 0) {
             obj = obj.substr(0, obj.length - 1);
           }
-          try {
-            const res = await deletePeople({
-              ids: obj
-            })
-            this.getpeopleList()
-            this.markingTable()
-          } catch (e) {
-            console.log(e);
+          if (obj) {
+            try {
+              const res = await deletePeople({
+                ids: obj
+              })
+              this.getpeopleList()
+              this.markingTable()
+            } catch (e) {
+              console.log(e);
+            }
+          } else {
+            return
           }
+
         }
       },
       // 获取模型数据
