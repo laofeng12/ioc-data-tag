@@ -636,9 +636,12 @@
           }
         }
       },
-      // 打标所有的数据
+      // 打标所有的数据  // 根据后台显示数据定义值
       async allData() {
-        const resData = await getListalldata()
+        const resData = await getListalldata({
+          page:0,
+          size:200
+        })
         this.arrtest = resData
       }
 

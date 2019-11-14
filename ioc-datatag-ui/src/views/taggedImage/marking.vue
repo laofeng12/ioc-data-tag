@@ -293,7 +293,7 @@
     },
     created() {
       // 获取标签组
-      this.allData()
+      // this.allData()
       this.modeleId = this.$route.query.id
       this.modelName = this.$route.query.modelName
       this.getlistTable()
@@ -317,6 +317,19 @@
         this.makingDialog = false
         this.$refs.ruleForm.resetFields()
       },
+      // 协作选择标签组（协作专用）
+      async getMyTagGroupList(fieldId) {
+        try {
+          const params = {
+            colField: fieldId,
+            modelId: this.modeleId
+          }
+          const data = await getTaggroup(params)
+          this.arrtest = data
+        } catch (e) {
+          console.log(e);
+        }
+      },
       dataMaking(row) {
         this.setTagsDialog = true
         this.valuesType = row.sourceDataType
@@ -324,7 +337,7 @@
         this.colId = row.colId
         this.sourceCol = row.sourceCol
         // 获取标签组
-        // this.getMyTagGroupList(row.colId)
+        this.getMyTagGroupList(row.colId)
         this.getHistoryColList(row.colId)
       },
       filterNode(value, data) {
@@ -637,10 +650,10 @@
         this.conditionSetting = item.conditionSetting
       },
       // 打标所有的数据
-      async allData() {
-        const resData = await getListalldata()
-        this.arrtest = resData
-      }
+      // async allData() {
+      //   const resData = await getListalldata()
+      //   this.arrtest = resData
+      // }
     },
     computed: {
       listCheck() {
