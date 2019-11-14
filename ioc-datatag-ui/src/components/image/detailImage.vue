@@ -14,7 +14,7 @@
             @keyup.enter.native="goback"
             v-model.trim="input2">
           </el-input>
-          <el-button class="zxlistBtn" size="small" type="primary" @click="goback">查询</el-button>
+          <el-button class="zxlistBtn" size="small" type="primary" @click="goBack">查询</el-button>
         </div>
       </div>
     </div>
@@ -62,8 +62,13 @@
     },
     methods: {
       ...mapActions('tagPanel', ['getimageList', 'getarrList']),
-      goback() {
-        this.$router.go(-1)
+      goBack() {
+        this.$router.push({
+          path:'/queryImage',
+          query:{
+            id:this.input2
+          }
+        })
       }
     },
     created() {
@@ -82,9 +87,7 @@
       })
     },
     watch: {},
-    mounted() {
-
-    }
+    mounted() {}
   }
 </script>
 
@@ -96,13 +99,9 @@
     padding-top: 18px;
   }
   .zxinp {
-    /*width: 500px;*/
     width: 482px;
   }
 
-  .zxlistBtn {
-    /*margin-left: 10px;*/
-  }
   .result {
     display: flex;
     justify-content: flex-start;
