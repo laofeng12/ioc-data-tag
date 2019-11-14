@@ -22,7 +22,7 @@
         </el-table-column>
       </el-table>
       <!--改造-->
-      <el-dialog class="creat newData" title="数据打标" :visible.sync="setTagsDialog" width="900px" left
+      <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" left
                  :modal-append-to-body="false" :close-on-click-modal="false"
                  @close="closeSettags" @open="init">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -73,16 +73,15 @@
                   <!--自动打标结构-->
                   <div class="card-handle" v-if="item.isHandle===0">
                     <div class="auto">自动</div>
-                    <el-cascader ref="myCascader" v-model="item.tagId" size="small"
-                                 :options="arrtest" :props="defaultParams" :clearable="true" :show-all-levels="false"
-                                 @change="changeCascader"></el-cascader>
+                    <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
+                                 :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
                     <span class="chinese">{{item.sourceCol}}</span>
                     <div class="conditions">
                       <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
                         <div class="count-symbol" v-if="conItem.isConnectSymbol===0">
                           <span class="smbol-len" v-show="conItem.symbol.length>2">{{conItem.symbol}}</span>
                           <span class="smbol" v-show="conItem.symbol.length<3">{{conItem.symbol}}</span>
-                          <el-input style="width:135px" size="small" v-model="conItem.theValues" clearable
+                          <el-input style="width:100px" size="small" v-model="conItem.theValues" clearable
                                     placeholder="请输入内容"></el-input>
                         </div>
                         <div class="connect-symbol" v-else>
@@ -98,9 +97,8 @@
                       <div class="auto">手动</div>
                     </div>
                     <div>
-                      <el-cascader ref="myCascader" v-model="item.tagId" size="small"
-                                   :options="arrtest" :props="defaultParams" :clearable="true" :show-all-levels="false"
-                                   @change="changeCascader"></el-cascader>
+                      <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
+                                   :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
                     </div>
                     <div class="chinese">{{item.sourceCol}}</div>
                     <div class="self-mark-choose-box">
@@ -144,7 +142,7 @@
 
         </el-form>
         <div slot="footer" class="dialog-footer device" style="text-align: center">
-          <el-button size="small" class="queryBtn cancleBtn" @click="canselMark">取消</el-button>
+          <el-button size="small" class="queryBtn cancleBtn" :loading="saveLoading" @click="canselMark">取消</el-button>
           <el-button size="small" type="primary" class="queryBtn  sureBtn" :loading="saveLoading" @click="saveMark">确定
           </el-button>
         </div>
@@ -186,6 +184,64 @@
         val: [],
         defaultParams: {},
         arrtest: [],
+        mytest: [
+          {
+            code: '',
+            createTime: "2019-09-10 10:22:18",
+            createUser: 392846190550001,
+            id: 848821386820223,
+            isDeleted: 0,
+            isNew: '',
+            isShare: 0,
+            message: '',
+            modifyTime: "2019-10-22 17:16:55",
+            percentage: 0,
+            popularity: 0,
+            popularityLevel: '',
+            synopsis: "1001010",
+            tagName: "测试10",
+            label: '测试10',
+            value: '848821386820223',
+            children: [{
+              "value": "848956331340223",
+              "tagName": "测试10-2",
+              label: '测试10-2',
+              "children": [
+                {"value": "848956811340223", label: '熟女22', "tagName": "熟女22", "children": undefined},
+                {
+                  "value": "848956939080223",
+                  "label": "剩女",
+                  "children": [
+                    {"value": "848956811340223", "label": "熟女", "children": undefined}
+                  ]
+                }, {"value": "849050497670223", "label": "圣女", "children": undefined}, {
+                  "value": "849050960050223",
+                  "label": "大叔",
+                  "children": [{"value": "848956811340223", "label": "熟女", "children": undefined}]
+                }]
+            }]
+          },
+          {
+            code: '',
+            createTime: "2019-09-10 10:22:18",
+            createUser: 392846190550001,
+            id: 848821386820223,
+            isDeleted: 0,
+            isNew: '',
+            isShare: 0,
+            message: '',
+            modifyTime: "2019-10-22 17:16:55",
+            percentage: 0,
+            popularity: 0,
+            popularityLevel: '',
+            synopsis: "1001010",
+            tagName: "没有标签",
+            label: '没有标签',
+            value: '848821386820223',
+            children: []
+          }
+        ],
+        mytestId: ['848821386820223', '848956331340223', '848956811340223'],
         changeRed: -1,
         znumber: '',
         ztheadData: '',
@@ -291,15 +347,10 @@
       getLabel() {
       },
       closeSettags() {
-        this.changeRed = -1
       },
       // 取消
       canselMark() {
         this.setTagsDialog = false
-        this.changeRed = -1
-      },
-      changeCascader() {
-        this.changeRed = -1
       },
       init() {
         this.ruleForm.tagTeam = ''
@@ -586,23 +637,43 @@
         }
       },
       //确认打标按钮
-      async saveMark() {
+      saveMark() {
         this.saveLoading = true
-        try {
-          let conditions = this.deepClone(this.selfMarkList)
-          conditions.forEach((obj, index) => {
-            delete obj.checkList
-            delete obj.sourceCol
-            delete obj.tagSetName
-            delete obj.showSelfMark
-            obj.colId = this.colId
-            obj.tagId = obj.tagId && obj.tagId.pop()
-            return obj
-          })
-          const params = {
-            colId: this.colId,
-            condtion: conditions
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            this.getSaveMarkList()
+            this.saveLoading = false
+          } else {
+            this.saveLoading = false
           }
+        });
+      },
+      //打标确认保存
+      async getSaveMarkList() {
+        this.selfMarkList.map(item =>{
+          if(this.changeRed == -1){
+            const arrId = item.tagId.pop()
+            item.tagId = arrId
+          }else {
+            // console.log('item22',item);
+            // console.log('item555',item.tagId);
+          }
+        })
+        // console.log('this.valuesType',this.valuesType)
+        let conditions = this.deepClone(this.selfMarkList)
+        conditions.forEach((obj, index) => {
+          delete obj.checkList
+          delete obj.sourceCol
+          delete obj.tagSetName
+          delete obj.showSelfMark
+          obj.colId = this.colId
+          return obj
+        })
+        const params = {
+          colId: this.colId,
+          condtion: conditions
+        }
+        try {
           const data = await saveMarkData(params)
           this.$message({
             showClose: true,
@@ -617,7 +688,6 @@
           console.log('e', e);
           this.changeRed = e.data
         }
-        this.saveLoading = false
       },
       //选中要打标条件修改
       chooseMark(item, index) {
@@ -635,7 +705,7 @@
         }
       },
       // 打标所有的数据
-      async allData() {
+      async allData(){
         const resData = await getListalldata()
         this.arrtest = resData
       }
@@ -903,17 +973,17 @@
 
 </style>
 <style>
-  .newData .el-dialog__title {
+  .creat .el-dialog__title {
     font-family: PingFangSC-Medium;
     font-size: 16px;
     color: #262626;
   }
 
-  .newData .el-dialog__body {
+  .creat .el-dialog__body {
     padding: 18px 20px !important;
   }
 
-  .newData .el-button {
+  .creat .el-button {
     padding: 0 16px !important;
     font-family: PingFangSC-Regular;
     font-size: 14px;
@@ -921,20 +991,20 @@
     background-color: #fff !important;
   }
 
-  .newData .sureBtn {
+  .creat .sureBtn {
     color: #fff;
     background-color: #0486fe !important;
   }
 
-  .newData .cancleBtn {
+  .creat .cancleBtn {
     border: 1px solid #0486FE;
   }
 
-  .newData .card-handle {
+  .creat .card-handle {
     min-height: 50px;
   }
 
-  .newData .el-card__body {
+  .creat .el-card__body {
     padding: 6px 70px 3px 9px !important;
   }
 

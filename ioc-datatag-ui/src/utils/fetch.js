@@ -60,7 +60,6 @@ service.interceptors.response.use(
           if (code === 20019 || code === 20020) {
             authFailure(data)
           } else {
-            Message.closeAll()
             Message({
               message: message || '请求错误',
               type: 'error',
@@ -80,7 +79,6 @@ service.interceptors.response.use(
   },
   error => {
     if (!error.response) {
-      Message.closeAll()
       Message({
         message: '请求超时',
         type: 'error',
@@ -90,7 +88,6 @@ service.interceptors.response.use(
     }
     const { status, data } = error.response
     if (!data) {
-      Message.closeAll()
       Message({
         message: '服务器错误',
         type: 'error',
@@ -100,14 +97,12 @@ service.interceptors.response.use(
     if (status === 401 || status === 403) {
       authFailure(data)
     } else if (status > 403 && status < 500) {
-      Message.closeAll()
       Message({
         message: data.message,
         type: 'error',
         duration: 5 * 1000
       })
     } else {
-      Message.closeAll()
       Message({
         message: data.message || '服务器错误',
         type: 'error',

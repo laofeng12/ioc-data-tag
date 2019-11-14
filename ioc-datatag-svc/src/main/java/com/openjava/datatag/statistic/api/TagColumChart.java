@@ -37,7 +37,7 @@ public class TagColumChart {
      * 获取去年每个月标签变化
      *
      * */
-    @ApiOperation(value = "标签变化:去年每个月标签变化", nickname="select", notes = "报文格式：content-type=application/json")
+    @ApiOperation(value = "标签变化:今年每个月标签变化柱状图", nickname="select", notes = "报文格式：content-type=application/json")
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })

@@ -40,7 +40,7 @@
         </div>
       </div>
     </div>
-    <el-dialog class="creat newData" title="数据打标" :visible.sync="setTagsDialog" width="900px" left
+    <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" left
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="closeSettags" @open="init">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -160,7 +160,7 @@
 
       </el-form>
       <div slot="footer" class="dialog-footer device" style="text-align: center">
-        <el-button size="small" class="queryBtn cancleBtn"  @click="canselMark">取消</el-button>
+        <el-button size="small" class="queryBtn cancleBtn" :loading="saveLoading" @click="canselMark">取消</el-button>
         <el-button size="small" type="primary" class="queryBtn  sureBtn" :loading="saveLoading" @click="saveMark">确定
         </el-button>
       </div>
@@ -591,24 +591,44 @@
 
         }
       },
-      //确认打标按钮保存
-      async saveMark() {
+      //确认打标按钮
+      saveMark() {
         this.saveLoading = true
-        try {
-          let conditions = this.deepClone(this.selfMarkList)
-          conditions.forEach((obj, index) => {
-            delete obj.checkList
-            delete obj.sourceCol
-            delete obj.tagSetName
-            delete obj.showSelfMark
-            obj.colId = this.colId
-            obj.tagId = obj.tagId && obj.tagId.pop()
-            return obj
-          })
-          const params = {
-            colId: this.colId,
-            condtion: conditions
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            this.getSaveMarkList()
+            this.saveLoading = false
+          } else {
+            this.saveLoading = false
           }
+        });
+      },
+      //打标确认保存
+      async getSaveMarkList() {
+        this.selfMarkList.map(item =>{
+          if(this.changeRed == -1){
+            const arrId = item.tagId.pop()
+            item.tagId = arrId
+          }else {
+            // console.log('item22',item);
+            // console.log('item555',item.tagId);
+          }
+
+        })
+        let conditions = this.deepClone(this.selfMarkList)
+        conditions.forEach((obj, index) => {
+          delete obj.checkList
+          delete obj.sourceCol
+          delete obj.tagSetName
+          delete obj.showSelfMark
+          obj.colId = this.colId
+          return obj
+        })
+        const params = {
+          colId: this.colId,
+          condtion: conditions
+        }
+        try {
           const data = await saveMarkData(params)
           this.$message({
             showClose: true,
@@ -623,7 +643,6 @@
           console.log('e', e);
           this.changeRed = e.data
         }
-        this.saveLoading = false
       },
       //选中要打标条件修改
       chooseMark(item, index) {
@@ -994,17 +1013,17 @@
   }
 </style>
 <style>
-  .newData .el-dialog__title {
+  .creat .el-dialog__title {
     font-family: PingFangSC-Medium;
     font-size: 16px;
     color: #262626;
   }
 
-  .newData .el-dialog__body {
+  .creat .el-dialog__body {
     padding: 18px 20px !important;
   }
 
-  .newData .el-button {
+  .creat .el-button {
     padding: 0 16px !important;
     font-family: PingFangSC-Regular;
     font-size: 14px;
@@ -1012,20 +1031,20 @@
     background-color: #fff !important;
   }
 
-  .newData .sureBtn {
+  .creat .sureBtn {
     color: #fff;
     background-color: #0486fe !important;
   }
 
-  .newData .cancleBtn {
+  .creat .cancleBtn {
     border: 1px solid #0486FE;
   }
 
-  .newData .card-handle {
+  .creat .card-handle {
     min-height: 50px;
   }
 
-  .newData .el-card__body {
+  .creat .el-card__body {
     padding: 6px 70px 3px 9px !important;
   }
 

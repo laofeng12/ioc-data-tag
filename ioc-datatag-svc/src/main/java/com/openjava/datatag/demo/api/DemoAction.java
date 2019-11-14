@@ -1,7 +1,9 @@
 package com.openjava.datatag.demo.api;
 
+
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.component.WebsocketServer;
+import com.openjava.datatag.demo.service.DemoService;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.userprofile.service.PortrayalService;
 import com.openjava.datatag.utils.jdbc.excuteUtil.MppPgExecuteUtil;
@@ -28,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 @Api(tags="demo")
 @RestController
 @RequestMapping("/datatag/demo/cline")
-public class DtClineDemoAction {
+public class DemoAction {
 
 	@Resource
 	WebsocketServer websocketServer;
@@ -36,6 +38,8 @@ public class DtClineDemoAction {
 	private StringRedisTemplate stringRedisTemplate;
 	@Resource
 	private PortrayalService portrayalService;
+	@Resource
+	private DemoService demoService;
 
 	@ApiOperation(value = "调用其他组件的例子", nickname="save", notes = "调用其他组件的例子")
 	@Security(session=false)
@@ -73,5 +77,13 @@ public class DtClineDemoAction {
 	@RequestMapping(value="/testDowload", method=RequestMethod.GET)
 	public void testDowload(Long taggingModelId){
 		portrayalService.dowloadRunResult(100L,taggingModelId);
+	}
+
+	@ApiOperation(value = "testAudit", nickname="testAudit", notes = "testAudit")
+	@Security(session=false)
+	@RequestMapping(value="/testAudit", method=RequestMethod.GET)
+	public void testAudit(Long type) throws Exception
+	{
+		demoService.testAudit(type);
 	}
 }

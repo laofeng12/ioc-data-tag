@@ -1,26 +1,26 @@
 <template>
   <div class="app-container">
     <div class="actionBar">
-      <el-input
-        class="zxinp moduleOne"
-        size="small"
-        clearable
-        placeholder="请输入内容"
-        prefix-icon="el-icon-search"
-        @keyup.enter.native="getQuireData"
-        v-model="input2">
-      </el-input>
-      <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-      <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
-      <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
-      <el-button size="small" type="primary" @click="shareLabel">共享标签组</el-button>
+        <el-input
+          class="zxinp moduleOne"
+          size="small"
+          clearable
+          placeholder="请输入内容"
+          prefix-icon="el-icon-search"
+          @keyup.enter.native="getQuireData"
+          v-model="input2">
+        </el-input>
+        <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+        <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
+        <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
+        <el-button size="small" type="primary" @click="shareLabel">共享标签组</el-button>
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -40,7 +40,7 @@
                 <div class="gressPercentage">
                   <!--{{scope.row.percentage}}-->
                   <!--<el-progress :percentage="scope.row.popularityLevel" :show-text="false"-->
-                  <!--:color="customColorMethod"></el-progress>-->
+                               <!--:color="customColorMethod"></el-progress>-->
                   <el-progress :percentage="scope.row.percentage" :show-text="false"
                                :color="customColorMethod"></el-progress>
                 </div>
@@ -70,12 +70,15 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <span class="operationIcona">
+                <!--<i class="el-icon-delete iconLogo" @click="delTag(row.id)"></i>-->
                  <i class="el-icon-delete iconLogo" @click="delTaglabel(row)"></i>
               </span>
               </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
+        <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
+                            <!--@sureClick="goPage"></element-pagination>-->
         <element-pagination
           :pageSize="size"
           :currentPage="page+1"
@@ -121,8 +124,7 @@
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定
-            </el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定 </el-button>
             <el-button size="small" plain class="btn-group" @click="closeShare2">取消</el-button>
           </div>
         </div>
@@ -205,11 +207,11 @@
         page: 0,
         size: 10,
         input2: '',
-        tagName: '',
-        delTreeId: '',
+        tagName:'',
+        delTreeId:'',
         Loading: true,
-        deleteDialog: false,
-        deleteLoading: false,
+        deleteDialog:false,
+        deleteLoading:false,
         saveLoading2: true,
         shareDialog: false,
         saveLoading: false,
@@ -256,11 +258,6 @@
           return '#67c23a';
         }
       },
-      /**
-       * 标签组设置操作
-       * @param row
-       * @param index
-       */
       handleShare(row, index) {
         this.shareDialog = true
         this.ruleForm.labelName = row.tagsName
@@ -271,24 +268,18 @@
           this.isShare = true
         }
         this.labelId = row.id
+        // console.log(this.isShare)
+
       },
-      /**
-       * 标签组设置弹框关闭操作
-       */
       closeShare() {
         this.shareDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      /**
-       * 标签组设置弹框取消操作
-       */
       closeShare2() {
         this.shareDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      /**
-       * 标签组设置弹框确认操作
-       */
+      // 共享确认
       sureShare() {
         this.saveLoading = true
         this.$refs.ruleForm.validate((valid) => {
@@ -305,16 +296,11 @@
             this.saveLoading = false
           }
         });
+
       },
-      /**
-       * 创建标签组
-       */
       createLabel() {
         this.labelcreatDialog = true
       },
-      /**
-       * 创建标签组确认编辑操作
-       */
       sureCreat() {
         try {
           this.creatsaveLoading = true
@@ -329,7 +315,7 @@
                   tagsName: this.ruleForm.tagsName
                 })
                 this.creatsaveLoading = false
-                this.$router.push('/labelcreatTree/' + data.id + '/' + data.tagsName)
+                this.$router.push('/labelcreatTree/' + data.id +'/'+ data.tagsName)
               } catch (e) {
                 this.creatsaveLoading = false
                 console.log(e);
@@ -343,30 +329,18 @@
           console.log(e);
         }
       },
-      /**
-       * 创建标签组确认关闭操作
-       */
       closeCreat() {
         this.$refs.ruleForm.resetFields();
         this.labelcreatDialog = false
       },
-      /**
-       * 创建标签组确认取消操作
-       */
       cancleCreat() {
         this.$refs.ruleForm.resetFields();
         this.labelcreatDialog = false
       },
-      /**
-       * 共享标签组
-       */
       shareLabel() {
         this.$router.push('/shareLabel')
       },
-      /**
-       * 我的标签列表数据
-       * @returns {Promise<void>}
-       */
+      // 我的标签列表数据
       async getTagsData() {
         const params = {
           eq_isShare: this.eq_isShare,
@@ -406,6 +380,7 @@
 
         }
       },
+
       // 共享确认
       async getDtTagGroupData() {
         let isShare = 0
@@ -429,19 +404,19 @@
 
         }
       },
-      // 查询
+      //查询
       getQuireData() {
         this.page = 0
         this.eq_isShare = this.value
         this.keyword = this.input2
         this.getTagsData()
       },
-      // 点击分页跳转
+      //点击分页跳转
       handleCurrentChange(page) {
         this.page = page - 1
         this.getTagsData()
       },
-      handleSizeChange(size) {
+      handleSizeChange (size) {
         this.size = size
         this.getTagsData()
       },
@@ -449,8 +424,7 @@
       goPage() {
 
       },
-      // 标签组删除
-      delTaglabel(row) {
+      delTaglabel(row){
         this.deleteDialog = true
         this.tagName = row.tagsName
         this.delTreeId = row.id
@@ -458,10 +432,10 @@
       closedelete() {
         this.deleteDialog = false
       },
-      cancelDelete() {
+      cancelDelete(){
         this.deleteDialog = false
       },
-      // 确定删除
+      //删除
       async delTag(id) {
         try {
           const data = await delTagGroup(id)

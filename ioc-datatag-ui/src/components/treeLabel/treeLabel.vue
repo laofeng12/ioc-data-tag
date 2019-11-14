@@ -1,159 +1,158 @@
 <template>
   <div>
-    <div class="treeContainer">
-      <div class="treelabel treeBel temporary">
-        <div class="labelTitle">
-          <div class="labelName"><i class="el-icon-folder iconLabel"></i>{{groupName}}</div>
-          <div v-show="topLabel"><i class="el-icon-plus add" @click="openOne"></i></div>
-        </div>
-        <el-input
-          class="elInput"
-          size="small"
-          clearable
-          placeholder="输入关键字进行过滤"
-          v-model="filterText">
-        </el-input>
-        <div class="treeTop" :style="{height:taHeight}">
-          <el-tree
-            class="filter-tree"
-            :data="data"
-            node-key="id"
-            :props="defaultProps"
-            default-expand-all
-            :filter-node-method="filterNode"
-            :expand-on-click-node="false"
-            :highlight-current="true"
-            @node-click="handleNodeClick"
-            ref="tree">
+  <div class="treeContainer">
+    <div class="treelabel treeBel temporary">
+      <div class="labelTitle">
+        <div class="labelName"><i class="el-icon-folder iconLabel"></i>{{groupName}}</div>
+        <div v-show="topaddLabel"><i class="el-icon-plus add" @click="openOne"></i></div>
+      </div>
+      <el-input
+        class="elInput"
+        size="small"
+        clearable
+        placeholder="输入关键字进行过滤"
+        v-model="filterText">
+      </el-input>
+      <div class="treeTop" :style="{height:taHeight}">
+        <el-tree
+          class="filter-tree"
+          :data="data"
+          node-key="id"
+          :props="defaultProps"
+          default-expand-all
+          :filter-node-method="filterNode"
+          :expand-on-click-node="false"
+          :highlight-current="true"
+          @node-click="handleNodeClick"
+          ref="tree">
         <span class="custom-tree-node" slot-scope="{ node, data }">
         <span class="labelLength" :title="node.label">{{ node.label }}</span>
         <span v-show="addLabel">
+          <!--<el-button-->
+          <!--type="text"-->
+          <!--size="mini"-->
+          <!--@click="() => append(data)">-->
           <el-button class="addBtn" type="text" size="mini" @click.stop="addTwo(node,data)" :disabled="node.level>2">
             <!--Append-->
             <i class="el-icon-plus"></i>
           </el-button>
+          <!--<el-button type="text" size="mini" @click.stop="remove(node, data)" :disabled="node.level>2">-->
           <el-button type="text" size="mini" @click.stop="remove(node, data)">
             <!--Delete-->
             <i class="el-icon-delete"></i>
           </el-button>
         </span>
       </span>
-          </el-tree>
-        </div>
-
+        </el-tree>
       </div>
 
-      <div class="tableContent">
-        <el-form :model="ruleForm2" :rules="rules" ref="ruleForm2" label-width="100px" v-if="showContent">
-          <el-form-item label="标签名称:" prop="name2" class="nameOne">
-            <el-input v-model="ruleForm2.name2" maxlength="25" show-word-limit :disabled="lookContent"
-                      placeholder="请输入标签名称"></el-input>
+    </div>
+
+    <div class="tableContent">
+      <el-form :model="ruleForm2" :rules="rules" ref="ruleForm2" label-width="100px" v-if="showContent">
+        <el-form-item label="标签名称:" prop="name2" class="nameOne">
+          <el-input v-model="ruleForm2.name2"  maxlength="25" show-word-limit :disabled="lookContent" placeholder="请输入标签名称"></el-input>
+        </el-form-item>
+        <el-form-item label="标签简介:" prop="textarea2" class="nameOne">
+          <el-input
+            class="area"
+            type="textarea"
+            :autosize="{ minRows: 8, maxRows: 4}"
+            placeholder="请输入标签简介"
+            maxlength="100"
+            show-word-limit
+            :disabled="lookContent"
+            v-model="ruleForm2.textarea2">
+          </el-input>
+        </el-form-item>
+        <el-form-item style="text-align: center">
+          <el-button v-show="showBtndo" size="small" type="primary" :loading="editLoading" @click="sureShare(ruleForm.deteleId)">保存</el-button>
+          <el-button v-show="showBtndo" size="small" @click="handleDelete(ruleForm2.name2,ruleForm.deteleId)">删除</el-button>
+          <el-button size="small" @click="goback">返回</el-button>
+        </el-form-item>
+      </el-form>
+      <div class="noImage"  v-else>
+        <img src="../../assets/img/002.png" height="144" width="160"/></div>
+      </div>
+    <el-dialog class="creat" title="添加顶级标签" :visible.sync="labelDialog" width="530px" center
+               :close-on-click-modal="false"
+               @close="closedialogOne">
+      <div class="del-dialog-cnt">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+          <el-form-item label="标签名称:" prop="name" class="nameOne">
+            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入标签名称"></el-input>
           </el-form-item>
-          <el-form-item label="标签简介:" prop="textarea2" class="nameOne">
+          <el-form-item label="标签简介:" prop="textarea" class="nameOne">
             <el-input
               class="area"
               type="textarea"
-              :autosize="{ minRows: 8, maxRows: 4}"
+              :autosize="{ minRows: 2, maxRows: 4}"
               placeholder="请输入标签简介"
               maxlength="100"
               show-word-limit
-              :disabled="lookContent"
-              v-model="ruleForm2.textarea2">
+              v-model="ruleForm.textarea">
             </el-input>
           </el-form-item>
-          <el-form-item style="text-align: center">
-            <el-button v-show="showBtn" size="small" type="primary" :loading="editLoading"
-                       @click="sureShare(ruleForm.deteleId)">保存
-            </el-button>
-            <el-button v-show="showBtn" size="small" @click="handleDelete(ruleForm2.name2,ruleForm.deteleId)">删除
-            </el-button>
-            <el-button size="small" @click="goback">返回</el-button>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer device">
+        <div>
+          <el-button size="small" plain class="btn-group" @click="cancel()">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading"
+                     @click="add(ruleForm.name,ruleForm.textarea)">添加
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
+    <el-dialog class="creat" title="添加下级标签" :visible.sync="labelDialog2" width="530px" center
+               :close-on-click-modal="false"
+               @close="closedialogTwo">
+      <div class="del-dialog-cnt">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+          <el-form-item label="标签名称:" prop="name" class="nameOne">
+            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入标签名称"></el-input>
+          </el-form-item>
+          <el-form-item label="标签简介:" prop="textarea" class="nameOne">
+            <el-input
+              class="area"
+              type="textarea"
+              :autosize="{ minRows: 2, maxRows: 4}"
+              placeholder="请输入标签简介"
+              maxlength="100"
+              show-word-limit
+              v-model="ruleForm.textarea">
+            </el-input>
           </el-form-item>
         </el-form>
-        <div class="noImage" v-else>
-          <img src="../../assets/img/002.png" height="144" width="160"/></div>
       </div>
-      <el-dialog class="creat" title="添加顶级标签" :visible.sync="labelDialog" width="530px" center
-                 :close-on-click-modal="false"
-                 @close="closedialogOne">
-        <div class="del-dialog-cnt">
-          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
-            <el-form-item label="标签名称:" prop="name" class="nameOne">
-              <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入标签名称"></el-input>
-            </el-form-item>
-            <el-form-item label="标签简介:" prop="textarea" class="nameOne">
-              <el-input
-                class="area"
-                type="textarea"
-                :autosize="{ minRows: 2, maxRows: 4}"
-                placeholder="请输入标签简介"
-                maxlength="100"
-                show-word-limit
-                v-model="ruleForm.textarea">
-              </el-input>
-            </el-form-item>
-          </el-form>
+      <div slot="footer" class="dialog-footer device">
+        <div>
+          <el-button size="small" plain class="btn-group" @click="cancelOne()">取消</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="savelabelLoading"
+                     @click="addNext(ruleForm.name,ruleForm.textarea)">添加
+          </el-button>
         </div>
-        <div slot="footer" class="dialog-footer device">
-          <div>
-            <el-button size="small" plain class="btn-group" @click="cancel()">取消</el-button>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading"
-                       @click="add(ruleForm.name,ruleForm.textarea)">添加
-            </el-button>
-          </div>
+      </div>
+    </el-dialog>
+
+    <el-dialog class="creat" title="删除提示" :visible.sync="deleteDialog" width="530px" center
+               :close-on-click-modal="false"
+               @close="closedelete">
+      <div class="del-dialog-cnt">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" style="text-align: center">
+          <el-form-item>您正在删除{{this.tagName}}标签，使用过该标签的模型会停止运行，是否确认删除？</el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer device">
+        <div>
+          <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="delTree(delTreeId)">
+            确定删除
+          </el-button>
+          <el-button size="small" @click="cancelDelete">取消</el-button>
         </div>
-      </el-dialog>
-      <el-dialog class="creat" title="添加下级标签" :visible.sync="labelDialog2" width="530px" center
-                 :close-on-click-modal="false"
-                 @close="closedialogTwo">
-        <div class="del-dialog-cnt">
-          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
-            <el-form-item label="标签名称:" prop="name" class="nameOne">
-              <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入标签名称"></el-input>
-            </el-form-item>
-            <el-form-item label="标签简介:" prop="textarea" class="nameOne">
-              <el-input
-                class="area"
-                type="textarea"
-                :autosize="{ minRows: 2, maxRows: 4}"
-                placeholder="请输入标签简介"
-                maxlength="100"
-                show-word-limit
-                v-model="ruleForm.textarea">
-              </el-input>
-            </el-form-item>
-          </el-form>
-        </div>
-        <div slot="footer" class="dialog-footer device">
-          <div>
-            <el-button size="small" plain class="btn-group" @click="cancelOne()">取消</el-button>
-            <el-button size="small" type="primary" class="queryBtn" :loading="addLoading"
-                       @click="addNext(ruleForm.name,ruleForm.textarea)">添加
-            </el-button>
-          </div>
-        </div>
-      </el-dialog>
-      <!--删除开始-->
-      <el-dialog class="creat" title="删除提示" :visible.sync="deleteDialog" width="530px" center
-                 :close-on-click-modal="false"
-                 @close="closedelete">
-        <div class="del-dialog-cnt">
-          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" style="text-align: center">
-            <el-form-item>您正在删除{{this.tagName}}标签，使用过该标签的模型会停止运行，是否确认删除？</el-form-item>
-          </el-form>
-        </div>
-        <div slot="footer" class="dialog-footer device">
-          <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading"
-                       @click="delTree(delTreeId)">
-              确定删除
-            </el-button>
-            <el-button size="small" @click="cancelDelete">取消</el-button>
-          </div>
-        </div>
-      </el-dialog>
-      <!--删除结束 end-->
-    </div>
+      </div>
+    </el-dialog>
+  </div>
   </div>
 </template>
 
@@ -166,16 +165,16 @@
     name: "treeLabel",
     data() {
       return {
-        lookContent: false,
-        showContent: true,
-        showBtn: true,
-        groupName: '',
-        tabHeight: '',
-        tagName: '',
+        lookContent:false,
+        showContent:true,
+        showBtndo:true,
+        groupName:'',
+        tabHeight:'',
+        tagName:'',
         delTreeId: 0,
         lvl: 1,
         id: 0,
-        tagId: 0,
+        preaTagId: 0,
         labelDialog: false,
         labelDialog2: false,
         editDialog: false,
@@ -187,14 +186,15 @@
         saveLoading2: true,
         shareDialog: false,
         saveLoading: false,
-        addLoading: false,
-        editLoading: false,
+        savelabelLoading: false,
+        editLoading:false,
         percentage: 30,
         addLabel: true,
-        topLabel: true,
+        topaddLabel: true,
         labelEdit: true,
         treeID: '',
         value1: '',
+        labelcreatID: '',
         textarea: '',
         options: [{
           value: '选项1',
@@ -207,15 +207,15 @@
           label: '已共享'
         }],
         value: '',
-        parentList: [],
-        showList: [],
+        tableparentList: [],
+        ztableShowList: [],
         ruleForm: {
           name: '',
           textarea: '',
-          deteleId: ''
+          deteleId:''
         },
-        ruleForm2: {
-          name2: '',
+        ruleForm2:{
+          name2:'',
           textarea2: ''
         },
         rules: {
@@ -223,13 +223,13 @@
             {required: true, message: '请填写', trigger: 'blur'}
           ],
           name2: [
-            {required: true, message: '请填写', trigger: 'blur'}, {trigger: 'change'}
+            {required: true, message: '请填写', trigger: 'blur'},{trigger: 'change'}
           ],
           textarea: [
             {required: true, message: '请填写', trigger: 'blur'}
           ],
           textarea2: [
-            {required: true, message: '请填写', trigger: 'blur'}, {trigger: 'change'}
+            {required: true, message: '请填写', trigger: 'blur'},{trigger: 'change'}
           ]
         },
         data: [],
@@ -244,8 +244,8 @@
         this.$refs.tree.filter(val);
       }
     },
-    computed: {
-      taHeight: function () {
+    computed:{
+      taHeight:function () {
         return (document.body.clientHeight - 300) + "px"
       }
     },
@@ -278,7 +278,7 @@
                   this.data = res.childrenNode
                   if (res.childrenNode && res.childrenNode.length > 0) {
                     const treeTable = await looktreeTable(res.childrenNode[0].id)
-                  } else {
+                  }else{
                     this.showContent = false
                     this.ruleForm2.name2 = ''
                     this.ruleForm2.textarea2 = ''
@@ -301,12 +301,9 @@
           }
         });
       },
-      /**
-       * 标签树添加顶级标签
-       * @param tagsName
-       * @param synopsis
-       */
-      add(tagsName, synopsis) {
+
+      //添加顶级标签
+      add(tagsName,synopsis) {
         this.saveLoading = true
         this.$refs.ruleForm.validate((valid) => {
           if (valid) {
@@ -326,41 +323,36 @@
           }
         });
       },
-      /**
-       * 标签树添加下级
-       * @param tagsName
-       * @param synopsis
-       */
-      addNext(tagsName, synopsis) {
-        this.addLoading = true
+      //添加下级
+      addNext(tagsName,synopsis) {
+        this.savelabelLoading = true
         this.$refs.ruleForm.validate((valid) => {
           if (valid) {
             try {
-              this.parentList = []
-              this.getDtTagData(this.tagId, synopsis, tagsName)
+              this.tableparentList = []
+              this.getDtTagData(this.preaTagId, synopsis, tagsName)
               this.labelDialog2 = false
-              this.addLoading = false
+              this.savelabelLoading = false
               this.$refs.ruleForm.resetFields()
             } catch (e) {
-              this.addLoading = false
+              this.savelabelLoading = false
               console.log(e);
             }
           } else {
-            this.addLoading = false
+            this.savelabelLoading = false
           }
         });
+
       },
-      // 关闭
       closeShare2() {
         this.editDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      // 弹框取消操作
       cancel() {
         this.labelDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      // 取消添加下级
+      //取消添加下级
       cancelOne() {
         this.labelDialog2 = false
         this.$refs.ruleForm.resetFields()
@@ -370,20 +362,18 @@
         if (!value) return true;
         return data.tagName.indexOf(value) !== -1;
       },
-      // 获取标签信息
       async handleNodeClick(data) {
         this.ruleForm2.name2 = data.tagName
         this.ruleForm2.textarea2 = data.synopsis
         this.ruleForm.deteleId = data.id
-        this.parentList = []
+        this.tableparentList = []
         const treeTable = await looktreeTable(data.id)
-        this.showList = treeTable.childrenTag
-        this.parentList.push(treeTable.parentTag)
-        if (this.showList == '') {
+        this.ztableShowList = treeTable.childrenTag
+        this.tableparentList.push(treeTable.parentTag)
+        if (this.ztableShowList == '') {
           this.Loading2 = false
         }
       },
-      // 增加
       append(data) {
         const newChild = {id: id++, label: 'testtest', children: []};
         if (!data.children) {
@@ -391,11 +381,13 @@
         }
         data.children.push(newChild);
       },
-      // 删除
+
       remove(node, data) {
+        console.log('删除了',data)
         this.deleteDialog = true
         this.tagName = data.tagName
         this.delTreeId = data.id
+        // this.delTree(data.id)
       },
       renderContent(h, {node, data, store}) {
         return (
@@ -410,40 +402,34 @@
       openOne() {
         this.labelDialog = true
       },
-      // 新建下级标签
       addTwo(node, data) {
         //console.log('新建下级标签',node,data)
         this.lvl = node.level + 1
-        this.tagId = data.id
+        this.preaTagId = data.id
         this.labelDialog2 = true
       },
-      // 关闭一级标签弹框
       closedialogOne() {
         this.labelDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      // 关闭二级标签弹框
       closedialogTwo() {
         this.labelDialog2 = false
         this.$refs.ruleForm.resetFields()
       },
-      // 取消编辑
       closeEdit() {
         this.editDialog = false
       },
-      // 关闭删除弹框
       closedelete() {
         this.deleteDialog = false
       },
-      // 删除操作
-      handleDelete(name, id) {
+      handleDelete(name,id) {
         this.tagName = name
         this.delTreeId = id
         this.deleteDialog = true
       },
-      // 确定删除
+      //删除
       async delTree(id) {
-        this.parentList = []
+        this.tableparentList = []
         try {
           const data = await delTree(id)
           if (data.message == '删除成功') {
@@ -462,25 +448,19 @@
         }
         this.deleteDialog = false
       },
-      cancelDelete() {
+      cancelDelete(){
         this.deleteDialog = false
       },
-      /**
-       * 标签管理标签树新建树节点
-       * @param tagId
-       * @param synopsis
-       * @param tagsName
-       * @returns {Promise<void>}
-       */
-      async getDtTagData(tagId, synopsis, tagsName) {
+      //新建树节点
+      async getDtTagData(preaTagId, synopsis, tagsName) {
         const tagsId = Number(this.$route.params.tagsId)
         const params = {
           lvl: this.lvl,
-          preaTagId: tagId,
+          preaTagId: preaTagId,
           isNew: true,
           synopsis: synopsis,
           tagName: tagsName,
-          tagsId: tagsId, // 标签组id
+          tagsId: tagsId,//标签组id
         }
         try {
           const data = await getDtTagData(params)
@@ -490,7 +470,6 @@
 
         }
       },
-      // 获取数据列表数据
       async sharelookTree() {
         try {
           const res = await lookTree(this.$route.params.tagsId)
@@ -500,7 +479,7 @@
             this.ruleForm2.name2 = treeTable.parentTag.tagName
             this.ruleForm2.textarea2 = treeTable.parentTag.synopsis
             this.ruleForm.deteleId = treeTable.parentTag.id
-          } else {
+          }else{
             this.showContent = false
             this.ruleForm2.name2 = ''
             this.ruleForm2.textarea2 = ''
@@ -509,8 +488,7 @@
           console.log(e);
         }
       },
-      // 返回
-      goback() {
+      goback(){
         this.$router.go(-1)
       }
     },
@@ -518,18 +496,17 @@
       if (this.$route.name == 'lookTree') {
         this.sharelookTree()
         this.addLabel = false
-        this.topLabel = false
+        this.topaddLabel = false
         this.labelEdit = false
-        this.showBtn = false
+        this.showBtndo = false
         this.lookContent = true
       } else if (this.$route.name == 'editTree') {
         this.sharelookTree()
       } else if (this.$route.name == 'labelcreatTree') {
         this.sharelookTree()
-      } else if (this.$route.name == 'tree') {
+      }else if(this.$route.name == 'tree'){
         this.sharelookTree()
-      } else {
-      }
+      }else {}
       this.groupName = this.$route.params.tagsName
     }
   };
@@ -582,7 +559,7 @@
     padding-left: 15px;
     width: 200px;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow:ellipsis;
     white-space: nowrap;
   }
 
@@ -603,6 +580,18 @@
     padding-left: 5px;
     padding-right: 5px;
     overflow-y: auto;
+    /*border: 1px solid red;*/
+  }
+
+  .iconLogo {
+    font-size: 18px;
+    margin-left: 25px;
+    cursor: pointer;
+  }
+
+  .newTable {
+    overflow-y: auto;
+    margin-top: -20px;
   }
 
   .addBtn {
@@ -612,21 +601,22 @@
   .secondTable >>> .el-table__header-wrapper {
     display: none;
   }
-
-  .iconLabel {
+  .back {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .iconLabel{
     padding-right: 5px;
   }
-
-  .noImage {
+  .noImage{
     text-align: center;
     margin-top: 20%;
   }
-
-  .labelLength {
+  .labelLength{
     display: inline-block;
     width: 180px;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow:ellipsis;
     white-space: nowrap;
   }
 </style>
