@@ -16,12 +16,20 @@ import com.openjava.datatag.tagcol.dto.*;
 import com.openjava.datatag.tagcol.query.DtCooTagcolLimitDBParam;
 import com.openjava.datatag.tagcol.query.DtCooperationSetColParam;
 import com.openjava.datatag.tagcol.service.DtCooTagcolLimitService;
+import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 
 
+import com.openjava.datatag.tagmanage.dto.DtTagDTO;
+import com.openjava.datatag.tagmanage.service.DtTagGroupService;
+import com.openjava.datatag.tagmanage.service.DtTagService;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.user.service.SysUserService;
+import com.openjava.datatag.utils.VoUtils;
+import com.openjava.datatag.utils.tree.TagDTOTreeNode;
+import com.openjava.datatag.utils.tree.TagDTOTreeNodeShow2;
+import org.apache.commons.collections.CollectionUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 
 import org.ljdp.component.exception.APIException;
@@ -75,7 +83,10 @@ public class DtCooperationAction {
     private DtCooTagcolLimitService dtCooTagcolLimitService;
     @Resource
     private SysUserService sysUserService;
-
+    @Resource
+    private DtTagGroupService dtTagGroupService;
+    @Resource
+    private DtTagService dtTagService;
     /**
      * 用主键获取数据
      *
@@ -243,11 +254,31 @@ public class DtCooperationAction {
     })
     @Security(session = true)
     @RequestMapping(value = "/taggroup", method = RequestMethod.POST)
-    public DataApiResponse<DtTagGroup> tagGroup(@RequestParam(value = "modelId", required = true) Long modelId, @RequestParam(value = "colField", required = true) Long colField) {
+    public List<TagDTOTreeNodeShow2> tagGroup(@RequestParam(value = "modelId", required = true) Long modelId, @RequestParam(value = "colField", required = true) Long colField) {
         List<DtTagGroup> result = dtCooperationService.findCurrentUserTagGroup(modelId, colField);
-        DataApiResponse<DtTagGroup> resp = new DataApiResponse<>();
-        resp.setRows(result);
-        return resp;
+        List<TagDTOTreeNodeShow2> resultsList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(result)){
+            for (DtTagGroup group:result) {
+                Long tagsId = group.getId();
+                List<DtTag> tagList = dtTagService.findByTagsId(tagsId);
+                if (CollectionUtils.isEmpty(tagList)){
+                    TagDTOTreeNodeShow2 father = new TagDTOTreeNodeShow2();
+                    father.setLabel(group.getTagsName());
+                    father.setValue(group.getId().toString());
+                    father.setChildren(new ArrayList<>());
+                    resultsList.add(father);
+                    continue;
+                }
+                DtTagDTO root = new DtTagDTO();
+                root.setId(TagDTOTreeNode.ROOT_ID);
+                TagDTOTreeNode treeNode = new TagDTOTreeNode(TagDTOTreeNode.toDtTagDTO(tagList), root);
+                TagDTOTreeNodeShow2 treeNodeShow = new TagDTOTreeNodeShow2(treeNode);
+                treeNodeShow.setValue(group.getId().toString());
+                treeNodeShow.setLabel(group.getTagsName());
+                resultsList.add(treeNodeShow);
+            }
+        }
+        return resultsList;
     }
 
     /**
