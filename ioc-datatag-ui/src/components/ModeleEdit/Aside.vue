@@ -433,6 +433,7 @@
           })
         }
       },
+      // 标签单选操作
       handleCheckedColsChange(value) {
         let checkedCount = value.length;
         this.checkAll = checkedCount === this.cols.length;
@@ -514,6 +515,7 @@
         this.myData = []
         this.editData = []
         colsOptions = []
+        this.checkAll = false
         // this.colSetDialog = true
         let colsData = {}
         let allcolsData = {}
@@ -529,7 +531,7 @@
           this.resourceName = colsData.data.resourceName
           this.resourceId = colsData.data.resourceId
           this.resourceType = colsData.data.type   // 0数据湖 1自建目录
-          // this.tableData = []
+          this.tableData = []
           this.columnData.forEach((item, index) => {
             colsOptions.push(item.definition)
           })
@@ -658,7 +660,7 @@
                 Object.assign(item, {leaf: true})
               })
             }
-            // 状态
+            // 根据后台返回的字段定义状态显示
             if (resData.openScope == '1') {
               this.openScope = '全部对外公开'
             } else if (resData.openScope == '2') {
@@ -787,6 +789,7 @@
       getCheckChange(row, $event) {
         this.tableData = JSON.parse(JSON.stringify(this.tableData))
       },
+      // 删除列表中的字段
       delCol(index) {
         this.checkedCols.forEach((name, cindex) => {
           if (name === this.tableData[index].definition) {
@@ -795,6 +798,7 @@
         })
         this.tableData.splice(index, 1)
       },
+      // 打标主键的选择
       changeSel() {
         this.tableData.map(item => {
           if (item.definition == this.ruleForm.pkey) {
@@ -805,6 +809,7 @@
       handleClick(tab, event) {
         // console.log(tab, event);
       },
+      // 订阅数据
       async getLink() {
         try {
           const link = await getdatalakeLink(this.resourceId)
@@ -821,8 +826,6 @@
         } catch (e) {
           console.log(e);
         }
-
-
       },
       getHeight() {
         this.contentStyleObj.width = window.innerWidth - 614 + 'px';
