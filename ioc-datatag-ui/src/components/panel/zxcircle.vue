@@ -1,7 +1,7 @@
 <template>
   <div class="chart">
     <!--<div id="myCircle" :style="conheight" ></div>-->
-    <div id="myCircle" :style="{width: '100%', minHeight: '100px'}" ></div>
+    <div id="myCircle" :style="{width: '100%', minHeight: '100px'}"></div>
   </div>
 </template>
 
@@ -19,7 +19,8 @@
         }
       }
     },
-    mounted() {},
+    mounted() {
+    },
     methods: {
       ...mapActions('tagPanel', ['getimageList', 'getarrList']),
       hadCircle() {
