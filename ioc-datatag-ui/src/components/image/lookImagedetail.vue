@@ -86,11 +86,8 @@
             pKey: this.pKey,
             tableName: this.tableName
           })
-          console.log('resDetail',resDetail.lists);
           this.rightListarr = resDetail.data.mapLists // 右边
           this.leftListarr = resDetail.data.mapProperty  // 左边
-          console.log('right',this.rightListarr);
-          console.log('left',this.leftListarr);
         } catch (e) {
 
         }
