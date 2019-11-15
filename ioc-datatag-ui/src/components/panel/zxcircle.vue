@@ -1,7 +1,6 @@
 <template>
   <div class="chart">
-    <!--<div id="myCircle" :style="conheight" ></div>-->
-    <div id="myCircle" :style="{width: '100%', minHeight: '100px'}"></div>
+    <div id="myCircle" :style="{height: scrollerHeight}" ></div>
   </div>
 </template>
 
@@ -14,8 +13,8 @@
     data() {
       return {
         arr: [],
-        conheight: {
-          height: ''
+        onHeight: {
+          height: '100'
         }
       }
     },
@@ -103,14 +102,15 @@
           }
           this.arr.push(numTwo)
         }
-        let obj = 0
-        this.arr.forEach(_item => {
-          obj = obj + _item.symbolSize
-        })
-        if (obj < 100) {
-          obj = 100
-        }
-        this.conheight.height = obj + 'px';
+        // let obj = 0
+        // this.arr.forEach(_item => {
+        //   obj = obj + _item.symbolSize
+        // })
+        // if (obj < 100) {
+        //   obj = 100
+        // }
+        // this.onHeight.height = obj + 'px';
+        // console.log('height',this.onHeight.height);
         return len;
       },
       async circle() {
@@ -132,7 +132,11 @@
     computed: {
       ...mapState({
         ...mapState('tagPanel', ['contentArr', 'listArr'])
-      })
+      }),
+      // 高度
+      scrollerHeight: function() {
+        return (window.innerHeight - 470) + 'px';
+      }
     },
   }
 </script>

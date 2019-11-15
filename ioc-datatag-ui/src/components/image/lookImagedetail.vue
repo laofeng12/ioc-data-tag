@@ -4,7 +4,7 @@
     <div class="header">
       <div class="left">
           <span class="return">
-            <i class="el-icon-arrow-left" @click="goback"></i>
+            <i class="el-icon-arrow-left" @click="goBack"></i>
           </span>
         <div class="name">
           <div class="img"></div>
@@ -68,13 +68,15 @@
       this.tableName = this.$route.query.tableName
       this.titleName = this.$route.query.titleName
       this.getpictureList()
+      localStorage.setItem('pKey',this.pKey)
+      localStorage.setItem('tableName',this.tableName)
     },
     mounted() {
 
     },
     methods: {
       // 返回
-      goback() {
+      goBack() {
         this.$router.go(-1)
       },
       // 获取显示数据信息
@@ -84,8 +86,11 @@
             pKey: this.pKey,
             tableName: this.tableName
           })
+          console.log('resDetail',resDetail.lists);
           this.rightListarr = resDetail.data.mapLists // 右边
           this.leftListarr = resDetail.data.mapProperty  // 左边
+          console.log('right',this.rightListarr);
+          console.log('left',this.leftListarr);
         } catch (e) {
 
         }
@@ -139,7 +144,7 @@
   .numDetail {
     font-size: 16px;
     color: #333333;
-    margin-top: 50px;
+    /*margin-top: 50px;*/
     margin-left: 50px;
   }
 
