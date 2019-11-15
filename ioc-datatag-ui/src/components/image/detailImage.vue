@@ -14,7 +14,7 @@
             @keyup.enter.native="goback"
             v-model.trim="input2">
           </el-input>
-          <el-button class="zxlistBtn" size="small" type="primary" @click="goback">查询</el-button>
+          <el-button class="zxlistBtn" size="small" type="primary" @click="goBack">查询</el-button>
         </div>
       </div>
     </div>
@@ -42,12 +42,13 @@
       <div class="quan">
         <hadleCircle></hadleCircle>
       </div>
-  </div>
+    </div>
   </div>
 </template>
 <script>
   import {mapActions, mapState, mapGetters} from 'vuex'
   import hadleCircle from '@/components/panel/zxcircle'
+
   export default {
     name: "detailImage",
     components: {
@@ -56,14 +57,19 @@
     data() {
       return {
         input2: '',
-        titleId:'',
-        arr:[]
+        titleId: '',
+        arr: []
       }
     },
     methods: {
       ...mapActions('tagPanel', ['getimageList', 'getarrList']),
-      goback() {
-        this.$router.go(-1)
+      goBack() {
+        this.$router.push({
+          path: '/queryImage',
+          query: {
+            id: this.input2
+          }
+        })
       }
     },
     created() {
@@ -72,8 +78,8 @@
       const pKey = localStorage.getItem('pKey')
       const tableName = localStorage.getItem('tableName')
       this.getarrList({
-        pKey:pKey,
-        tableName:tableName
+        pKey: pKey,
+        tableName: tableName
       })
     },
     computed: {
@@ -83,7 +89,6 @@
     },
     watch: {},
     mounted() {
-
     }
   }
 </script>
@@ -95,14 +100,11 @@
     padding-left: 16px;
     padding-top: 18px;
   }
+
   .zxinp {
-    /*width: 500px;*/
     width: 482px;
   }
 
-  .zxlistBtn {
-    /*margin-left: 10px;*/
-  }
   .result {
     display: flex;
     justify-content: flex-start;
@@ -115,46 +117,55 @@
     text-align: center;
     margin-top: 20px;
   }
-  .nameImage{
+
+  .nameImage {
     font-size: 16px;
     color: #262626;
     font-family: PingFangSC-Medium;
     margin-left: -4px;
   }
-  .queryInput{
+
+  .queryInput {
     display: flex;
     margin-left: 8px;
     margin-top: 16px;
   }
-  .contentD{
+
+  .contentD {
     background-color: #fff;
     min-height: calc(100vh - 265px);
     margin-top: 22px;
   }
-  .myCon{
+
+  .myCon {
     text-align: center;
     padding: 0px 50px;
     margin-top: 40px;
   }
-  .allContent{
+
+  .allContent {
   }
-  .information{
+
+  .information {
     position: relative;
     display: inline-block;
     background-color: #fff;
     min-width: 320px;
     min-height: 154px;
     margin: 0 auto;
-    box-shadow: 0 0 50px 0 rgba(4,134,254,0.1);
+    box-shadow: 0 0 50px 0 rgba(4, 134, 254, 0.1);
   }
-  .inforLabel{
+
+  .inforLabel {
     margin-top: 20px;
     padding: 0px 16px;
   }
-  .inforImage{
+
+  .inforImage {
     margin-top: 20px;
   }
-  .labelName{
+
+  .labelName {
     font-family: PingFangSC-Regular;
     font-size: 14px;
     color: #0486FE;
@@ -166,31 +177,37 @@
     display: inline-block;
     margin-bottom: 20px;
   }
-  .iconA{
+
+  .iconA {
     position: absolute;
     left: 0px;
     top: 0px;
   }
-  .iconB{
+
+  .iconB {
     position: absolute;
     right: 0px;
     top: 0px;
   }
-  .iconC{
+
+  .iconC {
     position: absolute;
     left: 0px;
     bottom: 0px;
   }
-  .iconD{
+
+  .iconD {
     position: absolute;
     right: 0px;
     bottom: 0px;
   }
-  .arrow{
+
+  .arrow {
     text-align: center;
     margin-bottom: 40px;
   }
-  .quan{
+
+  .quan {
     text-align: center;
     width: 100%;
   }

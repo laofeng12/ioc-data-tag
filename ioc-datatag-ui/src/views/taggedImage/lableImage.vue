@@ -51,12 +51,12 @@
           </el-table-column>
           <el-table-column prop="runResult" label="调度总量/成功数量"></el-table-column>
           <!--<el-table-column prop="people" label="修改人/修改时间">-->
-            <!--<template slot-scope="scope">-->
-              <!--<div>-->
-                <!--<div>{{scope.row.modifyUserName}}</div>-->
-                <!--<div>{{scope.row.modifyTime}}</div>-->
-              <!--</div>-->
-            <!--</template>-->
+          <!--<template slot-scope="scope">-->
+          <!--<div>-->
+          <!--<div>{{scope.row.modifyUserName}}</div>-->
+          <!--<div>{{scope.row.modifyTime}}</div>-->
+          <!--</div>-->
+          <!--</template>-->
           <!--</el-table-column>-->
           <el-table-column prop="modifyUserName" label="修改人"></el-table-column>
           <el-table-column prop="modifyTime" label="修改时间"></el-table-column>
@@ -86,7 +86,8 @@
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="导出数据" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-download iconLogo" @click="download(scope.row.taggingModelId,scope.row.runResult)"></i>
+                    <i class="el-icon-download iconLogo"
+                       @click="download(scope.row.taggingModelId,scope.row.runResult)"></i>
                 </span>
               </el-tooltip>
 
@@ -176,11 +177,13 @@
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="handleExport">确定导出</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="handleExport">确定导出
+            </el-button>
             <el-button size="small" type="primary" class="queryBtn" @click="cancleExport">取消</el-button>
           </div>
         </div>
       </el-dialog>
+      <!--下载 end-->
       <el-dialog class="creat" title="删除提示" :visible.sync="deleteDialog" width="530px" center
                  :close-on-click-modal="false"
                  @close="closedelete">
@@ -193,7 +196,7 @@
           <div>
             <el-button size="small" type="primary" class="queryBtn" :loading="deleteLoading" @click="sureDelete">确定删除
             </el-button>
-            <el-button size="small" plain  @click="cancelDelete">取消</el-button>
+            <el-button size="small" plain @click="cancelDelete">取消</el-button>
           </div>
         </div>
       </el-dialog>
@@ -246,12 +249,13 @@
           </div>
         </div>
       </el-dialog>
+      <!--查看错误日志 end-->
     </div>
   </div>
 </template>
 
 <script>
-  import {getmodelList, getDispatch, getDelete, getDispatchdetail,startDown,getError} from '@/api/lableImage.js'
+  import {getmodelList, getDispatch, getDelete, getDispatchdetail, startDown, getError} from '@/api/lableImage.js'
   import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
   import DMSocket from '@/utils/DMSocket'
@@ -262,10 +266,10 @@
     name: "tagManage",
     data() {
       return {
-        errorContent:'',
-        lockReconnect:false,
+        errorContent: '',
+        lockReconnect: false,
         webUserId: '',
-        downloadId:'',
+        downloadId: '',
         page: 0,
         size: 10,
         totalnum: 0,
@@ -276,7 +280,7 @@
         deleteName: '',
         deleteId: '',
         input2: '',
-        errorDialog:false,
+        errorDialog: false,
         Loading: true,
         saveLoading2: true,
         controlDialog: false,
@@ -390,6 +394,12 @@
           return "backgroundColor:#ee0320";
         }
       },
+      /**
+       * 标签组调度
+       * @param name
+       * @param id
+       * @returns {Promise<void>}
+       */
       async handleControl(name, id) {
         this.controlDialog = true
         this.dispatchName = name
@@ -413,31 +423,41 @@
         this.controlDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      download(id,num) {
-        if(num === '0/0'){
+      /**
+       * 导出数据
+       * @param id
+       * @param num
+       */
+      download(id, num) {
+        if (num === '0/0') {
           this.$message.error('调度成功数量为0，无法导出！');
           return
-        }else {
+        } else {
           this.downloadDialog = true
           this.downloadId = id
         }
       },
+      // 关闭下载模板
       closeDownload() {
         this.downloadDialog = false
         this.exportNum = ''
       },
-      cancleExport(){
+      // 取消下载模板操作
+      cancleExport() {
         this.downloadDialog = false
         this.exportNum = ''
       },
+      // 获取删除信息
       handleDelete(name, id) {
         this.deleteDialog = true
         this.deleteName = name
         this.deleteId = id
       },
+      // 关闭删除
       closedelete() {
         this.deleteDialog = false
       },
+      // 删除取消按钮操作
       cancelDelete() {
         this.deleteDialog = false
       },
@@ -450,32 +470,34 @@
       cooperationModel() {
         this.$router.push('cooperationModel')
       },
+      // 下载跳转操作
       down() {
         this.$router.push('download')
       },
-      async handleExport(){
+      // 导出数据操作
+      async handleExport() {
         this.saveLoading = true
-          if((this.exportValue == 1 && this.exportNum != '') || this.exportValue == 0){
-            const params = {
-              number:this.exportNum,
-              taggingModelId:this.downloadId
-            }
-            try{
-              const res = await startDown(params)
-              this.$message({
-                message: res.message,
-                type: 'success'
-              });
-              this.saveLoading = false
-              this.downloadDialog = false
-              this.$router.push('download')
-            }catch (e) {
-              console.log(e);
-            }
-          }else{
-            this.$message.error('请输入需要导出的数据条目数量');
-            this.saveLoading = false
+        if ((this.exportValue == 1 && this.exportNum != '') || this.exportValue == 0) {
+          const params = {
+            number: this.exportNum,
+            taggingModelId: this.downloadId
           }
+          try {
+            const res = await startDown(params)
+            this.$message({
+              message: res.message,
+              type: 'success'
+            });
+            this.saveLoading = false
+            this.downloadDialog = false
+            this.$router.push('download')
+          } catch (e) {
+            console.log(e);
+          }
+        } else {
+          this.$message.error('请输入需要导出的数据条目数量');
+          this.saveLoading = false
+        }
       },
       // 定时器
       setTimer() {
@@ -483,6 +505,7 @@
           this.datamodelList()
         }, 5000)
       },
+      // 获取数据列表操作
       async datamodelList() {
         const params = {
           eq_runState: this.value,
@@ -538,10 +561,14 @@
       },
       goPage() {
       },
+      // 查询操作
       modelQuery() {
         this.page = 0
         this.datamodelList()
       },
+      /**
+       * 确定调度操作
+       */
       sureDispatch() {
         const param = {
           "cycleEnum": this.ruleForm.region,
@@ -552,6 +579,7 @@
         this.$refs.ruleForm.validate(async (valid) => {
           if (valid) {
             try {
+              // 限制现在运行的时间不能少于当前时间
               const remindTime = this.ruleForm.date
               const str = remindTime.toString()
               const str2 = str.replace('/-/g', '/')
@@ -580,6 +608,7 @@
         });
 
       },
+      // 确定删除操作
       async sureDelete() {
         const res = await getDelete({
           id: this.deleteId
@@ -599,6 +628,7 @@
         this.$refs.ruleForm.resetFields();
         this.labelcreatDialog = false
       },
+      // 标签组确定编辑操作
       sureCreat() {
         try {
           this.creatsaveLoading = true
@@ -627,6 +657,7 @@
           console.log(e);
         }
       },
+      // 查看画像详情
       lookImage(row, id, name) {
         if (row.runState != '运行成功') {
           this.$message.error('请先进行数据调度成功之后再查看画像！');
@@ -648,24 +679,25 @@
           const handler = (evt, ws) => {
             //evt 是 websockett数据
             var obj = JSON.parse(evt.data)
-            if(obj.datas != "-1"){
+            if (obj.datas != "-1") {
               this.datamodelList()
               wssCenter.close();  //断开连接
             }
           }
-          const wssCenter = createSocket(url, handler,this.webUserId)
+          const wssCenter = createSocket(url, handler, this.webUserId)
         } catch (e) {
           console.log(e)
           this.reconnect(url);
         }
       },
       // 查看错误日记
-      async handleError(taggingModelId){
+      async handleError(taggingModelId) {
         this.errorDialog = true
         const res = await getError(taggingModelId)
         this.errorContent = res
       },
-      cancelError(){
+      // 关闭查看错误日记
+      cancelError() {
         this.errorDialog = false
       }
     },
@@ -675,7 +707,8 @@
     },
     computed: {},
     watch: {},
-    mounted() {}
+    mounted() {
+    }
   }
 </script>
 
@@ -721,13 +754,16 @@
     display: flex;
     align-items: center;
   }
-  .errorState{
+
+  .errorState {
     cursor: pointer;
   }
+
   .stateName {
     color: #00CC33;
   }
-  .errorContent{
+
+  .errorContent {
     width: 100%;
     height: 300px;
     overflow-y: auto;
@@ -736,6 +772,7 @@
     color: #ffffff;
     line-height: 25px;
   }
+
   .area {
     width: 360px;
   }
