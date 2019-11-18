@@ -3,7 +3,7 @@
     <div v-show="this.routerName === 'creatModel'" class="newAside">
       <div class="asideTwo">
         <el-input placeholder="输入关键词搜索" v-model="filterText" class="search" size="small"
-                  suffix-icon="el-icon-search"></el-input>
+                  suffix-icon="el-icon-search" clearable></el-input>
         <div class="tree-box treeCode">
           <el-tree class="tree" :props="props" :highlight-current="true"
                    :filter-node-method="filterNode"
@@ -25,7 +25,7 @@
               <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="可用字段" name="first">
                   <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
-                            suffix-icon="el-icon-search"></el-input>
+                            suffix-icon="el-icon-search" clearable></el-input>
                   <div class="h4" v-show="list.length > 0">
                     <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
                       {{resourceName}}
@@ -48,7 +48,7 @@
                 </el-tab-pane>
                 <el-tab-pane label="全部字段" name="second" class="">
                   <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
-                            suffix-icon="el-icon-search"></el-input>
+                            suffix-icon="el-icon-search" clearable></el-input>
                   <div class="h4">
                     <span class="allNametitle">{{resourceName}}</span>
                   </div>
@@ -139,7 +139,7 @@
             <el-tabs v-model="activeName" @tab-click="handleClick">
               <el-tab-pane label="可用字段" name="first">
                 <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
-                          suffix-icon="el-icon-search"></el-input>
+                          suffix-icon="el-icon-search" clearable></el-input>
                 <div class="h4">
                   <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
                     {{resourceName}}
@@ -162,7 +162,7 @@
               </el-tab-pane>
               <el-tab-pane label="全部字段" name="second" class="">
                 <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
-                          suffix-icon="el-icon-search"></el-input>
+                          suffix-icon="el-icon-search" clearable></el-input>
                 <div class="h4">
                   <span class="allNametitle">{{resourceName}}</span>
                 </div>
