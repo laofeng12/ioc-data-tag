@@ -1,5 +1,6 @@
 <template>
-  <el-dialog class="creat" title="数据打标"  :visible.sync="setTagsDialog" width="630px" center :modal-append-to-body="false" :close-on-click-modal="false"
+  <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="630px" center :modal-append-to-body="false"
+             :close-on-click-modal="false"
              @close="close">
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
       <el-form-item label="选择标签组" prop="region">
@@ -57,9 +58,9 @@
 </template>
 
 <script>
-    export default {
-        name: "MarkDialog"
-    }
+  export default {
+    name: "MarkDialog"
+  }
 </script>
 
 <style scoped>

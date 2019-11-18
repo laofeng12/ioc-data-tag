@@ -4,7 +4,7 @@
     <div class="header">
       <div class="left">
           <span class="return">
-            <i class="el-icon-arrow-left" @click="goback"></i>
+            <i class="el-icon-arrow-left" @click="goBack"></i>
           </span>
         <div class="name">
           <div class="img"></div>
@@ -14,64 +14,29 @@
     </div>
     <div class="content">
       <div class="components">
-        <div>
+        <div class="contentD">
           <p class="numDetail"><span>{{pKey}}</span><span>的画像详情</span></p>
-          <div class="circularContent">
-            <div class="circular">
-              <div class="circularOne">
+          <div class="allContent">
+            <div class="myCon">
+              <div class="information">
+                <img class="iconA" src="../../assets/img/icon_corner1.png" height="16" width="16"/>
+                <img class="iconB" src="../../assets/img/icon_corner2.png" height="16" width="16"/>
+                <img class="iconC" src="../../assets/img/icon_corner3.png" height="16" width="16"/>
+                <img class="iconD" src="../../assets/img/icon_corner4.png" height="16" width="16"/>
                 <div>
-                  <el-button class="peopleDetailid" size="mini" round><span>ID：</span><span>{{pKey}}</span></el-button>
-                  <el-button v-for="(item,key,index) in leftListarr" :class='"peopleDetail"+(1+index)' size="mini" round
-                             :title="`${key}：${item}`">{{key}}：{{item}}
-                  </el-button>
-                  <!--<el-button class="peopleDetailid" size="mini" round><span>ID：</span><span>2222</span></el-button>-->
-                  <!--<el-button class="peopleDetail1" size="mini" round>33</el-button>-->
-                  <!--<el-button class="peopleDetail2" size="mini" round>tb_0_MODULE_CREATETIME：33</el-button>-->
-                  <!--<el-button class="peopleDetail2" size="mini" round>tb_0_MODULE_CREATETIME：张晓非</el-button>-->
-                  <!--<el-button class="peopleDetail3" size="mini" round>tb_0_MODULE_CREATETIME：女</el-button>-->
-                  <!--<el-button class="peopleDetail4" size="mini" round>tb_0_MODULE_CREATETIME：28岁</el-button>-->
+                  <img class="inforImage" src="../../assets/img/icon_default.png" height="54" width="54"/>
                 </div>
-                <div class="circularTwo">
-                  <img class="line" src="../../assets/img/line.png" height="44" width="120"/>
-                  <div class="circulartwoSmall">
-                    <div class="circulartwoSmall2"></div>
-                  </div>
-                  <div class="circularThree">
-                    <div class="dataImage">数据画像</div>
-                  </div>
-                </div>
-                <div class="content">
-                  <div style="position:absolute;left: 360px;top:0px">
-                    <el-button v-for="(item,key,index) in rightListarr" :key="'info2-'+index"
-                               :class='"contentDetai"+(1+index)' size="mini" round v-if="index < 10"
-                               :title="`${key}：${item}`">{{key}}：{{item}}
-                    </el-button>
-                    <!--<el-button class="contentDetai1" size="mini" round>tb_0_MODULE_CODE：美容顾问美容顾问</el-button>-->
-                    <!--<el-button class="contentDetai2" size="mini" round>tb_0_MODULE_CODE：租房</el-button>-->
-                    <!--<el-button class="contentDetai3" size="mini" round>tb_0_MODULE_CODE：工作5年</el-button>-->
-                    <!--<el-button class="contentDetai4" size="mini" round>tb_0_MODULE_CODE：乐观派</el-button>-->
-                    <!--<el-button class="contentDetai5" size="mini" round>tb_0_MODULE_CODE：月收入2000元</el-button>-->
-                    <!--<el-button class="contentDetai6" size="mini" round>tb_0_MODULE_CODE：未婚6</el-button>-->
-                    <!--<el-button class="contentDetai7" size="mini" round>tb_0_MODULE_CODE：未婚7</el-button>-->
-                    <!--<el-button class="contentDetai8" size="mini" round>tb_0_MODULE_CODE：单身8</el-button>-->
-                    <!--<el-button class="contentDetai9" size="mini" round>tb_0_MODULE_CODE：单身9</el-button>-->
-                  </div>
-                  <!--// 增加-->
-                  <div style="position:absolute;left: 600px;top:0px">
-                    <el-button v-for="(item,key,index) in rightListarr" :key="'info2-'+index"
-                               :class='"contentDetai"+(1+index)' size="mini" round v-if="9 < index && index < 20"
-                               :title="`${key}：${item}`">{{key}}：{{item}}
-                    </el-button>
-                  </div>
-                  <div style="position:absolute;left: 840px;top:0px">
-                    <el-button v-for="(item,key,index) in rightListarr" :key="'info2-'+index"
-                               :class='"contentDetai"+(1+index)' size="mini" round v-if="19 < index && index < 30"
-                               :title="`${key}：${item}`">{{key}}：{{item}}
-                    </el-button>
-                  </div>
+                <div class="inforLabel">
+                  <span class="labelName">ID:<span>{{pKey}}</span></span>
+                  <span class="labelName" v-for="(item,index) in leftListarr" :key="index">{{item}}</span>
                 </div>
               </div>
             </div>
+            <div class="arrow">
+              <img src="../../assets/img/icon_arrow.png" height="36" width="40"/></div>
+          </div>
+          <div class="quan">
+            <hadleCircle></hadleCircle>
           </div>
         </div>
       </div>
@@ -81,9 +46,13 @@
 
 <script>
   import {getImagelist} from '@/api/lableImage.js'
+  import hadleCircle from '@/components/panel/zxcircle'
 
   export default {
     name: 'lookImagedetail',
+    components: {
+      hadleCircle
+    },
     data() {
       return {
         pKey: '',
@@ -99,21 +68,23 @@
       this.tableName = this.$route.query.tableName
       this.titleName = this.$route.query.titleName
       this.getpictureList()
+      localStorage.setItem('pKey',this.pKey)
+      localStorage.setItem('tableName',this.tableName)
     },
     mounted() {
 
     },
     methods: {
-      goback() {
+      // 返回
+      goBack() {
         this.$router.go(-1)
       },
+      // 获取显示数据信息
       async getpictureList() {
         try {
           const resDetail = await getImagelist({
             pKey: this.pKey,
-            // pKey:'714477082390166',
             tableName: this.tableName
-            // tableName:'DT_1643878'
           })
           this.rightListarr = resDetail.data.mapLists // 右边
           this.leftListarr = resDetail.data.mapProperty  // 左边
@@ -170,7 +141,7 @@
   .numDetail {
     font-size: 16px;
     color: #333333;
-    margin-top: 50px;
+    /*margin-top: 50px;*/
     margin-left: 50px;
   }
 
@@ -424,5 +395,124 @@
 
   .peopleDetailid {
 
+  }
+</style>
+<style scoped>
+  .numDetail {
+    font-size: 16px;
+    color: #333333;
+    padding-left: 16px;
+    padding-top: 18px;
+  }
+
+  .zxinp {
+    width: 482px;
+  }
+
+  .result {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: #FFF;
+    padding: 16px 16px 24px 16px;
+  }
+
+  .back {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .nameImage {
+    font-size: 16px;
+    color: #262626;
+    font-family: PingFangSC-Medium;
+    margin-left: -4px;
+  }
+
+  .queryInput {
+    display: flex;
+    margin-left: 8px;
+    margin-top: 16px;
+  }
+
+  .contentD {
+    background-color: #fff;
+    min-height: calc(100vh - 265px);
+    margin-top: 22px;
+  }
+
+  .myCon {
+    text-align: center;
+    padding: 0px 50px;
+    margin-top: 40px;
+  }
+
+  .allContent {
+  }
+
+  .information {
+    position: relative;
+    display: inline-block;
+    background-color: #fff;
+    min-width: 320px;
+    min-height: 154px;
+    margin: 0 auto;
+    box-shadow: 0 0 50px 0 rgba(4, 134, 254, 0.1);
+  }
+
+  .inforLabel {
+    margin-top: 20px;
+    padding: 0px 16px;
+  }
+
+  .inforImage {
+    margin-top: 20px;
+  }
+
+  .labelName {
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #0486FE;
+    padding: 8px 16px;
+    background: #F4FAFF;
+    border: 1px solid #0486FE;
+    border-radius: 18px;
+    margin: 0px 8px;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  .iconA {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+  }
+
+  .iconB {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+  }
+
+  .iconC {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+  }
+
+  .iconD {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+  }
+
+  .arrow {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .quan {
+    text-align: center;
+    width: 100%;
   }
 </style>
