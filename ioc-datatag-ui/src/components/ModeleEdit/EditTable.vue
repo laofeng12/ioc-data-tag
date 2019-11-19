@@ -21,8 +21,8 @@
           </template>
         </el-table-column>
       </el-table>
-      <!--改造-->
-      <el-dialog class="creat" title="数据打标" :visible.sync="setTagsDialog" width="900px" left
+      <!--UI改造-->
+      <el-dialog class="creat newData" title="数据打标" :visible.sync="setTagsDialog" width="900px" left
                  :modal-append-to-body="false" :close-on-click-modal="false"
                  @close="closeSettags" @open="init">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -73,15 +73,16 @@
                   <!--自动打标结构-->
                   <div class="card-handle" v-if="item.isHandle===0">
                     <div class="auto">自动</div>
-                    <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
-                                 :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
+                    <el-cascader ref="myCascader" v-model="item.tagId" size="small"
+                                 :options="arrtest" :props="defaultParams" :clearable="true" :show-all-levels="false"
+                                 @change="changeCascader"></el-cascader>
                     <span class="chinese">{{item.sourceCol}}</span>
                     <div class="conditions">
                       <div class="condition" v-for="(conItem,conIndex) in item.conditionSetting" :key="'con'+conIndex">
                         <div class="count-symbol" v-if="conItem.isConnectSymbol===0">
                           <span class="smbol-len" v-show="conItem.symbol.length>2">{{conItem.symbol}}</span>
                           <span class="smbol" v-show="conItem.symbol.length<3">{{conItem.symbol}}</span>
-                          <el-input style="width:100px" size="small" v-model="conItem.theValues" clearable
+                          <el-input style="width:135px" size="small" v-model="conItem.theValues" clearable
                                     placeholder="请输入内容"></el-input>
                         </div>
                         <div class="connect-symbol" v-else>
@@ -91,21 +92,22 @@
                     </div>
                     <div class="autoDelete" @click="delSelfMark(index)">删除</div>
                   </div>
+                  <!--自动打标结构 end-->
                   <!--手动打标结构-->
                   <div class="card2" v-else>
                     <div>
                       <div class="auto">手动</div>
                     </div>
                     <div>
-                      <el-cascader ref="myCascader"  v-model="item.tagId" size="small"
-                                   :options="arrtest" :props="defaultParams" :clearable="true":show-all-levels="false"></el-cascader>
+                      <el-cascader ref="myCascader" v-model="item.tagId" size="small"
+                                   :options="arrtest" :props="defaultParams" :clearable="true" :show-all-levels="false"
+                                   @change="changeCascader"></el-cascader>
                     </div>
                     <div class="chinese">{{item.sourceCol}}</div>
                     <div class="self-mark-choose-box">
                       <div class="chooseNum" @click="showSelf(item,$event)" id="handle">
                         <span>已选</span>
                         <span class="num">{{item.checkList.length}}</span>
-                        <!--<span class="num">{{checkList.length}}</span>-->
                         <span>条</span>
                         <i class="el-icon-caret-top" v-if="item.showSelfMark==true"></i>
                         <i class="el-icon-caret-bottom" v-else></i>
@@ -133,7 +135,7 @@
                     </div>
                     <div class="autoDelete" @click="delSelfMark(index)">删除</div>
                   </div>
-
+                  <!--手动打标结构 end-->
                 </el-card>
               </div>
               <!--打标结束-->
@@ -142,11 +144,12 @@
 
         </el-form>
         <div slot="footer" class="dialog-footer device" style="text-align: center">
-          <el-button size="small" class="queryBtn cancleBtn" :loading="saveLoading" @click="canselMark">取消</el-button>
+          <el-button size="small" class="queryBtn cancleBtn" @click="canselMark">取消</el-button>
           <el-button size="small" type="primary" class="queryBtn  sureBtn" :loading="saveLoading" @click="saveMark">确定
           </el-button>
         </div>
       </el-dialog>
+      <!--UI改造 end-->
     </div>
   </div>
 </template>
@@ -184,64 +187,6 @@
         val: [],
         defaultParams: {},
         arrtest: [],
-        mytest: [
-          {
-            code: '',
-            createTime: "2019-09-10 10:22:18",
-            createUser: 392846190550001,
-            id: 848821386820223,
-            isDeleted: 0,
-            isNew: '',
-            isShare: 0,
-            message: '',
-            modifyTime: "2019-10-22 17:16:55",
-            percentage: 0,
-            popularity: 0,
-            popularityLevel: '',
-            synopsis: "1001010",
-            tagName: "测试10",
-            label: '测试10',
-            value: '848821386820223',
-            children: [{
-              "value": "848956331340223",
-              "tagName": "测试10-2",
-              label: '测试10-2',
-              "children": [
-                {"value": "848956811340223", label: '熟女22', "tagName": "熟女22", "children": undefined},
-                {
-                  "value": "848956939080223",
-                  "label": "剩女",
-                  "children": [
-                    {"value": "848956811340223", "label": "熟女", "children": undefined}
-                  ]
-                }, {"value": "849050497670223", "label": "圣女", "children": undefined}, {
-                  "value": "849050960050223",
-                  "label": "大叔",
-                  "children": [{"value": "848956811340223", "label": "熟女", "children": undefined}]
-                }]
-            }]
-          },
-          {
-            code: '',
-            createTime: "2019-09-10 10:22:18",
-            createUser: 392846190550001,
-            id: 848821386820223,
-            isDeleted: 0,
-            isNew: '',
-            isShare: 0,
-            message: '',
-            modifyTime: "2019-10-22 17:16:55",
-            percentage: 0,
-            popularity: 0,
-            popularityLevel: '',
-            synopsis: "1001010",
-            tagName: "没有标签",
-            label: '没有标签',
-            value: '848821386820223',
-            children: []
-          }
-        ],
-        mytestId: ['848821386820223', '848956331340223', '848956811340223'],
         changeRed: -1,
         znumber: '',
         ztheadData: '',
@@ -347,11 +292,17 @@
       getLabel() {
       },
       closeSettags() {
+        this.changeRed = -1
       },
       // 取消
       canselMark() {
         this.setTagsDialog = false
+        this.changeRed = -1
       },
+      changeCascader() {
+        this.changeRed = -1
+      },
+      // 初始化清空字段
       init() {
         this.ruleForm.tagTeam = ''
         this.treeLevdata = []
@@ -382,7 +333,7 @@
         }
         return newObj
       },
-      //选择连接符号
+      // 选择连接符号
       chooseConnectSymbo(item) {
         const conditionObj = {
           isConnectSymbol: 1,//是否有连接符号
@@ -406,7 +357,7 @@
         }
         this.conditionSetting = this.selfMarkList[this.curIndex].conditionSetting
       },
-      //选择运算符号
+      // 选择运算符号
       chooseCountSymbol(item) {
         const conditionObj = {
           isConnectSymbol: 0,//是否有连接符号
@@ -434,7 +385,7 @@
         this.ruleForm.tagTeam = ''
         this.selfMarkList = []
       },
-      //点击人工打标按钮
+      // 点击人工打标按钮
       selfMark() {
         let tagSetName = ''
         this.tagSetList.forEach((item) => {
@@ -443,7 +394,7 @@
           }
         })
         const conditionSetting = [{
-          isConnectSymbol: 0,//是否有连接符号
+          isConnectSymbol: 0,// 是否有连接符号
           symbol: 'IN',
           theValues: '',
           valuesType: this.valuesType,
@@ -454,14 +405,14 @@
           sourceCol: this.sourceCol,
           checkList: [],
           showSelfMark: false,
-          isHandle: 1,//人工打标
+          isHandle: 1,// 人工打标
           conditionSetting: conditionSetting
         }
         this.selfMarkList.push(markObj)
         this.curIndex = this.selfMarkList.length - 1
         this.isHandle = 1
       },
-      //自动打标
+      // 自动打标
       handleMark() {
         let tagSetName = ''
         this.tagSetList.forEach((item) => {
@@ -475,14 +426,14 @@
           sourceCol: this.sourceCol,
           checkList: [],
           showSelfMark: false,
-          isHandle: 0,//自动打标
+          isHandle: 0,// 自动打标
           conditionSetting: []
         }
         this.selfMarkList.push(markObj)
         this.curIndex = this.selfMarkList.length - 1
         this.isHandle = 0
       },
-      //选中自动打标内容
+      // 选中自动打标内容
       checkMarkChange(item) {
         // console.log('选中自动打标内容',item);
         this.checkList = item.checkList
@@ -495,7 +446,7 @@
         const res = new Map()
         return arr.filter((markName) => !res.has(markName) && res.set(markName, 1))
       },
-      //显示自动打标内容
+      // 显示自动打标内容
       showSelf(itemObj) {
         itemObj.showSelfMark = !itemObj.showSelfMark
         this.colList = []
@@ -505,7 +456,7 @@
           this.colList.push({markName: markName})
         })
         const obj = {}
-        //数组去重
+        // 数组去重
         this.colList = this.colList.reduce((item, next) => {
           obj[next.markName] ? '' : obj[next.markName] = true && item.push(next)
           return item
@@ -518,7 +469,7 @@
       search() {
         // console.log("查询");
       },
-      ///过滤树
+      // 过滤树
       filterNode(value, data) {
         if (!value) return true;
         return data.tagName.indexOf(value) !== -1;
@@ -530,7 +481,7 @@
         this.colId = data.colId
         this.getHistoryColList(data.colId)
       },
-      //下拉菜单处理
+      // 下拉菜单处理
       handleCommandTags(dropIndex, data) {
         // console.log('下拉菜单数据',data)
         switch (dropIndex) {
@@ -596,7 +547,7 @@
         } catch (e) {
         }
       },
-      //关闭打标
+      // 关闭打标
       close() {
         this.showSelfMark = false
         this.colList = []
@@ -609,7 +560,7 @@
         }
         try {
           const data = await getHistoryColData(params)
-          //打标相关字段  this.checkList
+          // 打标相关字段  this.checkList
           data.condtion.forEach(item => {
             item.conditionSetting.map(itemIndex => {
               if (itemIndex.theValues == null) {
@@ -636,44 +587,24 @@
 
         }
       },
-      //确认打标按钮
-      saveMark() {
+      // 确认打标按钮
+      async saveMark() {
         this.saveLoading = true
-        this.$refs.ruleForm.validate((valid) => {
-          if (valid) {
-            this.getSaveMarkList()
-            this.saveLoading = false
-          } else {
-            this.saveLoading = false
-          }
-        });
-      },
-      //打标确认保存
-      async getSaveMarkList() {
-        this.selfMarkList.map(item =>{
-          if(this.changeRed == -1){
-            const arrId = item.tagId.pop()
-            item.tagId = arrId
-          }else {
-            // console.log('item22',item);
-            // console.log('item555',item.tagId);
-          }
-        })
-        // console.log('this.valuesType',this.valuesType)
-        let conditions = this.deepClone(this.selfMarkList)
-        conditions.forEach((obj, index) => {
-          delete obj.checkList
-          delete obj.sourceCol
-          delete obj.tagSetName
-          delete obj.showSelfMark
-          obj.colId = this.colId
-          return obj
-        })
-        const params = {
-          colId: this.colId,
-          condtion: conditions
-        }
         try {
+          let conditions = this.deepClone(this.selfMarkList)
+          conditions.forEach((obj, index) => {
+            delete obj.checkList
+            delete obj.sourceCol
+            delete obj.tagSetName
+            delete obj.showSelfMark
+            obj.colId = this.colId
+            obj.tagId = obj.tagId && obj.tagId.pop()
+            return obj
+          })
+          const params = {
+            colId: this.colId,
+            condtion: conditions
+          }
           const data = await saveMarkData(params)
           this.$message({
             showClose: true,
@@ -688,8 +619,9 @@
           console.log('e', e);
           this.changeRed = e.data
         }
+        this.saveLoading = false
       },
-      //选中要打标条件修改
+      // 选中要打标条件修改
       chooseMark(item, index) {
         this.curIndex = index
         //console.log('选中要打标的项',item)
@@ -704,9 +636,12 @@
           }
         }
       },
-      // 打标所有的数据
-      async allData(){
-        const resData = await getListalldata()
+      // 打标所有的数据  // 根据后台显示数据定义值
+      async allData() {
+        const resData = await getListalldata({
+          page: 0,
+          size: 200
+        })
         this.arrtest = resData
       }
 
@@ -973,17 +908,17 @@
 
 </style>
 <style>
-  .creat .el-dialog__title {
+  .newData .el-dialog__title {
     font-family: PingFangSC-Medium;
     font-size: 16px;
     color: #262626;
   }
 
-  .creat .el-dialog__body {
+  .newData .el-dialog__body {
     padding: 18px 20px !important;
   }
 
-  .creat .el-button {
+  .newData .el-button {
     padding: 0 16px !important;
     font-family: PingFangSC-Regular;
     font-size: 14px;
@@ -991,20 +926,20 @@
     background-color: #fff !important;
   }
 
-  .creat .sureBtn {
+  .newData .sureBtn {
     color: #fff;
     background-color: #0486fe !important;
   }
 
-  .creat .cancleBtn {
+  .newData .cancleBtn {
     border: 1px solid #0486FE;
   }
 
-  .creat .card-handle {
+  .newData .card-handle {
     min-height: 50px;
   }
 
-  .creat .el-card__body {
+  .newData .el-card__body {
     padding: 6px 70px 3px 9px !important;
   }
 

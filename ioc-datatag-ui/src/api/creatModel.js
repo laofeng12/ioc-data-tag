@@ -251,9 +251,10 @@ export function getdatalakeLink(resourceId) {
  * 新修改的数据打标获取全部数据接口
  * @param
  */
-export function getListalldata() {
+export function getListalldata(params) {
   return fetch ({
     url:'/datatag/tagmanage/dtTag/getAllTree',
-    method:'get'
+    method:'get',
+    params
   })
 }

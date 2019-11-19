@@ -151,6 +151,7 @@
         </div>
       </div>
     </el-dialog>
+    <!--另存 end-->
     <!--运行-->
     <el-dialog class="creat" title="模型调度" :visible.sync="runDialog" width="530px" center :close-on-click-modal="false"
                @close="closeRun">
@@ -189,8 +190,9 @@
         </div>
       </div>
     </el-dialog>
+    <!--运行 end-->
     <!--协作添加-->
-    <el-dialog class="creat addCreat" title="添加成员333" :visible.sync="addSetDialog" width="1100px" center
+    <el-dialog class="creat addCreat" title="添加成员" :visible.sync="addSetDialog" width="1100px" center
                :modal-append-to-body="false" :close-on-click-modal="false"
                @close="close">
       <div class="col-set-box">
@@ -257,6 +259,7 @@
         </el-container>
       </div>
     </el-dialog>
+    <!--协作添加 end-->
   </div>
 </template>
 
@@ -289,9 +292,9 @@
         selectD: 0,
         openScope: '',
         showBtn: true,
-        headColList: [],//打标字段头部数据
-        modelData: {},//获取模型数据
-        taggingModelId: 0,//模型id
+        headColList: [], // 打标字段头部数据
+        modelData: {}, // 获取模型数据
+        taggingModelId: 0, // 模型id
         routerName: 'creatModel',
         runModelname: '未命名',
         show: false,
@@ -389,9 +392,9 @@
       rename() {
         this.showBtn = false
       },
-      //type=0,新增，type=1编辑
+      // type=0,新增，type=1编辑
       editSetTags(type) {
-        //调用子组件里面的方法
+        // 调用子组件里面的方法
         // this.$refs['tree'].setTags(type)
         // this.$refs['tree'].handleNodeClick()
         this.$refs.tree.handleNodeClick()
@@ -418,8 +421,8 @@
         } else {
           return
         }
-
       },
+      // 协作人员添加已选用户
       addPeople() {
         if (this.taggingModelId) {
           this.addSetDialog = true
@@ -450,29 +453,34 @@
           if (obj.length > 0) {
             obj = obj.substr(0, obj.length - 1);
           }
-          try {
-            const res = await deletePeople({
-              ids: obj
-            })
-            this.getpeopleList()
-            this.markingTable()
-          } catch (e) {
-            console.log(e);
+          if (obj) {
+            try {
+              const res = await deletePeople({
+                ids: obj
+              })
+              this.getpeopleList()
+              this.markingTable()
+            } catch (e) {
+              console.log(e);
+            }
+          } else {
+            return
           }
+
         }
       },
       // 获取模型数据
       async getModelColsList(modelId, page, size, type) {
-        //console.log(modelId,page,size)
+        // console.log(modelId,page,size)
         try {
-          //表格数据
+          // 表格数据
           const data = await getModelColsData(modelId, page, size, type)
           this.modelTableData = data.data.content
         } catch (e) {
 
         }
       },
-      //
+      // 显示协作人员列表
       showIt() {
         this.show = !this.show
       },
@@ -483,6 +491,7 @@
         this.editDialog = false
         this.$refs.ruleForm.resetFields()
       },
+      // 模型调度操作
       async runModel() {
         this.runDialog = true
         try {
@@ -525,7 +534,7 @@
       async getpeopleList() {
         const params = {
           eq_createUser: '',
-          eq_taggmId: this.taggingModelId,  //模型ID
+          eq_taggmId: this.taggingModelId,  // 模型ID
           page: '',
           size: 1000
         }
@@ -544,7 +553,7 @@
         const param = {
           "cooUser": userId,
           "id": 0,
-          "taggmId": this.taggingModelId,  //模型ID
+          "taggmId": this.taggingModelId,  // 模型ID
         }
         try {
           const addRes = await addPeople(param)
@@ -553,7 +562,7 @@
           console.log(e);
         }
       },
-      // 删除
+      // 删除操作
       async deleteList(id, index) {
         try {
           const res = await deletePeople({
@@ -573,20 +582,20 @@
           console.log(e);
         }
       },
-      // 点击用户
+      // 点击用户操作
       async markingPeople(zuserid, id, index) {
         this.changeRed = index
         this.helpId = zuserid
         this.cooId = id
         this.startDisable = false
       },
-      // table列表
+      // table列表数据获取
       async markingTable() {
         const userId = this.$store.state.user.userInfo.userId
         this.tableData = []
         try {
           const markingRes = await markingCheck({
-            modelId: this.taggingModelId,  //模型ID
+            modelId: this.taggingModelId,  // 模型ID
             userId: userId
           })
           if (markingRes.rows && markingRes.rows.length > 0) {
@@ -595,7 +604,7 @@
                 item.ischecked = false
                 item.select = ''      // 标签组id
                 item.helpuserId = ''  // 协作用户id
-                item.ztagColName = ''  //打标字段
+                item.ztagColName = ''  // 打标字段
                 if (item.isCooField == 0) {
                   item.isCooField = false  // checkbox 为false
                 } else {
@@ -642,7 +651,7 @@
           console.log(e)
         }
       },
-      //checkbox
+      // checkbox
       getRow(row) {
         if (row.isCooField == false) {
           row.isCooField = true
@@ -665,13 +674,13 @@
           row.isDeleted = 1
           const tmp = arrRow.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId, isDeleted}) => {
             return {
-              "cooId": id, //id
-              "id": cooFieldId,  //  cooFieldId
+              "cooId": id, // id
+              "id": cooFieldId,  // cooFieldId
               "tagColName": showCol, // 打标字段
               useTagGroup,  // 标签组ID
-              isCooField,//是否选中
-              cooUser, //协作用户ID
-              tagColId: tagColId,  //
+              isCooField,// 是否选中
+              cooUser, // 协作用户ID
+              tagColId: tagColId,
               isDelete: isDeleted
             }
           })
@@ -698,18 +707,18 @@
           }
         }
       },
-      // save
+      // 数据保存操作
       async getdosave() {
         this.saveLoading = true
         const tmp = this.tableData.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId, isDeleted}) => {
           return {
-            "cooId": id, //id
+            "cooId": id, // id
             "id": cooFieldId,  //  cooFieldId
             "tagColName": showCol, // 打标字段
             useTagGroup,  // 标签组ID
-            isCooField,//是否选中
-            cooUser, //协作用户ID
-            tagColId: tagColId,  //
+            isCooField,// 是否选中
+            cooUser, // 协作用户ID
+            tagColId: tagColId,
             isDelete: isDeleted
           }
         })
@@ -754,7 +763,7 @@
           this.saveLoading = false
         }
       },
-      //名称保存
+      // 模型名称保存
       async getsaveName() {
         try {
           const resName = await saveName({
@@ -771,7 +780,7 @@
         }
 
       },
-      // 另存
+      // 另存模型
       async saveAsmodel() {
         this.saveasLoading = true
         try {
@@ -791,6 +800,7 @@
           this.saveasLoading = false
         }
       },
+      // 确定调度
       async goDispatchto() {
         this.savedispatchLoading = true
         this.$refs.ruleForm.validate(async (valid) => {
@@ -910,14 +920,13 @@
         background-repeat: no-repeat;
         background-size: 100% 100%;
       }
-      .button {
-        /*width: 80px;*/
-      }
     }
   }
 
   .content {
     display: flex;
+    height: calc(100vh - 189px);
+    padding-top: 40px;
     .aside {
       width: 250px;
       flex-shrink: 0;
@@ -1241,14 +1250,13 @@
         background-repeat: no-repeat;
         background-size: 100% 100%;
       }
-      .button {
-        /*width: 80px;*/
-      }
     }
   }
 
   .content {
     display: flex;
+    height: calc(100vh - 189px);
+    padding-top: 40px;
     .aside {
       width: 250px;
       flex-shrink: 0;
@@ -1500,6 +1508,7 @@
     background-color: #fff;
     margin: 24px;
     position: relative;
+    overflow-y: auto;
   }
 
   .headLeft {

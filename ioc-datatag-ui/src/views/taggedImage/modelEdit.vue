@@ -19,7 +19,8 @@
       </div>
     </div>
     <div class="content">
-      <Aside v-if="updateAsideForce" :dimensionList="dimensionList" :measureList="measureList" @updateAside="updateAside" />
+      <Aside v-if="updateAsideForce" :dimensionList="dimensionList" :measureList="measureList"
+             @updateAside="updateAside"/>
       <div class="components">
         <div class="top">
           <div class="left">
@@ -77,7 +78,7 @@
                 <div class="head"><i class="el-icon-delete"></i></div>
               </div>
 
-          </div>
+            </div>
           </div>
 
         </div>
@@ -140,7 +141,7 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" >确定运行</el-button>
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading">确定运行</el-button>
         </div>
       </div>
     </el-dialog>
@@ -180,25 +181,25 @@
 
   export default {
     name: 'modelEdit',
-    data () {
+    data() {
       return {
-        show:false,
-        editDialog:false,
-        saveLoading:false,
-        runDialog:false,
-        saveDialog:false,
-        value1:'',
-        value:'',
+        show: false,
+        editDialog: false,
+        saveLoading: false,
+        runDialog: false,
+        saveDialog: false,
+        value1: '',
+        value: '',
         tableBoxWidth: 800,
         tableBoxHeight: 800,
         tableWidth: 800,
         tableHeight: 800,
         search: '',
-        ruleForm:{
-          name:'',
-          textarea2:'',
-          modelName:'',
-          date:''
+        ruleForm: {
+          name: '',
+          textarea2: '',
+          modelName: '',
+          date: ''
         },
         options2: [{
           value: '选项1',
@@ -209,13 +210,13 @@
         }],
         rules: {
           name: [
-            {required: true, message: '请填写',trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'}
           ],
           textarea2: [
-            {required: true, message: '请填写',trigger: 'blur'}
+            {required: true, message: '请填写', trigger: 'blur'}
           ],
-          date:[{required: true, message: '请选择时间',trigger: 'blur'}],
-          date2:[{required: true, message: '请选择',trigger: 'change'}]
+          date: [{required: true, message: '请选择时间', trigger: 'blur'}],
+          date2: [{required: true, message: '请选择', trigger: 'change'}]
         },
         tableData: [],
         theadData: [],
@@ -226,20 +227,20 @@
         updateAsideForce: true
       }
     },
-    components: { EditTable, Aside },
+    components: {EditTable, Aside},
     watch: {
       theadData: function (val) {
         this.tableWidth = val.length * 149
       }
     },
-    created () {
+    created() {
       this.datasetId = this.$route.params.id
     },
-    mounted () {
+    mounted() {
       this.getDatasetDetails()
     },
     methods: {
-      updateAside (type, val) {
+      updateAside(type, val) {
         if (type === 'measure') {
           this.measureList = val
         } else {
@@ -249,12 +250,12 @@
         this.$nextTick(() => (this.updateAsideForce = true))
         // this.getTableDetails()
       },
-      async getDatasetDetails () {
-        const { data: { dimensionList, measureList } } = await datasetWordDetailsApi(this.datasetId)
+      async getDatasetDetails() {
+        const {data: {dimensionList, measureList}} = await datasetWordDetailsApi(this.datasetId)
         this.dimensionList = dimensionList
         this.measureList = measureList
-        const newDimensionList = this.dimensionList.map(item => ({ columnName: item.columnName, values: [] }))
-        const newMeasureList = this.measureList.map(item => ({ columnName: item.columnName, values: [] }))
+        const newDimensionList = this.dimensionList.map(item => ({columnName: item.columnName, values: []}))
+        const newMeasureList = this.measureList.map(item => ({columnName: item.columnName, values: []}))
         let cfgObj = {
           rows: [],
           filters: [],
@@ -270,8 +271,8 @@
           query: '{}',
           reload: true
         }
-        const { data: { columnList: column, data: tableList } } = await datasetDetailsApi(detailsParams)
-        const theadData = column.map(item => ({ label: item.name }))
+        const {data: {columnList: column, data: tableList}} = await datasetDetailsApi(detailsParams)
+        const theadData = column.map(item => ({label: item.name}))
         this.theadData = theadData
         const tableData = tableList.map(item => {
           const objItem = {}
@@ -288,7 +289,7 @@
       // async previewTable () {
       //   const columnList = [{index: 0, aggType: null, name: "SOURCE_NAME"}]
       // },
-      async datasetSave () {
+      async datasetSave() {
         const data = {
           dsDataSetId: Number(this.datasetId),
           dimensionJson: JSON.stringify(this.dimensionList),
@@ -297,26 +298,26 @@
         }
         const res = await datasetChangeApi(data)
       },
-    //
-      showIt(){
+      //
+      showIt() {
         this.show = !this.show
       },
-      saveAs(){
+      saveAs() {
         this.editDialog = true
       },
-      closeSaveas(){
+      closeSaveas() {
         this.editDialog = false
       },
-      runModel(){
+      runModel() {
         this.runDialog = true
       },
-      closeRun(){
+      closeRun() {
         this.runDialog = false
       },
-      saveModel(){
+      saveModel() {
         this.saveDialog = true
       },
-      closeSave(){
+      closeSave() {
         this.saveDialog = false
       },
     }
@@ -375,6 +376,7 @@
       }
     }
   }
+
   .content {
     display: flex;
     .aside {
@@ -504,28 +506,33 @@
     }
   }
 
-  .cooperation,.multiply,.num{
+  .cooperation, .multiply, .num {
     font-size: 12px;
     color: #999999;
     margin-left: 4px;
   }
-  .cooperation{
+
+  .cooperation {
     margin-right: 5px;
   }
-  .iconPeople{
+
+  .iconPeople {
     font-size: 15px;
     margin-right: 2px;
     margin-top: -5px;
   }
-  .handlePeople{
+
+  .handlePeople {
     font-size: 15px;
     margin-left: 5px;
   }
-  .right{
+
+  .right {
     display: flex;
     align-items: center;
   }
-  .card{
+
+  .card {
     width: 200px;
     border: 1px solid #dedede;
     position: absolute;
@@ -535,31 +542,38 @@
     background-color: #fff;
     border-radius: 8px;
   }
-  .peopleList,.addPeople{
+
+  .peopleList, .addPeople {
     font-size: 14px;
     margin-top: 10px;
   }
-  .peopleList{
+
+  .peopleList {
     float: left;
     margin-left: 15px;
   }
-  .addPeople{
+
+  .addPeople {
     float: right;
     margin-right: 15px;
   }
-  .peopleContent{
+
+  .peopleContent {
     margin-top: 15px;
     height: 280px;
     overflow-y: auto;
   }
-  .imgPeople2,.listName{
+
+  .imgPeople2, .listName {
     float: left;
   }
-  .imgPeople2{
+
+  .imgPeople2 {
     margin-top: 6px;
     margin-left: 8px;
   }
-  .listName{
+
+  .listName {
     font-size: 12px;
     width: 105px;
     margin-left: 8px;
@@ -567,19 +581,23 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .head{
+
+  .head {
     font-size: 14px;
     float: right;
     margin-right: 8px;
   }
-  .contentA{
+
+  .contentA {
     height: 40px;
     line-height: 40px;
   }
-  .dateInp,.controlChoose{
+
+  .dateInp, .controlChoose {
     width: 340px;
   }
-  .clearfix:after{
+
+  .clearfix:after {
     content: '';
     display: block;
     clear: both;

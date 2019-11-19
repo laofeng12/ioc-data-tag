@@ -84,6 +84,17 @@ public class DemoAction {
 	@RequestMapping(value="/testAudit", method=RequestMethod.GET)
 	public void testAudit(Long type) throws Exception
 	{
-		demoService.testAudit(type);
+		if (type==1){
+			demoService.testAudit1();
+		}
+		if (type==2){
+			demoService.testAudit2();
+		}
+		if (type==3){
+			demoService.testAudit3();
+		}
+		if (type==4){
+			demoService.testAudit4();
+		}
 	}
 }
