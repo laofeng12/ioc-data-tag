@@ -1,5 +1,8 @@
 package com.openjava.datatag.tagmanage.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.openjava.audit.auditManagement.component.AuditComponet;
+import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.log.service.DtTaggChooseLogService;
@@ -43,8 +46,10 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
     private DtTaggChooseLogService dtTaggChooseLogService;
     @Resource
     private DtTagService dtTagService;
+    @Resource
+    private AuditComponet auditComponet;
 
-    public Page<DtShareTagGroup> findList(String searchKey, Pageable pageable){
+    public Page<DtShareTagGroup> findList(String searchKey, Pageable pageable)throws Exception{
         Page<DtShareTagGroup> result = dtShareTagGroupRepository.findList("%" + searchKey+ "%", pageable);
         if (CollectionUtils.isNotEmpty(result.getContent())){
             Long maxPopularity = dtTagGroupRepository.findMaxPopularityBytagsIdAAndIsDeletedAAndIsShare(Constants.PUBLIC_NO,Constants.PUBLIC_YES);
@@ -58,10 +63,17 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
             }
 
         }
+        AuditLogVO vo = new AuditLogVO();
+        vo.setType(2L);//数据查询
+        vo.setOperationService("标签与画像");//必传
+        vo.setOperationModule("标签管理");//必传
+        vo.setFunctionLev1("共享标签组");//必传
+        vo.setFunctionLev2("查询");//必传
+        auditComponet.saveAuditLog(vo);
         return result;
     }
 
-    public void choose(Long id,Long userId,String ip) throws APIException {
+    public void choose(Long id,Long userId,String ip) throws Exception {
         Optional<DtTagGroup> o = dtTagGroupRepository.findById(id);
         DtTagGroup tgg = null;
         if(o.isPresent()){
@@ -83,7 +95,7 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
         newTgg.setCreateTime(now);
         newTgg.setModifyTime(now);
         newTgg.setIsDeleted(Constants.PUBLIC_NO);
-        dtTagGroupRepository.save(newTgg);
+        newTgg = dtTagGroupRepository.save(newTgg);
         List<DtTag> tagList = dtTagRepository.findByTagsIdAndIsDeleted(id,Constants.PUBLIC_NO);
         DtTagDTO root = new DtTagDTO();
         root.setId(TagDTOTreeNode.ROOT_ID);
@@ -92,7 +104,7 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
         setNewIdAndSave(tagTreeNode,null,newId,now);
 
         //选用日志记录
-        dtTaggChooseLogService.loggingChoose(id,newTgg,userId,ip);
+//        dtTaggChooseLogService.loggingChoose(id,newTgg,userId,ip);
 
         //热度增加-每天每人只能加一次
         Long c = dtTaggChooseLogService.countChooseToday(userId,id);
@@ -100,6 +112,14 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
            tgg.setPopularity(tgg.getPopularity()+1L);
            dtTagGroupRepository.save(tgg);
         }
+        AuditLogVO vo = new AuditLogVO();
+        vo.setType(1L);//管理操作
+        vo.setOperationService("标签与画像");//必传
+        vo.setOperationModule("标签管理");//必传
+        vo.setFunctionLev1("共享标签组");//必传
+        vo.setFunctionLev2("选用为我的");//必传
+        vo.setDataAfterOperat(JSONObject.toJSONString(newTgg));
+        auditComponet.saveAuditLog(vo);
     }
 
     private void setNewIdAndSave(TagDTOTreeNode tree, Long pId, Long tagsId, Date now){

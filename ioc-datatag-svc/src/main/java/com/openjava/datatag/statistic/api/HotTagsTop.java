@@ -39,7 +39,7 @@ public class HotTagsTop {
     @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getsamedayhottags" ,method = RequestMethod.GET)
-    public  Object getHotTags(){
+    public  Object getHotTags()throws Exception{
         List<Object> list = TagDashboardService.getSamedayHotTags();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();
         apiResp.setData(list);
@@ -57,7 +57,7 @@ public class HotTagsTop {
     @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getyesterdayhottags" ,method = RequestMethod.GET)
-    public  Object getYesterdayHotTags(){
+    public  Object getYesterdayHotTags()throws Exception{
         List<Object> list = TagDashboardService.getYesterdayHotTags();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();
         apiResp.setData(list);
@@ -75,7 +75,7 @@ public class HotTagsTop {
     @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getlastweekhottags" ,method = RequestMethod.GET)
-    public  Object getLastweekHotTags(){
+    public  Object getLastweekHotTags()throws Exception{
         List<Object> list = TagDashboardService.getLastweekHotTags();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();
         apiResp.setData(list);
@@ -93,7 +93,7 @@ public class HotTagsTop {
     @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getlastmonthhottags" ,method = RequestMethod.GET)
-    public  Object getLastMonthHotTags(){
+    public  Object getLastMonthHotTags()throws Exception{
         List<Object> list = TagDashboardService.getLastMonthHotTags();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();
         apiResp.setData(list);
@@ -112,7 +112,7 @@ public class HotTagsTop {
     @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getlastyearhottags" ,method = RequestMethod.GET)
-    public  Object getLastYearHotTags(){
+    public  Object getLastYearHotTags()throws Exception{
         List<Object> list = TagDashboardService.getLastYearHotTags();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();
         apiResp.setData(list);

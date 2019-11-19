@@ -1,21 +1,34 @@
 package com.openjava.datatag.tagmanage.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.openjava.audit.auditManagement.component.AuditComponet;
+import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.log.domain.DtTagUpdateLog;
 import com.openjava.datatag.log.service.DtTagUpdateLogService;
+import com.openjava.datatag.tagcol.service.DtCooperationService;
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmanage.dto.DtTagDTO;
 import com.openjava.datatag.tagmanage.query.DtTagDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagRepository;
 import com.openjava.datatag.log.repository.DtTagUpdateLogRepository;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
+import com.openjava.datatag.utils.IpUtil;
+import com.openjava.datatag.utils.VoUtils;
+import com.openjava.datatag.utils.tree.TagDTOTreeNode;
+import com.openjava.datatag.utils.tree.TagDTOTreeNodeShow;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.ljdp.common.bean.MyBeanUtils;
+import org.ljdp.component.exception.APIException;
+import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.sequence.SequenceService;
+import org.ljdp.component.user.BaseUserInfo;
+import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -43,6 +56,11 @@ public class DtTagServiceImpl implements DtTagService {
 	DtTaggingModelService dtTaggingModelService;
 	@Resource
 	private DtTagGroupService dtTagGroupService;
+	@Resource
+	private DtCooperationService dtCooperationService;
+	@Resource
+	private AuditComponet auditComponet;
+
 	public Page<DtTag> query(DtTagDBParam params, Pageable pageable){
 		Page<DtTag> pageresult = dtTagRepository.query(params, pageable);
 		return pageresult;
@@ -76,6 +94,35 @@ public class DtTagServiceImpl implements DtTagService {
 	public List<DtTag> findByTagsId(Long tagsId){
 		//查询所有未删除的标签list
 		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId, Constants.PUBLIC_NO);
+	}
+	public TagDTOTreeNodeShow getTree(Long id)throws Exception{
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		DtTagGroup db = dtTagGroupService.get(id);
+		if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)) {
+			throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND, "无此标签组或已被删除");
+		}
+		//查找当前用户是否配置有该标签组的协作权限
+		Long cooUserTagGroupCount = dtCooperationService.findCooUserTagGroup(VoUtils.toLong(userInfo.getUserId()), id);
+		//自己的和共享的标签组可以查看
+		if (userInfo.getUserId().equals(db.getCreateUser().toString()) || db.getIsShare().equals(Constants.PUBLIC_YES) || cooUserTagGroupCount > 0) {
+			List<DtTag> tagList = this.findByTagsId(id);
+			DtTagDTO root = new DtTagDTO();
+			root.setId(TagDTOTreeNode.ROOT_ID);
+			TagDTOTreeNode treeNode = new TagDTOTreeNode(TagDTOTreeNode.toDtTagDTO(tagList), root);
+			TagDTOTreeNodeShow treeNodeShow = new TagDTOTreeNodeShow(treeNode);
+			AuditLogVO vo = new AuditLogVO();
+			vo.setType(2L);//数据查询
+			vo.setOperationService("标签与画像");//必传
+			vo.setOperationModule("标签管理");//必传
+			vo.setFunctionLev1("共享标签组");//必传
+			vo.setFunctionLev2("查看");//必传
+			vo.setRecordId(id+"");
+			auditComponet.saveAuditLog(vo);
+			return treeNodeShow;
+		} else {
+			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY, "无权限查看");
+		}
+
 	}
 	public List<DtTag> findByPreaTagId(Long pId){
 		return dtTagRepository.findByPreaTagIdAndIsDeleted(pId,Constants.PUBLIC_NO);
@@ -112,7 +159,7 @@ public class DtTagServiceImpl implements DtTagService {
 		return db;
 	}
 
-	public void doSoftDeleteByDtTag(DtTag db,Long userId,String ip){
+	public void doSoftDeleteByDtTag(DtTag db,Long userId,String ip)throws Exception{
 		// TODO: 2019/9/16   删除标签时删除画像
 		List<Long> ids =  findAllIdsByTagId(db.getId());
 		dtTaggingModelService.stopModelByColIds(ids);//停止模型删除画像
@@ -123,6 +170,15 @@ public class DtTagServiceImpl implements DtTagService {
 		db.setIsDeleted(Constants.PUBLIC_YES);
 		db.setModifyTime(now);
 		doSave(db);
+
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("标签管理");//必传
+		vo.setFunctionLev1("编辑");//必传
+		vo.setFunctionLev2("删除");//必传
+		vo.setRecordId(db.getId()+"");
+		auditComponet.saveAuditLog(vo);
 		dtTagUpdateLogService.loggingDelete(db,userId,ip);
 	}
 
@@ -169,5 +225,62 @@ public class DtTagServiceImpl implements DtTagService {
 
 		}
 		return idpath;
+	}
+	public SuccessMessage doSaveOrEdit(DtTag body,String ip)throws Exception{
+		//修改，记录更新时间等
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		Long userId = Long.valueOf(userInfo.getUserId());
+//		String ip = IpUtil.getRealIP(request);
+		DtTagGroup tagGroup = dtTagGroupService.get(body.getTagsId());
+		if (userInfo.getUserId().equals(tagGroup.getCreateUser().toString())) {
+			String idpath = null;
+			if (body.getIsNew() == null || body.getIsNew()) {
+				body = this.doNew(body, userId, ip);
+				tagGroup.setModifyTime(new Date());
+				dtTagGroupService.doSave(tagGroup);
+				idpath = this.getIdpPath(body.getId());
+				body.setIdPath(idpath);
+				body = this.doSave(body);
+				AuditLogVO vo = new AuditLogVO();
+				vo.setType(1L);//管理操作
+				vo.setOperationService("标签与画像");//必传
+				vo.setOperationModule("标签管理");//必传
+				vo.setFunctionLev1("编辑");//必传
+				vo.setFunctionLev2("添加标签");//必传
+				vo.setDataAfterOperat(JSONObject.toJSONString(body));
+				vo.setRecordId(body.getId()+"");
+				auditComponet.saveAuditLog(vo);
+				return new SuccessMessage("新建成功");
+			} else {
+				DtTag db = this.get(body.getId());
+				String beforeUpdataJson = JSONObject.toJSONString(db);
+				if ((db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)) && body.getIsNew()) {
+					throw new APIException(MyErrorConstants.TAG_NOT_FOUND, "无此标签或已被删除");
+				}
+				if (body.getIsDeleted() != null && body.getIsDeleted().equals(Constants.PUBLIC_YES)) {
+					throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请不要用此方法进行删除操作，请用DELETE方法");
+				}
+				body = this.doUpdate(body, db, userId, ip);
+				idpath = this.getIdpPath(body.getId());
+				body.setIdPath(idpath);
+				body = this.doSave(body);
+				tagGroup.setModifyTime(new Date());
+				dtTagGroupService.doSave(tagGroup);
+				AuditLogVO vo = new AuditLogVO();
+				vo.setType(1L);//管理操作
+				vo.setOperationService("标签与画像");//必传
+				vo.setOperationModule("标签管理");//必传
+				vo.setFunctionLev1("编辑");//必传
+				vo.setFunctionLev2("保存");//必传
+				vo.setDataBeforeOperat(beforeUpdataJson);
+				vo.setDataAfterOperat(JSONObject.toJSONString(body));
+				vo.setRecordId(body.getId()+"");
+				auditComponet.saveAuditLog(vo);
+				return new SuccessMessage("修改成功");
+			}
+
+		} else {
+			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY, "无权限修改");
+		}
 	}
 }

@@ -79,7 +79,7 @@ public class MyDtTagGroupAction {
 	@RequestMapping(method=RequestMethod.GET)
 	public TablePage<DtTagGroup> doSearch(@ApiIgnore() DtTagGroupDBParam params,
 										  @ApiIgnore() Pageable pageable,
-										  HttpServletRequest request){
+										  HttpServletRequest request)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 
 		Long id = Long.parseLong(userInfo.getUserId());
@@ -107,7 +107,7 @@ public class MyDtTagGroupAction {
 	@RequestMapping(method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
-			HttpServletRequest request) throws APIException {
+			HttpServletRequest request) throws Exception {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		String ip = IpUtil.getRealIP(request);
 
@@ -137,7 +137,7 @@ public class MyDtTagGroupAction {
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_ERROE, message="请不要调用POST方法进行删除操作,请用DELETE方法"),
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="没有修改此标签组的权限")
 	})
-	public DtTagGroup doSave(@RequestBody DtTagGroupSaveDTO bodyDTO, HttpServletRequest request) throws APIException {
+	public DtTagGroup doSave(@RequestBody DtTagGroupSaveDTO bodyDTO, HttpServletRequest request) throws Exception {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long userId = Long.parseLong(userInfo.getUserId());
 		String ip = IpUtil.getRealIP(request);

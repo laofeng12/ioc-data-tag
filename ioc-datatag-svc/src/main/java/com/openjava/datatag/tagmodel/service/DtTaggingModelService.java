@@ -8,12 +8,14 @@ import com.openjava.datatag.tagmodel.dto.DtTaggingModelCopyDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelRenameDTO;
 import org.ljdp.component.exception.APIException;
+import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.user.BaseUserInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 标签模型业务层接口
@@ -21,7 +23,7 @@ import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
  *
  */
 public interface DtTaggingModelService {
-	Page<DtTaggingModel> query(DtTaggingModelDBParam params, Pageable pageable);
+	Page<DtTaggingModel> query(DtTaggingModelDBParam params, Pageable pageable)throws Exception;
 	
 	List<DtTaggingModel> queryDataOnly(DtTaggingModelDBParam params, Pageable pageable);
 	
@@ -30,10 +32,10 @@ public interface DtTaggingModelService {
 	DtTaggingModel doSave(DtTaggingModel m);
 	//DtTaggingModel doNew(DtTaggingModel m,BaseUserInfo userInfo, String ip);
 	DtTaggingModel doNew(DtTaggingModelDTO m,BaseUserInfo userInfo, String ip) throws APIException;
-	DtTaggingModel doRename(DtTaggingModelRenameDTO body, DtTaggingModel db, BaseUserInfo userInfo, String ip);
+	DtTaggingModel doRename(DtTaggingModelRenameDTO body, DtTaggingModel db, BaseUserInfo userInfo, String ip)throws Exception;
 
 
-	void doDispatch(DtTaggingDispatchDTO body, DtTaggingModel db, Long userId, String ip) throws APIException;
+	void doDispatch(DtTaggingDispatchDTO body, DtTaggingModel db, Long userId, String ip) throws Exception;
 	void doDelete(Long id);
 	void doRemove(String ids);
 
@@ -43,7 +45,7 @@ public interface DtTaggingModelService {
 	 */
 	void copy(DtTaggingModelCopyDTO id, String ip)throws Exception;
 
-	void doSoftDelete(DtTaggingModel taggingModel,Long userId,String ip);
+	void doSoftDelete(DtTaggingModel taggingModel,Long userId,String ip)throws Exception;
 	/**
 	 * 根据runState获取型
 	 */
@@ -91,4 +93,6 @@ public interface DtTaggingModelService {
 	 * 根据标签停止模型删除画像
 	 */
 	void stopModelByColIds(List<Long> colIds);
+
+	SuccessMessage beginDowload(Long number,Long taggingModelId)throws Exception;
 }

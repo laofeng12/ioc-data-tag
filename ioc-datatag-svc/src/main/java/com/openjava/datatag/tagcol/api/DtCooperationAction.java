@@ -173,41 +173,8 @@ public class DtCooperationAction {
     })
     @Security(session = true)
     @RequestMapping(value = "/search", method = RequestMethod.GET)
-    public TablePage<DtCooperationDTO> doSearch(@ApiIgnore() DtCooperationDBParam params, @ApiIgnore() Pageable pageable) {
-        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-        Long currentuserId = Long.valueOf(userInfo.getUserId());
-        if (params.getEq_createUser() == null) {
-            params.setEq_createUser(currentuserId);
-        }
-        List<DtCooperationDTO> dtoList = new ArrayList<>();
-        Page<DtCooperation> result = dtCooperationService.query(params, pageable);
-
-        DtCooTagcolLimitDBParam limitParams = new DtCooTagcolLimitDBParam();
-        for (DtCooperation opera : result) {
-            DtCooperationDTO dto = new DtCooperationDTO();
-            dto.setId(opera.getId());
-            dto.setTaggmId(opera.getTaggmId());
-            dto.setCooUser(opera.getCooUser());
-            dto.setCreateUser(opera.getCreateUser());
-            dto.setCreateTime(opera.getCreateTime());
-            dto.setModifyTime(opera.getModifyTime());
-            dto.setCooUserName(sysUserService.get(opera.getCooUser()).getFullname());
-            dto.setCreateUserName(sysUserService.get(dto.getCreateUser()).getFullname());
-            List<DtCooTagcolLimit> results = dtCooTagcolLimitService.findByColId(opera.getId());
-            List<DtCooTagcolLimitDTO> limtdtoList = new ArrayList<>();
-            for (DtCooTagcolLimit limtdto : results) {
-                DtCooTagcolLimitDTO ldto = new DtCooTagcolLimitDTO();
-                ldto.setId(limtdto.getId());
-                ldto.setCooId(dto.getId());
-                ldto.setTagColName(limtdto.getTagColName());
-                ldto.setUseTagGroup(limtdto.getUseTagGroup());
-                limtdtoList.add(ldto);
-            }
-            dto.setCooTagcolLimitList(limtdtoList);
-            dtoList.add(dto);
-        }
-        Page<DtCooperationDTO> showResult = new PageImpl<>(dtoList, pageable, dtoList.size());
-        return new TablePageImpl<>(showResult);
+    public TablePage<DtCooperationDTO> doSearch(@ApiIgnore() DtCooperationDBParam params, @ApiIgnore() Pageable pageable) throws Exception {
+        return dtCooperationService.doSearch(params,pageable);
     }
 
     @ApiOperation(value = "根据用户ID获取该用户的协作模型记录", notes = "结果对象数组", nickname = "userId")
@@ -362,7 +329,7 @@ public class DtCooperationAction {
     @RequestMapping(method = RequestMethod.DELETE)
     public SuccessMessage doDelete(
             @RequestParam(value = "id", required = false) Long id,
-            @RequestParam(value = "ids", required = false) String ids) {
+            @RequestParam(value = "ids", required = false) String ids) throws Exception{
         if (id != null) {
             dtCooperationService.doDelete(id);
         } else if (ids != null) {

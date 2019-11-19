@@ -120,7 +120,7 @@ public class DtTaggingModelAction {
 	})
 	@Security(session=true)
 	@RequestMapping(value="/search",method=RequestMethod.GET)
-	public TablePage<DtTaggingModelDTO> doSearch(@ApiIgnore() DtTaggingModelDBParam params, @ApiIgnore() Pageable pageable){
+	public TablePage<DtTaggingModelDTO> doSearch(@ApiIgnore() DtTaggingModelDBParam params, @ApiIgnore() Pageable pageable)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		params.setEq_isDeleted(Constants.PUBLIC_NO);
 		params.setEq_createUser(Long.parseLong(userInfo.getUserId()));
@@ -160,7 +160,7 @@ public class DtTaggingModelAction {
 	@Security(session=true)
 	@RequestMapping(value="/rename",method=RequestMethod.POST)
 	public SuccessMessage doSave(@RequestBody DtTaggingModelRenameDTO body,
-								 HttpServletRequest request) throws APIException {
+								 HttpServletRequest request) throws Exception {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		String ip = IpUtil.getRealIP(request);
 		//修改，记录更新时间等
@@ -187,7 +187,7 @@ public class DtTaggingModelAction {
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.TAGM_DISPATCH_CYCLE_ERROR, message="Cycle不合法")
 	})
 	public SuccessMessage doDispatch(@RequestBody DtTaggingDispatchDTO body,
-									 HttpServletRequest request) throws APIException {
+									 HttpServletRequest request) throws Exception {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long userId = Long.parseLong(userInfo.getUserId());
 		String ip = IpUtil.getRealIP(request);
@@ -264,7 +264,7 @@ public class DtTaggingModelAction {
 	@RequestMapping(method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
-			HttpServletRequest request) throws APIException {
+			HttpServletRequest request) throws Exception {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		Long userId = Long.parseLong(userInfo.getUserId());
 		String ip = IpUtil.getRealIP(request);
@@ -380,29 +380,7 @@ public class DtTaggingModelAction {
 	@RequestMapping(value="/beginDowload", method=RequestMethod.GET)
 	public SuccessMessage beginDowload(
 			@RequestParam(value="number")Long number,@RequestParam(value="taggingModelId")Long taggingModelId) throws Exception{
-		DtTaggingModel model =  dtTaggingModelService.get(taggingModelId);
-		if (model==null){
-			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此模型");
-		}
-		DownloadQueue queue = downloadQueueService.findBybtypeAndBid(Constants.DT_BTYPE_DATATAG,taggingModelId.toString());
-		if (queue==null){
-			queue = new DownloadQueue();
-			queue.setIsNew(true);
-		}else {
-			queue.setIsNew(false);
-		}
-		queue.setState(Constants.DT_DOWLOAD_STATE_WAIT);
-		queue.setSpeedOfProgress("0");
-		queue.setBtype(Constants.DT_BTYPE_DATATAG);
-		queue.setBid(taggingModelId.toString());
-		queue.setBname(model.getModelName());
-		queue.setCreateTime(new Date());
-		queue.setCreateUser(SsoContext.getUserId());
-		queue.setFileSize(null);
-		queue.setDownloadUrl(null);
-		queue.setDownloadNum(number);
-		downloadQueueService.doSave(queue);
-		return new SuccessMessage("已开始导出");
+		return dtTaggingModelService.beginDowload(number,taggingModelId);
 	}
 
 //	@ApiOperation(value = "PG测试", nickname="PG测试")

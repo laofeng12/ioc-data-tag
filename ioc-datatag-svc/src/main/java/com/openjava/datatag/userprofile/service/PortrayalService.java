@@ -11,7 +11,7 @@ public interface PortrayalService {
      * 获取画像结果
      * type写死为1
      */
-    PortrayalDetailDTO portrayal(String tableName, int type, String pKey)throws Exception;
+    PortrayalDetailDTO portrayal(String tableName, int type, String pKey,boolean isLog)throws Exception;
     /**
      * 画像查询
      * type写死为1

@@ -2,7 +2,9 @@ package com.openjava.datatag.tagmanage.service;
 
 import com.openjava.datatag.tagmanage.domain.DtTag;
 import com.openjava.datatag.tagmanage.query.DtTagDBParam;
+import com.openjava.datatag.utils.tree.TagDTOTreeNodeShow;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.ljdp.component.result.SuccessMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -19,13 +21,13 @@ public interface DtTagService {
 	Page<DtTag> query(DtTagDBParam params, Pageable pageable);
 	
 	List<DtTag> queryDataOnly(DtTagDBParam params, Pageable pageable);
-	
+	TagDTOTreeNodeShow getTree(Long id) throws Exception;
 	DtTag get(Long id);
 	List<DtTag> findByTagsId(Long id);
 	List<DtTag> findByPreaTagId(Long pId);
 
 	DtTag doSave(DtTag m);
-
+	SuccessMessage doSaveOrEdit(DtTag body,String ip)throws Exception;
 	DtTag doNew(DtTag tag,Long userId,String ip);
 
 	DtTag doUpdate(DtTag tag,DtTag db,Long userId,String ip);
@@ -34,7 +36,7 @@ public interface DtTagService {
 
 	void doSoftDeleteByRootID(Long id,Date now);
 
-	void doSoftDeleteByDtTag(DtTag tag,Long userId,String ip);
+	void doSoftDeleteByDtTag(DtTag tag,Long userId,String ip)throws Exception;
 
 	/**
 	 * 根据主键批量获取标签

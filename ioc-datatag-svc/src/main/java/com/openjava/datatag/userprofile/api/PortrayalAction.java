@@ -64,7 +64,7 @@ public class PortrayalAction {
             @PathVariable(value = "pKey") String pKey
     ) throws Exception{
         DataApiResponse<PortrayalDetailDTO> resp = new DataApiResponse<>();
-        resp.setData(portrayalService.portrayal(tableName,1,pKey));
+        resp.setData(portrayalService.portrayal(tableName,1,pKey,true));
         return resp;
     }
 
