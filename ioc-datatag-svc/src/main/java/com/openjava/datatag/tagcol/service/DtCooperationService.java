@@ -12,11 +12,13 @@ import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
+import org.ljdp.ui.bootstrap.TablePage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.openjava.datatag.tagcol.domain.DtCooperation;
 import com.openjava.datatag.tagcol.query.DtCooperationDBParam;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * tagcol业务层接口
@@ -51,5 +53,5 @@ public interface DtCooperationService {
     void doDelete(Long id);
 
     void doRemove(String ids);
-
+    TablePage<DtCooperationDTO> doSearch(DtCooperationDBParam params, Pageable pageable) throws Exception;
 }

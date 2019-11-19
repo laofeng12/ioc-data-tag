@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.baomidou.mybatisplus.extension.exceptions.ApiException;
+import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.component.FtpUtil;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
@@ -96,7 +97,7 @@ public class DownloadQueueAction {
 	})
 	@Security(session=true)
 	@RequestMapping(value="/search",method=RequestMethod.GET)
-	public TablePage<DownloadQueue> doSearch(@ApiIgnore() DownloadQueueDBParam params, @ApiIgnore() Pageable pageable){
+	public TablePage<DownloadQueue> doSearch(@ApiIgnore() DownloadQueueDBParam params, @ApiIgnore() Pageable pageable)throws Exception{
 		Page<DownloadQueue> result =  downloadQueueService.query(params, pageable);
 		
 		return new TablePageImpl<>(result);
@@ -174,27 +175,7 @@ public class DownloadQueueAction {
 	public void doExport(
 			@PathVariable(value="taggingModelId")Long taggingModelId,
 			HttpServletResponse response) throws Exception{
-		try {
-
-//			ftpUtil.uploadFile("ioc-datatag\\1\\233","233.zip","C:\\export_result\\1\\1677352\\1677352.zip");
-			// 清空response
-			response.reset();
-			String path = ftpUtil.getLocalPath()+"\\"+ Constants.DT_BTYPE_DATATAG+"\\"+taggingModelId.toString();
-			String fileName = taggingModelId.toString()+".zip";
-			OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
-			boolean result =  ftpUtil.downloadFile(path,fileName,toClient);
-			if (!result){
-				throw new ApiException("下载失败！");
-			}
-			toClient.flush();
-			toClient.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-			try {
-				response.getWriter().write(e.getMessage());
-			} catch (Exception e2) {
-			}
-		}
+		downloadQueueService.doExport(taggingModelId,response);
 	}
 
 }

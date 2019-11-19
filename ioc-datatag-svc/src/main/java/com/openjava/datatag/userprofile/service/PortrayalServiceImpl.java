@@ -1,5 +1,8 @@
 package com.openjava.datatag.userprofile.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.openjava.audit.auditManagement.component.AuditComponet;
+import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.component.PostgreSqlConfig;
 import com.openjava.datatag.dowload.domain.DownloadQueue;
@@ -40,6 +43,8 @@ public class PortrayalServiceImpl implements PortrayalService {
     private PostgreSqlConfig postgreSqlConfig;
     @Resource
     private DownloadQueueService downloadQueueService;
+    @Resource
+    private AuditComponet auditComponet;
 
     public List<PortrayalDetailDTO> searchPortrayal(String id, int type)throws Exception{
         MppPgExecuteUtil mppPgExecuteUtil = new MppPgExecuteUtil();
@@ -56,12 +61,20 @@ public class PortrayalServiceImpl implements PortrayalService {
         String[][] data = mppPgExecuteUtil.getData();//第一个为表头
         List<PortrayalDetailDTO> result = new LinkedList<>();
         for (int i = 1; i < data.length; i++) {
-            result.add(portrayal(data[i][0],1,data[i][1]));
+            result.add(portrayal(data[i][0],1,data[i][1],false));
         }
+        AuditLogVO vo = new AuditLogVO();
+        vo.setType(2L);//数据查询
+        vo.setOperationService("标签与画像");//必传
+        vo.setOperationModule("画像查询");//必传
+        vo.setFunctionLev1("查询");//必传
+        vo.setFunctionLev2("查询搜索");//必传
+        vo.setRecordId(id);
+        auditComponet.saveAuditLog(vo);
         return result;
     }
 
-    public PortrayalDetailDTO portrayal(String tableName, int type, String pKey)throws Exception{
+    public PortrayalDetailDTO portrayal(String tableName, int type, String pKey,boolean isLog)throws Exception{
         String [] prefixAndId = tableName.split(Constants.DT_TABLE_PREFIX);
         DtTaggingModel taggingModel = dtTaggingModelService.get(Long.valueOf(prefixAndId[1]));
         String alias = "t";//别名
@@ -78,6 +91,17 @@ public class PortrayalServiceImpl implements PortrayalService {
         if (!CollectionUtils.isEmpty(list)) {
             portrayal = list.get(0);
         }
+        if (isLog) {
+            AuditLogVO vo = new AuditLogVO();
+            vo.setType(2L);//数据查询
+            vo.setOperationService("标签与画像");//必传
+            vo.setOperationModule("画像查询");//必传
+            vo.setFunctionLev1("查询");//必传
+            vo.setFunctionLev2("查询详情");//必传
+            vo.setRecordId(taggingModel.getTaggingModelId()+"");
+            auditComponet.saveAuditLog(vo);
+        }
+        //日志记录
         return portrayal;
     }
 

@@ -101,8 +101,8 @@ public class DatatagApplication {
 	}
 
 	@Bean
-	public DatatagRunner ljdpRunner() {
-		return new DatatagRunner();
+	public LjdpBootRunner ljdpRunner() {
+		return new LjdpBootRunner();
 	}
 
 	@Bean

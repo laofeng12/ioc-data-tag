@@ -1,6 +1,8 @@
 package com.openjava.datatag.tagmanage.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.openjava.audit.auditManagement.component.AuditComponet;
+import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.log.service.DtTaggUpdateLogService;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
@@ -40,6 +42,8 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 
 	@Resource
 	private DtTaggUpdateLogService dtTaggUpdateLogService;
+	@Resource
+	private AuditComponet auditComponet;
 
 	public Page<DtTagGroup> query(DtTagGroupDBParam params, Pageable pageable){
 		Page<DtTagGroup> pageresult = dtTagGroupRepository.query(params, pageable);
@@ -66,25 +70,36 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 	}
 
 
-	public void doSoftDelete(DtTagGroup db,Long userId,String ip){
+	public void doSoftDelete(DtTagGroup db,Long userId,String ip)throws Exception {
+		String beforeJcon = JSONObject.toJSONString(db);
 		db.setModifyTime(new Date());
 		db.setIsDeleted(Constants.PUBLIC_YES);
 		//批量修改标签表的删除标识
 		dtTagService.doSoftDeleteByTagsID(db.getId(),db.getModifyTime());
 		//修改标签组表的删除标识
-		doSave(db);
+		db = doSave(db);
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("标签管理");//必传
+		vo.setFunctionLev1("我的标签组");//必传
+		vo.setFunctionLev2("删除");//必传
+		vo.setRecordId(db.getId()+"");
+		vo.setDataBeforeOperat(beforeJcon);
+		vo.setDataAfterOperat(JSONObject.toJSONString(db));//修改后数据
+		auditComponet.saveAuditLog(vo);
 		//日志记录
-		dtTaggUpdateLogService.loggingDelete(db,userId,ip);
+//		dtTaggUpdateLogService.loggingDelete(db,userId,ip);
 	}
 
-	public DtTagGroup doNew(DtTagGroup body,Long userId,String ip){
+	public DtTagGroup doNew(DtTagGroup body,Long userId,String ip)throws Exception{
 		if (body.getTagsName() == null){
 			body.setTagsName("新建标签组");
 		}
 		if (body.getSynopsis() == null){
 			body.setSynopsis("未填写简介");
 		}
-		String modifyContent = JSONObject.toJSONString(body);
+//		String modifyContent = JSONObject.toJSONString(body);
 		//新增，记录创建时间等
 		//设置主键(请根据实际情况修改)
 		SequenceService ss = ConcurrentSequence.getInstance();
@@ -100,12 +115,19 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		DtTagGroup db = dtTagGroupRepository.save(body);
 
 		//日志记录
-		dtTaggUpdateLogService.loggingNew(modifyContent,db,userId,ip);
-
+//		dtTaggUpdateLogService.loggingNew(modifyContent,db,userId,ip);
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("标签管理");//必传
+		vo.setFunctionLev1("我的标签组");//必传
+		vo.setFunctionLev2("创建标签组");//必传
+		vo.setDataAfterOperat(JSONObject.toJSONString(db));//修改后数据
+		auditComponet.saveAuditLog(vo);
 		return  db;
 	}
 
-	public DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip){
+	public DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip)throws Exception{
 		String oldContent = JSONObject.toJSONString(db);
 		String modifyContent = JSONObject.toJSONString(body);
 		//Create* 应该保持不变，Modify更新
@@ -117,7 +139,16 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		DtTagGroup newdb = doSave(db);
 
 		//日志记录
-		dtTaggUpdateLogService.loggingUpdate(modifyContent,oldContent,db,userId,ip);
+//		dtTaggUpdateLogService.loggingUpdate(modifyContent,oldContent,db,userId,ip);
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("标签管理");//必传
+		vo.setFunctionLev1("我的标签组");//必传
+		vo.setFunctionLev2("设置");//必传
+		vo.setDataBeforeOperat(oldContent);//修改前的数据
+		vo.setDataAfterOperat(JSONObject.toJSONString(newdb));//修改后数据
+		auditComponet.saveAuditLog(vo);
 		return newdb;
 	}
 
@@ -125,7 +156,7 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		return dtTagGroupRepository.getMyTagGroup(createUser);
 	}
 
-	public Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable){
+	public Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable)throws Exception{
 		Page<DtTagGroup> result = query(params,pageable);
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
 		if (CollectionUtils.isNotEmpty(result.getContent())){
@@ -140,6 +171,13 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 			}
 
 		}
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(2L);//数据查询
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("标签管理");//必传
+		vo.setFunctionLev1("我的标签组");//必传
+		vo.setFunctionLev2("查询");//必传
+		auditComponet.saveAuditLog(vo);
 		return result;
 	}
 

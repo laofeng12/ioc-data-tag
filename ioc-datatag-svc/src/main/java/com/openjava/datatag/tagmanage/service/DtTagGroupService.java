@@ -21,16 +21,16 @@ public interface DtTagGroupService {
 	
 	DtTagGroup doSave(DtTagGroup m);
 
-	void doSoftDelete(DtTagGroup db,Long userId,String ip);
+	void doSoftDelete(DtTagGroup db,Long userId,String ip)throws Exception ;
 
-	DtTagGroup doNew(DtTagGroup body,Long userId,String ip);
+	DtTagGroup doNew(DtTagGroup body,Long userId,String ip)throws Exception;
 
-	DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip);
+	DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip)throws Exception;
 	
 //	void doUpdate(DtTagGroup body,DtTagGroup db);
 
 	List<DtTagGroup> getMyTagGroup(Long createUser);
 
-	Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable);
+	Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable)throws Exception;
 
 }

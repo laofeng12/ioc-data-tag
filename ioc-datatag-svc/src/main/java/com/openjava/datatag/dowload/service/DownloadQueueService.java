@@ -8,13 +8,15 @@ import org.springframework.data.domain.Pageable;
 import com.openjava.datatag.dowload.domain.DownloadQueue;
 import com.openjava.datatag.dowload.query.DownloadQueueDBParam;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 下载列表业务层接口
  * @author zmk
  *
  */
 public interface DownloadQueueService {
-	Page<DownloadQueue> query(DownloadQueueDBParam params, Pageable pageable);
+	Page<DownloadQueue> query(DownloadQueueDBParam params, Pageable pageable)throws Exception;
 	
 	List<DownloadQueue> queryDataOnly(DownloadQueueDBParam params, Pageable pageable);
 	
@@ -34,4 +36,5 @@ public interface DownloadQueueService {
 	DownloadQueue findBybtypeAndBid(String btype,String bid);
 
 	List<DownloadQueue> findByState(Long state);
+	void doExport(Long taggingModelId, HttpServletResponse response);
 }

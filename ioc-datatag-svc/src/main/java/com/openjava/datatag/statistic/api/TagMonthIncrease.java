@@ -42,7 +42,7 @@ public class TagMonthIncrease {
     @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "/datasetgrowth",method = RequestMethod.GET)
-    public DataApiResponse<DtTaggingModelTemp> getDataSetGrowth(){
+    public DataApiResponse<DtTaggingModelTemp> getDataSetGrowth()throws Exception{
         Long lastMonthDataSetCount = TagDashboardService.lastMonthDataSetCount();
         DtTaggingModelTemp dtTaggingModelTemp = new DtTaggingModelTemp(lastMonthDataSetCount);
         DataApiResponse<DtTaggingModelTemp> apiResp = new DataApiResponse<>();
@@ -62,7 +62,7 @@ public class TagMonthIncrease {
     @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "/getLastMonthTagSum",method = RequestMethod.GET)
-    public Object getLastMonthTagSum(){
+    public Object getLastMonthTagSum()throws Exception{
         tagsum = TagDashboardService.getLastMonthTagSum();
         DtTagTemp dtTagTemp = new DtTagTemp(tagsum);
         DataApiResponse<DtTagTemp> apiResp = new DataApiResponse<>();
@@ -81,7 +81,7 @@ public class TagMonthIncrease {
     @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "/getTagThanDataSet",method = RequestMethod.GET)
-    public Object getTagThanDataSet(){
+    public Object getTagThanDataSet()throws Exception{
         String percentage = TagDashboardService.getTagThanDataSet();
         DtTagThanDataSet dtTagThanDataSet = new DtTagThanDataSet(percentage);
         DataApiResponse<DtTagThanDataSet> apiResp = new DataApiResponse<>();

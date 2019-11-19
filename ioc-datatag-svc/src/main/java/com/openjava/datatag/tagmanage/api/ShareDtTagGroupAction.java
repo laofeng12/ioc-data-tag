@@ -52,7 +52,7 @@ public class ShareDtTagGroupAction {
     @Security(session=true)
     @RequestMapping(method= RequestMethod.GET)
     public Page<DtShareTagGroup> doSearchShare(@ApiIgnore @RequestParam(value = "searchKey",required = false) String searchKey,
-                                               @ApiIgnore() Pageable pageable){
+                                               @ApiIgnore() Pageable pageable)throws Exception{
         if (searchKey == null){
             searchKey = "";
         }
@@ -73,7 +73,7 @@ public class ShareDtTagGroupAction {
     @RequestMapping(method=RequestMethod.POST)
     public SuccessMessage doChooseShareTagGroup(
             @RequestParam(value="id",required=false)Long id,
-            HttpServletRequest request) throws APIException {
+            HttpServletRequest request) throws Exception {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         String ip = IpUtil.getRealIP(request);
         DtTagGroup db = dtTagGroupService.get(id);
