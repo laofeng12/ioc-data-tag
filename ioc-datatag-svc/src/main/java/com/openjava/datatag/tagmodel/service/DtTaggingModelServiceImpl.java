@@ -2,12 +2,16 @@ package com.openjava.datatag.tagmodel.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.support.odps.udf.CodecCheck;
+import com.openjava.audit.auditManagement.component.AuditComponet;
+import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.component.PostgreSqlConfig;
 import com.openjava.datatag.component.TokenGenerator;
 import com.openjava.datatag.demo.dto.BaseResp;
 import com.openjava.datatag.demo.dto.TopDepartmentReqReqDTO;
+import com.openjava.datatag.dowload.domain.DownloadQueue;
+import com.openjava.datatag.dowload.service.DownloadQueueService;
 import com.openjava.datatag.log.domain.DtTaggingErrorLog;
 import com.openjava.datatag.log.service.DtTaggingErrorLogService;
 import com.openjava.datatag.log.service.DtTagmUpdateLogService;
@@ -43,6 +47,7 @@ import org.ljdp.common.http.HttpClientUtils;
 import org.ljdp.common.http.LjdpHttpClient;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.Result;
+import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +113,10 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DtTaggingErrorLogService dtTaggingErrorLogService;
 	@Resource
 	private PortrayalService portrayalService;
+	@Resource
+	private AuditComponet auditComponet;
+	@Resource
+	private DownloadQueueService downloadQueueService;
 
 	public void copy(DtTaggingModelCopyDTO copy,String ip)throws Exception{
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -133,7 +142,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		clone.setRunState(Constants.DT_MODEL_NO_BEGIN);
 		EntityClassUtil.dealCreateInfo(clone,userInfo);
 		clone = doSave(clone);
-		clone.setDataTableName("DT_"+clone.getTaggingModelId());//@TODO 这里要注意
+		clone.setDataTableName("DT_"+clone.getTaggingModelId());// 这里要注意
 		//克隆字段
 		List<DtSetCol> cloList =
 				dtSetColRepository.getByTaggingModelIdAndIsDeleted(model.getTaggingModelId(),Constants.PUBLIC_NO);
@@ -173,13 +182,29 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			}
 		}
 
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("模型部署");//必传
+		vo.setFunctionLev1("编辑");//必传
+		vo.setFunctionLev2("另存模型");//必传
+		vo.setRecordId(clone.getTaggingModelId()+"");
+		vo.setDataAfterOperat(JSONObject.toJSONString(clone));
+		auditComponet.saveAuditLog(vo);
 		//日志记录
-		dtTagmUpdateLogService.loggingNew("{ \"from\": "+content+"}",clone,ip);
+//		dtTagmUpdateLogService.loggingNew("{ \"from\": "+content+"}",clone,ip);
 
 	}
 
 
-	public Page<DtTaggingModel> query(DtTaggingModelDBParam params, Pageable pageable){
+	public Page<DtTaggingModel> query(DtTaggingModelDBParam params, Pageable pageable)throws Exception{
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(2L);//数据查询
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("模型部署");//必传
+		vo.setFunctionLev1("我的模型");//必传
+		vo.setFunctionLev2("查询");//必传
+		auditComponet.saveAuditLog(vo);
 		Page<DtTaggingModel> pageresult = dtTaggingModelRepository.query(params, pageable);
 		return pageresult;
 	}
@@ -256,7 +281,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	}
 
 
-	public DtTaggingModel doRename(DtTaggingModelRenameDTO body,DtTaggingModel db,BaseUserInfo userInfo,String ip){
+	public DtTaggingModel doRename(DtTaggingModelRenameDTO body,DtTaggingModel db,BaseUserInfo userInfo,String ip)throws Exception{
 		String oldContent = JSONObject.toJSONString(db);
 		String modifyContent = JSONObject.toJSONString(body);
 		EntityClassUtil.dealModifyInfo(db,userInfo);
@@ -267,8 +292,17 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		DtTaggingModel dbObj =dtTaggingModelRepository.save(db);
 
 		//日志记录
-		dtTagmUpdateLogService.loggingUpdate(modifyContent,oldContent,db,ip);
-
+//		dtTagmUpdateLogService.loggingUpdate(modifyContent,oldContent,db,ip);
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("模型部署");//必传
+		vo.setFunctionLev1("编辑");//必传
+		vo.setFunctionLev2("修改模型名称");//必传
+		vo.setRecordId(body.getTaggingModelId()+"");
+		vo.setDataBeforeOperat(oldContent);
+		vo.setDataAfterOperat(JSONObject.toJSONString(dbObj));
+		auditComponet.saveAuditLog(vo);
 		return dbObj;
 	}
 
@@ -276,7 +310,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	/*
 	 * 设置调度
 	 */
-	public void doDispatch(DtTaggingDispatchDTO body, DtTaggingModel db, Long userId, String ip) throws APIException {
+	public void doDispatch(DtTaggingDispatchDTO body, DtTaggingModel db, Long userId, String ip) throws Exception {
 		String oldContent = JSONObject.toJSONString(db);
 		String modifyContent = JSONObject.toJSONString(body);
 		db.setModifyTime(new Date());
@@ -302,10 +336,19 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			throw new APIException(MyErrorConstants.TAGM_DISPATCH_CYCLE_ERROR,"Cycle不合法");
 		}
 
-		dtTaggingModelRepository.save(db);
-
+		db = dtTaggingModelRepository.save(db);
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("模型部署");//必传
+		vo.setFunctionLev1("我的模型");//必传
+		vo.setFunctionLev2("调度");//必传
+		vo.setRecordId(db.getId()+"");
+		vo.setDataBeforeOperat(oldContent);
+		vo.setDataAfterOperat(JSONObject.toJSONString(db));
+		auditComponet.saveAuditLog(vo);
 		//日志记录
-		dtTagmUpdateLogService.loggingUpdate(modifyContent,oldContent,db,ip);
+//		dtTagmUpdateLogService.loggingUpdate(modifyContent,oldContent,db,ip);
 	}
 
 	//检查Cycle是否合法
@@ -362,7 +405,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		return cronEx.toString();
 	}
 
-	public void doSoftDelete(DtTaggingModel db,Long userId,String ip){
+	public void doSoftDelete(DtTaggingModel db,Long userId,String ip)throws Exception{
+		String oldJson = JSONObject.toJSONString(db);
 		Date now = new Date();
 		List<DtSetCol> list = dtSetColRepository.getByTaggingModelIdAndIsDeleted(db.getId(),Constants.PUBLIC_NO);
 		for (DtSetCol col: list){
@@ -371,10 +415,20 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		dtSetColRepository.doSoftDeleteByTaggingModelId(db.getId(),now,db.getCreateUser());
 		db.setIsDeleted(Constants.PUBLIC_YES);
 		db.setModifyTime(now);
-		dtTaggingModelRepository.save(db);
-
+		db = dtTaggingModelRepository.save(db);
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("模型部署");//必传
+		vo.setFunctionLev1("我的模型	");//必传
+		vo.setFunctionLev2("删除");//必传
+		vo.setRecordId(db.getTaggingModelId()+"");
+		vo.setDataBeforeOperat(oldJson);
+		vo.setDataAfterOperat(JSONObject.toJSONString(db));
+		auditComponet.saveAuditLog(vo);
 		//日志记录
-		dtTagmUpdateLogService.loggingDelete(db, ip);
+//		dtTagmUpdateLogService.loggingDelete(db, ip);
+		//@TODO  删除画像
 	}
 
 	public void doDelete(Long id) {
@@ -850,6 +904,39 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		}
 	}
 
+	public SuccessMessage beginDowload(Long number, Long taggingModelId)throws Exception{
+		DtTaggingModel model =  this.get(taggingModelId);
+		if (model==null){
+			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"查无此模型");
+		}
+		DownloadQueue queue = downloadQueueService.findBybtypeAndBid(Constants.DT_BTYPE_DATATAG,taggingModelId.toString());
+		if (queue==null){
+			queue = new DownloadQueue();
+			queue.setIsNew(true);
+		}else {
+			queue.setIsNew(false);
+		}
+		queue.setState(Constants.DT_DOWLOAD_STATE_WAIT);
+		queue.setSpeedOfProgress("0");
+		queue.setBtype(Constants.DT_BTYPE_DATATAG);
+		queue.setBid(taggingModelId.toString());
+		queue.setBname(model.getModelName());
+		queue.setCreateTime(new Date());
+		queue.setCreateUser(SsoContext.getUserId());
+		queue.setFileSize(null);
+		queue.setDownloadUrl(null);
+		queue.setDownloadNum(number);
+		queue = downloadQueueService.doSave(queue);
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("模型部署");//必传
+		vo.setFunctionLev1("我的模型	");//必传
+		vo.setFunctionLev2("导出数据");//必传
+		vo.setRecordId(taggingModelId+"");
+		auditComponet.saveAuditLog(vo);
+		return new SuccessMessage("已开始导出");
+	}
 
 	public static void main(String[] args) {
 		/*String colJson = "[{\"index\":0,\"aggType\":null,\"name\":\"tb_0_MODIFY_ID\"},{\"index\":1,\"aggType\":null,\"name\":\"tb_0_CREATE_NAME\"},{\"index\":2,\"aggType\":null,\"name\":\"tb_0_SOURCE_NAME\"}]";

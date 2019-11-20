@@ -9,11 +9,14 @@ import javax.persistence.PersistenceContext;
 import com.alibaba.fastjson.JSONObject;
 import com.commons.utils.QueryParamsUtil;
 import com.commons.utils.VoUtils;
+import com.openjava.audit.auditManagement.component.AuditComponet;
+import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
 import com.openjava.datatag.tagcol.domain.DtTagmCooLog;
 import com.openjava.datatag.tagcol.dto.*;
+import com.openjava.datatag.tagcol.query.DtCooTagcolLimitDBParam;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
@@ -33,11 +36,10 @@ import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.core.db.DBQueryParam;
 import org.ljdp.core.spring.data.JpaMultiDynamicQueryDAO;
 import org.ljdp.secure.sso.SsoContext;
+import org.ljdp.ui.bootstrap.TablePage;
+import org.ljdp.ui.bootstrap.TablePageImpl;
 import org.ljdp.util.DateFormater;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,6 +73,8 @@ public class DtCooperationServiceImpl implements DtCooperationService {
     //首先初始化JpaMultiDynamicQueryDAO对象。(暂时只支持JPA)
     private EntityManager em;
     private JpaMultiDynamicQueryDAO dao;
+    @Resource
+    private AuditComponet auditComponet;
 
     @PersistenceContext
     public void setEntityManager(EntityManager em) {
@@ -401,6 +405,15 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             }
 
         }
+        AuditLogVO vo = new AuditLogVO();
+        vo.setType(1L);//管理操作
+        vo.setOperationService("标签与画像");//必传
+        vo.setOperationModule("模型部署");//必传
+        vo.setFunctionLev1("编辑");//必传
+        vo.setFunctionLev2("添加成员");//必传
+        vo.setRecordId(userId+"");
+        auditComponet.saveAuditLog(vo);
+
     }
 
     /**
@@ -471,7 +484,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         }
     }
 
-    public void doDelete(Long id) {
+    public void doDelete(Long id){
         //根据Id删除协作成员表记录
         dtCooperationRepository.deleteById(id);
         //根据协作成员Id删除协作字段表记录
@@ -483,5 +496,41 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         for (int i = 0; i < items.length; i++) {
             dtCooperationRepository.deleteById(new Long(items[i]));
         }
+    }
+    public TablePage<DtCooperationDTO> doSearch(DtCooperationDBParam params, Pageable pageable) throws Exception{
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+        Long currentuserId = Long.valueOf(userInfo.getUserId());
+        if (params.getEq_createUser() == null) {
+            params.setEq_createUser(currentuserId);
+        }
+        List<DtCooperationDTO> dtoList = new ArrayList<>();
+        Page<DtCooperation> result = this.query(params, pageable);
+
+        DtCooTagcolLimitDBParam limitParams = new DtCooTagcolLimitDBParam();
+        for (DtCooperation opera : result) {
+            DtCooperationDTO dto = new DtCooperationDTO();
+            dto.setId(opera.getId());
+            dto.setTaggmId(opera.getTaggmId());
+            dto.setCooUser(opera.getCooUser());
+            dto.setCreateUser(opera.getCreateUser());
+            dto.setCreateTime(opera.getCreateTime());
+            dto.setModifyTime(opera.getModifyTime());
+            dto.setCooUserName(sysUserService.get(opera.getCooUser()).getFullname());
+            dto.setCreateUserName(sysUserService.get(dto.getCreateUser()).getFullname());
+            List<DtCooTagcolLimit> results = dtCooTagcolLimitService.findByColId(opera.getId());
+            List<DtCooTagcolLimitDTO> limtdtoList = new ArrayList<>();
+            for (DtCooTagcolLimit limtdto : results) {
+                DtCooTagcolLimitDTO ldto = new DtCooTagcolLimitDTO();
+                ldto.setId(limtdto.getId());
+                ldto.setCooId(dto.getId());
+                ldto.setTagColName(limtdto.getTagColName());
+                ldto.setUseTagGroup(limtdto.getUseTagGroup());
+                limtdtoList.add(ldto);
+            }
+            dto.setCooTagcolLimitList(limtdtoList);
+            dtoList.add(dto);
+        }
+        Page<DtCooperationDTO> showResult = new PageImpl<>(dtoList, pageable, dtoList.size());
+        return new TablePageImpl<>(showResult);
     }
 }

@@ -24,7 +24,7 @@
             </div>
             <div v-else>暂无数据</div>
           </template>
-          <el-table-column prop="bname" label="名称"></el-table-column>
+          <el-table-column prop="bname" label="模型名称"></el-table-column>
           <el-table-column prop="downloadNum" label="下载数据量"></el-table-column>
           <el-table-column prop="createTime" label="下载时间"></el-table-column>
           <el-table-column prop="fileSize" label="文件大小"></el-table-column>

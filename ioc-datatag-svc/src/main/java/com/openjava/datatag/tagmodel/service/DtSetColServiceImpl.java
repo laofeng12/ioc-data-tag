@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
+import com.openjava.audit.auditManagement.component.AuditComponet;
+import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 
@@ -67,6 +69,8 @@ public class DtSetColServiceImpl implements DtSetColService {
 	private DtTagmUpdateLogService dtTagmUpdateLogService;
 	@Resource
 	private DtCooTagcolLimitService dtCooTagcolLimitService;
+	@Resource
+	private AuditComponet auditComponet;
 
 	public Page<DtSetCol> query(DtSetColDBParam params, Pageable pageable){
 		Page<DtSetCol> pageresult = dtSetColRepository.query(params, pageable);
@@ -114,8 +118,16 @@ public class DtSetColServiceImpl implements DtSetColService {
 			dtTagConditionService.doSave(record);
 		});
 		String content = "{\"delConditions\":" + JSONObject.toJSONString(conditions)+"}";
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("模型部署");//必传
+		vo.setFunctionLev1("编辑");//必传
+		vo.setFunctionLev2("清除字段");//必传
+		vo.setRecordId(id+"");
+		auditComponet.saveAuditLog(vo);
 		//记录（打标显示）字段的删除
-		dtTagcolUpdateLogService.loggingDelete(content,dtSetCol,ip);
+//		dtTagcolUpdateLogService.loggingDelete(content,dtSetCol,ip);
 	}
 	public void doRemove(String ids) throws Exception{
 		String[] items = ids.split(",");
@@ -146,6 +158,15 @@ public class DtSetColServiceImpl implements DtSetColService {
 		//如果taggingModelId为空则新建模型
 		if(body.getTaggingModelId()==null){
 			taggingModel = dtTaggingModelService.doNew(body,userInfo,ip);
+			AuditLogVO vo = new AuditLogVO();
+			vo.setType(1L);//管理操作
+			vo.setOperationService("标签与画像");//必传
+			vo.setOperationModule("模型部署");//必传
+			vo.setFunctionLev1("创建模型");//必传
+			vo.setFunctionLev2("字段设置");//必传
+			vo.setRecordId(taggingModel.getTaggingModelId()+"");
+			vo.setDataAfterOperat(JSONObject.toJSONString(taggingModel));
+			auditComponet.saveAuditLog(vo);
 		}else{
 			taggingModel = dtTaggingModelService.get(body.getTaggingModelId());
 			if (taggingModel==null) {
@@ -222,7 +243,17 @@ public class DtSetColServiceImpl implements DtSetColService {
 			//日志记录
 			String content = "{\"reqParam\":" + reqParams + ",\"removeCol\":" + JSONObject.toJSONString(removeCols) + "}";
 			String oldContent = "{\"model\":" + oldtagModelContent + ",\"setCol\":"+ oldColsContent +"}";
-			dtTagmUpdateLogService.loggingUpdate(content,oldContent,taggingModel,ip);
+			AuditLogVO vo = new AuditLogVO();
+			vo.setType(1L);//管理操作
+			vo.setOperationService("标签与画像");//必传
+			vo.setOperationModule("模型部署");//必传
+			vo.setFunctionLev1("编辑");//必传
+			vo.setFunctionLev2("字段设置");//必传
+			vo.setRecordId(taggingModel.getTaggingModelId()+"");
+			vo.setDataBeforeOperat(oldContent);
+			vo.setDataAfterOperat(content);
+			auditComponet.saveAuditLog(vo);
+//			dtTagmUpdateLogService.loggingUpdate(content,oldContent,taggingModel,ip);
 		}
 		body.setTaggingModelId(taggingModel.getTaggingModelId());
 		return body;
@@ -314,10 +345,20 @@ public class DtSetColServiceImpl implements DtSetColService {
 		clone.setIsNew(true);
 		clone.setIsSource(Constants.PUBLIC_NO);//非源字段
 		clone.setShowCol(Constants.DT_COL_COPY + col.getSourceCol()+"_"+String.valueOf(cloneCount));
-		doSave(clone);
+		clone = doSave(clone);
+
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("模型部署");//必传
+		vo.setFunctionLev1("编辑");//必传
+		vo.setFunctionLev2("克隆字段");//必传
+		vo.setRecordId(clone.getColId()+"");
+		vo.setDataAfterOperat(JSONObject.toJSONString(clone));
+		auditComponet.saveAuditLog(vo);
 
 		//日志记录
-		dtTagcolUpdateLogService.loggingNew("{ \"cloneFrom\":" + col + "}",clone,ip);
+//		dtTagcolUpdateLogService.loggingNew("{ \"cloneFrom\":" + col + "}",clone,ip);
 
 	}
 
@@ -448,7 +489,16 @@ public class DtSetColServiceImpl implements DtSetColService {
 		String content = "{\"req\":" + reqParams
                 + ",\"delCondition\":" + JSONObject.toJSONString(delLog)
                 + ",\"addCondition\":" + JSONObject.toJSONString(addLog) + "}";
-		dtTagcolUpdateLogService.loggingUpdate(content,col,req.getIp());
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(1L);//管理操作
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("模型部署");//必传
+		vo.setFunctionLev1("编辑");//必传
+		vo.setFunctionLev2("数据打标");//必传
+		vo.setRecordId(req.getColId()+"");
+		vo.setDataAfterOperat(content);
+		auditComponet.saveAuditLog(vo);
+//		dtTagcolUpdateLogService.loggingUpdate(content,col,req.getIp());
 	}
 
 	/**

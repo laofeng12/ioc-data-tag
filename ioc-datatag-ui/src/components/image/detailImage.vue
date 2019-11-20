@@ -11,10 +11,10 @@
             clearable
             placeholder="请输入内容"
             prefix-icon="el-icon-search"
-            @keyup.enter.native="goback"
+            @keyup.enter.native="backQuery"
             v-model.trim="input2">
           </el-input>
-          <el-button class="zxlistBtn" size="small" type="primary" @click="goBack">查询</el-button>
+          <el-button class="zxlistBtn" size="small" type="primary" @click="backQuery">查询</el-button>
         </div>
       </div>
     </div>
@@ -63,13 +63,20 @@
     },
     methods: {
       ...mapActions('tagPanel', ['getimageList', 'getarrList']),
-      goBack() {
-        this.$router.push({
-          path: '/queryImage',
-          query: {
-            id: this.input2
-          }
-        })
+      backQuery() {
+        if(this.input2){
+          this.$router.push({
+            path:'/queryImage',
+            query:{
+              id:this.input2 ,
+            }
+          })
+        }else{
+          this.$message({
+            message: '请填写查询信息',
+            type: 'warning'
+          });
+        }
       }
     },
     created() {

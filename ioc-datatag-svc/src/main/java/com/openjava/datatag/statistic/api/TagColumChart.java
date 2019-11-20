@@ -62,7 +62,7 @@ public class TagColumChart {
     @Security(session=true)
     @ResponseBody
     @RequestMapping(value = "getAllYearMonth",method = RequestMethod.GET)
-    public Object getLeftListData(){
+    public Object getLeftListData()throws Exception{
         //List<Object>  list = TagDashboardService.getAllYearMonth();
         Map<String,String> map = TagDashboardService.getAllYearMonth();
         DataApiResponse<Object> apiResp = new DataApiResponse<>();

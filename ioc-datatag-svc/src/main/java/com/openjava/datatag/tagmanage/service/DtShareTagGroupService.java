@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface DtShareTagGroupService {
-    Page<DtShareTagGroup> findList(String searchKey, Pageable pageable);
+    Page<DtShareTagGroup> findList(String searchKey, Pageable pageable)throws Exception;
 
-     void choose(Long id, Long userId,String ip)throws APIException;
+     void choose(Long id, Long userId,String ip)throws Exception;
 }

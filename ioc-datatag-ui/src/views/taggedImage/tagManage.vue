@@ -1,26 +1,26 @@
 <template>
   <div class="app-container">
     <div class="actionBar">
-        <el-input
-          class="zxinp moduleOne"
-          size="small"
-          clearable
-          placeholder="请输入内容"
-          prefix-icon="el-icon-search"
-          @keyup.enter.native="getQuireData"
-          v-model="input2">
-        </el-input>
-        <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-        <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
-        <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
-        <el-button size="small" type="primary" @click="shareLabel">共享标签组</el-button>
+      <el-input
+        class="zxinp moduleOne"
+        size="small"
+        clearable
+        placeholder="请输入内容"
+        prefix-icon="el-icon-search"
+        @keyup.enter.native="getQuireData"
+        v-model="input2">
+      </el-input>
+      <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
+      <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
+      <el-button size="small" type="primary" @click="shareLabel">共享标签组</el-button>
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -40,7 +40,7 @@
                 <div class="gressPercentage">
                   <!--{{scope.row.percentage}}-->
                   <!--<el-progress :percentage="scope.row.popularityLevel" :show-text="false"-->
-                               <!--:color="customColorMethod"></el-progress>-->
+                  <!--:color="customColorMethod"></el-progress>-->
                   <el-progress :percentage="scope.row.percentage" :show-text="false"
                                :color="customColorMethod"></el-progress>
                 </div>
@@ -50,8 +50,14 @@
           </el-table-column>
           <el-table-column prop="isShare" label="共享状态">
             <template slot-scope="scope">
-              <div v-if="scope.row.isShare===0">未共享</div>
-              <div v-if="scope.row.isShare===1">已共享</div>
+              <!--<div v-if="scope.row.isShare===0">未共享</div>-->
+              <!--<div v-if="scope.row.isShare===1">已共享</div>-->
+              <div>
+                <span @click='shareStatus(!scope.row.isShare,scope.row)'
+                      :class='
+                      ["share-btn",scope.row.isShare?"share":"no-share"]'>{{scope.row.isShare ? '已共享': '未共享'}}
+                </span>
+              </div>
             </template>
           </el-table-column>
           <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
@@ -60,7 +66,9 @@
             <template slot-scope="{row,$index}" class="caozuo">
               <el-tooltip class="item" effect="dark" content="设置" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-setting iconLogo" @click="handleShare(row,$index)"></i>
+                  <!--el-icon-document-->
+                  <!--<i class="el-icon-setting iconLogo" @click="handleShare(row,$index)"></i>-->
+                  <i class="el-icon-document iconLogo" @click="handleShare(row,$index)"></i>
                 </span>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -78,7 +86,7 @@
           </el-table-column>
         </el-table>
         <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
-                            <!--@sureClick="goPage"></element-pagination>-->
+        <!--@sureClick="goPage"></element-pagination>-->
         <element-pagination
           :pageSize="size"
           :currentPage="page+1"
@@ -113,18 +121,19 @@
                 v-model="ruleForm.textarea">
               </el-input>
             </el-form-item>
-            <el-form-item label="是否共享:" prop="introduction" class="nameOne">
-              <el-switch
-                v-model="isShare"
-                active-text="共享"
-                inactive-text="不共享">
-              </el-switch>
-            </el-form-item>
+            <!--<el-form-item label="是否共享:" prop="introduction" class="nameOne">-->
+            <!--<el-switch-->
+            <!--v-model="isShare"-->
+            <!--active-text="共享"-->
+            <!--inactive-text="不共享">-->
+            <!--</el-switch>-->
+            <!--</el-form-item>-->
           </el-form>
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定 </el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureShare">确定
+            </el-button>
             <el-button size="small" plain class="btn-group" @click="closeShare2">取消</el-button>
           </div>
         </div>
@@ -198,7 +207,7 @@
     name: "tagManage",
     data() {
       return {
-        labelId: 0,
+        labelId: '',
         isShare: false,
         labelName: '',
         totalnum: 0,
@@ -207,11 +216,11 @@
         page: 0,
         size: 10,
         input2: '',
-        tagName:'',
-        delTreeId:'',
+        tagName: '',
+        delTreeId: '',
         Loading: true,
-        deleteDialog:false,
-        deleteLoading:false,
+        deleteDialog: false,
+        deleteLoading: false,
         saveLoading2: true,
         shareDialog: false,
         saveLoading: false,
@@ -258,15 +267,15 @@
           return '#67c23a';
         }
       },
-      handleShare(row, index) {
+      handleShare(row) {
         this.shareDialog = true
         this.ruleForm.labelName = row.tagsName
         this.ruleForm.textarea = row.synopsis
-        if (row.isShare === 0) {
-          this.isShare = false
-        } else {
-          this.isShare = true
-        }
+        // if (row.isShare === 0) {
+        //   this.isShare = false
+        // } else {
+        //   this.isShare = true
+        // }
         this.labelId = row.id
         // console.log(this.isShare)
 
@@ -279,13 +288,35 @@
         this.shareDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      // 共享确认
+      /**
+       * 共享
+       * @param status
+       * @param item
+       * @returns {Promise<void>}
+       */
+      async shareStatus(status, item) {
+        this.ruleForm.labelName = item.tagsName
+        this.ruleForm.textarea = item.synopsis
+        if (item.isShare === 0) {
+          this.isShare = false
+        } else {
+          this.isShare = true
+        }
+        this.labelId = item.id
+        try {
+          await this.$confirm(`是否${item.isShare ? '取消' : ''}共享${item.tagsName}`)
+          this.getDtTagGroupData('status')
+        } catch (err) {
+          console.warn(err)
+        }
+      },
+      // 设置确认
       sureShare() {
         this.saveLoading = true
         this.$refs.ruleForm.validate((valid) => {
           if (valid) {
             try {
-              this.getDtTagGroupData()
+              this.getDtTagGroupData('edit')
               this.shareDialog = false
               this.saveLoading = false
             } catch (e) {
@@ -311,11 +342,11 @@
                   id: '',
                   isNew: true,
                   isShare: '',
-                  synopsis: this.ruleForm.synopsis,
-                  tagsName: this.ruleForm.tagsName
+                  synopsis: this.ruleForm.synopsis, // 简介
+                  tagsName: this.ruleForm.tagsName  // 名称
                 })
                 this.creatsaveLoading = false
-                this.$router.push('/labelcreatTree/' + data.id +'/'+ data.tagsName)
+                this.$router.push('/labelcreatTree/' + data.id + '/' + data.tagsName)
               } catch (e) {
                 this.creatsaveLoading = false
                 console.log(e);
@@ -381,28 +412,52 @@
         }
       },
 
-      // 共享确认
-      async getDtTagGroupData() {
-        let isShare = 0
-        if (this.isShare === false) {
-          isShare = 0
+      // 共享和设置确认
+      async getDtTagGroupData(type) {
+        if (type === 'status') {
+          let isShare = 0
+          if (this.isShare === false) {
+            isShare = 1
+          } else {
+            isShare = 0
+          }
+          let params = {
+            id: this.labelId,
+            isNew: false,
+            isShare: isShare,
+            synopsis: this.ruleForm.textarea,
+            tagsName: this.ruleForm.labelName
+          }
+          try {
+            const data = await getDtTagGroupData(params)
+            this.getQuireData()
+            this.$message({
+              message: '修改状态成功！',
+              type: 'success'
+            });
+          } catch (e) {
+            this.$message.error('修改状态失败，请重试！');
+          }
         } else {
-          isShare = 1
+          let params = {
+            id: this.labelId,
+            isNew: false,
+            isShare: '',
+            synopsis: this.ruleForm.textarea,
+            tagsName: this.ruleForm.labelName
+          }
+          try {
+            const data = await getDtTagGroupData(params)
+            this.getQuireData()
+            this.$message({
+              message: '修改信息成功！',
+              type: 'success'
+            });
+          } catch (e) {
+            this.$message.error('修改信息失败，请重试！');
+          }
         }
-        const params = {
-          id: this.labelId,
-          isNew: false,
-          isShare: isShare,
-          synopsis: this.ruleForm.textarea,
-          tagsName: this.ruleForm.labelName
-        }
-        try {
-          const data = await getDtTagGroupData(params)
-          this.getQuireData()
 
-        } catch (e) {
-
-        }
       },
       //查询
       getQuireData() {
@@ -416,7 +471,7 @@
         this.page = page - 1
         this.getTagsData()
       },
-      handleSizeChange (size) {
+      handleSizeChange(size) {
         this.size = size
         this.getTagsData()
       },
@@ -424,7 +479,7 @@
       goPage() {
 
       },
-      delTaglabel(row){
+      delTaglabel(row) {
         this.deleteDialog = true
         this.tagName = row.tagsName
         this.delTreeId = row.id
@@ -432,7 +487,7 @@
       closedelete() {
         this.deleteDialog = false
       },
-      cancelDelete(){
+      cancelDelete() {
         this.deleteDialog = false
       },
       //删除
@@ -506,5 +561,27 @@
 
   .area, .dateInp {
     width: 360px;
+  }
+
+  .share-btn {
+    display: inline-block;
+    font-size: 12px;
+    width: 60px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 10px;
+    border: 1px solid #0486FE;
+    cursor: pointer;
+    padding-top: 1px
+  }
+
+  .share {
+    background: #0486fe;
+    color: white;
+  }
+
+  .no-share {
+    background: white;
+    color: #0486FE;
   }
 </style>

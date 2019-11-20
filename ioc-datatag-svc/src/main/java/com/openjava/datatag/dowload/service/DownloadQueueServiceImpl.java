@@ -1,10 +1,18 @@
 package com.openjava.datatag.dowload.service;
 
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
+import com.baomidou.mybatisplus.extension.exceptions.ApiException;
+import com.openjava.audit.auditManagement.component.AuditComponet;
+import com.openjava.audit.auditManagement.vo.AuditLogVO;
+import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.component.FtpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,8 +40,12 @@ public class DownloadQueueServiceImpl implements DownloadQueueService {
 	private DownloadQueueRepository downloadQueueRepository;
 	@Resource
 	private SysCodeService sysCodeService;
-	
-	public Page<DownloadQueue> query(DownloadQueueDBParam params, Pageable pageable){
+	@Resource
+	private AuditComponet auditComponet;
+	@Resource
+	private FtpUtil ftpUtil;
+
+	public Page<DownloadQueue> query(DownloadQueueDBParam params, Pageable pageable)throws Exception{
 //		params.setTableAlias("t");
 		if (StringUtils.isNotBlank(params.getLike_bname())){
 			params.setLike_bname("%"+params.getLike_bname()+"%");
@@ -50,6 +62,13 @@ public class DownloadQueueServiceImpl implements DownloadQueueService {
 				}
 			}
 		}
+		AuditLogVO vo = new AuditLogVO();
+		vo.setType(2L);//数据查询
+		vo.setOperationService("标签与画像");//必传
+		vo.setOperationModule("模型部署");//必传
+		vo.setFunctionLev1("下载管理");//必传
+		vo.setFunctionLev2("查询");//必传
+		auditComponet.saveAuditLog(vo);
 		return pageresult;
 	}
 	
@@ -101,5 +120,37 @@ public class DownloadQueueServiceImpl implements DownloadQueueService {
 	}
 	public List<DownloadQueue> findByState(Long state){
 		return  downloadQueueRepository.findByState(state);
+	}
+
+	public void doExport(Long taggingModelId, HttpServletResponse response){
+		try {
+
+
+			// 清空response
+			response.reset();
+			String path = ftpUtil.getLocalPath()+"\\"+ Constants.DT_BTYPE_DATATAG+"\\"+taggingModelId.toString();
+			String fileName = taggingModelId.toString()+".zip";
+			OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
+			boolean result =  ftpUtil.downloadFile(path,fileName,toClient);
+			if (!result){
+				throw new ApiException("下载失败！");
+			}
+			toClient.flush();
+			toClient.close();
+			AuditLogVO vo = new AuditLogVO();
+			vo.setType(2L);//数据查询
+			vo.setOperationService("标签与画像");//必传
+			vo.setOperationModule("模型部署");//必传
+			vo.setFunctionLev1("下载管理");//必传
+			vo.setFunctionLev2("导出到本地");//必传
+			vo.setRecordId(taggingModelId+"");
+			auditComponet.saveAuditLog(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+			try {
+				response.getWriter().write(e.getMessage());
+			} catch (Exception e2) {
+			}
+		}
 	}
 }
