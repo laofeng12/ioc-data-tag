@@ -79,7 +79,7 @@ public class DownloadQueueAction {
 	@ApiResponses({
 		@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
 	public DownloadQueue get(@PathVariable("id")Long id) {
 		DownloadQueue m = downloadQueueService.get(id);
@@ -95,7 +95,7 @@ public class DownloadQueueAction {
 		@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
 		@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/search",method=RequestMethod.GET)
 	public TablePage<DownloadQueue> doSearch(@ApiIgnore() DownloadQueueDBParam params, @ApiIgnore() Pageable pageable)throws Exception{
 		Page<DownloadQueue> result =  downloadQueueService.query(params, pageable);
@@ -109,7 +109,7 @@ public class DownloadQueueAction {
 	 * 保存
 	 */
 	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(method=RequestMethod.POST)
 	public SuccessMessage doSave(@RequestBody DownloadQueue body
 
@@ -150,7 +150,7 @@ public class DownloadQueueAction {
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
 		@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
@@ -170,7 +170,7 @@ public class DownloadQueueAction {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "taggingModelId", value = "模型主键编码", dataType ="Long", paramType = "path"),
 	})
-	@Security(session=false)
+	@Security(session=false,allowResources = {"lableImage"})
 	@RequestMapping(value="/dowloadToLocal/{taggingModelId}", method=RequestMethod.GET)
 	public void doExport(
 			@PathVariable(value="taggingModelId")Long taggingModelId,

@@ -36,7 +36,7 @@ public class HotTagsTop {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = {"tagPanel"})
     @ResponseBody
     @RequestMapping(value = "getsamedayhottags" ,method = RequestMethod.GET)
     public  Object getHotTags()throws Exception{
@@ -54,7 +54,7 @@ public class HotTagsTop {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = {"tagPanel"})
     @ResponseBody
     @RequestMapping(value = "getyesterdayhottags" ,method = RequestMethod.GET)
     public  Object getYesterdayHotTags()throws Exception{
@@ -72,7 +72,7 @@ public class HotTagsTop {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = {"tagPanel"})
     @ResponseBody
     @RequestMapping(value = "getlastweekhottags" ,method = RequestMethod.GET)
     public  Object getLastweekHotTags()throws Exception{
@@ -90,7 +90,7 @@ public class HotTagsTop {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = {"tagPanel"})
     @ResponseBody
     @RequestMapping(value = "getlastmonthhottags" ,method = RequestMethod.GET)
     public  Object getLastMonthHotTags()throws Exception{
@@ -109,7 +109,7 @@ public class HotTagsTop {
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
     //验证用户登录
-    @Security(session=true)
+    @Security(session=true,allowResources = {"tagPanel"})
     @ResponseBody
     @RequestMapping(value = "getlastyearhottags" ,method = RequestMethod.GET)
     public  Object getLastYearHotTags()throws Exception{

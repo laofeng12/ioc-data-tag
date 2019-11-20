@@ -100,7 +100,7 @@ public class DtCooperationAction {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效")
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public DtCooperation get(@PathVariable("id") Long id) {
         DtCooperation m = dtCooperationService.get(id);
@@ -115,7 +115,7 @@ public class DtCooperationAction {
             @ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(value = "/pagesearch", method = RequestMethod.GET)
     public TablePage<DtCooperationModelDTO> doPageSearch(@ApiIgnore() DtCooperationDBParam params, @ApiIgnore() Pageable pageable) {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -171,7 +171,7 @@ public class DtCooperationAction {
             @ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public TablePage<DtCooperationDTO> doSearch(@ApiIgnore() DtCooperationDBParam params, @ApiIgnore() Pageable pageable) throws Exception {
         return dtCooperationService.doSearch(params,pageable);
@@ -184,7 +184,7 @@ public class DtCooperationAction {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效")
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(value = "/searchcool", method = RequestMethod.POST)
 
     public DataApiResponse<DtCooperationModelDTO> doSearchCool(@RequestParam(value = "userId", required = false) Long userId) {
@@ -203,7 +203,7 @@ public class DtCooperationAction {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效")
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(value = "/searchcoofield", method = RequestMethod.POST)
 
     public DataApiResponse<DtCooperationSetCol> doSearchCooField(@ApiIgnore() DtCooperationSetColParam params) {
@@ -219,7 +219,7 @@ public class DtCooperationAction {
             @ApiImplicitParam(name = "colField", value = "协作打标字段名称", required = true, dataType = "Long", paramType = "query"),
 
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(value = "/taggroup", method = RequestMethod.POST)
     public List<TagDTOTreeNodeShow2> tagGroup(@RequestParam(value = "modelId", required = true) Long modelId, @RequestParam(value = "colField", required = true) Long colField) {
         List<DtTagGroup> result = dtCooperationService.findCurrentUserTagGroup(modelId, colField);
@@ -252,7 +252,7 @@ public class DtCooperationAction {
      * 保存
      */
     @ApiOperation(value = "保存单个协作用户", nickname = "save", notes = "报文格式：content-type=application/json")
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public SuccessMessage doSave(@RequestBody CooperationSaveDTO body
     ) throws Exception {
@@ -309,7 +309,7 @@ public class DtCooperationAction {
      * 保存
      */
     @ApiOperation(value = "保存协作成员", nickname = "save", notes = "报文格式：content-type=application/json")
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(value = "/dosave", method = RequestMethod.POST)
     public SuccessMessage doCoolSave(@RequestBody List<DtCooperationListDTO> body) throws Exception {
         if(null == body || body.size() ==0 ){
@@ -325,7 +325,7 @@ public class DtCooperationAction {
             @ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
             @ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(method = RequestMethod.DELETE)
     public SuccessMessage doDelete(
             @RequestParam(value = "id", required = false) Long id,

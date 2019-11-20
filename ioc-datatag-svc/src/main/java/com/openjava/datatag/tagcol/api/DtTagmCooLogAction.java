@@ -69,7 +69,7 @@ public class DtTagmCooLogAction {
 	@ApiResponses({
 		@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
 	public DtTagmCooLog get(@PathVariable("id")Long id) {
 		DtTagmCooLog m = dtTagmCooLogService.get(id);
@@ -82,7 +82,7 @@ public class DtTagmCooLogAction {
 		@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
 		@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/search",method=RequestMethod.GET)
 	public TablePage<DtTagmCooLog> doSearch(@ApiIgnore() DtTagmCooLogDBParam params, @ApiIgnore() Pageable pageable){
 		Page<DtTagmCooLog> result =  dtTagmCooLogService.query(params, pageable);
@@ -96,7 +96,7 @@ public class DtTagmCooLogAction {
 	 * 保存
 	 */
 	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(method=RequestMethod.POST)
 	public SuccessMessage doSave(@RequestBody DtTagmCooLog body
 
@@ -125,7 +125,7 @@ public class DtTagmCooLogAction {
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
 		@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
