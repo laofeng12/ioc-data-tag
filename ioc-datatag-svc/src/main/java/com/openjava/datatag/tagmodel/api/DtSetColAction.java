@@ -63,7 +63,7 @@ public class DtSetColAction {
 	 */
 	@ApiOperation(value = "字段设置确认选择接口", nickname="save", notes = "新增格式：{\"resourceId\":1,\"resourceName\":\"高考数据\",\"resourceType\":1,\"pkey\":\"user_name\",\"colList\":[{\"sourceCol\":\"user_name\",\"sourceDataType\":\"String\",\"isMarking\":1}]}" +
 			"修改的格式：{\"taggingModelId\":1,\"pkey\":\"userId2\",\"resourceId\":1,\"resourceName\":\"高考数据233\",\"resourceType\":1,\"colList\":[{\"colId\":1,\"taggingModelId\":1,\"sourceCol\":\"name\",\"sourceDataType\":\"String\",\"isMarking\":1},{\"sourceCol\":\"userId2\",\"sourceDataType\":\"Long\",\"isMarking\":1}]}")
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/selectCol", method=RequestMethod.POST)
 	public SelectColSuccessDTO selectCol(@RequestBody DtTaggingModelDTO body,
 									HttpServletRequest request) throws Exception{
@@ -92,7 +92,7 @@ public class DtSetColAction {
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
 		@ApiImplicitParam(name = "ids", value = "批量删除用，多个主键编码用,分隔", required = false, paramType = "delete"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/delete",method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
@@ -109,7 +109,7 @@ public class DtSetColAction {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/clone",method=RequestMethod.POST)
 	public SuccessMessage clone(@RequestParam(value="colId",required=true)Long colId,
 								HttpServletRequest request)throws Exception{
@@ -122,7 +122,7 @@ public class DtSetColAction {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/getHistoryCol",method=RequestMethod.GET)
 	public GetHistoryColDTO getHistoryCol(@RequestParam(value="colId",required=true)Long colId)throws Exception{
 		return dtSetColService.getHistoryCol(colId);
@@ -138,7 +138,7 @@ public class DtSetColAction {
 	@ApiImplicitParams({
 //			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/saveCondition",method=RequestMethod.POST)
 	public DataApiResponse<Object> saveCondition(@RequestBody SaveConditionDTO req,
 												 HttpServletRequest request)throws Exception{

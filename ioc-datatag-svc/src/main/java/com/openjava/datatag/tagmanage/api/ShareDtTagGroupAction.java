@@ -49,7 +49,7 @@ public class ShareDtTagGroupAction {
             @ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = {"tagManage"})
     @RequestMapping(method= RequestMethod.GET)
     public Page<DtShareTagGroup> doSearchShare(@ApiIgnore @RequestParam(value = "searchKey",required = false) String searchKey,
                                                @ApiIgnore() Pageable pageable)throws Exception{
@@ -69,7 +69,7 @@ public class ShareDtTagGroupAction {
             @io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
             @io.swagger.annotations.ApiResponse(code= MyErrorConstants.SHARE_TAG_GROUP_NOT_FOUND, message="无此标签组或未共享")
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = {"tagManage"})
     @RequestMapping(method=RequestMethod.POST)
     public SuccessMessage doChooseShareTagGroup(
             @RequestParam(value="id",required=false)Long id,

@@ -69,7 +69,7 @@ public class DtTagConditionAction {
 	@ApiResponses({
 		@io.swagger.annotations.ApiResponse(code=20020, message="会话失效")
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
 	public DtTagCondition get(@PathVariable("id")Long id) {
 		DtTagCondition m = dtTagConditionService.get(id);
@@ -86,7 +86,7 @@ public class DtTagConditionAction {
 		@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
 		@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/search",method=RequestMethod.GET)
 	public TablePage<DtTagCondition> doSearch(@ApiIgnore() DtTagConditionDBParam params, @ApiIgnore() Pageable pageable){
 		Page<DtTagCondition> result =  dtTagConditionService.query(params, pageable);
@@ -100,7 +100,7 @@ public class DtTagConditionAction {
 	 * 保存
 	 */
 	@ApiOperation(value = "保存", nickname="save", notes = "报文格式：content-type=application/json")
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(method=RequestMethod.POST)
 	public SuccessMessage doSave(@RequestBody DtTagCondition body
 

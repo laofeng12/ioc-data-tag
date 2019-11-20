@@ -53,7 +53,7 @@ public class MyDtTagGroupAction {
 			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="无权限查看")
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"tagManage"})
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
 	public DtTagGroup get(@PathVariable("id")Long id) throws APIException {
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -75,7 +75,7 @@ public class MyDtTagGroupAction {
 			@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
 			@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"tagManage"})
 	@RequestMapping(method=RequestMethod.GET)
 	public TablePage<DtTagGroup> doSearch(@ApiIgnore() DtTagGroupDBParam params,
 										  @ApiIgnore() Pageable pageable,
@@ -103,7 +103,7 @@ public class MyDtTagGroupAction {
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.TAG_GROUP_NOT_FOUND, message="无此标签组或已被删除"),
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="无权限删除")
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"tagManage"})
 	@RequestMapping(method=RequestMethod.DELETE)
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
@@ -129,7 +129,7 @@ public class MyDtTagGroupAction {
 	 * 保存
 	 */
 	@ApiOperation(value = "修改标签组:标签组名-简介-共享状态/新建标签组", nickname="save", notes = "报文格式：content-type=application/json")
-	@Security(session=true)
+	@Security(session=true,allowResources = {"tagManage"})
 	@RequestMapping(method=RequestMethod.POST)
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code=20020, message="会话失效"),
