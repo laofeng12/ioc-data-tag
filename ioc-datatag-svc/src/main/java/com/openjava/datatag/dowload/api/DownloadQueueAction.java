@@ -170,7 +170,7 @@ public class DownloadQueueAction {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "taggingModelId", value = "模型主键编码", dataType ="Long", paramType = "path"),
 	})
-	@Security(session=false,allowResources = {"lableImage"})
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/dowloadToLocal/{taggingModelId}", method=RequestMethod.GET)
 	public void doExport(
 			@PathVariable(value="taggingModelId")Long taggingModelId,
