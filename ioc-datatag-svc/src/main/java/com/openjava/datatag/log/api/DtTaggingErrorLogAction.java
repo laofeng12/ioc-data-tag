@@ -48,7 +48,7 @@ public class DtTaggingErrorLogAction {
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "taggingModelId", value = "模型主键=", required = false, dataType = "Long", paramType = "path"),
 	})
-	@Security(session=true)
+	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/{taggingModelId}",method=RequestMethod.GET)
 	public String doSearch(@PathVariable("taggingModelId") Long taggingModelId){
 		DtTaggingErrorLog log=  dtTaggingErrorLogService.getByTaggingModelIdOrderByErrorTimeDesc(taggingModelId);
