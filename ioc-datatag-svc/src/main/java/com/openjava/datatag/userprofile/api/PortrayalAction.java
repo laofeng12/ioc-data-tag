@@ -41,7 +41,7 @@ public class PortrayalAction {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效")
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"portraitQuery"})
     @RequestMapping(value = "/search/{id}", method = RequestMethod.GET)
     public DataApiResponse<PortrayalDetailDTO> doSearchCool(@PathVariable(value = "id") String id) throws Exception{
         DataApiResponse<PortrayalDetailDTO> resp = new DataApiResponse<>();
@@ -57,7 +57,7 @@ public class PortrayalAction {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效")
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage","portraitQuery"})
     @RequestMapping(value = "/getCoolDetail/{tableName}/{pKey}", method = RequestMethod.GET)
     public DataApiResponse<PortrayalDetailDTO> getCoolDetail(
             @PathVariable(value = "tableName") String tableName,

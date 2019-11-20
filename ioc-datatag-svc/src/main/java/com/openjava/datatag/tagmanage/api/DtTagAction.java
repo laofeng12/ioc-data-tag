@@ -65,7 +65,7 @@ public class DtTagAction {
             @io.swagger.annotations.ApiResponse(code = MyErrorConstants.PUBLIC_NO_AUTHORITY, message = "无权限查看"),
             @io.swagger.annotations.ApiResponse(code = MyErrorConstants.PUBLIC_ERROE, message = "其他异常"),
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"tagManage"})
     @RequestMapping(method = RequestMethod.POST)
     public SuccessMessage doSaveOrEdit(@RequestBody DtTag body,
                                  HttpServletRequest request) throws Exception {
@@ -84,7 +84,7 @@ public class DtTagAction {
             @io.swagger.annotations.ApiResponse(code = MyErrorConstants.TAG_NOT_FOUND, message = "无此标签或已被删除"),
             @io.swagger.annotations.ApiResponse(code = MyErrorConstants.PUBLIC_NO_AUTHORITY, message = "无权限查看")
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"tagManage"})
     @RequestMapping(method = RequestMethod.DELETE)
     public SuccessMessage doDelete(
             @RequestParam(value = "id", required = false) Long id,
@@ -120,7 +120,7 @@ public class DtTagAction {
             @io.swagger.annotations.ApiResponse(code = MyErrorConstants.TAG_GROUP_NOT_FOUND, message = "无此标签组或已被删除"),
             @io.swagger.annotations.ApiResponse(code = MyErrorConstants.PUBLIC_NO_AUTHORITY, message = "无权限查看")
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"tagManage"})
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public TagDTOTreeNodeShow getTree(@PathVariable("id") Long id) throws Exception {
         return dtTagService.getTree(id);
@@ -139,7 +139,7 @@ public class DtTagAction {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效"),
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"lableImage","tagManage"})
     @RequestMapping(value = "/getAllTree", method = RequestMethod.GET)
     public List<TagDTOTreeNodeShow2> getTreeByTagsId(@ApiIgnore() Pageable pageable) throws Exception {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
@@ -197,7 +197,7 @@ public class DtTagAction {
             @io.swagger.annotations.ApiResponse(code = MyErrorConstants.TAG_NOT_FOUND, message = "无此标签或已被删除"),
             @io.swagger.annotations.ApiResponse(code = MyErrorConstants.PUBLIC_NO_AUTHORITY, message = "无权限查看")
     })
-    @Security(session = true)
+    @Security(session = true,allowResources = {"tagManage"})
     @RequestMapping(value = "/table/{id}", method = RequestMethod.GET)
     public DtTagTableDTO get(@PathVariable("id") Long id) throws APIException {
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();

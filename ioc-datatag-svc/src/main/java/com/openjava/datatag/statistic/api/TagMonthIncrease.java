@@ -39,7 +39,7 @@ public class TagMonthIncrease {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = "tagPanel")
     @ResponseBody
     @RequestMapping(value = "/datasetgrowth",method = RequestMethod.GET)
     public DataApiResponse<DtTaggingModelTemp> getDataSetGrowth()throws Exception{
@@ -59,7 +59,7 @@ public class TagMonthIncrease {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = "tagPanel")
     @ResponseBody
     @RequestMapping(value = "/getLastMonthTagSum",method = RequestMethod.GET)
     public Object getLastMonthTagSum()throws Exception{
@@ -78,7 +78,7 @@ public class TagMonthIncrease {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = {"tagPanel"})
     @ResponseBody
     @RequestMapping(value = "/getTagThanDataSet",method = RequestMethod.GET)
     public Object getTagThanDataSet()throws Exception{

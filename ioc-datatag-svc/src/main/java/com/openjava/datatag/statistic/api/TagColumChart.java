@@ -41,7 +41,7 @@ public class TagColumChart {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = {"tagPanel"})
     @ResponseBody
     @RequestMapping(value = "getMonthlyLabelChanges",method = RequestMethod.GET)
     public Object getMonthlyLabelChanges() throws Exception{
@@ -59,7 +59,7 @@ public class TagColumChart {
     @ApiResponses({
             @io.swagger.annotations.ApiResponse(code=200, message="数据获取成功"),
     })
-    @Security(session=true)
+    @Security(session=true,allowResources = {"tagPanel"})
     @ResponseBody
     @RequestMapping(value = "getAllYearMonth",method = RequestMethod.GET)
     public Object getLeftListData()throws Exception{
