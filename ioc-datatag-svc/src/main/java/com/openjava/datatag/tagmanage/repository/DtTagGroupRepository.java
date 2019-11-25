@@ -1,7 +1,11 @@
 package com.openjava.datatag.tagmanage.repository;
 
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmanage.dto.ShareTopDTO;
+import com.openjava.datatag.tagmanage.dto.ShareTopListDTO;
 import org.ljdp.core.spring.data.DynamicJpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -33,4 +37,9 @@ public interface DtTagGroupRepository extends DynamicJpaRepository<DtTagGroup, L
 
     @Query(value = "select max (t.popularity) from DtTagGroup t  where t.isDeleted=:isDeleted and t.isShare=:isShare")
     Long findMaxPopularityBytagsIdAAndIsDeletedAAndIsShare(Long isDeleted,Long isShare);
+
+    @Query(value = "SELECT t.POPULARITY,t.TAGS_NAME,t.id FROM DT_TAG_GROUP t WHERE t.IS_DELETED !=1 order by t.POPULARITY desc nulls last",
+            countQuery = "SELECT count(1) from DT_TAG_GROUP t WHERE t.IS_DELETED !=1",
+            nativeQuery = true)
+    Page<Object[]> getShareTopList(Pageable pageable);
 }

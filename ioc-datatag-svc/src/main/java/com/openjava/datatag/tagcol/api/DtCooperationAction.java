@@ -338,4 +338,19 @@ public class DtCooperationAction {
         return new SuccessMessage("删除成功");//没有需要返回的数据，就直接返回一条消息
     }
 
+    @ApiOperation(value = "根据协作id获取协作字段信息", notes = "结果对象数组")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "协作id", required = false, dataType = "Long", paramType = "path"),
+    })
+    @ApiResponses({
+            @io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效")
+    })
+    @Security(session = true)
+    @RequestMapping(value = "/getColList/{id}", method = RequestMethod.POST)
+    public DataApiResponse<ColListDTO> getColList(@PathVariable("id") Long id) {
+        ColListDTO result = dtCooperationService.getColList(id);
+        DataApiResponse<ColListDTO> resp = new DataApiResponse<>();
+        resp.setData(result);
+        return resp;
+    }
 }

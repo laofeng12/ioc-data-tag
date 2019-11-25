@@ -65,4 +65,10 @@ public interface DtCooperationRepository extends DynamicJpaRepository<DtCooperat
             ,nativeQuery = true)
     Long findCooUserTagGroup(@Param("userId")Long userId, @Param("tagGroupId") Long tagGroupId);
 
+    /**
+     *根据协作表ID获取模型名称
+     */
+    @Query(value =" select t.modelName from DtTaggingModel t,DtCooperation t2 where t.taggingModelId=t2.taggmId and t2.id=:coolId")
+    String getModelNameBycooId(@Param("coolId")Long coolId);
+
 }
