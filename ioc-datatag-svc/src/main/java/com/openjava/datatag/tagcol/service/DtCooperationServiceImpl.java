@@ -20,15 +20,18 @@ import com.openjava.datatag.tagcol.query.DtCooTagcolLimitDBParam;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
+import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
+import com.openjava.datatag.tagmodel.service.DtSetColService;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
 import com.openjava.datatag.user.domain.SysUser;
 import com.openjava.datatag.user.service.SysUserService;
 import com.openjava.datatag.utils.TimeUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.C;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.exception.APIException;
@@ -75,7 +78,8 @@ public class DtCooperationServiceImpl implements DtCooperationService {
     private JpaMultiDynamicQueryDAO dao;
     @Resource
     private AuditComponet auditComponet;
-
+    @Resource
+    private DtSetColService dtSetColService;
     @PersistenceContext
     public void setEntityManager(EntityManager em) {
         this.em = em;
@@ -532,5 +536,23 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         }
         Page<DtCooperationDTO> showResult = new PageImpl<>(dtoList, pageable, dtoList.size());
         return new TablePageImpl<>(showResult);
+    }
+    public ColListDTO getColList(Long id){
+        List<DtCooTagcolLimit> results = dtCooTagcolLimitService.findByColId(id);
+        String modelName =  dtCooperationRepository.getModelNameBycooId(id);
+        ColListDTO colListDTO = new ColListDTO();
+        colListDTO.setModelName(modelName);
+        List<ColDTO> list = new ArrayList<>();
+        for (DtCooTagcolLimit limit:results) {
+            ColDTO col = new ColDTO();
+            col.setTagColName(limit.getTagColName());//标签名称
+            DtSetCol dtSetCol =  dtSetColService.get(limit.getTagColId());
+            col.setColTye(dtSetCol.getSourceDataType());//标签类型
+            DtTagGroup dtTagGroup = dtTagGroupService.get(limit.getUseTagGroup());//获取标签组
+            col.setColGroupName(dtTagGroup.getTagsName());//标签组名称
+            list.add(col);
+        }
+        colListDTO.setColList(list);
+        return colListDTO;
     }
 }
