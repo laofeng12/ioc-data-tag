@@ -4,12 +4,15 @@ import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmanage.dto.DtTagGroupSaveDTO;
+import com.openjava.datatag.tagmanage.dto.ShareTopDTO;
+import com.openjava.datatag.tagmanage.dto.ShareTopListDTO;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.utils.IpUtil;
 import io.swagger.annotations.*;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.exception.APIException;
+import org.ljdp.component.result.DataApiResponse;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.annotation.Security;
@@ -25,6 +28,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 
 /**
@@ -169,5 +173,26 @@ public class MyDtTagGroupAction {
 				throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"没有修改此标签组的权限");
 			}
 		}
+	}
+
+	/**
+	 * 查看签组共享榜单
+	 * @return
+	 */
+	@ApiOperation(value = "查看签组共享榜单", notes = "查看签组共享榜单", nickname = "getShareTopList")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
+	})
+	@ApiResponses({
+			@io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效"),
+	})
+	@Security(session = true,allowResources = {"tagManage"})
+	@RequestMapping(value = "/getShareTopList", method = RequestMethod.GET)
+	public DataApiResponse<List<ShareTopDTO>> getShareTopList(@ApiIgnore() Pageable pageable) {
+		List<ShareTopDTO> result = dtTagGroupService.getShareTopList(pageable);
+		DataApiResponse data = new DataApiResponse<List<ShareTopDTO>>();
+		data.setData(result);
+		return data;
 	}
 }

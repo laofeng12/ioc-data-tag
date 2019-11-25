@@ -1,6 +1,8 @@
 package com.openjava.datatag.tagmanage.service;
 
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmanage.dto.ShareTopDTO;
+import com.openjava.datatag.tagmanage.dto.ShareTopListDTO;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,4 +35,5 @@ public interface DtTagGroupService {
 
 	Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable)throws Exception;
 
+	List<ShareTopDTO> getShareTopList(Pageable pageable);
 }

@@ -6,6 +6,8 @@ import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.log.service.DtTaggUpdateLogService;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import com.openjava.datatag.tagmanage.dto.ShareTopDTO;
+import com.openjava.datatag.tagmanage.dto.ShareTopListDTO;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
 import org.apache.commons.collections.CollectionUtils;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -195,7 +198,23 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		}
 		return denominator;
 	}
+	public List<ShareTopDTO> getShareTopList(Pageable pageable){
+		List<ShareTopDTO> list = new ArrayList<>();
+		Page<Object[]>  topListDTOPage = dtTagGroupRepository.getShareTopList(pageable);
+		if (CollectionUtils.isNotEmpty(topListDTOPage.getContent())){
 
+			for (Object[] ob:topListDTOPage.getContent()) {
+				ShareTopDTO shareTop = new ShareTopDTO();
+				BigDecimal heat = (BigDecimal) ob[0];
+				shareTop.setHeat(heat.longValue());//使用热度
+				shareTop.setName((String) ob[1]);//表签组名称
+				BigDecimal id = (BigDecimal) ob[2];
+				shareTop.setId(id.longValue());//表签组id
+				list.add(shareTop);
+			}
+		}
+		return  list;
+	}
 	public static void main(String[] args) {
 		System.out.println(getDenominator(10001L));
 	}
