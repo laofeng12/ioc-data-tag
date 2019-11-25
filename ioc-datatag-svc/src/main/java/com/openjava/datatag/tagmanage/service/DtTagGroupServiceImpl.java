@@ -17,6 +17,7 @@ import org.ljdp.component.sequence.SequenceService;
 import org.ljdp.component.user.BaseUserInfo;
 import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -198,7 +199,8 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		}
 		return denominator;
 	}
-	public List<ShareTopDTO> getShareTopList(Pageable pageable){
+	public List<ShareTopDTO> getShareTopList(int top){
+		Pageable pageable = PageRequest.of(0, top);//
 		List<ShareTopDTO> list = new ArrayList<>();
 		Page<Object[]>  topListDTOPage = dtTagGroupRepository.getShareTopList(pageable);
 		if (CollectionUtils.isNotEmpty(topListDTOPage.getContent())){
