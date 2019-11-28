@@ -35,5 +35,5 @@ public interface DtTagGroupService {
 
 	Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable)throws Exception;
 
-	List<ShareTopDTO> getShareTopList(Pageable pageable);
+	List<ShareTopDTO> getShareTopList(int top);
 }

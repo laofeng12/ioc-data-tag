@@ -4,10 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
-import com.openjava.datatag.tagcol.dto.DtCooperationDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationListDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationModelDTO;
-import com.openjava.datatag.tagcol.dto.DtCooperationSetCol;
+import com.openjava.datatag.tagcol.dto.*;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
 import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
@@ -54,4 +51,6 @@ public interface DtCooperationService {
 
     void doRemove(String ids);
     TablePage<DtCooperationDTO> doSearch(DtCooperationDBParam params, Pageable pageable) throws Exception;
+
+    ColListDTO getColList(Long id);
 }

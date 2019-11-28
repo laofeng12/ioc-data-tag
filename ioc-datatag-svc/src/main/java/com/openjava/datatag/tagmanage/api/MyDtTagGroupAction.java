@@ -181,16 +181,15 @@ public class MyDtTagGroupAction {
 	 */
 	@ApiOperation(value = "查看签组共享榜单", notes = "查看签组共享榜单", nickname = "getShareTopList")
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "top", value = "榜单个数", required = false, dataType = "int", paramType = "query"),
 	})
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code = 20020, message = "会话失效"),
 	})
 	@Security(session = true,allowResources = {"tagManage"})
 	@RequestMapping(value = "/getShareTopList", method = RequestMethod.GET)
-	public DataApiResponse<List<ShareTopDTO>> getShareTopList(@ApiIgnore() Pageable pageable) {
-		List<ShareTopDTO> result = dtTagGroupService.getShareTopList(pageable);
+	public DataApiResponse<List<ShareTopDTO>> getShareTopList(@RequestParam("top") int top) {
+		List<ShareTopDTO> result = dtTagGroupService.getShareTopList(top);
 		DataApiResponse data = new DataApiResponse<List<ShareTopDTO>>();
 		data.setData(result);
 		return data;
