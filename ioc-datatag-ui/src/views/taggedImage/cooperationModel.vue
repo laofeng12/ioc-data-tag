@@ -298,8 +298,9 @@
 
   .iconLogo {
     font-size: 18px;
-    margin-left: 10px;
+    /*margin-left: 10px;*/
     cursor: pointer;
+    color: #0486FE;
   }
 
   .controlChoose, .dateInp {

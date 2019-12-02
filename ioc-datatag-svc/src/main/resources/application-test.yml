@@ -78,8 +78,8 @@ ljdp:
     local-temp-path: C:/temp
     localPath: ioc-datatag
   dfs:
-    ftp2http-proxy: http://183.6.55.26:31075/ftp
-    ftp2http-download: http://183.6.55.26:31075/ljdp/dfs/downloadByFid.act?fid=
+    ftp2http-proxy: http://219.135.182.2:31075/ftp
+    ftp2http-download: http://219.135.182.2:31075/ljdp/dfs/downloadByFid.act?fid=
   fileupload:
     # 覆盖batch.fileupload.path配置
     local-path: /tmp

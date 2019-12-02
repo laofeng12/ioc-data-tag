@@ -254,8 +254,10 @@
   }
   .iconLogo {
     font-size: 18px;
-    margin-left: 24px;
+    /*margin-left: 24px;*/
     cursor: pointer;
+    margin-right: 16px;
+    color: #0486FE;
   }
   .area,.dateInp{
     width: 360px;
