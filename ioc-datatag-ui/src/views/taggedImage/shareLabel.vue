@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
-    <div class="actionBar">
+    <div class="clearfix">
+      <div class="searchBar">
         <el-input
           class="zxinp tagSelect"
           size="small"
@@ -11,7 +12,10 @@
           v-model="input2">
         </el-input>
         <el-button class="zxlistBtn" size="small" type="primary" @click="shareQuery">查询</el-button>
+      </div>
+      <div class="actionBar">
         <el-button size="small" type="primary" @click="createLabel">我的标签组</el-button>
+      </div>
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -20,31 +24,34 @@
                   :header-cell-style="{background:'#f0f2f5'}">
           <template slot="empty">
             <div v-if="Loading">
-              <div v-loading="saveLoading2" ></div>
+              <div v-loading="saveLoading2"></div>
             </div>
             <div v-else>暂无数据</div>
           </template>
           <el-table-column prop="tagsName" label="标签组名称"></el-table-column>
-          <el-table-column prop="source" label="选用热度" >
+          <el-table-column prop="source" label="选用热度">
             <template slot-scope="scope">
               <div class="gress">
-                <div class="gressPercentage"><el-progress :percentage="scope.row.percentage" :show-text="false" :color="customColorMethod"></el-progress></div>
+                <div class="gressPercentage">
+                  <el-progress :percentage="scope.row.percentage" :show-text="false"
+                               :color="customColorMethod"></el-progress>
+                </div>
                 <div>{{scope.row.popularity}}</div>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="level1" label="单位" ></el-table-column>
+          <el-table-column prop="level1" label="单位"></el-table-column>
           <el-table-column prop="synopsis" label="标签组简介"></el-table-column>
           <!--<el-table-column prop="people" label="共享人/更新时间" >-->
-            <!--<template slot-scope="scope">-->
-              <!--<div>-->
-                <!--<div>{{scope.row.shareUserName}}</div>-->
-                <!--<div>{{scope.row.modifyTime}}</div>-->
-              <!--</div>-->
-            <!--</template>-->
+          <!--<template slot-scope="scope">-->
+          <!--<div>-->
+          <!--<div>{{scope.row.shareUserName}}</div>-->
+          <!--<div>{{scope.row.modifyTime}}</div>-->
+          <!--</div>-->
+          <!--</template>-->
           <!--</el-table-column>-->
-          <el-table-column prop="shareUserName" label="共享人" ></el-table-column>
-          <el-table-column prop="modifyTime" label="更新时间" ></el-table-column>
+          <el-table-column prop="shareUserName" label="共享人"></el-table-column>
+          <el-table-column prop="modifyTime" label="更新时间"></el-table-column>
           <el-table-column label="操作" width="125px">
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="查看" placement="top">
@@ -71,17 +78,19 @@
           @handleCurrentChange="handleCurrentChange"
         ></element-pagination>
       </div>
-      <el-dialog class="creat" title="选用标签组" :visible.sync="labelDialog" width="530px" center :close-on-click-modal="false"
+      <el-dialog class="creat" title="选用标签组" :visible.sync="labelDialog" width="530px" center
+                 :close-on-click-modal="false"
                  @close="closelabelDialog">
         <div class="del-dialog-cnt">
           <el-form label-width="80px">
-            <el-form-item >您正在选用{{this.selectiontagsName}}，是否确认选用？</el-form-item>
+            <el-form-item>您正在选用{{this.selectiontagsName}}，是否确认选用？</el-form-item>
           </el-form>
         </div>
         <div slot="footer" class="dialog-footer device">
           <div>
-            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureOk">确定选用</el-button>
-            <el-button size="small"  class="queryBtn" @click="cancelNo">取消</el-button>
+            <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="sureOk">确定选用
+            </el-button>
+            <el-button size="small" class="queryBtn" @click="cancelNo">取消</el-button>
           </div>
         </div>
       </el-dialog>
@@ -90,26 +99,27 @@
 </template>
 
 <script>
-  import {shareSearch,changeSelection} from '@/api/shareLabel.js'
+  import {shareSearch, changeSelection} from '@/api/shareLabel.js'
   import ElementPagination from '@/components/ElementPagination'
+
   export default {
     components: {ElementPagination},
     name: "tagManage",
     data() {
       return {
-        page:0,
-        size:10,
-        totalnum:0,
+        page: 0,
+        size: 10,
+        totalnum: 0,
         input2: '',
-        Loading:true,
-        saveLoading2:true,
-        shareDialog:false,
-        saveLoading:false,
-        labelDialog:false,
-        selectionId:'',
-        selectiontagsName:'',
+        Loading: true,
+        saveLoading2: true,
+        shareDialog: false,
+        saveLoading: false,
+        labelDialog: false,
+        selectionId: '',
+        selectiontagsName: '',
         percentage: 0,
-        ztableShowList:[],
+        ztableShowList: [],
       }
     },
     methods: {
@@ -122,79 +132,80 @@
           return '#67c23a';
         }
       },
-      handleShare(){
+      handleShare() {
         this.shareDialog = true
       },
-      closeShare(){
+      closeShare() {
         this.shareDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      closeShare2(){
+      closeShare2() {
         this.shareDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      cancelShare(){
+      cancelShare() {
         this.shareDialog = false
         this.$refs.ruleForm.resetFields()
       },
-      createLabel(){
+      createLabel() {
         this.$router.push('tagManage')
       },
-      async handleSearch(){
-        try{
+      async handleSearch() {
+        try {
           const search = await shareSearch({
-            page:this.page,
-            searchKey:this.input2,
-            size:this.size
+            page: this.page,
+            searchKey: this.input2,
+            size: this.size
           })
-          this.ztableShowList = search.content?search.content:[]
+          this.ztableShowList = search.content ? search.content : []
           this.totalnum = search.totalElements
-          if(search.content&&search.content.length > 0){
+          if (search.content && search.content.length > 0) {
             search.content.forEach(item => {
-              if(item.popularityLevel == 0){
+              if (item.popularityLevel == 0) {
                 item.popularityLevel = 0
-              }else if(item.popularityLevel == 1){
+              } else if (item.popularityLevel == 1) {
                 item.popularityLevel = 25
-              }else if(item.popularityLevel == 2){
+              } else if (item.popularityLevel == 2) {
                 item.popularityLevel = 50
-              }else if(item.popularityLevel == 3){
+              } else if (item.popularityLevel == 3) {
                 item.popularityLevel = 75
-              }else{
+              } else {
                 item.popularityLevel = 100
               }
             })
-          }else {
+          } else {
             this.Loading = false
           }
-        }catch (e) {
+        } catch (e) {
           console.log(e);
           this.Loading = false
         }
       },
-      handleCurrentChange(page){
-        this.page = page-1
+      handleCurrentChange(page) {
+        this.page = page - 1
         this.handleSearch()
       },
-      handleSizeChange (size) {
+      handleSizeChange(size) {
         this.size = size
         this.handleSearch()
       },
-      shareQuery(){
+      shareQuery() {
         this.page = 0
         this.handleSearch()
       },
-      goPage(){},
-      Selection(id,name){
+      goPage() {
+      },
+      Selection(id, name) {
         this.labelDialog = true
         this.selectionId = id
         this.selectiontagsName = name
       },
-      closelabelDialog(){
+      closelabelDialog() {
         this.labelDialog = false
       },
-      async sureOk(){
+      async sureOk() {
         this.saveLoading = true
-        try{
+        try {
           const res = await changeSelection({
             id: this.selectionId
           })
@@ -205,24 +216,20 @@
           this.saveLoading = false
           this.labelDialog = false
           this.$router.push('/tagManage')
-        }catch (e) {
+        } catch (e) {
           this.saveLoading = false
           console.log(e);
         }
       },
-      cancelNo(){
+      cancelNo() {
         this.labelDialog = false
       }
     },
     created() {
       this.handleSearch()
     },
-    computed: {
-
-    },
-    watch: {
-
-    },
+    computed: {},
+    watch: {},
     mounted() {
     }
   }
@@ -232,34 +239,48 @@
   .zxinp {
     width: 240px;
   }
+
   .zxlistBtn {
     margin-right: 10px;
   }
-  .actionBar{
-    display: flex;
-    justify-content: flex-end;
+
+  .actionBar {
+    float: right;
   }
-  .tagSelect{
-    margin-left: 10px;
+
+  .searchBar {
+    float: left;
+  }
+
+  .tagSelect {
     margin-right: 10px;
   }
-  .gress{
+
+  .gress {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-around;
   }
-  .gressPercentage{
+
+  .gressPercentage {
     width: 60%;
   }
+
   .iconLogo {
     font-size: 18px;
-    /*margin-left: 24px;*/
     cursor: pointer;
     margin-right: 16px;
     color: #0486FE;
   }
-  .area,.dateInp{
+
+  .area, .dateInp {
     width: 360px;
+  }
+
+  .clearfix:after {
+    content: "";
+    display: block;
+    clear: both;
   }
 </style>

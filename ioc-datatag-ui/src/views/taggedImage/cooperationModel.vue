@@ -1,28 +1,32 @@
 <template>
   <div class="app-container">
-    <div class="actionBar">
-      <el-input
-        class="zxinp moduleOne"
-        size="small"
-        clearable
-        placeholder="请输入模型名称或发起人"
-        prefix-icon="el-icon-search"
-        @keyup.enter.native="modelQuery"
-        v-model="input2">
-      </el-input>
-      <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-      <el-button size="small" type="primary" @click="modelQuery">查询</el-button>
-      <el-button class="zxlistBtn" size="small" type="primary" @click="createLabel">创建标签组</el-button>
-      <router-link to="/lableImage">
-        <el-button size="small" type="primary">我的模型</el-button>
-      </router-link>
+    <div class="clearfix">
+      <div class="searchBar">
+        <el-input
+          class="zxinp moduleOne"
+          size="small"
+          clearable
+          placeholder="请输入模型名称或发起人"
+          prefix-icon="el-icon-search"
+          @keyup.enter.native="modelQuery"
+          v-model="input2">
+        </el-input>
+        <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+        <el-button size="small" type="primary" @click="modelQuery">查询</el-button>
+      </div>
+      <div class="actionBar">
+        <el-button class="zxlistBtn" size="small" type="primary" @click="createLabel">创建标签组</el-button>
+        <router-link to="/lableImage">
+          <el-button size="small" type="primary">我的模型</el-button>
+        </router-link>
+      </div>
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -52,12 +56,12 @@
             </template>
           </el-table-column>
           <!--<el-table-column prop="people" label="发起人/发起时间">-->
-            <!--<template slot-scope="scope">-->
-              <!--<div>-->
-                <!--<div>{{scope.row.createUserName}}</div>-->
-                <!--<div>{{scope.row.createTime}}</div>-->
-              <!--</div>-->
-            <!--</template>-->
+          <!--<template slot-scope="scope">-->
+          <!--<div>-->
+          <!--<div>{{scope.row.createUserName}}</div>-->
+          <!--<div>{{scope.row.createTime}}</div>-->
+          <!--</div>-->
+          <!--</template>-->
           <!--</el-table-column>-->
           <el-table-column prop="createUserName" label="发起人"></el-table-column>
           <el-table-column prop="createTime" label="发起时间"></el-table-column>
@@ -65,7 +69,8 @@
             <template slot-scope="props" class="caozuo">
               <el-tooltip class="item" effect="dark" content="打标" placement="top">
                 <span class="operationIcona">
-                    <i class="el-icon-price-tag iconLogo" @click="marking(props.row.taggingModelId,props.row.modelName)"></i>
+                    <i class="el-icon-price-tag iconLogo"
+                       @click="marking(props.row.taggingModelId,props.row.modelName)"></i>
                 </span>
               </el-tooltip>
             </template>
@@ -122,9 +127,10 @@
 </template>
 
 <script>
-  import {getcooperationList,cooperationQuery} from '@/api/cooperation.js'
-  import { getDtTagGroupData } from '@/api/tagManage'
+  import {getcooperationList, cooperationQuery} from '@/api/cooperation.js'
+  import {getDtTagGroupData} from '@/api/tagManage'
   import ElementPagination from '@/components/ElementPagination'
+
   export default {
     components: {ElementPagination},
     name: "cooperationModel",
@@ -169,7 +175,7 @@
     },
     methods: {
       stateColor(name) {
-        if (name == '已完成'){
+        if (name == '已完成') {
           return "color:#999999";
         } else if (name == '进行中') {
           return "color:#00CC33";
@@ -177,12 +183,12 @@
           return "color:#FF3333";
         }
       },
-      marking(id,name) {
+      marking(id, name) {
         this.$router.push({
-          path:'/marking',
-          query:{
-            id:id,
-            modelName:name
+          path: '/marking',
+          query: {
+            id: id,
+            modelName: name
           }
         })
       },
@@ -199,16 +205,16 @@
       },
       async modelQuery() {
         const params = {
-          eq_cooUser:'',
-          eq_taggmId:'',
-          keyWord:this.input2,
-          runState:this.value,
-          page:this.page,
-          size:this.size
+          eq_cooUser: '',
+          eq_taggmId: '',
+          keyWord: this.input2,
+          runState: this.value,
+          page: this.page,
+          size: this.size
         }
-        try{
+        try {
           const resQuery = await cooperationQuery(params)
-          if(resQuery.rows && resQuery.rows.length > 0){
+          if (resQuery.rows && resQuery.rows.length > 0) {
             resQuery.rows.forEach(item => {
               if (item.runState == 0) {
                 item.runState = '进行中'
@@ -218,12 +224,12 @@
             })
             this.ztableShowList = resQuery.rows
             this.totalnum = resQuery.total
-          }else{
+          } else {
             this.ztableShowList = []
             this.Loading = false
           }
 
-        }catch (e) {
+        } catch (e) {
 
         }
 
@@ -242,7 +248,7 @@
                   tagsName: this.ruleForm.tagsName
                 })
                 this.creatsaveLoading = false
-                this.$router.push('/labelcreatTree/' + data.id +'/'+ data.tagsName)
+                this.$router.push('/labelcreatTree/' + data.id + '/' + data.tagsName)
               } catch (e) {
                 this.creatsaveLoading = false
                 console.log(e);
@@ -256,15 +262,16 @@
           console.log(e);
         }
       },
-      handleCurrentChange(page){
-        this.page = page-1
+      handleCurrentChange(page) {
+        this.page = page - 1
         this.modelQuery()
       },
-      handleSizeChange (size) {
+      handleSizeChange(size) {
         this.size = size
         this.modelQuery()
       },
-      goPage(){},
+      goPage() {
+      },
     },
     created() {
       // this.getList()
@@ -287,8 +294,11 @@
   }
 
   .actionBar {
-    display: flex;
-    justify-content: flex-end;
+    float: right;
+  }
+
+  .searchBar {
+    float: left;
   }
 
   .tagSelect {
@@ -298,7 +308,6 @@
 
   .iconLogo {
     font-size: 18px;
-    /*margin-left: 10px;*/
     cursor: pointer;
     color: #0486FE;
   }
@@ -319,5 +328,11 @@
   .state {
     display: flex;
     align-items: center;
+  }
+
+  .clearfix:after {
+    content: "";
+    display: block;
+    clear: both;
   }
 </style>

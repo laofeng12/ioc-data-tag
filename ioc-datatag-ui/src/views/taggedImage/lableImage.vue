@@ -1,28 +1,32 @@
 <template>
   <div class="app-container">
-    <div class="actionBar">
-      <el-input
-        class="zxinp moduleOne"
-        size="small"
-        clearable
-        placeholder="请输入模型名称"
-        @keyup.enter.native="modelQuery"
-        prefix-icon="el-icon-search"
-        v-model="input2">
-      </el-input>
-      <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-      <el-button class="zxlistBtn" size="small" type="primary" @click="modelQuery">查询</el-button>
-      <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
-      <el-button size="small" type="primary" @click="createModel">创建模型</el-button>
-      <el-button size="small" type="primary" @click="cooperationModel">协作模型</el-button>
-      <el-button size="small" type="primary" @click="down">下载管理</el-button>
+    <div class="clearfix">
+      <div class="searchBar">
+        <el-input
+          class="zxinp moduleOne"
+          size="small"
+          clearable
+          placeholder="请输入模型名称"
+          @keyup.enter.native="modelQuery"
+          prefix-icon="el-icon-search"
+          v-model="input2">
+        </el-input>
+        <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+        <el-button class="zxlistBtn" size="small" type="primary" @click="modelQuery">查询</el-button>
+      </div>
+      <div class="actionBar">
+        <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
+        <el-button size="small" type="primary" @click="createModel">创建模型</el-button>
+        <el-button size="small" type="primary" @click="cooperationModel">协作模型</el-button>
+        <el-button size="small" type="primary" @click="down">下载管理</el-button>
+      </div>
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -722,8 +726,11 @@
   }
 
   .actionBar {
-    display: flex;
-    justify-content: flex-end;
+    float: right;
+  }
+
+  .searchBar {
+    float: left;
   }
 
   .tagSelect {
@@ -777,5 +784,11 @@
 
   .area {
     width: 360px;
+  }
+
+  .clearfix:after {
+    content: "";
+    display: block;
+    clear: both;
   }
 </style>
