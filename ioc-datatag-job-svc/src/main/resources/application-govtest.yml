@@ -116,13 +116,12 @@ dataSet: #数据集相关
   resourceDataUrl: http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/
 
 pgconfig:
-  password: nanjian
-  username: nanjian#2019
+  password: nanjian#2019
+  username: nanjian
   ip: 19.104.59.17
-  port: :25308
+  port: 25308
   dataBaseName: postgres
   pooled: true
-
 
 
 
