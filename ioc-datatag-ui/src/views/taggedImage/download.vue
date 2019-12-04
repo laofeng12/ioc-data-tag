@@ -1,17 +1,21 @@
 <template>
   <div class="app-container">
-    <div class="actionBar">
-      <el-input
-        class="zxinp moduleOne"
-        size="small"
-        clearable
-        placeholder="请输入查询名称"
-        prefix-icon="el-icon-search"
-        @keyup.enter.native="getQuireData"
-        v-model="input2">
-      </el-input>
-      <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
-      <el-button size="small" type="primary" @click="goback">返回</el-button>
+    <div class="clearfix">
+      <div class="searchBar">
+        <el-input
+          class="zxinp moduleOne"
+          size="small"
+          clearable
+          placeholder="请输入查询名称"
+          prefix-icon="el-icon-search"
+          @keyup.enter.native="getQuireData"
+          v-model="input2">
+        </el-input>
+        <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
+      </div>
+      <div class="actionBar">
+        <el-button size="small" type="primary" @click="goback">返回</el-button>
+      </div>
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -202,8 +206,11 @@
   }
 
   .actionBar {
-    display: flex;
-    justify-content: flex-end;
+    float: right;
+  }
+
+  .searchBar {
+    float: left;
   }
 
   .tagSelect {

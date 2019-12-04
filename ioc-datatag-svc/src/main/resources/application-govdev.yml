@@ -100,4 +100,9 @@ pgconfig:
   dataBaseName: postgres
   pooled: true
 
+platform:
+  baseUrl: http://219.135.182.2:31012
+  spUnifyWorkform: /category/workform/spUnifyWorkform
+  finish: /category/workform/spUnifyWorkform/finish/%s/%s
+  spUnifyMsgNotice: /category/workform/spUnifyMsgNotice
 
