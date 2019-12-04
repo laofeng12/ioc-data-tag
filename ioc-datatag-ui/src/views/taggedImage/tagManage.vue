@@ -1,26 +1,30 @@
 <template>
   <div class="app-container">
-    <div class="actionBar">
-      <el-input
-        class="zxinp moduleOne"
-        size="small"
-        clearable
-        placeholder="请输入内容"
-        prefix-icon="el-icon-search"
-        @keyup.enter.native="getQuireData"
-        v-model="input2">
-      </el-input>
-      <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-      <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
-      <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
-      <el-button size="small" type="primary" @click="shareLabel">共享标签组</el-button>
+    <div class="clearfix">
+      <div class="searchBar">
+        <el-input
+          class="zxinp moduleOne"
+          size="small"
+          clearable
+          placeholder="请输入内容"
+          prefix-icon="el-icon-search"
+          @keyup.enter.native="getQuireData"
+          v-model="input2">
+        </el-input>
+        <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+        <el-button class="zxlistBtn" size="small" type="primary" @click="getQuireData">查询</el-button>
+      </div>
+      <div class="actionBar">
+        <el-button size="small" type="primary" @click="createLabel">创建标签组</el-button>
+        <el-button size="small" type="primary" @click="shareLabel">共享标签组</el-button>
+      </div>
     </div>
     <div class="tableBar">
       <div class="newTable  daList">
@@ -533,8 +537,11 @@
   }
 
   .actionBar {
-    display: flex;
-    justify-content: flex-end;
+    float: right;
+  }
+
+  .searchBar {
+    float: left;
   }
 
   .tagSelect {
@@ -585,5 +592,11 @@
   .no-share {
     background: white;
     color: #0486FE;
+  }
+
+  .clearfix:after {
+    content: "";
+    display: block;
+    clear: both;
   }
 </style>
