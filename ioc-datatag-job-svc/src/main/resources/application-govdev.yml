@@ -93,11 +93,29 @@ dataSet: #数据集相关
   resourceDataUrl: http://19.104.40.36/dsweb/pds/datalake/dataLake/resourceData/
 
 pgconfig:
-  password: nanjian
-  username: nanjian#2019
+  password: nanjian#2019
+  username: nanjian
   ip: 19.104.59.17
-  port: :25308
+  port: 25308
   dataBaseName: postgres
   pooled: true
 
+#计划任务配置 cron表达式
+schedule:
+  execution:
+    waitqueue: 0/5 * * * * ?
+  example:
+    example: 0/5 * * * * ?
+  dowload: 0/10 * * * * ?
+
+schedulejob: #定时任务组件
+  jobMethod: com.openjava.datatag.schedule.job.Schedulejob
+  jobGroup: scanjob
+  jobName: scanjob
+  queue: 0 0/1 * * * ? * #扫描新建模型频率
+searchjob: #更新模型中间表定时任务
+  jobMethod: com.openjava.datatag.schedule.job.DtTaggingUpdateIndexJob
+  jobGroup: search_job
+  jobName: search_job
+  queue: 0 0/5 * * * ? * #更新频率
 
