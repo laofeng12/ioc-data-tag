@@ -104,7 +104,7 @@ public class DtShareTagGroupServiceImpl implements DtShareTagGroupService{
         setNewIdAndSave(tagTreeNode,null,newId,now);
 
         //选用日志记录
-//        dtTaggChooseLogService.loggingChoose(id,newTgg,userId,ip);
+        dtTaggChooseLogService.loggingChoose(id,newTgg,userId,ip);
 
         //热度增加-每天每人只能加一次
         Long c = dtTaggChooseLogService.countChooseToday(userId,id);
