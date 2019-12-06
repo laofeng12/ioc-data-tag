@@ -109,7 +109,7 @@
               show-word-limit
               :autosize="{ minRows: 2, maxRows: 4}"
               placeholder="请输入标签组简介"
-              v-model="ruleForm.synopsis">
+              v-model="ruleForm.synopsis" style="width: 360px">
             </el-input>
           </el-form-item>
         </el-form>
