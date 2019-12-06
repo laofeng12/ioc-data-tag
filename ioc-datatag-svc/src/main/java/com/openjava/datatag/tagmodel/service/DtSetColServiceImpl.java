@@ -484,7 +484,10 @@ public class DtSetColServiceImpl implements DtSetColService {
 				dtTagConditionService.doDelete(record.getId());
 			}
 		}
-		dtCooTagcolLimitService.completeDtcooRagcol(col.getColId());//处理协助打标
+		if (CollectionUtils.isNotEmpty(saveconditions)) {
+			dtCooTagcolLimitService.completeDtcooRagcol(col.getColId());//处理协助打标
+		}
+
 		EntityClassUtil.dealModifyInfo(col,userInfo);
 		String content = "{\"req\":" + reqParams
                 + ",\"delCondition\":" + JSONObject.toJSONString(delLog)

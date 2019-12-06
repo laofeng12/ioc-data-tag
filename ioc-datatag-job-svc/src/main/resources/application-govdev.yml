@@ -73,7 +73,7 @@ ljdp:
     port: 21
     mode: PASV
     username: nanjian
-    password: iocplatfprm@0769
+    password: iocplatform@0769
     remote-path: /
     local-temp-path: /tmp
     localPath: /ioc-datatag
