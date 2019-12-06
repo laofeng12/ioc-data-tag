@@ -10,15 +10,14 @@ server:
 #  typeAliasesPackage: com.openjava.example.mybatis.domain
 #  mapperLocations: 
 #    -classpath:com.openjava.example.*.mapper/*.xml
-
 spring:
   datasource:
     # 用MySQL
-#    driver-class-name: com.mysql.jdbc.Driver
-#    url: jdbc:mysql://rm-wz9a1c8d803l35e2hio.mysql.rds.aliyuncs.com:3306/cloud?useUnicode=true&characterEncoding=utf-8&useSSL=false
-#    username: alitest
-#    password: Ch#123456
-    # 用Oracle 
+    #    driver-class-name: com.mysql.jdbc.Driver
+    #    url: jdbc:mysql://rm-wz9a1c8d803l35e2hio.mysql.rds.aliyuncs.com:3306/cloud?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    #    username: alitest
+    #    password: Ch#123456
+    # 用Oracle
     driver-class-name: oracle.jdbc.OracleDriver
     url: ENC(FTFu5gxTmQ5lL8aXEAGovm3mKRHhjWM5hYqHunezVjTXevsfdOPQ7cTEiALoOAilT6TgKJbU3fQ=)
     username: ENC(d6EfBImsJThWtN5tcSZ4//75KioUpNwk)
@@ -31,7 +30,7 @@ spring:
       pool-prepared-statements: false
       max-pool-prepared-statement-per-connection-size: 20
       max-open-prepared-statements: 20 #和上面的等价
-     # validation-query: SELECT 'x'
+      # validation-query: SELECT 'x'
       validation-query: SELECT 'x' FROM DUAL
       validation-query-timeout: 1
       test-on-borrow: false
@@ -73,7 +72,7 @@ ljdp:
     port: 21
     mode: PASV
     username: nanjian
-    password: iocplatfprm@0769
+    password: iocplatform@0769
     remote-path: /
     local-temp-path: /tmp
     localPath: /ioc-datatag
@@ -88,6 +87,17 @@ ljdp:
       skey: abdefghijklmnopqrstuvwxyz1234567890
 
 
+schedulejob: #定时任务组件
+  jobMethod: com.openjava.datatag.schedule.job.Schedulejob
+  jobGroup: scanjob
+  jobName: scanjob
+  queue: 0 0/1 * * * ? * #扫描新建模型频率
+
+searchjob: #更新模型中间表定时任务
+  jobMethod: com.openjava.datatag.schedule.job.DtTaggingUpdateIndexJob
+  jobGroup: search_job
+  jobName: search_job
+  queue: 0 0/5 * * * ? * #更新频率
 
 dataSet: #数据集相关
   resourceDataUrl: http://19.104.40.36/dsweb/pds/datalake/dataLake/resourceData/
