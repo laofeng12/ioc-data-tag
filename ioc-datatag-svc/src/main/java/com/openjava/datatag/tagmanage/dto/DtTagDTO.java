@@ -36,39 +36,39 @@ public class DtTagDTO implements Serializable{
     @ApiModelProperty("标签编号")
     @Id
     @Column(name = "ID")
-    private Long id;
+    private Long id;//标签编号"
 
     @ApiModelProperty("标签组编号")
     @Max(9223372036854775806L)
     @Column(name = "TAGS_ID")
-    private Long tagsId;
+    private Long tagsId;//标签组编号
 
     @ApiModelProperty("父标签编号")
     @Max(9223372036854775806L)
     @Column(name = "PREA_TAG_ID")
-    private Long preaTagId;
+    private Long preaTagId;//父标签编号
 
     @ApiModelProperty("标签名")
     @Length(min=0, max=32)
     @Column(name = "TAG_NAME")
-    private String tagName;
+    private String tagName;//标签名
 
     @ApiModelProperty("标签说明")
     @Length(min=0, max=2000)
     @Column(name = "SYNOPSIS")
-    private String synopsis;
+    private String synopsis;//标签说明
 
     @ApiModelProperty("创建时间")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     @Column(name = "CREATE_TIME")
-    private Date createTime;
+    private Date createTime;//创建时间
 
     @ApiModelProperty("修改时间")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
     @Column(name = "MODIFY_TIME")
-    private Date modifyTime;
+    private Date modifyTime;//修改时间
 
 //    @ApiModelProperty("删除标记")
 //    @Max(1L)
@@ -78,7 +78,7 @@ public class DtTagDTO implements Serializable{
     @ApiModelProperty("层级")
     @Max(9L)
     @Column(name = "LVL")
-    private Long lvl;
+    private Long lvl;//层级
 
 
 }

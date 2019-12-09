@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 /**
- * DT_TAG_GROUP业务层接口
+ * DT_TAG_GROUP表签组业务层接口
  * @author lch
  *
  */
@@ -18,10 +18,15 @@ public interface DtTagGroupService {
 	Page<DtTagGroup> query(DtTagGroupDBParam params, Pageable pageable);
 
 	List<DtTagGroup> queryDataOnly(DtTagGroupDBParam params, Pageable pageable);
-	
+
+	/**
+	 * 用主键获取标签组
+	 * @param id
+	 * @return
+	 */
 	DtTagGroup get(Long id);
 	
-	DtTagGroup doSave(DtTagGroup m);
+	DtTagGroup doSave(DtTagGroup m);//保存
 
 	void doSoftDelete(DtTagGroup db,Long userId,String ip)throws Exception ;
 

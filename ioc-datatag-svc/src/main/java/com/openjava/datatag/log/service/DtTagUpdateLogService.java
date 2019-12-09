@@ -25,9 +25,9 @@ public interface DtTagUpdateLogService {
 	
 	DtTagUpdateLog doSave(DtTagUpdateLog m);
 
-	DtTagUpdateLog loggingUpdate(String modifyContent,String oldContent,DtTag db,Long userId, String ip);
+	DtTagUpdateLog loggingUpdate(String modifyContent,String oldContent,DtTag db,Long userId, String ip);//记录修改日志
 
-	DtTagUpdateLog loggingNew(String modifyContent,DtTag db,Long userId,String ip);
+	DtTagUpdateLog loggingNew(String modifyContent,DtTag db,Long userId,String ip);//标签新增日志
 
 	DtTagUpdateLog loggingDelete(DtTag db,Long userId,String ip);
 	

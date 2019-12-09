@@ -53,10 +53,19 @@ public class DtTagUpdateLogServiceImpl implements DtTagUpdateLogService {
 		return dtTagUpdateLogRepository.save(m);
 	}
 
+	/**
+	 * 记录标签修改日志
+	 * @param modifyContent
+	 * @param oldContent
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	public DtTagUpdateLog loggingUpdate(String modifyContent,String oldContent,DtTag db,Long userId, String ip){
 		//日志记录
-		DtTagUpdateLog log = new DtTagUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
+		DtTagUpdateLog log = new DtTagUpdateLog();//新建日志
+		log.setId(ConcurrentSequence.getInstance().getSequence());//生成并设置主键
 		log.setModifyUser(userId);
 		log.setModifyUserip(ip);
 		log.setModifyType(Constants.DT_TG_LOG_UPDATE);

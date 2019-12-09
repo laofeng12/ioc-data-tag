@@ -69,9 +69,14 @@ public class DtTagServiceImpl implements DtTagService {
 	public List<DtTag> queryDataOnly(DtTagDBParam params, Pageable pageable){
 		return dtTagRepository.queryDataOnly(params, pageable);
 	}
-	
+
+	/**
+	 * 根据主键获取标签
+	 * @param id
+	 * @return
+	 */
 	public DtTag get(Long id) {
-		Optional<DtTag> o = dtTagRepository.findById(id);
+		Optional<DtTag> o = dtTagRepository.findById(id);//获取标签
 		if(o.isPresent()) {
 			DtTag m = o.get();
 			return m;
@@ -79,9 +84,14 @@ public class DtTagServiceImpl implements DtTagService {
 		System.out.println("找不到记录DtTag："+id);
 		return null;
 	}
-	
+
+	/**
+	 * 保存
+	 * @param m
+	 * @return
+	 */
 	public DtTag doSave(DtTag m) {
-		return dtTagRepository.saveAndFlush(m);
+		return dtTagRepository.saveAndFlush(m);//保存
 	}
 
 	public void doSoftDeleteByTagsID(Long id, Date now){
@@ -129,24 +139,31 @@ public class DtTagServiceImpl implements DtTagService {
 	}
 
 	public DtTag doNew(DtTag body,Long userId,String ip){
-		String modifyContent = JSONObject.toJSONString(body);
+		String modifyContent = JSONObject.toJSONString(body);//body变为json格式
 		//新增，记录创建时间等
-		//设置主键(请根据实际情况修改)
 		SequenceService ss = ConcurrentSequence.getInstance();
-		body.setId(ss.getSequence());
-		body.setIsDeleted(Constants.PUBLIC_NO);
+		body.setId(ss.getSequence());//设置主键(请根据实际情况修改)
+		body.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
 		body.setIsNew(true);//执行insert
-		Date now = new Date();
-		body.setCreateTime(now);
-		body.setModifyTime(now);
-		DtTag db = doSave(body);
-		dtTagUpdateLogService.loggingNew(modifyContent,db,userId,ip);
+		Date now = new Date();//当前时间
+		body.setCreateTime(now);//设置创建时间
+		body.setModifyTime(now);//设置修改时间
+		DtTag db = doSave(body);//保存
+		dtTagUpdateLogService.loggingNew(modifyContent,db,userId,ip);//记录日志
 		return db;
 	}
 
+	/**
+	 * 修改标签
+	 * @param body
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	public DtTag doUpdate(DtTag body,DtTag db,Long userId, String ip){
-		String oldContent = JSONObject.toJSONString(db);
-		String modifyContent = JSONObject.toJSONString(body);
+		String oldContent = JSONObject.toJSONString(db);//把db转化为json格式
+		String modifyContent = JSONObject.toJSONString(body);//把body转化为json格式
 		//不允许修改父节点，层级和创建时间
 		body.setPreaTagId(null);
 		body.setCreateTime(null);
@@ -154,8 +171,8 @@ public class DtTagServiceImpl implements DtTagService {
 		body.setModifyTime(new Date());
 		MyBeanUtils.copyPropertiesNotBlank(db, body);
 		db.setIsNew(false);//执行update
-		db = doSave(db);
-		dtTagUpdateLogService.loggingUpdate(modifyContent,oldContent,db,userId,ip);
+		db = doSave(db);//保存
+		dtTagUpdateLogService.loggingUpdate(modifyContent,oldContent,db,userId,ip);//记录日志
 		return db;
 	}
 
@@ -213,47 +230,56 @@ public class DtTagServiceImpl implements DtTagService {
 	 */
 	public String getIdpPath(Long tagId){
 		String idpath = null;
-		DtTag tag = get(tagId);
+		DtTag tag = get(tagId);//获取标签
 		if (tag != null){
 			if (tag.getPreaTagId()!=null){
-				idpath = this.getIdpPath(tag.getPreaTagId());
+				idpath = this.getIdpPath(tag.getPreaTagId());//获取标签路径
 				idpath += ","+tag.getId();
 			}else {
-				DtTagGroup tagGroup = dtTagGroupService.get(tag.getTagsId());
+				DtTagGroup tagGroup = dtTagGroupService.get(tag.getTagsId());//获取标签组
 				idpath = tagGroup.getId()+","+tag.getId();
 			}
 
 		}
 		return idpath;
 	}
+
+	/**
+	 * 修改标签
+	 * @param body
+	 * @param ip
+	 * @return
+	 * @throws Exception
+	 */
 	public SuccessMessage doSaveOrEdit(DtTag body,String ip)throws Exception{
 		//修改，记录更新时间等
 		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		Long userId = Long.valueOf(userInfo.getUserId());
+		Long userId = Long.valueOf(userInfo.getUserId());//获取用户id
 //		String ip = IpUtil.getRealIP(request);
-		DtTagGroup tagGroup = dtTagGroupService.get(body.getTagsId());
+		DtTagGroup tagGroup = dtTagGroupService.get(body.getTagsId());//获取表签组
 		if (userInfo.getUserId().equals(tagGroup.getCreateUser().toString())) {
 			String idpath = null;
 			if (body.getIsNew() == null || body.getIsNew()) {
+				//新建标签
 				body = this.doNew(body, userId, ip);
-				tagGroup.setModifyTime(new Date());
-				dtTagGroupService.doSave(tagGroup);
-				idpath = this.getIdpPath(body.getId());
-				body.setIdPath(idpath);
-				body = this.doSave(body);
-				AuditLogVO vo = new AuditLogVO();
+				tagGroup.setModifyTime(new Date());//修改日期
+				dtTagGroupService.doSave(tagGroup);//保存标签组
+				idpath = this.getIdpPath(body.getId());//标签路径
+				body.setIdPath(idpath);//设置标签路径
+				body = this.doSave(body);//保存
+				AuditLogVO vo = new AuditLogVO();//新建审计日志
 				vo.setType(1L);//管理操作
 				vo.setOperationService("标签与画像");//必传
 				vo.setOperationModule("标签管理");//必传
 				vo.setFunctionLev1("编辑");//必传
 				vo.setFunctionLev2("添加标签");//必传
-				vo.setDataAfterOperat(JSONObject.toJSONString(body));
-				vo.setRecordId(body.getId()+"");
-				auditComponet.saveAuditLog(vo);
+				vo.setDataAfterOperat(JSONObject.toJSONString(body));//body转化为json格式
+				vo.setRecordId(body.getId()+"");//记录id
+				auditComponet.saveAuditLog(vo);//保存
 				return new SuccessMessage("新建成功");
 			} else {
-				DtTag db = this.get(body.getId());
-				String beforeUpdataJson = JSONObject.toJSONString(db);
+				DtTag db = this.get(body.getId());//获取标签
+				String beforeUpdataJson = JSONObject.toJSONString(db);//db转化为json格式
 				if ((db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)) && body.getIsNew()) {
 					throw new APIException(MyErrorConstants.TAG_NOT_FOUND, "无此标签或已被删除");
 				}

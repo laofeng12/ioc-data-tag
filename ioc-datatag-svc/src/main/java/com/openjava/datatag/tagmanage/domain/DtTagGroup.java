@@ -37,62 +37,62 @@ public class DtTagGroup extends BaseMessageDTO implements Persistable<Long>,Seri
 	@ApiModelProperty("标签组编号")
 	@Id
 	@Column(name = "ID")
-	private Long id;
+	private Long id;//标签组编号
 
 	@ApiModelProperty("标签组名")
 	@Length(min=0, max=64)
 	@Column(name = "TAGS_NAME")
-	private String tagsName;
+	private String tagsName;//标签组名
 
 	@ApiModelProperty("是否共享")
 	@Max(1)
 	@Column(name = "IS_SHARE")
-	private Long isShare;
+	private Long isShare;//是否共享
 
 	@ApiModelProperty("标签组简介")
 	@Length(min=0, max=2000)
 	@Column(name = "SYNOPSIS")
-	private String synopsis;
+	private String synopsis;//标签组简介
 
 	@ApiModelProperty("使用热度")
 	@Max(9223372036854775806L)
 	@Column(name = "POPULARITY")
-	private Long popularity;
+	private Long popularity;//使用热度
 
 	@ApiModelProperty("创建者")
 	@Max(9223372036854775806L)
 	@Column(name = "CREATE_USER")
-	private Long createUser;
+	private Long createUser;//创建者
 
 	@ApiModelProperty("创建时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 	@Column(name = "CREATE_TIME")
-	private Date createTime;
+	private Date createTime;//创建时间
 
 	@ApiModelProperty("修改时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 	@Column(name = "MODIFY_TIME")
-	private Date modifyTime;
+	private Date modifyTime;//修改时间
 
 	@ApiModelProperty("删除标记")
 	@Max(1L)
 	@Column(name = "IS_DELETED")
-	private Long isDeleted;
+	private Long isDeleted;//删除标记
 
 
 	@ApiModelProperty("是否新增")
 	@Transient
-	private Boolean isNew;
+	private Boolean isNew;//是否新增
 
 	@ApiModelProperty("热度等级-从0~4")
 	@Transient
-	private Long popularityLevel;
+	private Long popularityLevel;//热度等级-从0~4
 
 	@ApiModelProperty("热度百分比")
 	@Transient
-	private Long percentage;
+	private Long percentage;//热度百分比
 
 
 
