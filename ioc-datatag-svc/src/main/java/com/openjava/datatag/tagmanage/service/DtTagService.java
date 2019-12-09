@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * DT_TAG业务层接口
+ * DT_TAG标签业务层接口
  * @author lch
  *
  */
@@ -27,7 +27,7 @@ public interface DtTagService {
 	List<DtTag> findByPreaTagId(Long pId);
 
 	DtTag doSave(DtTag m);
-	SuccessMessage doSaveOrEdit(DtTag body,String ip)throws Exception;
+	SuccessMessage doSaveOrEdit(DtTag body,String ip)throws Exception;//修改标签
 	DtTag doNew(DtTag tag,Long userId,String ip);
 
 	DtTag doUpdate(DtTag tag,DtTag db,Long userId,String ip);

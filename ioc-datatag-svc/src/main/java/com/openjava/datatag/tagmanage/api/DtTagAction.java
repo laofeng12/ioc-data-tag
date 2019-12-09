@@ -47,12 +47,12 @@ import java.util.List;
 @RequestMapping("/datatag/tagmanage/dtTag")
 public class DtTagAction {
     @Resource
-    private DtCooperationService dtCooperationService;
+    private DtCooperationService dtCooperationService;//协作打标业务层接口
     @Resource
-    private DtTagService dtTagService;
+    private DtTagService dtTagService;//标签业务层接口
 
     @Resource
-    private DtTagGroupService dtTagGroupService;
+    private DtTagGroupService dtTagGroupService;//表签组业务层接口
 
 
     /**
@@ -69,8 +69,8 @@ public class DtTagAction {
     @RequestMapping(method = RequestMethod.POST)
     public SuccessMessage doSaveOrEdit(@RequestBody DtTag body,
                                  HttpServletRequest request) throws Exception {
-        String ip = IpUtil.getRealIP(request);
-        return dtTagService.doSaveOrEdit(body,ip);
+        String ip = IpUtil.getRealIP(request);//获取ip
+        return dtTagService.doSaveOrEdit(body,ip);//修改标签
     }
 
 
@@ -160,6 +160,7 @@ public class DtTagAction {
                 //自己的和共享的标签组可以查看
                 if (userInfo.getUserId().equals(db.getCreateUser().toString()) || db.getIsShare().equals(Constants.PUBLIC_YES) || cooUserTagGroupCount > 0) {
                     List<DtTag> tagList = dtTagService.findByTagsId(tagsId);
+                    //适配前端要求，第一节不能选，初始化一个空的list给前端
                     if (CollectionUtils.isEmpty(tagList)){
                         TagDTOTreeNodeShow2 father = new TagDTOTreeNodeShow2();
                         father.setLabel(group.getTagsName());

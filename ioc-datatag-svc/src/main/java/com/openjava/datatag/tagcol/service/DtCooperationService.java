@@ -18,7 +18,7 @@ import com.openjava.datatag.tagcol.query.DtCooperationDBParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * tagcol业务层接口
+ * tagcol协作打标业务层接口
  *
  * @author hyq
  */

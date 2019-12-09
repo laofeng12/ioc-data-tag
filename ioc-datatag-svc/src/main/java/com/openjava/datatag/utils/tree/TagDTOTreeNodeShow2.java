@@ -25,6 +25,10 @@ public class TagDTOTreeNodeShow2 {
                 TagDTOTreeNodeShow2 ctreeShow = new TagDTOTreeNodeShow2(ctree);
                 children.add(ctreeShow);
             }
+        }else{
+            if (tree.getTag().getLvl()!=null && tree.getTag().getLvl()==1){
+                children = new ArrayList<>();
+            }
         }
     }
 }
