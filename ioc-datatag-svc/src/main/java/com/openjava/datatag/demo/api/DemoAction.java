@@ -72,13 +72,6 @@ public class DemoAction {
 		stringRedisTemplate.convertAndSend(Constants.DT_REDIS_MESSAGE_QUEUE_CHANL,String.valueOf(Math.random()));
 	}
 
-	@ApiOperation(value = "testDowload", nickname="save", notes = "redisMessageQueue调试")
-	@Security(session=false)
-	@RequestMapping(value="/testDowload", method=RequestMethod.GET)
-	public void testDowload(Long taggingModelId){
-		portrayalService.dowloadRunResult(100L,taggingModelId);
-	}
-
 	@ApiOperation(value = "testAudit", nickname="testAudit", notes = "testAudit")
 	@Security(session=false)
 	@RequestMapping(value="/testAudit", method=RequestMethod.GET)
