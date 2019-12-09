@@ -68,9 +68,9 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		System.out.println("找不到记录DtTagGroup："+id);
 		return null;
 	}
-	
+	//保存标签组
 	public DtTagGroup doSave(DtTagGroup m) {
-		return dtTagGroupRepository.save(m);
+		return dtTagGroupRepository.save(m);//保存
 	}
 
 
