@@ -797,6 +797,7 @@
           });
           this.saveasLoading = false
           this.editDialog = false
+          this.$router.push('/lableImage')
         } catch (e) {
           console.log(e);
           this.saveasLoading = false
@@ -829,6 +830,7 @@
               });
               this.savedispatchLoading = false
               this.runDialog = false
+              this.$router.push('/lableImage')
             } catch (e) {
               console.log(e);
               this.savedispatchLoading = false
