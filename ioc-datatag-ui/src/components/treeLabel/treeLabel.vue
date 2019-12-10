@@ -383,7 +383,6 @@
       },
 
       remove(node, data) {
-        console.log('删除了',data)
         this.deleteDialog = true
         this.tagName = data.tagName
         this.delTreeId = data.id
@@ -401,6 +400,10 @@
       },
       openOne() {
         this.labelDialog = true
+        if(this.ruleForm.name !== '' || this.ruleForm.textarea !== ''){
+          this.ruleForm.name = ''
+          this.ruleForm.textarea = ''
+        }
       },
       addTwo(node, data) {
         //console.log('新建下级标签',node,data)
