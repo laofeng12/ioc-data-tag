@@ -213,8 +213,13 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		return dtTaggingModelRepository.queryDataOnly(params, pageable);
 	}
 
+	/**
+	 * 根据主键获取模型
+	 * @param id
+	 * @return
+	 */
 	public DtTaggingModel get(Long id) {
-		Optional<DtTaggingModel> o = dtTaggingModelRepository.findById(id);
+		Optional<DtTaggingModel> o = dtTaggingModelRepository.findById(id);//根据主键获取模型
 		if(o.isPresent()) {
 			DtTaggingModel m = o.get();
 			return m;
@@ -863,20 +868,20 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	 * @param taggingModelId
 	 */
 	public void stopModel(Long taggingModelId,Long tagId){
-		DtTaggingModel model = get(taggingModelId);
-		model.setRunState(Constants.DT_MODEL_END);
-		model.setStartTime(null);
-		model.setCycle(null);
-		model.setCycleEnum(null);
-		model.setUpdateNum(0L);
-		model.setSuccessNum(0L);
+		DtTaggingModel model = get(taggingModelId);//获取模型
+		model.setRunState(Constants.DT_MODEL_END);//设置运行状态
+		model.setStartTime(null);//清空开始时间
+		model.setCycle(null);//清空调度设置
+		model.setCycleEnum(null);//
+		model.setUpdateNum(0L);//清空更新数据
+		model.setSuccessNum(0L);//清空成功数据
 		//删除字段的打标设置
 		if (tagId!=null) {
-			List<DtTagCondition> conditionList = dtTagConditionService.findByTaggingModelIdAndColId(taggingModelId,tagId);
+			List<DtTagCondition> conditionList = dtTagConditionService.findByTaggingModelIdAndColId(taggingModelId,tagId);//获取条件设置
 			if (CollectionUtils.isNotEmpty(conditionList)){
 				for (DtTagCondition condition:conditionList) {
-					condition.setIsDeleted(Constants.PUBLIC_YES);
-					dtTagConditionService.doSave(condition);
+					condition.setIsDeleted(Constants.PUBLIC_YES);//设置是否删除
+					dtTagConditionService.doSave(condition);//保存
 				}
 			}
 		}
@@ -884,22 +889,26 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		portrayalService.clearPortrayal(Constants.DT_TABLE_PREFIX+model.getTaggingModelId());
 	}
 
+	/**
+	 * 停止模型删除画像
+	 * @param tagids
+	 */
 	public void stopModelByColIds(List<Long> tagids){
 		if (CollectionUtils.isEmpty(tagids)){
 			return;
 		}
-		List<DtTaggingModel> models =  dtTaggingModelRepository.getModelByTagIds(tagids);
+		List<DtTaggingModel> models =  dtTaggingModelRepository.getModelByTagIds(tagids);//获取使用改标签的模型
 		if (CollectionUtils.isNotEmpty(models)){
 			//停止模型删除画像
 			models.forEach(model->{
 				stopModel(model.getTaggingModelId(),null);
 			});
 			//删除字段的打标设置
-			List<DtTagCondition> conditionList = dtTagConditionService.findByTagIds(tagids);
+			List<DtTagCondition> conditionList = dtTagConditionService.findByTagIds(tagids);//获取该标签的所有打标设置
 			if (CollectionUtils.isNotEmpty(conditionList)){
 				conditionList.forEach(condition->{
 					condition.setIsDeleted(Constants.PUBLIC_YES);
-					dtTagConditionService.doSave(condition);
+					dtTagConditionService.doSave(condition);//软删除
 				});
 			}
 		}

@@ -33,15 +33,15 @@ import java.util.List;
 @RequestMapping("/datatag/tagmanage/shareDtTagGroup")
 public class ShareDtTagGroupAction {
     @Resource
-    private DtShareTagGroupService dtShareTagGroupService;
+    private DtShareTagGroupService dtShareTagGroupService;//共享数据
 
     @Resource
-    private DtTagGroupService dtTagGroupService;
+    private DtTagGroupService dtTagGroupService;//DT_TAG_GROUP表签组业务层接口
 
     @Resource
-    private DtTagService dtTagService;
+    private DtTagService dtTagService;//DT_TAG标签业务层接口
     @Resource
-    private DtTaggChooseLogService dtTaggChooseLogService;
+    private DtTaggChooseLogService dtTaggChooseLogService;//DT_TAGG_CHOOSE_LOG业务层接口
 
     @ApiOperation(value = "标签组列表分页查询(共享)", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
     @ApiImplicitParams({
@@ -56,7 +56,7 @@ public class ShareDtTagGroupAction {
         if (searchKey == null){
             searchKey = "";
         }
-        Page<DtShareTagGroup> result =  dtShareTagGroupService.findList(searchKey,pageable);
+        Page<DtShareTagGroup> result =  dtShareTagGroupService.findList(searchKey,pageable);//标签组列表分页查询(共享)
         return result;
     }
 
@@ -74,9 +74,9 @@ public class ShareDtTagGroupAction {
     public SuccessMessage doChooseShareTagGroup(
             @RequestParam(value="id",required=false)Long id,
             HttpServletRequest request) throws Exception {
-        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-        String ip = IpUtil.getRealIP(request);
-        DtTagGroup db = dtTagGroupService.get(id);
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取当前用户信息
+        String ip = IpUtil.getRealIP(request);//获取请求ip
+        DtTagGroup db = dtTagGroupService.get(id);//获取标签组
         if(db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES) || db.getIsShare().equals(Constants.PUBLIC_NO)) {
             throw new APIException(MyErrorConstants.SHARE_TAG_GROUP_NOT_FOUND, "无此标签组或未共享");
         }
@@ -84,7 +84,7 @@ public class ShareDtTagGroupAction {
             throw new APIException(MyErrorConstants.CAN_NOT_CHOOSE, "不能选用自己的标签组");
         }
 
-        Long count = dtTaggChooseLogService.countChoose(Long.valueOf(userInfo.getUserId()),id);
+        Long count = dtTaggChooseLogService.countChoose(Long.valueOf(userInfo.getUserId()),id);//查询当前用户标签组选用次数
         if (count!=null && count>0){
             throw new APIException(MyErrorConstants.CAN_NOT_CHOOSE, "该标签组已选用，不能重复选用");
         }

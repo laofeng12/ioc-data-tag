@@ -87,6 +87,12 @@ public class DtTagConditionServiceImpl implements DtTagConditionService {
 		return dtTagConditionRepository.findByTagIds(tagIds);
 	}
 
+	/**
+	 * 根据模型id和标签id获取条件设置
+	 * @param taggingModelId
+	 * @param tagId
+	 * @return
+	 */
 	public List<DtTagCondition> findByTaggingModelIdAndColId(Long taggingModelId ,Long tagId){
 		return dtTagConditionRepository.findByTaggingModelIdAndColId(taggingModelId,tagId);
 	}

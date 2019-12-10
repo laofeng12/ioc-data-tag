@@ -8,7 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface DtShareTagGroupRepository extends DynamicJpaRepository<DtShareTagGroup,Long>,DtShareTagGroupRepositoryCustorm {
-
+    /**
+     *
+     * @param searchKey
+     * @param pageable
+     * @return
+     */
     @Query(value ="select e.* ,ROUND(((RANK() over (order by POPULARITY))-1)/(COUNT(*) over ())*4) popularity_level from\n" +
             "       (select tg.ID tags_id,tg.TAGS_NAME, u.USERID SHARE_USER_ID, u.FULLNAME SHARE_USER_Name,\n" +
             "            tg.MODIFY_TIME,tg.SYNOPSIS,tg.POPULARITY,u.LEVEL1,u.FULLNAME\n" +

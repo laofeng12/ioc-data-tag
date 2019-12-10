@@ -66,42 +66,56 @@ public class DtTagUpdateLogServiceImpl implements DtTagUpdateLogService {
 		//日志记录
 		DtTagUpdateLog log = new DtTagUpdateLog();//新建日志
 		log.setId(ConcurrentSequence.getInstance().getSequence());//生成并设置主键
-		log.setModifyUser(userId);
-		log.setModifyUserip(ip);
-		log.setModifyType(Constants.DT_TG_LOG_UPDATE);
-		log.setModifyTime(db.getModifyTime());
-		log.setTagId(db.getId());
+		log.setModifyUser(userId);//设置用户id
+		log.setModifyUserip(ip);//设置ip
+		log.setModifyType(Constants.DT_TG_LOG_UPDATE);//设置修改类型
+		log.setModifyTime(db.getModifyTime());//设置修改时间
+		log.setTagId(db.getId());//设置
 		log.setModifyContent("{\"old\":"+oldContent+ ",\"newRep\":"+ modifyContent+"}");
 		log.setIsNew(true);
-		return dtTagUpdateLogRepository.save(log);
+		return dtTagUpdateLogRepository.save(log);//保存并返回日志
 	}
 
+	/**
+	 * 标签新增日志
+	 * @param modifyContent
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	public DtTagUpdateLog loggingNew(String modifyContent,DtTag db,Long userId,String ip){
 		//日志记录
-		DtTagUpdateLog log = new DtTagUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUser(userId);
-		log.setModifyUserip(ip);
-		log.setModifyType(Constants.DT_TG_LOG_NEW);
-		log.setModifyTime(db.getModifyTime());
-		log.setTagId(db.getId());
-		log.setModifyContent(modifyContent);
+		DtTagUpdateLog log = new DtTagUpdateLog();//新建标签日志对象
+		log.setId(ConcurrentSequence.getInstance().getSequence());//获取并设置id
+		log.setModifyUser(userId);//设置修改用户id
+		log.setModifyUserip(ip);//设置ip
+		log.setModifyType(Constants.DT_TG_LOG_NEW);//设置修改类型
+		log.setModifyTime(db.getModifyTime());//设置修改时间
+		log.setTagId(db.getId());//设置标签id
+		log.setModifyContent(modifyContent);//设置修改内容
 		log.setIsNew(true);
-		return dtTagUpdateLogRepository.save(log);
+		return dtTagUpdateLogRepository.save(log);//保存并返回日志对象
 	}
-
+	/**
+	 * 保存删除日志
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	public DtTagUpdateLog loggingDelete(DtTag db,Long userId,String ip){
 		//日志记录
 		DtTagUpdateLog log = new DtTagUpdateLog();
-		log.setId(ConcurrentSequence.getInstance().getSequence());
-		log.setModifyUser(userId);
-		log.setModifyUserip(ip);
-		log.setModifyType(Constants.DT_TG_LOG_DELETE);
-		log.setModifyTime(db.getModifyTime());
-		log.setTagId(db.getId());
+		log.setId(ConcurrentSequence.getInstance().getSequence());//获取并设置id
+		log.setModifyUser(userId);//设置修改用户
+		log.setModifyUserip(ip);//设置ip
+		log.setModifyType(Constants.DT_TG_LOG_DELETE);//设置修改类型
+		log.setModifyTime(db.getModifyTime());//设置修改时间
+		log.setTagId(db.getId());//设置标签id
 		//log.setModifyContent(modifyContent);//删除就不需要详情了
 		log.setIsNew(true);
-		return dtTagUpdateLogRepository.save(log);
+		return dtTagUpdateLogRepository.save(log);//保存并放回日志
 	}
 
 

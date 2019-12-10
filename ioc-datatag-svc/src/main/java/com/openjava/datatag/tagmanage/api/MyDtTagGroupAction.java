@@ -42,7 +42,7 @@ import java.util.List;
 public class MyDtTagGroupAction {
 	
 	@Resource
-	private DtTagGroupService dtTagGroupService;
+	private DtTagGroupService dtTagGroupService;//DT_TAG_GROUP表签组业务层接口
 
 	/**
 	 * 用主键获取数据
@@ -60,8 +60,8 @@ public class MyDtTagGroupAction {
 	@Security(session=true,allowResources = {"tagManage"})
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
 	public DtTagGroup get(@PathVariable("id")Long id) throws APIException {
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		DtTagGroup m = dtTagGroupService.get(id);
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//当前登录用户信息
+		DtTagGroup m = dtTagGroupService.get(id);//获取标签组
 		if(m == null || m.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			return null;
 		}
@@ -84,15 +84,15 @@ public class MyDtTagGroupAction {
 	public TablePage<DtTagGroup> doSearch(@ApiIgnore() DtTagGroupDBParam params,
 										  @ApiIgnore() Pageable pageable,
 										  HttpServletRequest request)throws Exception{
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//当前登录用户信息
 
-		Long id = Long.parseLong(userInfo.getUserId());
-		params.setEq_createUser(id);
-		params.setEq_isDeleted(Constants.PUBLIC_NO);
+		Long id = Long.parseLong(userInfo.getUserId());//登录用户id
+		params.setEq_createUser(id);//创建者
+		params.setEq_isDeleted(Constants.PUBLIC_NO);//非删除状态
 		params.setSql_key("tagsName like \'%" + params.getKeyword() + "%\' or "+ "synopsis like \'%" + params.getKeyword()+"%\'");
 		Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-				Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));
-		Page<DtTagGroup> results =  dtTagGroupService.searchMyTagGroup(params, mypage);
+				Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));//按照修改时间和创建时间倒叙排序
+		Page<DtTagGroup> results =  dtTagGroupService.searchMyTagGroup(params, mypage);//
 		return new TablePageImpl<>(results);
 
 	}
@@ -112,10 +112,10 @@ public class MyDtTagGroupAction {
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
 			HttpServletRequest request) throws Exception {
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		String ip = IpUtil.getRealIP(request);
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取用户信息
+		String ip = IpUtil.getRealIP(request);//获取ip
 
-		DtTagGroup tagGroup = dtTagGroupService.get(id);
+		DtTagGroup tagGroup = dtTagGroupService.get(id);//获取标签组
 		if(tagGroup == null || tagGroup.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND,"无此标签组或已被删除");
 		}
@@ -142,21 +142,21 @@ public class MyDtTagGroupAction {
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="没有修改此标签组的权限")
 	})
 	public DtTagGroup doSave(@RequestBody DtTagGroupSaveDTO bodyDTO, HttpServletRequest request) throws Exception {
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		Long userId = Long.parseLong(userInfo.getUserId());
-		String ip = IpUtil.getRealIP(request);
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取当前登录信息
+		Long userId = Long.parseLong(userInfo.getUserId());//获取用户id
+		String ip = IpUtil.getRealIP(request);//获取ip
 
 		DtTagGroup body = new DtTagGroup();
-		MyBeanUtils.copyPropertiesNotBlank(body,bodyDTO);
+		MyBeanUtils.copyPropertiesNotBlank(body,bodyDTO);//对象拷贝
 		//EntityClassUtil.getHtmlOfEntity(body);
 		if (body.getIsNew() == null || body.getIsNew()) {
-			DtTagGroup db = dtTagGroupService.doNew(body,userId,ip);
-			db.setCode(200L);
+			DtTagGroup db = dtTagGroupService.doNew(body,userId,ip);//创建标签组
+			db.setCode(200L);//状态码
 			db.setMessage("新建成功");
 			return db;
 		} else {
 			//修改，记录更新时间等
-			DtTagGroup db = dtTagGroupService.get(body.getId());
+			DtTagGroup db = dtTagGroupService.get(body.getId());//获取标签组
 			if(db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
 				throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND,"无此标签组或已被删除");
 			}
@@ -165,8 +165,8 @@ public class MyDtTagGroupAction {
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请不要调用POST方法进行删除操作,请用DELETE方法");
 				}
 				DtTagGroup newdb = dtTagGroupService.doUpdate(body,db,userId,ip);
-				newdb.setCode(200L);
-				newdb.setMessage("更新成功");
+				newdb.setCode(200L);//状态码
+				newdb.setMessage("更新成功");//
 				return newdb;
 
 			}else{
@@ -189,9 +189,9 @@ public class MyDtTagGroupAction {
 	@Security(session = true,allowResources = {"tagManage"})
 	@RequestMapping(value = "/getShareTopList", method = RequestMethod.GET)
 	public DataApiResponse<List<ShareTopDTO>> getShareTopList(@RequestParam("top") int top) {
-		List<ShareTopDTO> result = dtTagGroupService.getShareTopList(top);
-		DataApiResponse data = new DataApiResponse<List<ShareTopDTO>>();
-		data.setData(result);
+		List<ShareTopDTO> result = dtTagGroupService.getShareTopList(top);//共享版单
+		DataApiResponse data = new DataApiResponse<List<ShareTopDTO>>();//构造返回信息
+		data.setData(result);//设置返回数据
 		return data;
 	}
 }
