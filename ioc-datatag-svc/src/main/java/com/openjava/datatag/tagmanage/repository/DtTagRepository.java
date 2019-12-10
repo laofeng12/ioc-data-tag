@@ -16,6 +16,11 @@ import java.util.List;
  *
  */
 public interface DtTagRepository extends DynamicJpaRepository<DtTag, Long>, DtTagRepositoryCustom{
+    /**
+     *
+     * @param id
+     * @param now
+     */
     @Transactional
     @Modifying
     @Query("update DtTag set isDeleted = 1, modifyTime = :now  where tagsId = :id")
@@ -51,10 +56,27 @@ public interface DtTagRepository extends DynamicJpaRepository<DtTag, Long>, DtTa
             "CONNECT BY PRIOR ID = PREA_TAG_ID",nativeQuery = true)
     List<Long> findAllIdsByRootId(@Param("rootId") Long rootId);
 
+    /**
+     *
+     * @param tagsID
+     * @param isDeleted
+     * @return
+     */
     List<DtTag> findByTagsIdAndIsDeleted(Long tagsID,Long isDeleted);
 
+    /**
+     * 根据父标签id获取标签
+     * @param preaTagId
+     * @param isDeteled
+     * @return
+     */
     List<DtTag> findByPreaTagIdAndIsDeleted(Long preaTagId,Long isDeteled);
 
+    /**
+     *
+     * @param ids
+     * @return
+     */
     @Query("from DtTag t where t.isDeleted = 0 and t.id in(:ids)")
     List<DtTag> findByTagIds(@Param("ids") List<Long> ids);
 

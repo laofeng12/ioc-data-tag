@@ -25,10 +25,34 @@ public interface DtTagUpdateLogService {
 	
 	DtTagUpdateLog doSave(DtTagUpdateLog m);
 
+	/**
+	 * 记录标签修改日志
+	 * @param modifyContent
+	 * @param oldContent
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	DtTagUpdateLog loggingUpdate(String modifyContent,String oldContent,DtTag db,Long userId, String ip);//记录修改日志
 
+	/**
+	 * 标签新增日志
+	 * @param modifyContent
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	DtTagUpdateLog loggingNew(String modifyContent,DtTag db,Long userId,String ip);//标签新增日志
 
+	/**
+	 * 保存删除日志
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	DtTagUpdateLog loggingDelete(DtTag db,Long userId,String ip);
 	
 }

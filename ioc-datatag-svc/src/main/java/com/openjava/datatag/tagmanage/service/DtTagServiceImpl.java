@@ -48,26 +48,38 @@ import java.util.*;
 public class DtTagServiceImpl implements DtTagService {
 	
 	@Resource
-	private DtTagRepository dtTagRepository;
+	private DtTagRepository dtTagRepository;//DT_TAG数据库访问层
 
 	@Resource
-	private DtTagUpdateLogService dtTagUpdateLogService;
+	private DtTagUpdateLogService dtTagUpdateLogService;//DT_TAG_UPDATE_LOG业务层接口
 	@Resource
-	DtTaggingModelService dtTaggingModelService;
+	DtTaggingModelService dtTaggingModelService;//标签模型业务层接口
 	@Resource
-	private DtTagGroupService dtTagGroupService;
+	private DtTagGroupService dtTagGroupService;//DT_TAG_GROUP表签组业务层接口
 	@Resource
-	private DtCooperationService dtCooperationService;
+	private DtCooperationService dtCooperationService;//tagcol协作打标业务层接口
 	@Resource
-	private AuditComponet auditComponet;
+	private AuditComponet auditComponet;//审计组件
 
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public Page<DtTag> query(DtTagDBParam params, Pageable pageable){
-		Page<DtTag> pageresult = dtTagRepository.query(params, pageable);
+		Page<DtTag> pageresult = dtTagRepository.query(params, pageable);//获取数据
 		return pageresult;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public List<DtTag> queryDataOnly(DtTagDBParam params, Pageable pageable){
-		return dtTagRepository.queryDataOnly(params, pageable);
+		return dtTagRepository.queryDataOnly(params, pageable);//获取数据
 	}
 
 	/**
@@ -78,7 +90,7 @@ public class DtTagServiceImpl implements DtTagService {
 	public DtTag get(Long id) {
 		Optional<DtTag> o = dtTagRepository.findById(id);//获取标签
 		if(o.isPresent()) {
-			DtTag m = o.get();
+			DtTag m = o.get();//
 			return m;
 		}
 		System.out.println("找不到记录DtTag："+id);
@@ -94,20 +106,37 @@ public class DtTagServiceImpl implements DtTagService {
 		return dtTagRepository.saveAndFlush(m);//保存
 	}
 
+	/**
+	 *
+	 * @param id
+	 * @param now
+	 */
 	public void doSoftDeleteByTagsID(Long id, Date now){
 		// TODO: 2019/9/16  删除标签组时删除画像
 		List<Long> ids = findIdsByTagsId(id);
 		dtTaggingModelService.stopModelByColIds(ids);//停止模型删除画像
-		dtTagRepository.doSoftDeleteByTagsID(id,now);
+		dtTagRepository.doSoftDeleteByTagsID(id,now);//
 	}
 
+	/**
+	 *
+	 * @param tagsId
+	 * @return
+	 */
 	public List<DtTag> findByTagsId(Long tagsId){
 		//查询所有未删除的标签list
-		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId, Constants.PUBLIC_NO);
+		return dtTagRepository.findByTagsIdAndIsDeleted(tagsId, Constants.PUBLIC_NO);//
 	}
+
+	/**
+	 * 根据标签组ID获取(标签树)
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
 	public TagDTOTreeNodeShow getTree(Long id)throws Exception{
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		DtTagGroup db = dtTagGroupService.get(id);
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取用户信息
+		DtTagGroup db = dtTagGroupService.get(id);//获取标签组
 		if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)) {
 			throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND, "无此标签组或已被删除");
 		}
@@ -115,29 +144,42 @@ public class DtTagServiceImpl implements DtTagService {
 		Long cooUserTagGroupCount = dtCooperationService.findCooUserTagGroup(VoUtils.toLong(userInfo.getUserId()), id);
 		//自己的和共享的标签组可以查看
 		if (userInfo.getUserId().equals(db.getCreateUser().toString()) || db.getIsShare().equals(Constants.PUBLIC_YES) || cooUserTagGroupCount > 0) {
-			List<DtTag> tagList = this.findByTagsId(id);
-			DtTagDTO root = new DtTagDTO();
-			root.setId(TagDTOTreeNode.ROOT_ID);
-			TagDTOTreeNode treeNode = new TagDTOTreeNode(TagDTOTreeNode.toDtTagDTO(tagList), root);
-			TagDTOTreeNodeShow treeNodeShow = new TagDTOTreeNodeShow(treeNode);
-			AuditLogVO vo = new AuditLogVO();
+			List<DtTag> tagList = this.findByTagsId(id);//根据标签组id获取所属标签
+			DtTagDTO root = new DtTagDTO();//创建
+			root.setId(TagDTOTreeNode.ROOT_ID);//设置id
+			TagDTOTreeNode treeNode = new TagDTOTreeNode(TagDTOTreeNode.toDtTagDTO(tagList), root);//初始化树结构
+			TagDTOTreeNodeShow treeNodeShow = new TagDTOTreeNodeShow(treeNode);//构造造成前端需要的
+			AuditLogVO vo = new AuditLogVO();//审计日志
 			vo.setType(2L);//数据查询
 			vo.setOperationService("标签与画像");//必传
 			vo.setOperationModule("标签管理");//必传
 			vo.setFunctionLev1("共享标签组");//必传
 			vo.setFunctionLev2("查看");//必传
-			vo.setRecordId(id+"");
-			auditComponet.saveAuditLog(vo);
+			vo.setRecordId(id+"");//
+			auditComponet.saveAuditLog(vo);//保存审计日志
 			return treeNodeShow;
 		} else {
-			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY, "无权限查看");
+			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY, "无权限查看");//
 		}
 
 	}
+
+	/**
+	 * 根据父标签id获取标签
+	 * @param pId
+	 * @return
+	 */
 	public List<DtTag> findByPreaTagId(Long pId){
-		return dtTagRepository.findByPreaTagIdAndIsDeleted(pId,Constants.PUBLIC_NO);
+		return dtTagRepository.findByPreaTagIdAndIsDeleted(pId,Constants.PUBLIC_NO);//根据父标签id获取标签
 	}
 
+	/**
+	 *
+	 * @param body
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	public DtTag doNew(DtTag body,Long userId,String ip){
 		String modifyContent = JSONObject.toJSONString(body);//body变为json格式
 		//新增，记录创建时间等
@@ -169,53 +211,70 @@ public class DtTagServiceImpl implements DtTagService {
 		body.setCreateTime(null);
 		body.setLvl(null);
 		body.setModifyTime(new Date());
-		MyBeanUtils.copyPropertiesNotBlank(db, body);
+		MyBeanUtils.copyPropertiesNotBlank(db, body);//复制对象
 		db.setIsNew(false);//执行update
 		db = doSave(db);//保存
 		dtTagUpdateLogService.loggingUpdate(modifyContent,oldContent,db,userId,ip);//记录日志
 		return db;
 	}
 
+	/**
+	 * 软删除
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @throws Exception
+	 */
 	public void doSoftDeleteByDtTag(DtTag db,Long userId,String ip)throws Exception{
 		// TODO: 2019/9/16   删除标签时删除画像
-		List<Long> ids =  findAllIdsByTagId(db.getId());
+		List<Long> ids =  findAllIdsByTagId(db.getId());//根据标签id获取整颗数的节点id
 		dtTaggingModelService.stopModelByColIds(ids);//停止模型删除画像
-		Date now = new Date();
+		Date now = new Date();//当前时间
 		//先删除子节点
 		doSoftDeleteByRootID(db.getId(),now);
 		//再删除本节点
-		db.setIsDeleted(Constants.PUBLIC_YES);
-		db.setModifyTime(now);
-		doSave(db);
+		db.setIsDeleted(Constants.PUBLIC_YES);//设置是否删除
+		db.setModifyTime(now);//设置修改时间
+		doSave(db);//保存
 
-		AuditLogVO vo = new AuditLogVO();
+		AuditLogVO vo = new AuditLogVO();//审计日志
 		vo.setType(1L);//管理操作
 		vo.setOperationService("标签与画像");//必传
 		vo.setOperationModule("标签管理");//必传
 		vo.setFunctionLev1("编辑");//必传
 		vo.setFunctionLev2("删除");//必传
 		vo.setRecordId(db.getId()+"");
-		auditComponet.saveAuditLog(vo);
-		dtTagUpdateLogService.loggingDelete(db,userId,ip);
+		auditComponet.saveAuditLog(vo);//保存审计日志
+		dtTagUpdateLogService.loggingDelete(db,userId,ip);//保存删除日志
 	}
 
-
+	/**
+	 *
+	 * @param id
+	 * @param now
+	 */
 	public void doSoftDeleteByRootID(Long id,Date now){
 		//-为了减少数据库io，先查询该节点下的所有节点的父节点集，在逐层伪删除
 		List<Long> pIds = dtTagRepository.findPIdByRootId(id);
 		for (Long pId : pIds){
-		    dtTagRepository.doSoftDeleteByPreaTagId(pId,now);
+		    dtTagRepository.doSoftDeleteByPreaTagId(pId,now);//软删除
         }
 	}
+
+	/**
+	 *
+	 * @param tagIds
+	 * @return
+	 */
 	public List<DtTag> findByTagIds(List<Long> tagIds){
-		return dtTagRepository.findByTagIds(tagIds);
+		return dtTagRepository.findByTagIds(tagIds);//
 	}
 
 	/**
 	 * 根据标签id获取整颗数的节点id
 	 */
 	public List<Long> findAllIdsByTagId(Long tagId){
-		List<Long> tagIds = dtTagRepository.findAllIdsByRootId(tagId);
+		List<Long> tagIds = dtTagRepository.findAllIdsByRootId(tagId);//根据标签id获取整颗数的节点id
 		return tagIds;
 	}
 	/**
@@ -233,7 +292,7 @@ public class DtTagServiceImpl implements DtTagService {
 		DtTag tag = get(tagId);//获取标签
 		if (tag != null){
 			if (tag.getPreaTagId()!=null){
-				idpath = this.getIdpPath(tag.getPreaTagId());//获取标签路径
+				idpath = this.getIdpPath(tag.getPreaTagId());//获取标签树路径
 				idpath += ","+tag.getId();
 			}else {
 				DtTagGroup tagGroup = dtTagGroupService.get(tag.getTagsId());//获取标签组
@@ -253,7 +312,7 @@ public class DtTagServiceImpl implements DtTagService {
 	 */
 	public SuccessMessage doSaveOrEdit(DtTag body,String ip)throws Exception{
 		//修改，记录更新时间等
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取用户信息
 		Long userId = Long.valueOf(userInfo.getUserId());//获取用户id
 //		String ip = IpUtil.getRealIP(request);
 		DtTagGroup tagGroup = dtTagGroupService.get(body.getTagsId());//获取表签组
@@ -275,7 +334,7 @@ public class DtTagServiceImpl implements DtTagService {
 				vo.setFunctionLev2("添加标签");//必传
 				vo.setDataAfterOperat(JSONObject.toJSONString(body));//body转化为json格式
 				vo.setRecordId(body.getId()+"");//记录id
-				auditComponet.saveAuditLog(vo);//保存
+				auditComponet.saveAuditLog(vo);//保存审计日志
 				return new SuccessMessage("新建成功");
 			} else {
 				DtTag db = this.get(body.getId());//获取标签
@@ -286,22 +345,22 @@ public class DtTagServiceImpl implements DtTagService {
 				if (body.getIsDeleted() != null && body.getIsDeleted().equals(Constants.PUBLIC_YES)) {
 					throw new APIException(MyErrorConstants.PUBLIC_ERROE, "请不要用此方法进行删除操作，请用DELETE方法");
 				}
-				body = this.doUpdate(body, db, userId, ip);
-				idpath = this.getIdpPath(body.getId());
-				body.setIdPath(idpath);
-				body = this.doSave(body);
-				tagGroup.setModifyTime(new Date());
-				dtTagGroupService.doSave(tagGroup);
-				AuditLogVO vo = new AuditLogVO();
+				body = this.doUpdate(body, db, userId, ip);//更新标签
+				idpath = this.getIdpPath(body.getId());//获取标签树路径
+				body.setIdPath(idpath);//设置标签数据路径
+				body = this.doSave(body);//保存
+				tagGroup.setModifyTime(new Date());//设置标签组修改日期
+				dtTagGroupService.doSave(tagGroup);//保存标签组
+				AuditLogVO vo = new AuditLogVO();//成绩审计日志
 				vo.setType(1L);//管理操作
 				vo.setOperationService("标签与画像");//必传
 				vo.setOperationModule("标签管理");//必传
 				vo.setFunctionLev1("编辑");//必传
 				vo.setFunctionLev2("保存");//必传
-				vo.setDataBeforeOperat(beforeUpdataJson);
-				vo.setDataAfterOperat(JSONObject.toJSONString(body));
+				vo.setDataBeforeOperat(beforeUpdataJson);//修改之前的数据（json格式）
+				vo.setDataAfterOperat(JSONObject.toJSONString(body));//修改之后的数据（json格式）
 				vo.setRecordId(body.getId()+"");
-				auditComponet.saveAuditLog(vo);
+				auditComponet.saveAuditLog(vo);//保存审计日志
 				return new SuccessMessage("修改成功");
 			}
 

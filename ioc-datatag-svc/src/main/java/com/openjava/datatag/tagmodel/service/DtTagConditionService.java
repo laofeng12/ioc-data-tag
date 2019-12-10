@@ -28,6 +28,12 @@ public interface DtTagConditionService {
 	List<DtTagCondition> findByColId(Long colId);
 	List<DtTagCondition> findByColIds(List<Long> colIds);
 
+	/**
+	 * 根据模型id和标签id获取条件设置
+	 * @param taggingModelId
+	 * @param tagId
+	 * @return
+	 */
 	List<DtTagCondition> findByTaggingModelIdAndColId(Long taggingModelId ,Long tagId);
 	List<DtTagCondition> findByTagIds(List<Long> tagIds);
 }

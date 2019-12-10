@@ -18,24 +18,107 @@ import java.util.List;
  *
  */
 public interface DtTagService {
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	Page<DtTag> query(DtTagDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	List<DtTag> queryDataOnly(DtTagDBParam params, Pageable pageable);
+
+	/**
+	 * 根据标签组ID获取
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
 	TagDTOTreeNodeShow getTree(Long id) throws Exception;
+
+	/**
+	 * 根据id获取标签
+	 * @param id
+	 * @return
+	 */
 	DtTag get(Long id);
+
+	/**
+	 * 根据标签组id获取标齐全
+	 * @param id
+	 * @return
+	 */
 	List<DtTag> findByTagsId(Long id);
+
+	/**
+	 * 根据父标签id获取标签
+	 * @param pId
+	 * @return
+	 */
 	List<DtTag> findByPreaTagId(Long pId);
 
+	/**
+	 * 保存
+	 * @param m
+	 * @return
+	 */
 	DtTag doSave(DtTag m);
+
+	/**
+	 * 修改
+	 * @param body
+	 * @param ip
+	 * @return
+	 * @throws Exception
+	 */
 	SuccessMessage doSaveOrEdit(DtTag body,String ip)throws Exception;//修改标签
+
+	/**
+	 *
+	 * @param tag
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	DtTag doNew(DtTag tag,Long userId,String ip);
 
+	/**
+	 *
+	 * @param tag
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	DtTag doUpdate(DtTag tag,DtTag db,Long userId,String ip);
 
+	/**
+	 *
+	 * @param id
+	 * @param now
+	 */
 	void doSoftDeleteByTagsID(Long id, Date now);
 
+	/**
+	 *
+	 * @param id
+	 * @param now
+	 */
 	void doSoftDeleteByRootID(Long id,Date now);
 
+	/**
+	 * 软删除
+	 * @param tag
+	 * @param userId
+	 * @param ip
+	 * @throws Exception
+	 */
 	void doSoftDeleteByDtTag(DtTag tag,Long userId,String ip)throws Exception;
 
 	/**
