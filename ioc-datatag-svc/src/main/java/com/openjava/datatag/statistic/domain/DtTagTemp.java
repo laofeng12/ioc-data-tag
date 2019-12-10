@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 public class DtTagTemp {
-    private int tagsum;
+    private int tagsum;//上个月唯一标签增长数量
     public DtTagTemp(int tagsum){
         this.tagsum=tagsum;
     }

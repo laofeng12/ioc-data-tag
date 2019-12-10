@@ -43,10 +43,10 @@ public class TagMonthIncrease {
     @ResponseBody
     @RequestMapping(value = "/datasetgrowth",method = RequestMethod.GET)
     public DataApiResponse<DtTaggingModelTemp> getDataSetGrowth()throws Exception{
-        Long lastMonthDataSetCount = TagDashboardService.lastMonthDataSetCount();
+        Long lastMonthDataSetCount = TagDashboardService.lastMonthDataSetCount();//获取上个月使用数据集
         DtTaggingModelTemp dtTaggingModelTemp = new DtTaggingModelTemp(lastMonthDataSetCount);
-        DataApiResponse<DtTaggingModelTemp> apiResp = new DataApiResponse<>();
-        apiResp.setData(dtTaggingModelTemp);
+        DataApiResponse<DtTaggingModelTemp> apiResp = new DataApiResponse<>();//构造返回结构
+        apiResp.setData(dtTaggingModelTemp);//设置返回数据
         return apiResp;
     }
 
@@ -63,10 +63,10 @@ public class TagMonthIncrease {
     @ResponseBody
     @RequestMapping(value = "/getLastMonthTagSum",method = RequestMethod.GET)
     public Object getLastMonthTagSum()throws Exception{
-        tagsum = TagDashboardService.getLastMonthTagSum();
+        tagsum = TagDashboardService.getLastMonthTagSum();//上新增唯一标签数量
         DtTagTemp dtTagTemp = new DtTagTemp(tagsum);
-        DataApiResponse<DtTagTemp> apiResp = new DataApiResponse<>();
-        apiResp.setData(dtTagTemp);
+        DataApiResponse<DtTagTemp> apiResp = new DataApiResponse<>();//构造返回结构
+        apiResp.setData(dtTagTemp);//设置返回数据
         return apiResp;
     }
 
@@ -82,10 +82,10 @@ public class TagMonthIncrease {
     @ResponseBody
     @RequestMapping(value = "/getTagThanDataSet",method = RequestMethod.GET)
     public Object getTagThanDataSet()throws Exception{
-        String percentage = TagDashboardService.getTagThanDataSet();
+        String percentage = TagDashboardService.getTagThanDataSet();//获取上个月使用标签和使用据集的比重
         DtTagThanDataSet dtTagThanDataSet = new DtTagThanDataSet(percentage);
-        DataApiResponse<DtTagThanDataSet> apiResp = new DataApiResponse<>();
-        apiResp.setData(dtTagThanDataSet);
+        DataApiResponse<DtTagThanDataSet> apiResp = new DataApiResponse<>();//构造返回结构
+        apiResp.setData(dtTagThanDataSet);//设置返回数据
         return apiResp;
     }
 

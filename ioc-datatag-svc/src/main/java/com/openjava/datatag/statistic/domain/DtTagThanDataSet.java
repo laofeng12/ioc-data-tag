@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 public class DtTagThanDataSet {
-   private String numbers;
+   private String numbers;//上个月每个数据集对应的标签数量
     public DtTagThanDataSet(String numbers){
         this.numbers=numbers;
     }
