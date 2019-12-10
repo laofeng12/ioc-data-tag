@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 public class DtMonthsTagNumber {
-    private List<Object> MonthTagNumber =new ArrayList<>();
+    private List<Object> MonthTagNumber =new ArrayList<>();//
     public void getMonthTagNumber(List<Object> MonthTagNumber){this.MonthTagNumber=MonthTagNumber;}
 
 }

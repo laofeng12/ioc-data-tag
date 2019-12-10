@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class DtLeftListData {
-    private List<Object> AllYearMonth =new ArrayList<>();
+    private List<Object> AllYearMonth =new ArrayList<>();//
     public void getAllYearMonth(List<Object> AllYearMonth){this.AllYearMonth=AllYearMonth;}
 
 

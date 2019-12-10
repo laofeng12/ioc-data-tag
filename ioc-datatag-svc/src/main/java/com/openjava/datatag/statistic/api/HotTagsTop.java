@@ -40,9 +40,9 @@ public class HotTagsTop {
     @ResponseBody
     @RequestMapping(value = "getsamedayhottags" ,method = RequestMethod.GET)
     public  Object getHotTags()throws Exception{
-        List<Object> list = TagDashboardService.getSamedayHotTags();
-        DataApiResponse<Object> apiResp = new DataApiResponse<>();
-        apiResp.setData(list);
+        List<Object> list = TagDashboardService.getSamedayHotTags();//获取今日 top5热门标签
+        DataApiResponse<Object> apiResp = new DataApiResponse<>();//构造返回结构
+        apiResp.setData(list);//设置返回数据
         return apiResp;
     }
 
@@ -58,9 +58,9 @@ public class HotTagsTop {
     @ResponseBody
     @RequestMapping(value = "getyesterdayhottags" ,method = RequestMethod.GET)
     public  Object getYesterdayHotTags()throws Exception{
-        List<Object> list = TagDashboardService.getYesterdayHotTags();
-        DataApiResponse<Object> apiResp = new DataApiResponse<>();
-        apiResp.setData(list);
+        List<Object> list = TagDashboardService.getYesterdayHotTags();//获取昨日 top5热门标签
+        DataApiResponse<Object> apiResp = new DataApiResponse<>();//构造返回结构
+        apiResp.setData(list);//设置返回数据
         return apiResp;
     }
 
@@ -76,9 +76,9 @@ public class HotTagsTop {
     @ResponseBody
     @RequestMapping(value = "getlastweekhottags" ,method = RequestMethod.GET)
     public  Object getLastweekHotTags()throws Exception{
-        List<Object> list = TagDashboardService.getLastweekHotTags();
-        DataApiResponse<Object> apiResp = new DataApiResponse<>();
-        apiResp.setData(list);
+        List<Object> list = TagDashboardService.getLastweekHotTags();//获取最近一周 top5热门标签
+        DataApiResponse<Object> apiResp = new DataApiResponse<>();//构造返回结构
+        apiResp.setData(list);//设置返回数据
         return apiResp;
     }
 
@@ -94,9 +94,9 @@ public class HotTagsTop {
     @ResponseBody
     @RequestMapping(value = "getlastmonthhottags" ,method = RequestMethod.GET)
     public  Object getLastMonthHotTags()throws Exception{
-        List<Object> list = TagDashboardService.getLastMonthHotTags();
-        DataApiResponse<Object> apiResp = new DataApiResponse<>();
-        apiResp.setData(list);
+        List<Object> list = TagDashboardService.getLastMonthHotTags();//获取最近一周 top5热门标签
+        DataApiResponse<Object> apiResp = new DataApiResponse<>();//构造返回结构
+        apiResp.setData(list);//设置返回数据
         return apiResp;
     }
 
@@ -113,9 +113,9 @@ public class HotTagsTop {
     @ResponseBody
     @RequestMapping(value = "getlastyearhottags" ,method = RequestMethod.GET)
     public  Object getLastYearHotTags()throws Exception{
-        List<Object> list = TagDashboardService.getLastYearHotTags();
-        DataApiResponse<Object> apiResp = new DataApiResponse<>();
-        apiResp.setData(list);
+        List<Object> list = TagDashboardService.getLastYearHotTags();//获取最近一周 top5热门标签
+        DataApiResponse<Object> apiResp = new DataApiResponse<>();//构造返回结构
+        apiResp.setData(list);//设置返回数据
         return apiResp;
     }
 
