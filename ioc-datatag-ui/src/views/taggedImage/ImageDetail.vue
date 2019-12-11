@@ -24,21 +24,21 @@
               <div v-else>暂无数据</div>
             </template>
             <!--<el-table-column label="操作" width="100px">-->
-              <!--<template slot-scope="props" class="caozuo">-->
-                <!--<span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>-->
-              <!--</template>-->
+            <!--<template slot-scope="props" class="caozuo">-->
+            <!--<span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>-->
+            <!--</template>-->
             <!--</el-table-column>-->
             <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
                              :prop="item" min-width="300" v-if="index <1">
-            <template slot-scope="props" class="caozuo">
-              <span class="operationIcona  look" @click="lookImage(props.row)">{{props.row[item]}}</span>
-            </template>
+              <template slot-scope="props" class="caozuo">
+                <span class="operationIcona  look" @click="lookImage(props.row)">{{props.row[item]}}</span>
+              </template>
             </el-table-column>
             <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
                              :prop="item" min-width="300" v-if="index > 0"></el-table-column>
           </el-table>
           <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
-                              <!--@sureClick="goPage"></element-pagination>-->
+          <!--@sureClick="goPage"></element-pagination>-->
           <element-pagination
             :pageSize="size"
             :currentPage="page+1"
@@ -48,7 +48,7 @@
           ></element-pagination>
         </div>
         <div v-if="showPicture" class="topImage">
-        <img src="../../assets/img/001.png" height="144" width="160"/>
+          <img src="../../assets/img/001.png" height="144" width="160"/>
         </div>
       </div>
     </div>
@@ -57,15 +57,15 @@
 
 <script>
   import ElementPagination from '@/components/ElementPagination'
-  import {getlist, getImagelist} from '@/api/lableImage.js'
+  import {getTabulation, getImagelist} from '@/api/lableImage.js'
 
   export default {
     components: {ElementPagination},
     name: 'modelEdit',
     data() {
       return {
-        showTable:true,
-        showPicture:false,
+        showTable: true,
+        showPicture: false,
         page: 0,
         size: 20,
         totalnum: 0,
@@ -95,7 +95,6 @@
       this.getList()
     },
     mounted() {
-
     },
     methods: {
       async getList() {
@@ -106,7 +105,7 @@
         }
         try {
           //theadData
-          const resList = await getlist(params)
+          const resList = await getTabulation(params)
           if ((resList.data.result.content && resList.data.result.content.length > 0) && (resList.data.cols && resList.data.cols.length > 0)) {
             this.ztableShowList = resList.data.result.content
             this.theadData = resList.data.cols
@@ -120,9 +119,7 @@
             this.showPicture = true
             this.Loading = false
             this.showTable = false
-            // this.$message.error('请先进行数据调度');
           }
-
           this.totalnum = resList.data.result.totalElements
         } catch (e) {
 
@@ -132,9 +129,14 @@
         this.page = page - 1
         this.getList()
       },
-      handleSizeChange (size) {
+      handleSizeChange(size) {
         this.size = size
-        this.getList()
+        if (size > this.totalnum) {
+          this.page = 0
+          this.getList()
+        }else {
+          this.getList()
+        }
       },
       goPage() {
       },
@@ -237,9 +239,11 @@
     top: 50%;
     transform: translateY(-50%);
   }
-.newTable{
-  padding: 0px 15px;
-}
+
+  .newTable {
+    padding: 0px 15px;
+  }
+
   .clearfix:after {
     content: '';
     display: block;
