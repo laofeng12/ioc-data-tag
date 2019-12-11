@@ -23,52 +23,52 @@
           <el-container class="">
             <el-aside width="250px" class="leftNew">
               <!--<el-tabs v-model="activeName" @tab-click="handleClick">-->
-                <div>
-                  <h3 style="margin-top: -6px">选择字段</h3>
+              <div>
+                <h3 style="margin-top: -6px">选择字段</h3>
                 <!--<el-tab-pane label="可用字段" name="first">-->
-                  <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
-                            prefix-icon="el-icon-search" clearable></el-input>
-                  <div class="h4" v-show="list.length > 0">
-                    <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
-                      {{resourceName}}
-                    </el-checkbox>
-                  </div>
-                  <ul class="contentNumheight">
-                    <li v-for="(item,index) in list">
-                      <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
-                        <el-checkbox :label="item.definition" :key="item.definition">
+                <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
+                          prefix-icon="el-icon-search" clearable></el-input>
+                <div class="h4" v-show="list.length > 0">
+                  <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
+                    {{resourceName}}
+                  </el-checkbox>
+                </div>
+                <ul class="contentNumheight">
+                  <li v-for="(item,index) in list">
+                    <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
+                      <el-checkbox :label="item.definition" :key="item.definition">
                         <span class="col-name-box">
                           <span v-if="item.type==='string'" class="blue">Str.</span>
                           <span v-else-if="item.type==='number'" class="green">No.</span>
                           <span v-else="item.type==='date'" class="orange">Date.</span>
                           <span class="col-name" :title="item.definition">{{item.definition}}</span>
                         </span>
-                        </el-checkbox>
-                      </el-checkbox-group>
-                    </li>
-                  </ul>
+                      </el-checkbox>
+                    </el-checkbox-group>
+                  </li>
+                </ul>
                 <!--</el-tab-pane>-->
-                </div>
+              </div>
               <!--暂时注释掉，为后期数据湖权限功能做准备-->
-                <!--<el-tab-pane label="全部字段" name="second" class="">-->
-                  <!--<el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"-->
-                            <!--prefix-icon="el-icon-search" clearable></el-input>-->
-                  <!--<div class="h4">-->
-                    <!--<span class="allNametitle">{{resourceName}}</span>-->
-                  <!--</div>-->
-                  <!--<ul class="contentNumheight">-->
-                    <!--<li v-for="(item,index) in allList">-->
-                      <!--<div class="col-name-box">-->
-                        <!--<div v-if="item.type==='string'" class="blue">Str.</div>-->
-                        <!--<div v-else-if="item.type==='number'" class="green">No.</div>-->
-                        <!--<div v-else="item.type==='date'" class="orange">Date.</div>-->
-                        <!--<div class="col-name" :title="item.definition">{{item.definition}}</div>-->
-                        <!--<div class="power"><span>{{powerName}}</span></div>-->
-                      <!--</div>-->
-                    <!--</li>-->
-                  <!--</ul>-->
-                  <!--&lt;!&ndash;<div class="subscribeData" v-if="this.resourceType == 0" @click="getLink">订阅数据</div>&ndash;&gt;-->
-                <!--</el-tab-pane>-->
+              <!--<el-tab-pane label="全部字段" name="second" class="">-->
+              <!--<el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"-->
+              <!--prefix-icon="el-icon-search" clearable></el-input>-->
+              <!--<div class="h4">-->
+              <!--<span class="allNametitle">{{resourceName}}</span>-->
+              <!--</div>-->
+              <!--<ul class="contentNumheight">-->
+              <!--<li v-for="(item,index) in allList">-->
+              <!--<div class="col-name-box">-->
+              <!--<div v-if="item.type==='string'" class="blue">Str.</div>-->
+              <!--<div v-else-if="item.type==='number'" class="green">No.</div>-->
+              <!--<div v-else="item.type==='date'" class="orange">Date.</div>-->
+              <!--<div class="col-name" :title="item.definition">{{item.definition}}</div>-->
+              <!--<div class="power"><span>{{powerName}}</span></div>-->
+              <!--</div>-->
+              <!--</li>-->
+              <!--</ul>-->
+              <!--&lt;!&ndash;<div class="subscribeData" v-if="this.resourceType == 0" @click="getLink">订阅数据</div>&ndash;&gt;-->
+              <!--</el-tab-pane>-->
               <!--</el-tabs>-->
             </el-aside>
 
@@ -142,51 +142,51 @@
           <el-aside width="250px" class="left">
             <div>
               <h3>选择字段</h3>
-            <!--<el-tabs v-model="activeName" @tab-click="handleClick">-->
+              <!--<el-tabs v-model="activeName" @tab-click="handleClick">-->
               <!--<el-tab-pane label="可用字段" name="first">-->
-                <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
-                          prefix-icon="el-icon-search" clearable></el-input>
-                <div class="h4">
-                  <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
-                    {{resourceName}}
-                  </el-checkbox>
-                </div>
-                <ul class="contentNum">
-                  <li v-for="(item,index) in list">
-                    <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
-                      <el-checkbox :label="item.definition" :key="item.definition">
+              <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"
+                        prefix-icon="el-icon-search" clearable></el-input>
+              <div class="h4">
+                <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
+                  {{resourceName}}
+                </el-checkbox>
+              </div>
+              <ul class="contentNum">
+                <li v-for="(item,index) in list">
+                  <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
+                    <el-checkbox :label="item.definition" :key="item.definition">
                         <span class="col-name-box">
                           <span v-if="item.type==='string'" class="blue">Str.</span>
                           <span v-else-if="item.type==='number'" class="green">No.</span>
                           <span v-else="item.type==='date'" class="orange">Date.</span>
                           <span class="col-name" :title="item.definition">{{item.definition}}</span>
                         </span>
-                      </el-checkbox>
-                    </el-checkbox-group>
-                  </li>
-                </ul>
+                    </el-checkbox>
+                  </el-checkbox-group>
+                </li>
+              </ul>
               <!--</el-tab-pane>-->
               <!--暂时注释，为后期数据湖权限问题做准备-->
               <!--<el-tab-pane label="全部字段" name="second" class="">-->
-                <!--<el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"-->
-                          <!--prefix-icon="el-icon-search" clearable></el-input>-->
-                <!--<div class="h4">-->
-                  <!--<span class="allNametitle">{{resourceName}}</span>-->
-                <!--</div>-->
-                <!--<ul class="contentNum">-->
-                  <!--<li v-for="(item,index) in allList">-->
-                    <!--<div class="col-name-box">-->
-                      <!--<div v-if="item.type==='string'" class="blue">Str.</div>-->
-                      <!--<div v-else-if="item.type==='number'" class="green">No.</div>-->
-                      <!--<div v-else="item.type==='date'" class="orange">Date.</div>-->
-                      <!--<div class="col-name" :title="item.definition">{{item.definition}}</div>-->
-                      <!--<div class="power"><span>{{powerName}}</span></div>-->
-                    <!--</div>-->
-                  <!--</li>-->
-                <!--</ul>-->
-                <!--<div class="subscribeData" v-if="this.resourceType == 0" @click="getLink">订阅数据</div>-->
+              <!--<el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small"-->
+              <!--prefix-icon="el-icon-search" clearable></el-input>-->
+              <!--<div class="h4">-->
+              <!--<span class="allNametitle">{{resourceName}}</span>-->
+              <!--</div>-->
+              <!--<ul class="contentNum">-->
+              <!--<li v-for="(item,index) in allList">-->
+              <!--<div class="col-name-box">-->
+              <!--<div v-if="item.type==='string'" class="blue">Str.</div>-->
+              <!--<div v-else-if="item.type==='number'" class="green">No.</div>-->
+              <!--<div v-else="item.type==='date'" class="orange">Date.</div>-->
+              <!--<div class="col-name" :title="item.definition">{{item.definition}}</div>-->
+              <!--<div class="power"><span>{{powerName}}</span></div>-->
+              <!--</div>-->
+              <!--</li>-->
+              <!--</ul>-->
+              <!--<div class="subscribeData" v-if="this.resourceType == 0" @click="getLink">订阅数据</div>-->
               <!--</el-tab-pane>-->
-            <!--</el-tabs>-->
+              <!--</el-tabs>-->
             </div>
           </el-aside>
           <div class="right" style="width: 100%;">
@@ -224,7 +224,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="排序" width="50">
+                  label="序号" width="50">
                   <template slot-scope="scope">
                     <div v-model="scope.row.colSort">{{scope.row.colSort}}</div>
                   </template>
@@ -808,8 +808,12 @@
       },
       // 打标主键的选择
       changeSel() {
-        this.tableData.map(item => {
-          if (item.definition == this.ruleForm.pkey) {
+        let index = this.tableData.findIndex(item => item.definition === this.ruleForm.pkey)
+        let data = this.tableData.splice(index, 1)
+        this.tableData.unshift(data[0])
+        this.tableData.map((item, index) => {
+          item.colSort = index + 1
+          if (item.definition === this.ruleForm.pkey) {
             item.isMarking = false
           }
         })
