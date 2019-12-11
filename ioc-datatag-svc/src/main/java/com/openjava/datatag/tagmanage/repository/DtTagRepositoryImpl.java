@@ -7,6 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+/**
+ *
+ */
 public class DtTagRepositoryImpl implements DtTagRepositoryCustom {
 	private EntityManager em;
 	

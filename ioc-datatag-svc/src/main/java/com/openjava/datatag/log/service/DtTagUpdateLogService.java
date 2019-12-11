@@ -17,12 +17,34 @@ import com.openjava.datatag.log.query.DtTagUpdateLogDBParam;
  *
  */
 public interface DtTagUpdateLogService {
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	Page<DtTagUpdateLog> query(DtTagUpdateLogDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	List<DtTagUpdateLog> queryDataOnly(DtTagUpdateLogDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	DtTagUpdateLog get(Long id);
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	DtTagUpdateLog doSave(DtTagUpdateLog m);
 
 	/**

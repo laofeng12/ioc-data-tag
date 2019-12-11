@@ -63,17 +63,17 @@ import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 public class DtTaggingModelAction {
 	
 	@Resource
-	private DtTaggingModelService dtTaggingModelService;
+	private DtTaggingModelService dtTaggingModelService;//标签模型业务层接口
 
 	@Resource
-	private DtSetColService dtSetColService;
+	private DtSetColService dtSetColService;//字段表业务层接口
 
 	@Resource
-	private SysUserService sysUserService;
+	private SysUserService sysUserService;//业务层接口
 	@Resource
-	private MppPgExecuteUtil mppPgExecuteUtil;
+	private MppPgExecuteUtil mppPgExecuteUtil;//mpp工具
 	@Resource
-	private DownloadQueueService downloadQueueService;
+	private DownloadQueueService downloadQueueService;//下载列表业务层接口
 	/**
 	 * 用主键获取数据
 	 * @return
@@ -91,7 +91,7 @@ public class DtTaggingModelAction {
 	public DtTaggingModelDTO get(
 			@RequestParam(value="taggingModelId",required=true)Long taggingModelId,
 			@RequestParam(value="dataSetId",required=false)Long resourceId) throws Exception{
-		DtTaggingModel m = dtTaggingModelService.get(taggingModelId);
+		DtTaggingModel m = dtTaggingModelService.get(taggingModelId);//获取模型
 		if (m == null || m.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"无此标签模型或已被删除");
 		}
@@ -100,14 +100,21 @@ public class DtTaggingModelAction {
 				throw new APIException(MyErrorConstants.PUBLIC_ERROE,"请选择："+m.getResourceName()+"进行打标");
 			}
 		}
-		DtTaggingModelDTO result = new DtTaggingModelDTO();
-		MyBeanUtils.copyPropertiesNotBlank(result,m);
-		result.setColList(dtSetColService.getByTaggingModelId(result.getTaggingModelId()));
-		result.setModifyUserName(sysUserService.get(result.getModifyUser()).getFullname());
-		result.setCreateUserName(sysUserService.get(result.getCreateUser()).getFullname());
+		DtTaggingModelDTO result = new DtTaggingModelDTO();//
+		MyBeanUtils.copyPropertiesNotBlank(result,m);//对象拷贝
+		result.setColList(dtSetColService.getByTaggingModelId(result.getTaggingModelId()));//
+		result.setModifyUserName(sysUserService.get(result.getModifyUser()).getFullname());//
+		result.setCreateUserName(sysUserService.get(result.getCreateUser()).getFullname());//
 		return result;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 * @throws Exception
+	 */
 	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "like_modelName", value = "模型名字like", required = false, dataType = "String", paramType = "query"),
@@ -121,19 +128,19 @@ public class DtTaggingModelAction {
 	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/search",method=RequestMethod.GET)
 	public TablePage<DtTaggingModelDTO> doSearch(@ApiIgnore() DtTaggingModelDBParam params, @ApiIgnore() Pageable pageable)throws Exception{
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		params.setEq_isDeleted(Constants.PUBLIC_NO);
-		params.setEq_createUser(Long.parseLong(userInfo.getUserId()));
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取用户信息
+		params.setEq_isDeleted(Constants.PUBLIC_NO);//非删除状态
+		params.setEq_createUser(Long.parseLong(userInfo.getUserId()));//创建者
 		Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-				Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));
-		QueryParamsUtil.dealLike(params);
-		Page<DtTaggingModel> results =  dtTaggingModelService.query(params, mypage);
+				Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));//根据修改时间和创建时间倒叙排序
+		QueryParamsUtil.dealLike(params);//处理like
+		Page<DtTaggingModel> results =  dtTaggingModelService.query(params, mypage);//查询
 		List<DtTaggingModelDTO> showList = new ArrayList<>();
 		for (DtTaggingModel tgm: results){
-			DtTaggingModelDTO dto = new DtTaggingModelDTO();
-			MyBeanUtils.copyPropertiesNotBlank(dto,tgm);
-			dto.setCreateUserName(sysUserService.get(dto.getCreateUser()).getFullname());
-			dto.setModifyUserName(sysUserService.get(dto.getModifyUser()).getFullname());
+			DtTaggingModelDTO dto = new DtTaggingModelDTO();//模型
+			MyBeanUtils.copyPropertiesNotBlank(dto,tgm);//对象拷贝
+			dto.setCreateUserName(sysUserService.get(dto.getCreateUser()).getFullname());//创建用户
+			dto.setModifyUserName(sysUserService.get(dto.getModifyUser()).getFullname());//修改用户
 			if (tgm.getUpdateNum()==null) {
 				dto.setRunResult("0/0");
 			}else {
@@ -145,7 +152,7 @@ public class DtTaggingModelAction {
 			}
 			showList.add(dto);
 		}
-		Page<DtTaggingModelDTO> showResult = new PageImpl<>(showList,pageable,results.getTotalElements());
+		Page<DtTaggingModelDTO> showResult = new PageImpl<>(showList,pageable,results.getTotalElements());//
 		return new TablePageImpl<>(showResult);
 	}
 
@@ -161,14 +168,14 @@ public class DtTaggingModelAction {
 	@RequestMapping(value="/rename",method=RequestMethod.POST)
 	public SuccessMessage doSave(@RequestBody DtTaggingModelRenameDTO body,
 								 HttpServletRequest request) throws Exception {
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		String ip = IpUtil.getRealIP(request);
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取当前登录用户
+		String ip = IpUtil.getRealIP(request);//获取请求ip
 		//修改，记录更新时间等
 		DtTaggingModel db = dtTaggingModelService.get(body.getTaggingModelId());
 		if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"找不到该模型或模型已经被删除");
 		}
-		dtTaggingModelService.doRename(body,db,userInfo,ip);
+		dtTaggingModelService.doRename(body,db,userInfo,ip);//重命名
 
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
 		return new SuccessMessage("重命名成功");
@@ -188,16 +195,16 @@ public class DtTaggingModelAction {
 	})
 	public SuccessMessage doDispatch(@RequestBody DtTaggingDispatchDTO body,
 									 HttpServletRequest request) throws Exception {
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		Long userId = Long.parseLong(userInfo.getUserId());
-		String ip = IpUtil.getRealIP(request);
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取当前登录用户
+		Long userId = Long.parseLong(userInfo.getUserId());//获取用户id
+		String ip = IpUtil.getRealIP(request);//获取ip
 
-		DtTaggingModel db = dtTaggingModelService.get(body.getId());
+		DtTaggingModel db = dtTaggingModelService.get(body.getId());//获取模型
 		if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"找不到该模型或模型已经被删除");
 		}
 		if(db.getCreateUser() != null && db.getCreateUser().equals(userId)){
-			dtTaggingModelService.doDispatch(body,db,userId,ip);
+			dtTaggingModelService.doDispatch(body,db,userId,ip);//设置调度
 		}else{
 			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"没有权限修改本模型");
 		}
@@ -221,19 +228,19 @@ public class DtTaggingModelAction {
 	@RequestMapping(value="/Dispatch",method=RequestMethod.GET)
 	public DtTaggingDispatchDTO getDispatch(
 			@RequestParam(value="taggingModelId",required=true)Long taggingModelId) throws Exception{
-		DtTaggingModel m = dtTaggingModelService.get(taggingModelId);
+		DtTaggingModel m = dtTaggingModelService.get(taggingModelId);//获取模型
 		if (m == null || m.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"无此标签模型或已被删除");
 		}
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		Long userId = Long.parseLong(userInfo.getUserId());
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取用户信息
+		Long userId = Long.parseLong(userInfo.getUserId());//用户id
 		if (!m.getCreateUser().equals(userId)){
 			throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY,"无此标签模型权限");
 		}
-		DtTaggingDispatchDTO dto = new DtTaggingDispatchDTO();
-		dto.setCycleEnum(m.getCycleEnum());
-		dto.setStartTime(m.getStartTime());
-		dto.setId(m.getTaggingModelId());
+		DtTaggingDispatchDTO dto = new DtTaggingDispatchDTO();//
+		dto.setCycleEnum(m.getCycleEnum());//
+		dto.setStartTime(m.getStartTime());//开始时间
+		dto.setId(m.getTaggingModelId());//模型id
 		return dto;
 	}
 
@@ -249,12 +256,19 @@ public class DtTaggingModelAction {
 	public SuccessMessage clone(@PathVariable(value="taggingModelId")Long id,
 								@RequestBody DtTaggingModelCopyDTO copy,
 								HttpServletRequest request) throws Exception {
-		String ip = IpUtil.getRealIP(request);
-		copy.setTaggingModelId(id);
-		dtTaggingModelService.copy(copy,ip);
+		String ip = IpUtil.getRealIP(request);//获取ip
+		copy.setTaggingModelId(id);//设置模型id
+		dtTaggingModelService.copy(copy,ip);//另存
 		return new SuccessMessage("另存成功");
 	}
 
+	/**
+	 *
+	 * @param id
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@ApiOperation(value = "删除", nickname="delete")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
@@ -265,10 +279,10 @@ public class DtTaggingModelAction {
 	public SuccessMessage doDelete(
 			@RequestParam(value="id",required=false)Long id,
 			HttpServletRequest request) throws Exception {
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-		Long userId = Long.parseLong(userInfo.getUserId());
-		String ip = IpUtil.getRealIP(request);
-		DtTaggingModel db = dtTaggingModelService.get(id);
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取用户信息
+		Long userId = Long.parseLong(userInfo.getUserId());//用户id
+		String ip = IpUtil.getRealIP(request);//ip
+		DtTaggingModel db = dtTaggingModelService.get(id);//获取模型
 		if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)){
 			throw new APIException(MyErrorConstants.TAG_MODEL_NO_FIND,"找不到该模型或模型已经被删除");
 		}
@@ -281,6 +295,15 @@ public class DtTaggingModelAction {
 	}
 
 
+	/**
+	 *
+	 * @param taggingModelId
+	 * @param type
+	 * @param page
+	 * @param size
+	 * @return
+	 * @throws Exception
+	 */
 	@ApiOperation(value = "获取数据集数据", nickname="getDataSetData")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "taggingModelId", value = "模型主键编码", dataType ="String", paramType = "path"),
@@ -295,13 +318,21 @@ public class DtTaggingModelAction {
 			@PathVariable(value="type")int type,
 			@PathVariable(value="page")int page,
 			@PathVariable(value="size")int size) throws Exception {
-		DataApiResponse response = new DataApiResponse();
-		Pageable pageable = PageRequest.of(page,size);
-		Object  data= dtTaggingModelService.getDataFromDataSet(taggingModelId,type,pageable);
+		DataApiResponse response = new DataApiResponse();//返回数据
+		Pageable pageable = PageRequest.of(page,size);//分页组件
+		Object  data= dtTaggingModelService.getDataFromDataSet(taggingModelId,type,pageable);//获取数据集数据（核心方法）
 		response.setData(data);
 		return response;
 	}
 
+	/**
+	 *
+	 * @param taggingModelId
+	 * @param page
+	 * @param size
+	 * @return
+	 * @throws Exception
+	 */
 	@ApiOperation(value = "查询模型打标结果列表", nickname="getDataSetData")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "taggingModelId", value = "模型主键编码", dataType ="String", paramType = "path"),
@@ -314,9 +345,9 @@ public class DtTaggingModelAction {
 			@PathVariable(value="taggingModelId")Long taggingModelId,
 			@PathVariable(value="page")int page,
 			@PathVariable(value="size")int size) throws Exception {
-		DataApiResponse response = new DataApiResponse();
-		Pageable pageable = PageRequest.of(page,size);
-		Object data = dtTaggingModelService.getTaggingResultData(taggingModelId,1,pageable);
+		DataApiResponse response = new DataApiResponse();//返回参数
+		Pageable pageable = PageRequest.of(page,size);//分页
+		Object data = dtTaggingModelService.getTaggingResultData(taggingModelId,1,pageable);//获取模型打标结果数据
 		response.setData(data);
 		return response;
 	}
@@ -380,9 +411,14 @@ public class DtTaggingModelAction {
 	@RequestMapping(value="/beginDowload", method=RequestMethod.GET)
 	public SuccessMessage beginDowload(
 			@RequestParam(value="number")Long number,@RequestParam(value="taggingModelId")Long taggingModelId) throws Exception{
-		return dtTaggingModelService.beginDowload(number,taggingModelId);
+		return dtTaggingModelService.beginDowload(number,taggingModelId);//开始导出
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws Exception
+	 */
 //	@ApiOperation(value = "PG测试", nickname="PG测试")
 	@Security(session=false)
 	@RequestMapping(value="/test",method=RequestMethod.GET)
@@ -391,32 +427,32 @@ public class DtTaggingModelAction {
 		mppPgExecuteUtil.setTableName("zmk_test");//表名
 		mppPgExecuteUtil.setTableKey("id");//主键
 		mppPgExecuteUtil.dropTable();//删表
-        Map<String,String> map  = new LinkedHashMap<>();
-        Map<String,String> mapType  = new LinkedHashMap<>();
-        map.put("id","主键");
-        map.put("name","名字");
-        map.put("create_time","创建时间");
-        mapType.put("id","bigint");
-        mapType.put("name","varchar");
-        mapType.put("create_time","date");
+        Map<String,String> map  = new LinkedHashMap<>();//
+        Map<String,String> mapType  = new LinkedHashMap<>();//
+        map.put("id","主键");//
+        map.put("name","名字");//
+        map.put("create_time","创建时间");//
+        mapType.put("id","bigint");//
+        mapType.put("name","varchar");//
+        mapType.put("create_time","date");//
 		mppPgExecuteUtil.createTable(map,mapType);//建表
-        List<Object> dataList = new ArrayList<>();
-        List<String> values = new ArrayList<>();
-        values.add("1");
-        values.add("名字1");
+        List<Object> dataList = new ArrayList<>();//
+        List<String> values = new ArrayList<>();//
+        values.add("1");//
+        values.add("名字1");//
         values.add("2018-07-09 00:00:00");
-        dataList.add(values);
-        List<String> values2 = new ArrayList<>();
-        values2.add("2");
-        values2.add("名字2");
+        dataList.add(values);//
+        List<String> values2 = new ArrayList<>();//
+        values2.add("2");//
+        values2.add("名字2");//
         values2.add("2018-07-09 00:00:00");
-        dataList.add(values2);
-		mppPgExecuteUtil.setDataList(dataList);
+        dataList.add(values2);//
+		mppPgExecuteUtil.setDataList(dataList);//
 		mppPgExecuteUtil.insertDataList();//load数据
 		mppPgExecuteUtil.dropTable();//删表
-		mppPgExecuteUtil.setSQL("select * from \"DT_1\"  t ");
-        String[][] data = mppPgExecuteUtil.getData();
-        System.out.println(data.length);
+		mppPgExecuteUtil.setSQL("select * from \"DT_1\"  t ");//
+        String[][] data = mppPgExecuteUtil.getData();//
+        System.out.println(data.length);//
 		return response;
 	}
 }

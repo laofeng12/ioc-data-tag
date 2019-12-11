@@ -18,6 +18,12 @@ public class Schedulejob implements Job {
     Logger logger = LogManager.getLogger(getClass());
     @Resource
     private DtTaggingModelService dtTaggingModelService;
+
+    /**
+     *
+     * @param jobExecutionContext
+     * @throws JobExecutionException
+     */
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         dtTaggingModelService.setToJob();

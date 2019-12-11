@@ -49,8 +49,14 @@ import com.openjava.datatag.log.query.DtTagcolUpdateLogDBParam;
 public class DtTagcolUpdateLogAction {
 	
 	@Resource
-	private DtTagcolUpdateLogService dtTagcolUpdateLogService;
+	private DtTagcolUpdateLogService dtTagcolUpdateLogService;//
 
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "eq_colId", value = "字段表主键=", required = false, dataType = "Long", paramType = "query"),

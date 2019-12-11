@@ -15,17 +15,62 @@ import org.springframework.data.repository.query.Param;
  *
  */
 public interface DtTagConditionService {
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	Page<DtTagCondition> query(DtTagConditionDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	List<DtTagCondition> queryDataOnly(DtTagConditionDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	DtTagCondition get(Long id);
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	DtTagCondition doSave(DtTagCondition m);
-	
+
+	/**
+	 *
+	 * @param id
+	 * @throws Exception
+	 */
 	void doDelete(Long id)throws Exception;
+
+	/**
+	 *
+	 * @param ids
+	 * @throws Exception
+	 */
 	void doRemove(String ids)throws Exception;
+
+	/**
+	 *
+	 * @param colId
+	 * @return
+	 */
 	List<DtTagCondition> findByColId(Long colId);
+
+	/**
+	 *
+	 * @param colIds
+	 * @return
+	 */
 	List<DtTagCondition> findByColIds(List<Long> colIds);
 
 	/**
@@ -35,5 +80,11 @@ public interface DtTagConditionService {
 	 * @return
 	 */
 	List<DtTagCondition> findByTaggingModelIdAndColId(Long taggingModelId ,Long tagId);
+
+	/**
+	 *
+	 * @param tagIds
+	 * @return
+	 */
 	List<DtTagCondition> findByTagIds(List<Long> tagIds);
 }

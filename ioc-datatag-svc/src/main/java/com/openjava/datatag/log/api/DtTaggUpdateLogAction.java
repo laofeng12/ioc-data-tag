@@ -35,10 +35,16 @@ import com.openjava.datatag.log.query.DtTaggUpdateLogDBParam;
 public class DtTaggUpdateLogAction {
 	
 	@Resource
-	private DtTaggUpdateLogService dtTaggUpdateLogService;
-	
+	private DtTaggUpdateLogService dtTaggUpdateLogService;//
 
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 * @throws APIException
+	 */
 	@ApiOperation(value = "列表分页查询-日志查询暂时不开放", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "eq_taggId", value = "标签组编号=", required = false, dataType = "Long", paramType = "query"),

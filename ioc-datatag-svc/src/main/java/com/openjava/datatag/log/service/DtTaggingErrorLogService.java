@@ -14,15 +14,52 @@ import com.openjava.datatag.log.query.DtTaggingErrorLogDBParam;
  *
  */
 public interface DtTaggingErrorLogService {
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	Page<DtTaggingErrorLog> query(DtTaggingErrorLogDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	List<DtTaggingErrorLog> queryDataOnly(DtTaggingErrorLogDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	DtTaggingErrorLog get(Long id);
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	DtTaggingErrorLog doSave(DtTaggingErrorLog m);
-	
+
+	/**
+	 *
+	 * @param id
+	 */
 	void doDelete(Long id);
+
+	/**
+	 *
+	 * @param ids
+	 */
 	void doRemove(String ids);
+
+	/**
+	 *
+	 * @param taggingModelId
+	 * @return
+	 */
 	DtTaggingErrorLog getByTaggingModelIdOrderByErrorTimeDesc(Long taggingModelId);
 }

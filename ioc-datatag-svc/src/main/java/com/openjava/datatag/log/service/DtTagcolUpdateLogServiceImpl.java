@@ -25,17 +25,34 @@ import com.openjava.datatag.log.repository.DtTagcolUpdateLogRepository;
 public class DtTagcolUpdateLogServiceImpl implements DtTagcolUpdateLogService {
 	
 	@Resource
-	private DtTagcolUpdateLogRepository dtTagcolUpdateLogRepository;
-	
+	private DtTagcolUpdateLogRepository dtTagcolUpdateLogRepository;//
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public Page<DtTagcolUpdateLog> query(DtTagcolUpdateLogDBParam params, Pageable pageable){
 		Page<DtTagcolUpdateLog> pageresult = dtTagcolUpdateLogRepository.query(params, pageable);
 		return pageresult;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public List<DtTagcolUpdateLog> queryDataOnly(DtTagcolUpdateLogDBParam params, Pageable pageable){
 		return dtTagcolUpdateLogRepository.queryDataOnly(params, pageable);
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	public DtTagcolUpdateLog get(Long id) {
 		Optional<DtTagcolUpdateLog> o = dtTagcolUpdateLogRepository.findById(id);
 		if(o.isPresent()) {
@@ -45,14 +62,28 @@ public class DtTagcolUpdateLogServiceImpl implements DtTagcolUpdateLogService {
 		System.out.println("找不到记录DtTagcolUpdateLog："+id);
 		return null;
 	}
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	public DtTagcolUpdateLog doSave(DtTagcolUpdateLog m) {
 		return dtTagcolUpdateLogRepository.save(m);
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 */
 	public void doDelete(Long id) {
 		dtTagcolUpdateLogRepository.deleteById(id);
 	}
+
+	/**
+	 *
+	 * @param ids
+	 */
 	public void doRemove(String ids) {
 		String[] items = ids.split(",");
 		for (int i = 0; i < items.length; i++) {
@@ -60,6 +91,13 @@ public class DtTagcolUpdateLogServiceImpl implements DtTagcolUpdateLogService {
 		}
 	}
 
+	/**
+	 *
+	 * @param content
+	 * @param db
+	 * @param ip
+	 * @return
+	 */
 	public DtTagcolUpdateLog loggingUpdate(String content,DtSetCol db, String ip){
 		DtTagcolUpdateLog log = new DtTagcolUpdateLog();
 		log.setId(ConcurrentSequence.getInstance().getSequence());
@@ -73,6 +111,13 @@ public class DtTagcolUpdateLogServiceImpl implements DtTagcolUpdateLogService {
 		return dtTagcolUpdateLogRepository.save(log);
 	}
 
+	/**
+	 *
+	 * @param content
+	 * @param db
+	 * @param ip
+	 * @return
+	 */
 	public DtTagcolUpdateLog loggingNew(String content,DtSetCol db,String ip){
 		DtTagcolUpdateLog log = new DtTagcolUpdateLog();
 		log.setId(ConcurrentSequence.getInstance().getSequence());
@@ -86,6 +131,13 @@ public class DtTagcolUpdateLogServiceImpl implements DtTagcolUpdateLogService {
 		return dtTagcolUpdateLogRepository.save(log);
 	}
 
+	/**
+	 *
+	 * @param content
+	 * @param db
+	 * @param ip
+	 * @return
+	 */
 	public DtTagcolUpdateLog loggingDelete(String content,DtSetCol db,String ip){
 		DtTagcolUpdateLog log = new DtTagcolUpdateLog();
 		log.setId(ConcurrentSequence.getInstance().getSequence());

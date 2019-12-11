@@ -15,10 +15,19 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
+/**
+ *
+ */
 public class DtTaggingUpdateIndexJob implements Job {
     Logger logger = LogManager.getLogger(getClass());
     @Resource
     private DtWaitUpdateIndexService dtWaitUpdateIndexService;
+
+    /**
+     *
+     * @param jobExecutionContext
+     * @throws JobExecutionException
+     */
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobKey key = jobExecutionContext.getJobDetail().getKey();

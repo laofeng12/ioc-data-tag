@@ -11,14 +11,26 @@ import org.springframework.data.jpa.repository.Query;
  *
  */
 public interface DtTaggChooseLogRepository extends DynamicJpaRepository<DtTaggChooseLog, Long>, DtTaggChooseLogRepositoryCustom{
-	@Query(value = "SELECT count(id) " +
+    /**
+     *
+     * @param userId
+     * @param copiedTaggId
+     * @return
+     */
+    @Query(value = "SELECT count(id) " +
             "from DT_TAGG_CHOOSE_LOG " +
             "where COPIED_TAGG = :copiedTaggId " +
             "and CHOOSE_USER = :userId " +
             "and to_char(CHOOSE_TIME,'yyyy-mm-dd') = to_char(sysdate,'yyyy-mm-dd')"
             ,nativeQuery = true)
     Long countChooseToday(Long userId,Long copiedTaggId);
-	
+
+    /**
+     *
+     * @param userId
+     * @param copiedTaggId
+     * @return
+     */
     @Query(value = "SELECT count(id) " +
             "from DT_TAGG_CHOOSE_LOG " +
             "where COPIED_TAGG = :copiedTaggId " +

@@ -28,17 +28,34 @@ import com.openjava.datatag.log.repository.DtTagUpdateLogRepository;
 public class DtTagUpdateLogServiceImpl implements DtTagUpdateLogService {
 	
 	@Resource
-	private DtTagUpdateLogRepository dtTagUpdateLogRepository;
-	
+	private DtTagUpdateLogRepository dtTagUpdateLogRepository;//
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public Page<DtTagUpdateLog> query(DtTagUpdateLogDBParam params, Pageable pageable){
 		Page<DtTagUpdateLog> pageresult = dtTagUpdateLogRepository.query(params, pageable);
 		return pageresult;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public List<DtTagUpdateLog> queryDataOnly(DtTagUpdateLogDBParam params, Pageable pageable){
 		return dtTagUpdateLogRepository.queryDataOnly(params, pageable);
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	public DtTagUpdateLog get(Long id) {
 		Optional<DtTagUpdateLog> o = dtTagUpdateLogRepository.findById(id);
 		if(o.isPresent()) {
@@ -48,7 +65,12 @@ public class DtTagUpdateLogServiceImpl implements DtTagUpdateLogService {
 		System.out.println("找不到记录DtTagUpdateLog："+id);
 		return null;
 	}
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	public DtTagUpdateLog doSave(DtTagUpdateLog m) {
 		return dtTagUpdateLogRepository.save(m);
 	}

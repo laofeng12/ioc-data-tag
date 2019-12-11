@@ -15,7 +15,11 @@ import java.util.List;
  *
  */
 public interface DtTaggingErrorLogRepository extends DynamicJpaRepository<DtTaggingErrorLog, Long>, DtTaggingErrorLogRepositoryCustom{
-
+    /**
+     *
+     * @param taggingModelId
+     * @return
+     */
     @Query(value = "select * from (select * from DT_TAGGING_ERROR_LOG  where TAGGING_MODEL_ID=:taggingModelId order by ERROR_TIME desc) where rownum <= 1 ",nativeQuery = true)
     DtTaggingErrorLog getByTaggingModelIdOrderByErrorTimeDesc(Long taggingModelId);
 }

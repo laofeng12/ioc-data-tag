@@ -23,20 +23,79 @@ import org.springframework.web.bind.annotation.RequestParam;
  *
  */
 public interface DtTaggingModelService {
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 * @throws Exception
+	 */
 	Page<DtTaggingModel> query(DtTaggingModelDBParam params, Pageable pageable)throws Exception;
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	List<DtTaggingModel> queryDataOnly(DtTaggingModelDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	DtTaggingModel get(Long id);
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	DtTaggingModel doSave(DtTaggingModel m);
 	//DtTaggingModel doNew(DtTaggingModel m,BaseUserInfo userInfo, String ip);
+
+	/**
+	 *
+	 * @param m
+	 * @param userInfo
+	 * @param ip
+	 * @return
+	 * @throws APIException
+	 */
 	DtTaggingModel doNew(DtTaggingModelDTO m,BaseUserInfo userInfo, String ip) throws APIException;
+
+	/**
+	 *
+	 * @param body
+	 * @param db
+	 * @param userInfo
+	 * @param ip
+	 * @return
+	 * @throws Exception
+	 */
 	DtTaggingModel doRename(DtTaggingModelRenameDTO body, DtTaggingModel db, BaseUserInfo userInfo, String ip)throws Exception;
 
-
+	/**
+	 *
+	 * @param body
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @throws Exception
+	 */
 	void doDispatch(DtTaggingDispatchDTO body, DtTaggingModel db, Long userId, String ip) throws Exception;
+
+	/**
+	 *
+	 * @param id
+	 */
 	void doDelete(Long id);
+
+	/**
+	 *
+	 * @param ids
+	 */
 	void doRemove(String ids);
 
 	/**
@@ -45,6 +104,13 @@ public interface DtTaggingModelService {
 	 */
 	void copy(DtTaggingModelCopyDTO id, String ip)throws Exception;
 
+	/**
+	 *
+	 * @param taggingModel
+	 * @param userId
+	 * @param ip
+	 * @throws Exception
+	 */
 	void doSoftDelete(DtTaggingModel taggingModel,Long userId,String ip)throws Exception;
 	/**
 	 * 根据runState获取型
@@ -94,5 +160,12 @@ public interface DtTaggingModelService {
 	 */
 	void stopModelByColIds(List<Long> colIds);
 
+	/**
+	 *
+	 * @param number
+	 * @param taggingModelId
+	 * @return
+	 * @throws Exception
+	 */
 	SuccessMessage beginDowload(Long number,Long taggingModelId)throws Exception;
 }

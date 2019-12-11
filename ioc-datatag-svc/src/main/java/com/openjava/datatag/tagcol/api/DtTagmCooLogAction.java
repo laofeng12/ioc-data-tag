@@ -55,7 +55,7 @@ import com.openjava.datatag.tagcol.query.DtTagmCooLogDBParam;
 public class DtTagmCooLogAction {
 	
 	@Resource
-	private DtTagmCooLogService dtTagmCooLogService;
+	private DtTagmCooLogService dtTagmCooLogService;//
 	
 	/**
 	 * 用主键获取数据
@@ -75,7 +75,13 @@ public class DtTagmCooLogAction {
 		DtTagmCooLog m = dtTagmCooLogService.get(id);
 		return m;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "eq_cooId", value = "协作表主键=", required = false, dataType = "Long", paramType = "query"),
@@ -119,7 +125,13 @@ public class DtTagmCooLogAction {
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;
 		return new SuccessMessage("保存成功");
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 * @param ids
+	 * @return
+	 */
 	@ApiOperation(value = "删除", nickname="delete")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),

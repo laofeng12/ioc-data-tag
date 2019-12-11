@@ -14,14 +14,52 @@ import com.openjava.datatag.tagcol.query.DtTagmCooLogDBParam;
  *
  */
 public interface DtTagmCooLogService {
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	Page<DtTagmCooLog> query(DtTagmCooLogDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	List<DtTagmCooLog> queryDataOnly(DtTagmCooLogDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	DtTagmCooLog get(Long id);
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	DtTagmCooLog doSave(DtTagmCooLog m);
+
+	/**
+	 *
+	 * @param colId
+	 * @return
+	 */
 	List<DtTagmCooLog> findByColId(Long colId);
+
+	/**
+	 *
+	 * @param id
+	 */
 	void doDelete(Long id);
+
+	/**
+	 *
+	 * @param ids
+	 */
 	void doRemove(String ids);
 }

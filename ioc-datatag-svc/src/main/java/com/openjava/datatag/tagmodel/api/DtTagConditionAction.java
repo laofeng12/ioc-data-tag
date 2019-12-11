@@ -55,7 +55,7 @@ import com.openjava.datatag.tagmodel.query.DtTagConditionDBParam;
 public class DtTagConditionAction {
 	
 	@Resource
-	private DtTagConditionService dtTagConditionService;
+	private DtTagConditionService dtTagConditionService;//条件设置表业务层接口
 	
 	/**
 	 * 用主键获取数据
@@ -72,10 +72,16 @@ public class DtTagConditionAction {
 	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
 	public DtTagCondition get(@PathVariable("id")Long id) {
-		DtTagCondition m = dtTagConditionService.get(id);
+		DtTagCondition m = dtTagConditionService.get(id);//获取条件设置表
 		return m;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "eq_colId", value = "字段表主键=", required = false, dataType = "Long", paramType = "query"),
@@ -89,7 +95,7 @@ public class DtTagConditionAction {
 	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/search",method=RequestMethod.GET)
 	public TablePage<DtTagCondition> doSearch(@ApiIgnore() DtTagConditionDBParam params, @ApiIgnore() Pageable pageable){
-		Page<DtTagCondition> result =  dtTagConditionService.query(params, pageable);
+		Page<DtTagCondition> result =  dtTagConditionService.query(params, pageable);//列表分页查询
 		
 		return new TablePageImpl<>(result);
 	}
@@ -108,16 +114,16 @@ public class DtTagConditionAction {
 		if(body.isNew()) {
 			//新增，记录创建时间等
 			//设置主键(请根据实际情况修改)
-			SequenceService ss = ConcurrentSequence.getInstance();
-			body.setTagConditionId(ss.getSequence());
+			SequenceService ss = ConcurrentSequence.getInstance();//
+			body.setTagConditionId(ss.getSequence());//设置id
 			body.setIsNew(true);//执行insert
-			DtTagCondition dbObj = dtTagConditionService.doSave(body);
+			DtTagCondition dbObj = dtTagConditionService.doSave(body);//保存
 		} else {
 			//修改，记录更新时间等
-			DtTagCondition db = dtTagConditionService.get(body.getTagConditionId());
-			MyBeanUtils.copyPropertiesNotBlank(db, body);
+			DtTagCondition db = dtTagConditionService.get(body.getTagConditionId());//获取条件设置表
+			MyBeanUtils.copyPropertiesNotBlank(db, body);//对象拷贝
 			db.setIsNew(false);//执行update
-			dtTagConditionService.doSave(db);
+			dtTagConditionService.doSave(db);//保存
 		}
 		
 		//没有需要返回的数据，就直接返回一条消息。如果需要返回错误，可以抛异常：throw new APIException(错误码，错误消息)，如果涉及事务请在service层抛;

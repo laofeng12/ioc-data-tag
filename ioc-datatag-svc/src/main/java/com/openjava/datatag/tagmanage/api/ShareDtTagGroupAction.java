@@ -43,6 +43,13 @@ public class ShareDtTagGroupAction {
     @Resource
     private DtTaggChooseLogService dtTaggChooseLogService;//DT_TAGG_CHOOSE_LOG业务层接口
 
+    /**
+     *
+     * @param searchKey
+     * @param pageable
+     * @return
+     * @throws Exception
+     */
     @ApiOperation(value = "标签组列表分页查询(共享)", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "searchKey", value = "查询关键字(单位/名称/简介)like", required = false, dataType = "String", paramType = "query"),
@@ -60,6 +67,13 @@ public class ShareDtTagGroupAction {
         return result;
     }
 
+    /**
+     *
+     * @param id
+     * @param request
+     * @return
+     * @throws Exception
+     */
     @ApiOperation(value = "选用标签组", nickname="choose")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "共享标签组编码", required = false, paramType = "query"),
