@@ -9,8 +9,18 @@ import com.openjava.datatag.user.domain.SysUser;
  *
  */
 public interface SysUserService {
-
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	SysUser get(Long id);
+
+	/**
+	 *
+	 * @param fullname
+	 * @return
+	 */
 	SysUser findByFullname(String fullname);
 
 }

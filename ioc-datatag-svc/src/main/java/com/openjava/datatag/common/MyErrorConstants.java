@@ -2,6 +2,9 @@ package com.openjava.datatag.common;
 
 import io.swagger.models.auth.In;
 
+/**
+ *
+ */
 public class MyErrorConstants {
     //===========公共错误错误代码=========
     public static final int PUBLIC_ERROE = -200;//通用错误代码

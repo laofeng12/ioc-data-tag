@@ -43,28 +43,36 @@ public class DataProviderService {
      * @throws Exception
      */
     private DataProvider getDataProviderWithDsDataSourceId(DsDataSource dsDataSource, Map<String, String> query, Boolean isAssociatedQuery) throws Exception {
-        DataProvider dataProvider = DataProviderManager.getDataProvider(dsDataSource, query, false);
+        DataProvider dataProvider = DataProviderManager.getDataProvider(dsDataSource, query, false);//
         return dataProvider;
     }
 
+    /**
+     *
+     * @param dsDataSource
+     * @param columns
+     * @param tableName
+     * @param pageable
+     * @return
+     */
     public AggregateResult queryTableDataWithDsDataSourceId(DsDataSource dsDataSource,String columns, String tableName, Pageable pageable) {
         if (StringUtils.isBlank(tableName)) {
-            return null;
+            return null;//
         }
 
         if (StringUtils.isBlank(columns)) {
-            columns = "*";
+            columns = "*";//
         }
 
         DataProvider dataProvider = null;
         try {
-            Map queryMap = new HashMap<String, String>(2);
-            queryMap.put("sql", " select " + columns + " from " + tableName);
-            dataProvider = getDataProviderWithDsDataSourceId(dsDataSource, queryMap, false);
-            return dataProvider.getTableData(columns, tableName, pageable);
+            Map queryMap = new HashMap<String, String>(2);//
+            queryMap.put("sql", " select " + columns + " from " + tableName);//
+            dataProvider = getDataProviderWithDsDataSourceId(dsDataSource, queryMap, false);//
+            return dataProvider.getTableData(columns, tableName, pageable);//
         } catch (Exception e) {
-            LOG.error("", e);
-            throw new RuntimeException(e.getMessage());
+            LOG.error("", e);//
+            throw new RuntimeException(e.getMessage());//
         }
     }
 

@@ -37,14 +37,21 @@ import com.openjava.framework.sys.service.SysCodeService;
 public class DownloadQueueServiceImpl implements DownloadQueueService {
 	
 	@Resource
-	private DownloadQueueRepository downloadQueueRepository;
+	private DownloadQueueRepository downloadQueueRepository;//
 	@Resource
-	private SysCodeService sysCodeService;
+	private SysCodeService sysCodeService;//
 	@Resource
-	private AuditComponet auditComponet;
+	private AuditComponet auditComponet;//
 	@Resource
-	private FtpUtil ftpUtil;
+	private FtpUtil ftpUtil;//
 
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 * @throws Exception
+	 */
 	public Page<DownloadQueue> query(DownloadQueueDBParam params, Pageable pageable)throws Exception{
 //		params.setTableAlias("t");
 		if (StringUtils.isNotBlank(params.getLike_bname())){
@@ -71,11 +78,22 @@ public class DownloadQueueServiceImpl implements DownloadQueueService {
 		auditComponet.saveAuditLog(vo);
 		return pageresult;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public List<DownloadQueue> queryDataOnly(DownloadQueueDBParam params, Pageable pageable){
 		return downloadQueueRepository.queryDataOnly(params, pageable);
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	public DownloadQueue get(Long id) {
 		Optional<DownloadQueue> o = downloadQueueRepository.findById(id);
 		if(o.isPresent()) {
@@ -92,14 +110,28 @@ public class DownloadQueueServiceImpl implements DownloadQueueService {
 		System.out.println("找不到记录DownloadQueue："+id);
 		return null;
 	}
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	public DownloadQueue doSave(DownloadQueue m) {
 		return downloadQueueRepository.save(m);
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 */
 	public void doDelete(Long id) {
 		downloadQueueRepository.deleteById(id);
 	}
+
+	/**
+	 *
+	 * @param ids
+	 */
 	public void doRemove(String ids) {
 		String[] items = ids.split(",");
 		for (int i = 0; i < items.length; i++) {
@@ -118,10 +150,21 @@ public class DownloadQueueServiceImpl implements DownloadQueueService {
 	public  DownloadQueue findBybtypeAndBid(String btype,String bid){
 		return  downloadQueueRepository.findBybtypeAndBid(btype,bid);
 	}
+
+	/**
+	 *
+	 * @param state
+	 * @return
+	 */
 	public List<DownloadQueue> findByState(Long state){
 		return  downloadQueueRepository.findByState(state);
 	}
 
+	/**
+	 *
+	 * @param taggingModelId
+	 * @param response
+	 */
 	public void doExport(Long taggingModelId, HttpServletResponse response){
 		try {
 

@@ -34,10 +34,18 @@
           <el-table-column prop="fileSize" label="文件大小"></el-table-column>
           <el-table-column prop="speedOfProgress" label="打包进度">
             <template slot-scope="scope">
-              <div class="gress">
+              <div class="gress" v-if="scope.row.state === 3">
                 <div class="gressPercentage">
                   <el-progress :percentage="scope.row.speedOfProgress"
-                               :color="customColorMethod" :format="format"></el-progress>
+                               :color="customColorMethod(scope.row.speedOfProgress,scope.row.state)"
+                               :format="format"></el-progress>
+                </div>
+              </div>
+              <div class="gress" v-if="scope.row.state !== 3">
+                <div class="gressPercentage">
+                  <el-progress :percentage="scope.row.speedOfProgress"
+                               :color="customColorMethod(scope.row.speedOfProgress,scope.row.state)"
+                               :format="formatTwo"></el-progress>
                 </div>
               </div>
             </template>
@@ -45,7 +53,7 @@
           <el-table-column label="操作" width="180px">
             <template slot-scope="scope">
               <div>
-                <div v-if="scope.row.speedOfProgress == '100'" class="export"
+                <div v-if="scope.row.speedOfProgress === 100 && scope.row.state === 3" class="export"
                      @click="exportData(scope.row.bname,scope.row.bid)">导出到本地
                 </div>
                 <div v-else>-</div>
@@ -97,17 +105,25 @@
       }
     },
     methods: {
-      customColorMethod(percentage) {
+      customColorMethod(percentage, state) {
         if (percentage < 25) {
           return '#909399';
         } else if (percentage < 75) {
           return '#e6a23c';
         } else {
-          return '#67c23a';
+          // return '#67c23a';
+          if (percentage == 100 && state === 3) {
+            return '#67c23a';
+          } else {
+            return '#e2162b';
+          }
         }
       },
       format(percentage) {
         return percentage === 100 ? '完成' : `${percentage}%`;
+      },
+      formatTwo(percentage) {
+        return percentage === 100 ? '失败' : `${percentage}%`;
       },
       goback() {
         this.$router.go(-1)

@@ -45,9 +45,9 @@ public class TagColumChart {
     @ResponseBody
     @RequestMapping(value = "getMonthlyLabelChanges",method = RequestMethod.GET)
     public Object getMonthlyLabelChanges() throws Exception{
-        List<Object> list = TagDashboardService.getMonthlyLabelChanges();
-        DataApiResponse<Object> apiResp = new DataApiResponse<>();
-        apiResp.setData(list);
+        List<Object> list = TagDashboardService.getMonthlyLabelChanges();//获取去年每个月标签变化
+        DataApiResponse<Object> apiResp = new DataApiResponse<>();//构造返回结构
+        apiResp.setData(list);//设置返回数据
         return apiResp;
     }
 
@@ -64,9 +64,9 @@ public class TagColumChart {
     @RequestMapping(value = "getAllYearMonth",method = RequestMethod.GET)
     public Object getLeftListData()throws Exception{
         //List<Object>  list = TagDashboardService.getAllYearMonth();
-        Map<String,String> map = TagDashboardService.getAllYearMonth();
-        DataApiResponse<Object> apiResp = new DataApiResponse<>();
-        apiResp.setData(map);
+        Map<String,String> map = TagDashboardService.getAllYearMonth();//获取标签变化左边数据列表
+        DataApiResponse<Object> apiResp = new DataApiResponse<>();//构造返回结构
+        apiResp.setData(map);//设置返回数据
         return apiResp;
     }
 

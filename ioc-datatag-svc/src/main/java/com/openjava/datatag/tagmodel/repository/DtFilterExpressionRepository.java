@@ -15,8 +15,17 @@ import java.util.List;
  *
  */
 public interface DtFilterExpressionRepository extends DynamicJpaRepository<DtFilterExpression, Long>, DtFilterExpressionRepositoryCustom{
+    /**
+     *
+     * @param tagConditionId
+     * @return
+     */
     List<DtFilterExpression> findByTagConditionId(Long tagConditionId);
 
+    /**
+     *
+     * @param tagConditionId
+     */
     @Modifying
     @Query(value = "delete from DtFilterExpression t where t.tagConditionId=:tagConditionId")
     void doRemoveByTagConditionId(@Param(value="tagConditionId")Long tagConditionId);

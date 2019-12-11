@@ -39,28 +39,44 @@ import java.util.Optional;
 public class DtTagGroupServiceImpl implements DtTagGroupService {
 	
 	@Resource
-	private DtTagGroupRepository dtTagGroupRepository;
+	private DtTagGroupRepository dtTagGroupRepository;//DT_TAG_GROUP数据库访问层
 
 	@Resource
-	private  DtTagService dtTagService;
+	private  DtTagService dtTagService;//DT_TAG标签业务层接口
 
 	@Resource
-	private DtTaggUpdateLogService dtTaggUpdateLogService;
+	private DtTaggUpdateLogService dtTaggUpdateLogService;//DT_TAGG_UPDATE_LOG业务层接口
 	@Resource
-	private AuditComponet auditComponet;
+	private AuditComponet auditComponet;//审计组件
 
+	/**
+	 * 分页查询
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public Page<DtTagGroup> query(DtTagGroupDBParam params, Pageable pageable){
-		Page<DtTagGroup> pageresult = dtTagGroupRepository.query(params, pageable);
+		Page<DtTagGroup> pageresult = dtTagGroupRepository.query(params, pageable);//分页查询
 		return pageresult;
 	}
 
-	
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public List<DtTagGroup> queryDataOnly(DtTagGroupDBParam params, Pageable pageable){
-		return dtTagGroupRepository.queryDataOnly(params, pageable);
+		return dtTagGroupRepository.queryDataOnly(params, pageable);//
 	}
-	
+
+	/**
+	 * 根据id获取标签组
+	 * @param id
+	 * @return
+	 */
 	public DtTagGroup get(Long id) {
-		Optional<DtTagGroup> o = dtTagGroupRepository.findById(id);
+		Optional<DtTagGroup> o = dtTagGroupRepository.findById(id);//获取标签组
 		if(o.isPresent()) {
 			DtTagGroup m = o.get();
 			return m;
@@ -68,34 +84,50 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		System.out.println("找不到记录DtTagGroup："+id);
 		return null;
 	}
-	//保存标签组
+	/**
+	 * 保存标签组
+	 */
 	public DtTagGroup doSave(DtTagGroup m) {
 		return dtTagGroupRepository.save(m);//保存
 	}
 
-
+	/**
+	 *
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @throws Exception
+	 */
 	public void doSoftDelete(DtTagGroup db,Long userId,String ip)throws Exception {
-		String beforeJcon = JSONObject.toJSONString(db);
-		db.setModifyTime(new Date());
-		db.setIsDeleted(Constants.PUBLIC_YES);
+		String beforeJcon = JSONObject.toJSONString(db);//修改前的数据
+		db.setModifyTime(new Date());//修改时间
+		db.setIsDeleted(Constants.PUBLIC_YES);//设置为删除状态
 		//批量修改标签表的删除标识
-		dtTagService.doSoftDeleteByTagsID(db.getId(),db.getModifyTime());
+		dtTagService.doSoftDeleteByTagsID(db.getId(),db.getModifyTime());//删除
 		//修改标签组表的删除标识
-		db = doSave(db);
-		AuditLogVO vo = new AuditLogVO();
+		db = doSave(db);//
+		AuditLogVO vo = new AuditLogVO();//审计日志
 		vo.setType(1L);//管理操作
 		vo.setOperationService("标签与画像");//必传
 		vo.setOperationModule("标签管理");//必传
 		vo.setFunctionLev1("我的标签组");//必传
 		vo.setFunctionLev2("删除");//必传
 		vo.setRecordId(db.getId()+"");
-		vo.setDataBeforeOperat(beforeJcon);
+		vo.setDataBeforeOperat(beforeJcon);//修改前的数据
 		vo.setDataAfterOperat(JSONObject.toJSONString(db));//修改后数据
-		auditComponet.saveAuditLog(vo);
+		auditComponet.saveAuditLog(vo);//保存
 		//日志记录
 //		dtTaggUpdateLogService.loggingDelete(db,userId,ip);
 	}
 
+	/**
+	 *
+	 * @param body
+	 * @param userId
+	 * @param ip
+	 * @return
+	 * @throws Exception
+	 */
 	public DtTagGroup doNew(DtTagGroup body,Long userId,String ip)throws Exception{
 		if (body.getTagsName() == null){
 			body.setTagsName("新建标签组");
@@ -106,45 +138,54 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 //		String modifyContent = JSONObject.toJSONString(body);
 		//新增，记录创建时间等
 		//设置主键(请根据实际情况修改)
-		SequenceService ss = ConcurrentSequence.getInstance();
-		body.setId(ss.getSequence());
+		SequenceService ss = ConcurrentSequence.getInstance();//主键生成工具
+		body.setId(ss.getSequence());//id
 		body.setIsNew(true);//执行insert
-		body.setCreateUser(userId);
-		Date now = new Date();
-		body.setCreateTime(now);
-		body.setModifyTime(now);
-		body.setIsDeleted(Constants.PUBLIC_NO);
-		body.setIsShare(Constants.PUBLIC_NO);
-		body.setPopularity(0L);
-		DtTagGroup db = dtTagGroupRepository.save(body);
+		body.setCreateUser(userId);//创建用户
+		Date now = new Date();//时间
+		body.setCreateTime(now);//设置创建时间
+		body.setModifyTime(now);//设置修改时间
+		body.setIsDeleted(Constants.PUBLIC_NO);//非删除状态
+		body.setIsShare(Constants.PUBLIC_NO);//非共享状态
+		body.setPopularity(0L);//使用热度初始化为0
+		DtTagGroup db = dtTagGroupRepository.save(body);//保存
 
 		//日志记录
 //		dtTaggUpdateLogService.loggingNew(modifyContent,db,userId,ip);
-		AuditLogVO vo = new AuditLogVO();
+		AuditLogVO vo = new AuditLogVO();//审计日志
 		vo.setType(1L);//管理操作
 		vo.setOperationService("标签与画像");//必传
 		vo.setOperationModule("标签管理");//必传
 		vo.setFunctionLev1("我的标签组");//必传
 		vo.setFunctionLev2("创建标签组");//必传
 		vo.setDataAfterOperat(JSONObject.toJSONString(db));//修改后数据
-		auditComponet.saveAuditLog(vo);
+		auditComponet.saveAuditLog(vo);//保存审计日志
 		return  db;
 	}
 
+	/**
+	 *
+	 * @param body
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 * @throws Exception
+	 */
 	public DtTagGroup doUpdate(DtTagGroup body,DtTagGroup db,Long userId,String ip)throws Exception{
-		String oldContent = JSONObject.toJSONString(db);
-		String modifyContent = JSONObject.toJSONString(body);
+		String oldContent = JSONObject.toJSONString(db);//旧数据
+		String modifyContent = JSONObject.toJSONString(body);//
 		//Create* 应该保持不变，Modify更新
-		body.setCreateUser(db.getCreateUser());
-		body.setCreateTime(db.getCreateTime());
-		body.setModifyTime(new Date());
-		MyBeanUtils.copyPropertiesNotBlank(db, body);
+		body.setCreateUser(db.getCreateUser());//创建人
+		body.setCreateTime(db.getCreateTime());//创建用户
+		body.setModifyTime(new Date());//修改时间
+		MyBeanUtils.copyPropertiesNotBlank(db, body);//对象拷贝
 		db.setIsNew(false);
-		DtTagGroup newdb = doSave(db);
+		DtTagGroup newdb = doSave(db);//保存
 
 		//日志记录
 //		dtTaggUpdateLogService.loggingUpdate(modifyContent,oldContent,db,userId,ip);
-		AuditLogVO vo = new AuditLogVO();
+		AuditLogVO vo = new AuditLogVO();//审计日志
 		vo.setType(1L);//管理操作
 		vo.setOperationService("标签与画像");//必传
 		vo.setOperationModule("标签管理");//必传
@@ -152,36 +193,48 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		vo.setFunctionLev2("设置");//必传
 		vo.setDataBeforeOperat(oldContent);//修改前的数据
 		vo.setDataAfterOperat(JSONObject.toJSONString(newdb));//修改后数据
-		auditComponet.saveAuditLog(vo);
+		auditComponet.saveAuditLog(vo);//保存审计日志
 		return newdb;
 	}
 
+	/**
+	 *
+	 * @param createUser
+	 * @return
+	 */
 	public List<DtTagGroup> getMyTagGroup(Long createUser){
-		return dtTagGroupRepository.getMyTagGroup(createUser);
+		return dtTagGroupRepository.getMyTagGroup(createUser);//
 	}
 
+	/**
+	 * 分页查询标签组
+	 * @param params
+	 * @param pageable
+	 * @return
+	 * @throws Exception
+	 */
 	public Page<DtTagGroup> searchMyTagGroup(DtTagGroupDBParam params, Pageable pageable)throws Exception{
-		Page<DtTagGroup> result = query(params,pageable);
-		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
+		Page<DtTagGroup> result = query(params,pageable);//分页查询
+		BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取当前登录用户信息
 		if (CollectionUtils.isNotEmpty(result.getContent())){
 			Long maxPopularity = dtTagGroupRepository.findMaxPopularityBytagsIdAAndIsDeletedAAndIsShare(Constants.PUBLIC_NO,Constants.PUBLIC_YES);
 			for (DtTagGroup tgg: result){
 				if (tgg.getPopularity()==null){
-					tgg.setPercentage(0L);
+					tgg.setPercentage(0L);//空时热度百分比为0
 				}else {
-					BigDecimal big = new BigDecimal(tgg.getPopularity()).divide(new BigDecimal(DtTagGroupServiceImpl.getDenominator(maxPopularity)) ,2,BigDecimal.ROUND_UP).multiply(new BigDecimal(100));
-					tgg.setPercentage(big.longValueExact());
+					BigDecimal big = new BigDecimal(tgg.getPopularity()).divide(new BigDecimal(DtTagGroupServiceImpl.getDenominator(maxPopularity)) ,2,BigDecimal.ROUND_UP).multiply(new BigDecimal(100));//计算百分比
+					tgg.setPercentage(big.longValueExact());//设置百分比
 				}
 			}
 
 		}
-		AuditLogVO vo = new AuditLogVO();
+		AuditLogVO vo = new AuditLogVO();//审计日志
 		vo.setType(2L);//数据查询
 		vo.setOperationService("标签与画像");//必传
 		vo.setOperationModule("标签管理");//必传
 		vo.setFunctionLev1("我的标签组");//必传
 		vo.setFunctionLev2("查询");//必传
-		auditComponet.saveAuditLog(vo);
+		auditComponet.saveAuditLog(vo);//保存审计日志
 		return result;
 	}
 
@@ -199,26 +252,28 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		}
 		return denominator;
 	}
+
+	/**
+	 *
+	 * @param top
+	 * @return
+	 */
 	public List<ShareTopDTO> getShareTopList(int top){
 		Pageable pageable = PageRequest.of(0, top);//
-		List<ShareTopDTO> list = new ArrayList<>();
-		Page<Object[]>  topListDTOPage = dtTagGroupRepository.getShareTopList(pageable);
+		List<ShareTopDTO> list = new ArrayList<>();//
+		Page<Object[]>  topListDTOPage = dtTagGroupRepository.getShareTopList(pageable);//
 		if (CollectionUtils.isNotEmpty(topListDTOPage.getContent())){
 
 			for (Object[] ob:topListDTOPage.getContent()) {
 				ShareTopDTO shareTop = new ShareTopDTO();
-				BigDecimal heat = (BigDecimal) ob[0];
+				BigDecimal heat = (BigDecimal) ob[0];//
 				shareTop.setHeat(heat.longValue());//使用热度
 				shareTop.setName((String) ob[1]);//表签组名称
 				BigDecimal id = (BigDecimal) ob[2];
 				shareTop.setId(id.longValue());//表签组id
-				list.add(shareTop);
+				list.add(shareTop);//
 			}
 		}
 		return  list;
 	}
-	public static void main(String[] args) {
-		System.out.println(getDenominator(10001L));
-	}
-
 }

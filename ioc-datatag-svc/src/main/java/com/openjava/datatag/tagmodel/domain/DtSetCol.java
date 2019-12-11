@@ -38,62 +38,62 @@ public class DtSetCol implements Persistable<Long>,Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commonseq")
 	@SequenceGenerator(name = "commonseq", sequenceName = "SEQ_COMMON_ID", allocationSize = 1)
 	@Column(name = "COL_ID")
-	private Long colId;
+	private Long colId;//字段表主键
 	
 	@ApiModelProperty("标签模型编号")
 	@Max(9223372036854775806L)
 	@Column(name = "TAGGING_MODEL_ID")
-	private Long taggingModelId;
+	private Long taggingModelId;//标签模型编号
 	
 	@ApiModelProperty("源字段名")
 	@Length(min=1, max=32)
 	@Column(name = "SOURCE_COL")
-	private String sourceCol;
+	private String sourceCol;//源字段名
 
 	@ApiModelProperty("源字段id")
 	@Length(min=1)
 	@Column(name = "SOURCE_COL_ID")
-	private String sourceColId;
+	private String sourceColId;//源字段id
 
 
 	@ApiModelProperty("源字段类型")
 	@Length(min=1, max=32)
 	@Column(name = "SOURCE_DATA_TYPE")
-	private String sourceDataType;
+	private String sourceDataType;//源字段类型
 
 	@ApiModelProperty("显示字段名")
 	@Length(min=0, max=32)
 	@Column(name = "SHOW_COL")
-	private String showCol;
+	private String showCol;//显示字段名
 	
 	@ApiModelProperty("创建用户")
 	@Max(9223372036854775806L)
 	@Column(name = "CREATE_USER")
-	private Long createUser;
+	private Long createUser;//创建用户
 	
 	@ApiModelProperty("创建时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATE_TIME")
-	private Date createTime;
+	private Date createTime;//创建时间
 	
 	@ApiModelProperty("修改用户")
 	@Max(9223372036854775806L)
 	@Column(name = "MODIFY_USER")
-	private Long modifyUser;
+	private Long modifyUser;//修改用户
 	
 	@ApiModelProperty("修改时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "MODIFY_TIME")
-	private Date modifyTime;
+	private Date modifyTime;//修改时间
 	
 	@ApiModelProperty("删除标记")
 	@Max(9L)
 	@Column(name = "IS_DELETED")
-	private Long isDeleted;
+	private Long isDeleted;//删除标记
 	
 //	@ApiModelProperty("是否主键")
 //	@Max(1L)
@@ -103,22 +103,22 @@ public class DtSetCol implements Persistable<Long>,Serializable {
 	@ApiModelProperty("是否打标字段")
 	@Max(1L)
 	@Column(name = "IS_MARKING")
-	private Long isMarking;
+	private Long isMarking;//是否打标字段
 	
 	@ApiModelProperty("是否源字段")
 	@Max(9L)
 	@Column(name = "IS_SOURCE")
-	private Long isSource;
+	private Long isSource;//是否源字段
 
 	@ApiModelProperty("排序")
 	@Max(9223372036854775806L)
 	@Column(name = "COL_SORT")
-	private Long colSort;
+	private Long colSort;//排序
 	
 	
 	@ApiModelProperty("是否新增")
 	@Transient
-    private Boolean isNew;
+    private Boolean isNew;//是否新增
 	
 	@Transient
     @JsonIgnore

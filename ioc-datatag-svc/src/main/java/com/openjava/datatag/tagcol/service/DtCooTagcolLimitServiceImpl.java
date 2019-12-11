@@ -33,25 +33,56 @@ import com.openjava.datatag.tagcol.repository.DtCooTagcolLimitRepository;
 public class DtCooTagcolLimitServiceImpl implements DtCooTagcolLimitService {
 	
 	@Resource
-	private DtCooTagcolLimitRepository dtCooTagcolLimitRepository;
+	private DtCooTagcolLimitRepository dtCooTagcolLimitRepository;//
 	@Resource
-	private DtTagConditionService dtTagConditionService;
+	private DtTagConditionService dtTagConditionService;//
 	@Resource
-	private DtCooperationService dtCooperationService;
+	private DtCooperationService dtCooperationService;//
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public Page<DtCooTagcolLimit> query(DtCooTagcolLimitDBParam params, Pageable pageable){
 		Page<DtCooTagcolLimit> pageresult = dtCooTagcolLimitRepository.query(params, pageable);
 		return pageresult;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public List<DtCooTagcolLimit> queryDataOnly(DtCooTagcolLimitDBParam params, Pageable pageable){
 		return dtCooTagcolLimitRepository.queryDataOnly(params, pageable);
 	}
+
+	/**
+	 *
+	 * @param colId
+	 * @return
+	 */
 	public List<DtCooTagcolLimit> findByColId(Long colId){
 		return dtCooTagcolLimitRepository.findByColId(colId);
 	}
+
+	/**
+	 *
+	 * @param colId
+	 * @return
+	 */
 	public int deleteBycoolId(Long colId){
 		return dtCooTagcolLimitRepository.deleteBycoolId(colId);
 	};
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	public DtCooTagcolLimit get(Long id) {
 		Optional<DtCooTagcolLimit> o = dtCooTagcolLimitRepository.findById(id);
 		if(o.isPresent()) {
@@ -61,20 +92,39 @@ public class DtCooTagcolLimitServiceImpl implements DtCooTagcolLimitService {
 		System.out.println("找不到记录DtCooTagcolLimit："+id);
 		return null;
 	}
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	public DtCooTagcolLimit doSave(DtCooTagcolLimit m) {
 		return dtCooTagcolLimitRepository.save(m);
 	}
 
+	/**
+	 *
+	 * @param id
+	 */
 	public void doDelete(Long id) {
 		dtCooTagcolLimitRepository.deleteById(id);
 	}
+
+	/**
+	 *
+	 * @param ids
+	 */
 	public void doRemove(String ids) {
 		String[] items = ids.split(",");
 		for (int i = 0; i < items.length; i++) {
 			dtCooTagcolLimitRepository.deleteById(new Long(items[i]));
 		}
 	}
+
+	/**
+	 *
+	 * @param colId
+	 */
 	public void completeDtcooRagcol(Long colId){
         DtCooTagcolLimit cooTagcolLimit = dtCooTagcolLimitRepository.findByTagColId(colId);
         if (cooTagcolLimit==null ||Constants.DT_COOP_TAGCOL_LIMMIT_YES == cooTagcolLimit.getState()){
@@ -95,6 +145,10 @@ public class DtCooTagcolLimitServiceImpl implements DtCooTagcolLimitService {
 		dtCooTagcolLimitRepository.save(cooTagcolLimit);
 	}
 
+	/**
+	 *
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Boolean k= Constants.DT_COOP_TAGCOL_LIMMIT_YES==1L;
 		System.out.printf(k.toString());

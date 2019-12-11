@@ -34,9 +34,15 @@ import com.openjava.datatag.log.query.DtTagUpdateLogDBParam;
 public class DtTagUpdateLogAction {
 	
 	@Resource
-	private DtTagUpdateLogService dtTagUpdateLogService;
+	private DtTagUpdateLogService dtTagUpdateLogService;//
 
-	
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 * @throws APIException
+	 */
 	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "eq_tagId", value = "标签编号=", required = false, dataType = "Long", paramType = "query"),

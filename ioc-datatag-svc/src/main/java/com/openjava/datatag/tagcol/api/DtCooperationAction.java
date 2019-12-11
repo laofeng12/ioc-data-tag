@@ -78,15 +78,15 @@ import com.openjava.datatag.tagcol.query.DtCooperationDBParam;
 public class DtCooperationAction {
 
     @Resource
-    private DtCooperationService dtCooperationService;
+    private DtCooperationService dtCooperationService;//
     @Resource
-    private DtCooTagcolLimitService dtCooTagcolLimitService;
+    private DtCooTagcolLimitService dtCooTagcolLimitService;//
     @Resource
-    private SysUserService sysUserService;
+    private SysUserService sysUserService;//
     @Resource
-    private DtTagGroupService dtTagGroupService;
+    private DtTagGroupService dtTagGroupService;//
     @Resource
-    private DtTagService dtTagService;
+    private DtTagService dtTagService;//
     /**
      * 用主键获取数据
      *
@@ -106,6 +106,13 @@ public class DtCooperationAction {
         DtCooperation m = dtCooperationService.get(id);
         return m;
     }
+
+    /**
+     *
+     * @param params
+     * @param pageable
+     * @return
+     */
     @ApiOperation(value = "分页根据用户ID获取该用户的协作模型记录", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname = "search")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "keyWord", value = "(非必填)关键字(模型名称)查询", required = false, dataType = "String", paramType = "query"),
@@ -163,6 +170,14 @@ public class DtCooperationAction {
 
 
     }
+
+    /**
+     *
+     * @param params
+     * @param pageable
+     * @return
+     * @throws Exception
+     */
     @ApiOperation(value = "列表分页查询协作成员记录", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname = "search")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "eq_createUser", value = "（不传时默认当前用户）发起者=", required = false, dataType = "Long", paramType = "query"),
@@ -177,6 +192,11 @@ public class DtCooperationAction {
         return dtCooperationService.doSearch(params,pageable);
     }
 
+    /**
+     *
+     * @param userId
+     * @return
+     */
     @ApiOperation(value = "根据用户ID获取该用户的协作模型记录", notes = "结果对象数组", nickname = "userId")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "协作用户Id(不传时默认当前用户)", required = false, dataType = "Long", paramType = "query"),
@@ -186,7 +206,6 @@ public class DtCooperationAction {
     })
     @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(value = "/searchcool", method = RequestMethod.POST)
-
     public DataApiResponse<DtCooperationModelDTO> doSearchCool(@RequestParam(value = "userId", required = false) Long userId) {
         List<DtCooperationModelDTO> result = dtCooperationService.findUserModelByUserId(userId);
         DataApiResponse<DtCooperationModelDTO> resp = new DataApiResponse<>();
@@ -194,6 +213,11 @@ public class DtCooperationAction {
         return resp;
     }
 
+    /**
+     *
+     * @param params
+     * @return
+     */
     @ApiOperation(value = "根据模型ID获取该用户的协作字段记录", notes = "结果对象数组")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "协作用户Id(不传时默认当前用户)", required = false, dataType = "Long", paramType = "query"),
@@ -205,7 +229,6 @@ public class DtCooperationAction {
     })
     @Security(session = true,allowResources = {"lableImage"})
     @RequestMapping(value = "/searchcoofield", method = RequestMethod.POST)
-
     public DataApiResponse<DtCooperationSetCol> doSearchCooField(@ApiIgnore() DtCooperationSetColParam params) {
         List<DtCooperationSetCol> result = dtCooperationService.findUserModelCooField(params.getUserId(), params.getModelId());
         DataApiResponse<DtCooperationSetCol> resp = new DataApiResponse<>();
@@ -213,6 +236,12 @@ public class DtCooperationAction {
         return resp;
     }
 
+    /**
+     *
+     * @param modelId
+     * @param colField
+     * @return
+     */
     @ApiOperation(value = "根据模型ID及字段名查询当前用户可配置的标签组记录", nickname = "标签组记录集")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "modelId", value = "协作模型ID", required = true, dataType = "Long", paramType = "query"),
@@ -320,6 +349,13 @@ public class DtCooperationAction {
         return new SuccessMessage("保存成功");
     }
 
+    /**
+     *
+     * @param id
+     * @param ids
+     * @return
+     * @throws Exception
+     */
     @ApiOperation(value = "删除", nickname = "delete")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
@@ -338,6 +374,11 @@ public class DtCooperationAction {
         return new SuccessMessage("删除成功");//没有需要返回的数据，就直接返回一条消息
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @ApiOperation(value = "根据协作id获取协作字段信息", notes = "结果对象数组")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "协作id", required = false, dataType = "Long", paramType = "path"),

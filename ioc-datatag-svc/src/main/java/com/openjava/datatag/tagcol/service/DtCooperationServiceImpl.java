@@ -61,30 +61,37 @@ public class DtCooperationServiceImpl implements DtCooperationService {
 
 
     @Resource
-    private DtCooperationRepository dtCooperationRepository;
+    private DtCooperationRepository dtCooperationRepository;//
 
     @Resource
-    private DtCooTagcolLimitService dtCooTagcolLimitService;
+    private DtCooTagcolLimitService dtCooTagcolLimitService;//
     @Resource
-    private DtTagmCooLogService dtTagmCooLogService;
+    private DtTagmCooLogService dtTagmCooLogService;//
     @Resource
-    private DtTaggingModelService dtTaggingModelService;
+    private DtTaggingModelService dtTaggingModelService;//
     @Resource
-    private SysUserService sysUserService;
+    private SysUserService sysUserService;//
     @Resource
-    private DtTagGroupService dtTagGroupService;
+    private DtTagGroupService dtTagGroupService;//
     //首先初始化JpaMultiDynamicQueryDAO对象。(暂时只支持JPA)
     private EntityManager em;
-    private JpaMultiDynamicQueryDAO dao;
+    private JpaMultiDynamicQueryDAO dao;//
     @Resource
-    private AuditComponet auditComponet;
+    private AuditComponet auditComponet;//
     @Resource
-    private DtSetColService dtSetColService;
+    private DtSetColService dtSetColService;//
     @PersistenceContext
     public void setEntityManager(EntityManager em) {
         this.em = em;
         dao = new JpaMultiDynamicQueryDAO(em);
     }
+
+    /**
+     *
+     * @param item
+     * @param pageable
+     * @return
+     */
     public Page<?>findPageUserModelByUserId(DtCooperationDBParam item, Pageable pageable){
         return dtCooperationRepository.findPageUserModelByUserId(item.getEq_cooUser(),item.getKeyWord(),item.getEq_taggmId(),item.getRunState(),pageable);
     }
@@ -118,11 +125,23 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         return dbresult;
     }
 
+    /**
+     *
+     * @param params
+     * @param pageable
+     * @return
+     */
     public Page<DtCooperation> query(DtCooperationDBParam params, Pageable pageable) {
         Page<DtCooperation> pageresult = dtCooperationRepository.query(params, pageable);
         return pageresult;
     }
 
+    /**
+     *
+     * @param params
+     * @param pageable
+     * @return
+     */
     public List<DtCooperation> queryDataOnly(DtCooperationDBParam params, Pageable pageable) {
         return dtCooperationRepository.queryDataOnly(params, pageable);
     }
@@ -298,6 +317,11 @@ public class DtCooperationServiceImpl implements DtCooperationService {
 
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     public DtCooperation get(Long id) {
         Optional<DtCooperation> o = dtCooperationRepository.findById(id);
         if (o.isPresent()) {
@@ -308,6 +332,11 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         return null;
     }
 
+    /**
+     *
+     * @param m
+     * @return
+     */
     public DtCooperation doSave(DtCooperation m) {
         return dtCooperationRepository.save(m);
     }
@@ -488,6 +517,10 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         }
     }
 
+    /**
+     *
+     * @param id
+     */
     public void doDelete(Long id){
         //根据Id删除协作成员表记录
         dtCooperationRepository.deleteById(id);
@@ -495,12 +528,24 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         dtCooTagcolLimitService.deleteBycoolId(id);
     }
 
+    /**
+     *
+     * @param ids
+     */
     public void doRemove(String ids) {
         String[] items = ids.split(",");
         for (int i = 0; i < items.length; i++) {
             dtCooperationRepository.deleteById(new Long(items[i]));
         }
     }
+
+    /**
+     *
+     * @param params
+     * @param pageable
+     * @return
+     * @throws Exception
+     */
     public TablePage<DtCooperationDTO> doSearch(DtCooperationDBParam params, Pageable pageable) throws Exception{
         BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
         Long currentuserId = Long.valueOf(userInfo.getUserId());
@@ -537,6 +582,12 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         Page<DtCooperationDTO> showResult = new PageImpl<>(dtoList, pageable, dtoList.size());
         return new TablePageImpl<>(showResult);
     }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
     public ColListDTO getColList(Long id){
         List<DtCooTagcolLimit> results = dtCooTagcolLimitService.findByColId(id);
         String modelName =  dtCooperationRepository.getModelNameBycooId(id);

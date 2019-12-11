@@ -73,7 +73,13 @@ public class DtTagAction {
         return dtTagService.doSaveOrEdit(body,ip);//修改标签
     }
 
-
+    /**
+     *
+     * @param id
+     * @param request
+     * @return
+     * @throws Exception
+     */
     @ApiOperation(value = "删除", nickname = "delete")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
@@ -89,16 +95,16 @@ public class DtTagAction {
     public SuccessMessage doDelete(
             @RequestParam(value = "id", required = false) Long id,
             HttpServletRequest request) throws Exception {
-        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-        Long userId = Long.valueOf(userInfo.getUserId());
-        String ip = IpUtil.getRealIP(request);
-        DtTag db = dtTagService.get(id);
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取用户信息
+        Long userId = Long.valueOf(userInfo.getUserId());//获取用户id
+        String ip = IpUtil.getRealIP(request);//获取ip
+        DtTag db = dtTagService.get(id);//获取标签
         if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)) {
             throw new APIException(MyErrorConstants.TAG_NOT_FOUND, "无此标签或已被删除");
         }
-        DtTagGroup tagGroupdb = dtTagGroupService.get(db.getTagsId());
+        DtTagGroup tagGroupdb = dtTagGroupService.get(db.getTagsId());//获取标签组
         if (userInfo.getUserId().equals(tagGroupdb.getCreateUser().toString())) {
-            dtTagService.doSoftDeleteByDtTag(db, userId, ip);
+            dtTagService.doSoftDeleteByDtTag(db, userId, ip);//软删除
             return new SuccessMessage("删除成功");
         } else {
             throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY, "无权限删除");
@@ -123,7 +129,7 @@ public class DtTagAction {
     @Security(session = true,allowResources = {"tagManage"})
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public TagDTOTreeNodeShow getTree(@PathVariable("id") Long id) throws Exception {
-        return dtTagService.getTree(id);
+        return dtTagService.getTree(id);//根据标签组ID获取
     }
 
     /**
@@ -142,19 +148,19 @@ public class DtTagAction {
     @Security(session = true,allowResources = {"lableImage","tagManage"})
     @RequestMapping(value = "/getAllTree", method = RequestMethod.GET)
     public List<TagDTOTreeNodeShow2> getTreeByTagsId(@ApiIgnore() Pageable pageable) throws Exception {
-        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-        Long id = Long.parseLong(userInfo.getUserId());
-        DtTagGroupDBParam params = new DtTagGroupDBParam();
-        params.setEq_createUser(id);
-        params.setEq_isDeleted(Constants.PUBLIC_NO);
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取用户信息
+        Long id = Long.parseLong(userInfo.getUserId());//获取当前登录用户id
+        DtTagGroupDBParam params = new DtTagGroupDBParam();//创建查询的params
+        params.setEq_createUser(id);//设置创建者为当前登录id
+        params.setEq_isDeleted(Constants.PUBLIC_NO);//非删除状态
         Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));
-        Page<DtTagGroup> results =  dtTagGroupService.searchMyTagGroup(params, mypage);
+                Sort.by(Sort.Order.desc("modifyTime")).and(Sort.by(Sort.Order.desc("createTime"))));//根据修改时间和创建时间倒叙排序
+        Page<DtTagGroup> results =  dtTagGroupService.searchMyTagGroup(params, mypage);//获取标签组数据
         List<TagDTOTreeNodeShow2> resultsList = new ArrayList<>();
         if (results!=null && CollectionUtils.isNotEmpty(results.getContent())){
             for (DtTagGroup group:results.getContent()) {
-                Long tagsId = group.getId();
-                DtTagGroup db = dtTagGroupService.get(tagsId);
+                Long tagsId = group.getId();//标签组id
+                DtTagGroup db = dtTagGroupService.get(tagsId);//获取标签组
                 //查找当前用户是否配置有该标签组的协作权限
                 Long cooUserTagGroupCount = dtCooperationService.findCooUserTagGroup(VoUtils.toLong(userInfo.getUserId()), tagsId);
                 //自己的和共享的标签组可以查看
@@ -163,18 +169,18 @@ public class DtTagAction {
                     //适配前端要求，第一节不能选，初始化一个空的list给前端
                     if (CollectionUtils.isEmpty(tagList)){
                         TagDTOTreeNodeShow2 father = new TagDTOTreeNodeShow2();
-                        father.setLabel(group.getTagsName());
-                        father.setValue(group.getId().toString());
-                        father.setChildren(new ArrayList<>());
-                        resultsList.add(father);
+                        father.setLabel(group.getTagsName());//标签名
+                        father.setValue(group.getId().toString());//标签id
+                        father.setChildren(new ArrayList<>());//初始化空list
+                        resultsList.add(father);//
                         continue;
                     }
-                    DtTagDTO root = new DtTagDTO();
-                    root.setId(TagDTOTreeNode.ROOT_ID);
+                    DtTagDTO root = new DtTagDTO();//
+                    root.setId(TagDTOTreeNode.ROOT_ID);//
                     TagDTOTreeNode treeNode = new TagDTOTreeNode(TagDTOTreeNode.toDtTagDTO(tagList), root);
                     TagDTOTreeNodeShow2 treeNodeShow = new TagDTOTreeNodeShow2(treeNode);
-                    treeNodeShow.setValue(group.getId().toString());
-                    treeNodeShow.setLabel(group.getTagsName());
+                    treeNodeShow.setValue(group.getId().toString());//设置组id
+                    treeNodeShow.setLabel(group.getTagsName());//设置标签组名称
                     resultsList.add(treeNodeShow);
                 }
             }
@@ -201,22 +207,22 @@ public class DtTagAction {
     @Security(session = true,allowResources = {"tagManage"})
     @RequestMapping(value = "/table/{id}", method = RequestMethod.GET)
     public DtTagTableDTO get(@PathVariable("id") Long id) throws APIException {
-        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-        DtTag db = dtTagService.get(id);
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取用户信息
+        DtTag db = dtTagService.get(id);//获取标签id
         if (db == null || db.getIsDeleted().equals(Constants.PUBLIC_YES)) {
-            throw new APIException(MyErrorConstants.TAG_NOT_FOUND, "无此标签或已被删除");
+            throw new APIException(MyErrorConstants.TAG_NOT_FOUND, "无此标签或已被删除");//
         }
-        DtTagGroup gdb = dtTagGroupService.get(db.getTagsId());
+        DtTagGroup gdb = dtTagGroupService.get(db.getTagsId());//获取标签组id
         if (gdb == null || gdb.getIsDeleted().equals(Constants.PUBLIC_YES)) {
-            throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND, "无此标签组或已被删除");
+            throw new APIException(MyErrorConstants.TAG_GROUP_NOT_FOUND, "无此标签组或已被删除");//
         }
         //自己的和共享的标签组可以查看
         if (userInfo.getUserId().equals(gdb.getCreateUser().toString()) || gdb.getIsShare().equals(Constants.PUBLIC_YES)) {
-            List<DtTag> tagList = dtTagService.findByPreaTagId(id);
-            DtTag root = dtTagService.get(id);
-            DtTagTableDTO dto = new DtTagTableDTO();
-            dto.setParentTag(root);
-            dto.setChildrenTag(tagList);
+            List<DtTag> tagList = dtTagService.findByPreaTagId(id);//根据父标签获取标签
+            DtTag root = dtTagService.get(id);//获取父标签
+            DtTagTableDTO dto = new DtTagTableDTO();//
+            dto.setParentTag(root);//父标签
+            dto.setChildrenTag(tagList);//孩子标签
             return dto;
         } else {
             throw new APIException(MyErrorConstants.PUBLIC_NO_AUTHORITY, "无权限查看");

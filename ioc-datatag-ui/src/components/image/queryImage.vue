@@ -51,7 +51,7 @@
         </el-row>
        </div>
     </div>
-    <div v-else>
+    <div v-else class="noImg">
       <img class="noImage" src="../../assets/img/007.png" height="144" width="160"/>
     </div>
 
@@ -182,8 +182,11 @@
     margin-top: -32px;
   }
   .noImage{
-    margin-top: 60px;
-    margin-left: 180px;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    margin: 0 auto;
+    top: 30%;
   }
 
   .nameImage{
@@ -280,5 +283,11 @@
   .cart_list >>> .el-card{
     border:none !important
     border-radius:0px !important
+  }
+  .noImg{
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    min-height: calc(85vh);
   }
 </style>

@@ -131,14 +131,16 @@
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
           <el-form-item label="模型名称:" prop="name" class="nameOne">
-            <el-input v-model="ruleForm.name"></el-input>
+            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入模型名称"></el-input>
           </el-form-item>
           <el-form-item label="模型简介:" prop="textarea2" class="nameOne">
             <el-input
               class="area"
               type="textarea"
+              maxlength="100"
+              show-word-limit
               :autosize="{ minRows: 2, maxRows: 4}"
-              placeholder="请输入内容"
+              placeholder="请输入模型简介"
               v-model="ruleForm.textarea2">
             </el-input>
           </el-form-item>
@@ -795,6 +797,7 @@
           });
           this.saveasLoading = false
           this.editDialog = false
+          this.$router.push('/lableImage')
         } catch (e) {
           console.log(e);
           this.saveasLoading = false
@@ -827,6 +830,7 @@
               });
               this.savedispatchLoading = false
               this.runDialog = false
+              this.$router.push('/lableImage')
             } catch (e) {
               console.log(e);
               this.savedispatchLoading = false

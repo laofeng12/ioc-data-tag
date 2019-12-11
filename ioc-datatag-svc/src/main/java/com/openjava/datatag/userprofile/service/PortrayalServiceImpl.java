@@ -193,9 +193,11 @@ public class PortrayalServiceImpl implements PortrayalService {
         }
         return list;
     }
-
+    /**
+     * 清除画像结果
+     */
     public void clearPortrayal(String tableName){
-        MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();
+        MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();//mpp工具
         mppUtil.initValidDataSource(postgreSqlConfig);//初始化数据库
         //第一步，先删中间表数据
         String deleteSql = "delete from \""+Constants.DT_SEARCH_TABLE_NAME+"\" t where t.model_table_name = '"+tableName+"'";

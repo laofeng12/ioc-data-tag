@@ -36,6 +36,12 @@ public interface DtTagConditionRepository extends DynamicJpaRepository<DtTagCond
     @Query(value = "from DtTagCondition t where t.tagId in(:tagIds)")
     List<DtTagCondition> findByTagIds(@Param("tagIds")List<Long> tagIds);
 
+    /**
+     *
+     * @param id
+     * @param now
+     * @param user
+     */
     @Transactional
     @Modifying
     @Query("update DtTagCondition set isDeleted = 1, modifyTime = :now,modifyUser= :user  where colId = :id")

@@ -13,6 +13,11 @@ public class HelloJob implements Job {
 
     Logger logger = LogManager.getLogger(getClass());
 
+    /**
+     *
+     * @param jobExecutionContext
+     * @throws JobExecutionException
+     */
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobKey key = jobExecutionContext.getJobDetail().getKey();

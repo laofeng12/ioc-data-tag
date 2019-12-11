@@ -56,7 +56,7 @@ import com.openjava.datatag.tagmodel.query.DtSetColDBParam;
 public class DtSetColAction {
 	
 	@Resource
-	private DtSetColService dtSetColService;
+	private DtSetColService dtSetColService;//字段表业务层接口
 
 	/**
 	 * 字段设置确认选择接口
@@ -67,7 +67,7 @@ public class DtSetColAction {
 	@RequestMapping(value="/selectCol", method=RequestMethod.POST)
 	public SelectColSuccessDTO selectCol(@RequestBody DtTaggingModelDTO body,
 									HttpServletRequest request) throws Exception{
-		String ip = IpUtil.getRealIP(request);
+		String ip = IpUtil.getRealIP(request);//获取ip
 		if (body.getResourceId() == null) {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"打标目标表id不能为空");
 		}
@@ -78,15 +78,22 @@ public class DtSetColAction {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"数据源主键不能指定为空");
 			//这里应该添加验证主键唯一性约束
 		}
-		DtTaggingModelDTO dtTaggingModelDTO =  dtSetColService.selectCol(body,ip);
-		Long id = dtTaggingModelDTO.getTaggingModelId();
-		SelectColSuccessDTO success = new SelectColSuccessDTO();
-		success.setCode(200L);
-		success.setMessage("保存成功");
+		DtTaggingModelDTO dtTaggingModelDTO =  dtSetColService.selectCol(body,ip);//字段设置-确认选择
+		Long id = dtTaggingModelDTO.getTaggingModelId();//模型id
+		SelectColSuccessDTO success = new SelectColSuccessDTO();//创建返回参数
+		success.setCode(200L);//状态码
+		success.setMessage("保存成功");//状态信息
 		success.setTaggingModelId(id);
 		return success;
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@ApiOperation(value = "字段清除", nickname="delete")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),
@@ -98,13 +105,20 @@ public class DtSetColAction {
 			@RequestParam(value="id",required=false)Long id,
 			//@RequestParam(value="ids",required=false)String ids,
 			HttpServletRequest request) throws Exception{
-		String ip = IpUtil.getRealIP(request);
+		String ip = IpUtil.getRealIP(request);//获取ip
 		if(id != null) {
-			dtSetColService.doDelete(id,ip);
+			dtSetColService.doDelete(id,ip);//清除字段
 		}
 		return new SuccessMessage("清除字段成功");
 	}
 
+	/**
+	 *
+	 * @param colId
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@ApiOperation(value = "克隆字段", nickname="delete")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
@@ -113,11 +127,17 @@ public class DtSetColAction {
 	@RequestMapping(value="/clone",method=RequestMethod.POST)
 	public SuccessMessage clone(@RequestParam(value="colId",required=true)Long colId,
 								HttpServletRequest request)throws Exception{
-		String ip = IpUtil.getRealIP(request);
-		dtSetColService.clone(colId,ip);
+		String ip = IpUtil.getRealIP(request);//获取ip
+		dtSetColService.clone(colId,ip);//克隆字段
 		return new SuccessMessage("克隆字段成功");
 	}
 
+	/**
+	 *
+	 * @param colId
+	 * @return
+	 * @throws Exception
+	 */
 	@ApiOperation(value = "确认打标-查询打标历史接口", nickname="getHistoryCol")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "colId", value = "主键编码", required = true, paramType = "clone"),
@@ -125,10 +145,16 @@ public class DtSetColAction {
 	@Security(session=true,allowResources = {"lableImage"})
 	@RequestMapping(value="/getHistoryCol",method=RequestMethod.GET)
 	public GetHistoryColDTO getHistoryCol(@RequestParam(value="colId",required=true)Long colId)throws Exception{
-		return dtSetColService.getHistoryCol(colId);
+		return dtSetColService.getHistoryCol(colId);//查询字段打标历史
 	}
 
-
+	/**
+	 *
+	 * @param req
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@ApiOperation(value = "确认打标-保存接口", nickname="getHistoryCol",
 			notes="数字类型修改：\n{\"colId\":2,\"condtion\":[{\"colId\":2,\"isHandle\":0,\"tagConditionId\":1000001,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\">\",\"theValues\":\"1\",\"valuesType\":\"NUMBER\"},{\"isConnectSymbol\":1,\"symbol\":\"AND\",\"theValues\":\"\",\"valuesType\":\"\"},{\"isConnectSymbol\":0,\"symbol\":\"<\",\"theValues\":\"5\",\"valuesType\":\"NUMBER\"}]},{\"colId\":2,\"isHandle\":1,\"tagConditionId\":1000000,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"IN\",\"theValues\":\"1,2,3,4\",\"valuesType\":\"NUMBER\"}]}]}\n" +
 					"字符串类型修改：\n{\"colId\":2,\"condtion\":[{\"colId\":2,\"isHandle\":0,\"tagConditionId\":1000001,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"=\",\"theValues\":\"王同学\",\"valuesType\":\"VARCHAR2\"},{\"isConnectSymbol\":1,\"symbol\":\"AND\",\"theValues\":\"\",\"valuesType\":\"\"},{\"isConnectSymbol\":0,\"symbol\":\"≠\",\"theValues\":\"李同学\",\"valuesType\":\"VARCHAR2\"}]},{\"colId\":2,\"isHandle\":1,\"tagConditionId\":1000000,\"tagId\":790991990471247,\"conditionSetting\":[{\"isConnectSymbol\":0,\"symbol\":\"IN\",\"theValues\":\"王同学,李同学,吴同学\",\"valuesType\":\"VARCHAR2\"}]}]}\n" +
@@ -142,15 +168,15 @@ public class DtSetColAction {
 	@RequestMapping(value="/saveCondition",method=RequestMethod.POST)
 	public DataApiResponse<Object> saveCondition(@RequestBody SaveConditionDTO req,
 												 HttpServletRequest request)throws Exception{
-		req.setIp(request);
-		DataApiResponse<Object> result = new DataApiResponse<>();
+		req.setIp(request);//
+		DataApiResponse<Object> result = new DataApiResponse<>();//返回参数
 		try{
-			dtSetColService.saveCondition(req);
-			result.setMessage("保存成功");
+			dtSetColService.saveCondition(req);//确认打标保存接口
+			result.setMessage("保存成功");//
 		}catch (APIException e){
 			if (MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR==e.getCode()){
-				result.setCode(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR);
-				result.setData(e.getMessage());
+				result.setCode(MyErrorConstants.TAG_TAGGING_GRAMMAR_ERROR);//
+				result.setData(e.getMessage());//
 				result.setMessage("第"+e.getMessage()+"条数据设置语法错误，请重新设置");
 			}
 		}

@@ -22,10 +22,15 @@ import java.util.Optional;
 public class SysUserServiceImpl implements SysUserService {
 	
 	@Resource
-	private SysUserRepository sysUserRepository;
+	private SysUserRepository sysUserRepository;//数据库访问层
 	@Resource
-	private SysCodeService sysCodeService;
+	private SysCodeService sysCodeService;//
 
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	public SysUser get(Long id) {
 		Optional<SysUser> o = sysUserRepository.findById(id);
 		if(!o.isPresent()) {
@@ -69,6 +74,12 @@ public class SysUserServiceImpl implements SysUserService {
 		}*/
 		return m;
 	}
+
+	/**
+	 *
+	 * @param fullname
+	 * @return
+	 */
 	public SysUser findByFullname(String fullname){
 		return sysUserRepository.findByFullname(fullname);
 	}

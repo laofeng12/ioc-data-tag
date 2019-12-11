@@ -32,121 +32,164 @@ import com.openjava.datatag.tagmodel.repository.DtWaitUpdateIndexRepository;
 public class DtWaitUpdateIndexServiceImpl implements DtWaitUpdateIndexService {
 	Logger logger = LogManager.getLogger(getClass());
 	@Resource
-	private DtWaitUpdateIndexRepository dtWaitUpdateIndexRepository;
+	private DtWaitUpdateIndexRepository dtWaitUpdateIndexRepository;//更新索引表数据库访问层
 	@Resource
-	private DtTaggingModelService dtTaggingModelService;
+	private DtTaggingModelService dtTaggingModelService;//标签模型业务层接口
 	@Resource
-	private PostgreSqlConfig postgreSqlConfig;
+	private PostgreSqlConfig postgreSqlConfig;//MPP配置
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public Page<DtWaitUpdateIndex> query(DtWaitUpdateIndexDBParam params, Pageable pageable){
-		Page<DtWaitUpdateIndex> pageresult = dtWaitUpdateIndexRepository.query(params, pageable);
+		Page<DtWaitUpdateIndex> pageresult = dtWaitUpdateIndexRepository.query(params, pageable);//
 		return pageresult;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public List<DtWaitUpdateIndex> queryDataOnly(DtWaitUpdateIndexDBParam params, Pageable pageable){
-		return dtWaitUpdateIndexRepository.queryDataOnly(params, pageable);
+		return dtWaitUpdateIndexRepository.queryDataOnly(params, pageable);//
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	public DtWaitUpdateIndex get(Long id) {
-		Optional<DtWaitUpdateIndex> o = dtWaitUpdateIndexRepository.findById(id);
+		Optional<DtWaitUpdateIndex> o = dtWaitUpdateIndexRepository.findById(id);//
 		if(o.isPresent()) {
-			DtWaitUpdateIndex m = o.get();
+			DtWaitUpdateIndex m = o.get();//
 			return m;
 		}
 		System.out.println("找不到记录DtWaitUpdateIndex："+id);
 		return null;
 	}
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	public DtWaitUpdateIndex doSave(DtWaitUpdateIndex m) {
-		return dtWaitUpdateIndexRepository.save(m);
+		return dtWaitUpdateIndexRepository.save(m);//
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 */
 	public void doDelete(Long id) {
-		dtWaitUpdateIndexRepository.deleteById(id);
+		dtWaitUpdateIndexRepository.deleteById(id);//
 	}
+
+	/**
+	 *
+	 * @param ids
+	 */
 	public void doRemove(String ids) {
 		String[] items = ids.split(",");
 		for (int i = 0; i < items.length; i++) {
-			dtWaitUpdateIndexRepository.deleteById(new Long(items[i]));
+			dtWaitUpdateIndexRepository.deleteById(new Long(items[i]));//
 		}
 	}
+
+	/**
+	 *
+	 * @param runState
+	 * @return
+	 */
 	public List<DtWaitUpdateIndex> getByRunState(Long runState){
-		return dtWaitUpdateIndexRepository.getByRunState(runState);
+		return dtWaitUpdateIndexRepository.getByRunState(runState);//
 	}
+
+	/**
+	 *
+	 * @param waitList
+	 */
 	public void updateModelIndex(List<DtWaitUpdateIndex> waitList){
-		MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();
+		MppPgExecuteUtil mppUtil = new MppPgExecuteUtil();//
 		mppUtil.initValidDataSource(postgreSqlConfig);//初始化数据库
 		if (CollectionUtils.isNotEmpty(waitList)) {
 			for (int i = 0; i < waitList.size() ; i++) {
-				DtWaitUpdateIndex waitUpdateIndex = waitList.get(i);
-				String modelTableName = waitUpdateIndex.getTableName();
-				String modelKeyColName = waitUpdateIndex.getModelKeyColName();
+				DtWaitUpdateIndex waitUpdateIndex = waitList.get(i);//
+				String modelTableName = waitUpdateIndex.getTableName();//
+				String modelKeyColName = waitUpdateIndex.getModelKeyColName();//
 				try	{
 					//第一步，先删中间表数据
 					String deleteSql = "delete from \""+Constants.DT_SEARCH_TABLE_NAME+"\" t where t.model_table_name = '"+modelTableName+"'";
-					List<String> deleteSqlList = new LinkedList<>();
-					deleteSqlList.add(deleteSql);
-					mppUtil.setUpdateSqlList(deleteSqlList);
-					mppUtil.updateDataList();
-					mppUtil.setSQL("select count(1) from \""+modelTableName+"\"");
+					List<String> deleteSqlList = new LinkedList<>();//
+					deleteSqlList.add(deleteSql);//
+					mppUtil.setUpdateSqlList(deleteSqlList);//
+					mppUtil.updateDataList();//
+					mppUtil.setSQL("select count(1) from \""+modelTableName+"\"");//
 					long totalCount = 0;
 					try {
-						String[][] count = mppUtil.getData2();
-						totalCount = Long.valueOf(count[1][0]);
+						String[][] count = mppUtil.getData2();//
+						totalCount = Long.valueOf(count[1][0]);//
 					}catch (Exception e){
-						e.printStackTrace();
-						logger.info(e.getMessage());
+						e.printStackTrace();//
+						logger.info(e.getMessage());//
 					}
 					//第二步更新中间表
-					int pageSize = 10000;
-					Pageable pageable  = PageRequest.of(0, pageSize);
+					int pageSize = 10000;//
+					Pageable pageable  = PageRequest.of(0, pageSize);//
 					String alias = "t";//别名
-					Map<String, String> tableNameForQuery = new LinkedHashMap<>(1);
-					tableNameForQuery.put(modelTableName,alias);
-					mppUtil.setTableNameForQuery(tableNameForQuery);
-					Map<String, String> columnMapForQuery = new LinkedHashMap<>(1);
-					columnMapForQuery.put(modelKeyColName,alias);
-					mppUtil.setColumnMapForQuery(columnMapForQuery);
-					mppUtil.setPageable(pageable);
+					Map<String, String> tableNameForQuery = new LinkedHashMap<>(1);//
+					tableNameForQuery.put(modelTableName,alias);//
+					mppUtil.setTableNameForQuery(tableNameForQuery);//
+					Map<String, String> columnMapForQuery = new LinkedHashMap<>(1);//
+					columnMapForQuery.put(modelKeyColName,alias);//
+					mppUtil.setColumnMapForQuery(columnMapForQuery);//
+					mppUtil.setPageable(pageable);//
 					String[][] firstPageData = mppUtil.getData();//第一个为表头
-					List<Object> data = new ArrayList<>();
+					List<Object> data = new ArrayList<>();//
 					for (int j = 1; j <firstPageData.length ; j++) {
-						List<Object> oblist = Arrays.asList(firstPageData[j]);
-						List<Object> temp = new LinkedList<>();
+						List<Object> oblist = Arrays.asList(firstPageData[j]);//
+						List<Object> temp = new LinkedList<>();//
 						oblist.forEach(record->{
-							temp.add(record);
+							temp.add(record);//
 						});
-						temp.add(modelTableName);
-						temp.add(new Date());
-						data.add(temp);
+						temp.add(modelTableName);//
+						temp.add(new Date());//
+						data.add(temp);//
 					}
-					Map<String, String> columnMap = new LinkedHashMap<>(1);
-					columnMap.put(Constants.DT_SEARCH_MODEL_PKEY,"模型的主键");
-					columnMap.put(Constants.DT_SEARCH_MODEL_TABLE_NAME,"模型表名称");
-					columnMap.put(Constants.DT_SEARCH_CREATE_TIME,"创建时间");
-					mppUtil.setTableName(Constants.DT_SEARCH_TABLE_NAME);
-					mppUtil.setColumnMap(columnMap);
-					mppUtil.setDataList(data);
-					mppUtil.insertDataList();
-					Page firstPage = new PageImpl<>(data, pageable, totalCount);
+					Map<String, String> columnMap = new LinkedHashMap<>(1);//
+					columnMap.put(Constants.DT_SEARCH_MODEL_PKEY,"模型的主键");//
+					columnMap.put(Constants.DT_SEARCH_MODEL_TABLE_NAME,"模型表名称");//
+					columnMap.put(Constants.DT_SEARCH_CREATE_TIME,"创建时间");//
+					mppUtil.setTableName(Constants.DT_SEARCH_TABLE_NAME);//
+					mppUtil.setColumnMap(columnMap);//
+					mppUtil.setDataList(data);//
+					mppUtil.insertDataList();//
+					Page firstPage = new PageImpl<>(data, pageable, totalCount);//
 					if (firstPage.hasNext()) {
 						for (int j = 1; j < firstPage.getTotalPages(); j++) {
-							Pageable nextPage  = PageRequest.of(j, pageSize);
+							Pageable nextPage  = PageRequest.of(j, pageSize);//
 							try{
-								mppUtil.setPageable(nextPage);
+								mppUtil.setPageable(nextPage);//
 								String[][] nextPageData = mppUtil.getData();//第一个为表头
-								List<Object> nextData = new ArrayList<>();
+								List<Object> nextData = new ArrayList<>();//
 								for (int k = 1; k<nextPageData.length ; k++) {
-									List<Object> oblist =Arrays.asList(nextPageData[k]);
-									List<Object> temp = new LinkedList<>();
+									List<Object> oblist =Arrays.asList(nextPageData[k]);//
+									List<Object> temp = new LinkedList<>();//
 									oblist.forEach(record->{
-										temp.add(record);
+										temp.add(record);//
 									});
-									temp.add(modelTableName);
-									temp.add(modelTableName);
-									nextData.add(temp);
+									temp.add(modelTableName);//
+									temp.add(modelTableName);//
+									nextData.add(temp);//
 								}
-								mppUtil.setDataList(nextData);
-								mppUtil.insertDataList();
+								mppUtil.setDataList(nextData);//
+								mppUtil.insertDataList();//
 							}catch (Exception e){
 								e.printStackTrace();
 							}

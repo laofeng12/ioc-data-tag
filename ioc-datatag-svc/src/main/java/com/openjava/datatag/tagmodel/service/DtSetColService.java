@@ -17,16 +17,56 @@ import com.openjava.datatag.tagmodel.query.DtSetColDBParam;
  *
  */
 public interface DtSetColService {
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	Page<DtSetCol> query(DtSetColDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	List<DtSetCol> queryDataOnly(DtSetColDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	DtSetCol get(Long id);
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	DtSetCol doSave(DtSetCol m);
-	
+
+	/**
+	 *
+	 * @param id
+	 * @param ip
+	 * @throws Exception
+	 */
 	void doDelete(Long id,String ip)throws Exception;
+
+	/**
+	 *
+	 * @param ids
+	 * @throws Exception
+	 */
 	void doRemove(String ids)throws Exception;
+
+	/**
+	 *
+	 * @param taggingModelId
+	 * @return
+	 */
 	List<DtSetCol> getByTaggingModelId(Long taggingModelId);
 	/**
 	 * 根据taggingModelId获取源字段（非删除）

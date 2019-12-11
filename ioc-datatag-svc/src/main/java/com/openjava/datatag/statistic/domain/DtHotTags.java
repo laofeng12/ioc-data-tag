@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 public class DtHotTags {
-    private List<Object> HotTags =new ArrayList<>();
+    private List<Object> HotTags =new ArrayList<>();//
     public void getHotTags(List<Object> AllYearMonth){this.HotTags=HotTags;}
 }
