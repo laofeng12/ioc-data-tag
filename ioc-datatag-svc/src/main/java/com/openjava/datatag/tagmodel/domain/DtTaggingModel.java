@@ -41,103 +41,103 @@ public class DtTaggingModel implements Persistable<Long>,Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commonseq")
 	@SequenceGenerator(name = "commonseq", sequenceName = "SEQ_COMMON_ID", allocationSize = 1)
 	@Column(name = "TAGGING_MODEL_ID")
-	private Long taggingModelId;
+	private Long taggingModelId;//标签模型主键
 	
 	@ApiModelProperty("模型名字")
 	@Length(min=1, max=32)
 	@Column(name = "MODEL_NAME")
-	private String modelName;
+	private String modelName;//模型名字
 
 	@ApiModelProperty("模型简介")
 	@Length(min=1, max=1000)
 	@Column(name = "MODEL_DESC")
-	private String modelDesc;
+	private String modelDesc;//模型简介
 
 	@ApiModelProperty("打标源表id")
 	@Max(9223372036854775806L)
 	@Min(1L)
 	@Column(name = "DATA_SET_ID")
-	private Long resourceId;
+	private Long resourceId;//打标源表id
 	
 	@ApiModelProperty("打标源表名称")
 	@Length(min=1, max=200)
 	@Column(name = "DATA_SET_NAME")
-	private String resourceName;
+	private String resourceName;//打标源表id
 
 	@ApiModelProperty("打标源表类型")
 	@Max(100)
 	@Column(name = "RESOURCE_TYPE")
-	private Long resourceType;
+	private Long resourceType;//打标源表类型
 
 	@ApiModelProperty("打标目的表名")
 	@Length(min=0, max=200)
 	@Column(name = "TAGGING_TABLE_NAME")
-	private String dataTableName;
+	private String dataTableName;//打标目的表名
 
 	@ApiModelProperty("声明的主键")
 	@Length(min=0, max=32)
 	@Column(name = "P_KEY")
-	private String pkey;
+	private String pkey;//声明的主键
 
 	@ApiModelProperty("创建用户")
 	@Column(name = "CREATE_USER")
-	private Long createUser;
+	private Long createUser;//创建用户
 
 	@ApiModelProperty("创建时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATE_TIME")
-	private Date createTime;
+	private Date createTime;//创建时间
 	
 	@ApiModelProperty("修改用户")
 	@Column(name = "MODIFY_USER")
-	private Long modifyUser;
+	private Long modifyUser;//修改用户
 	
 	@ApiModelProperty("修改时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "MODIFY_TIME")
-	private Date modifyTime;
+	private Date modifyTime;//修改时间
 	
 	@ApiModelProperty("运行开始时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "START_TIME")
-	private Date startTime;
+	private Date startTime;//运行开始时间
 	
 	@ApiModelProperty("调度运行周期-cron 表达式")
 	@Length(min=0, max=32)
 	@Column(name = "CYCLE")
-	private String cycle;
+	private String cycle;//调度运行周期-cron 表达式
 
 	@ApiModelProperty("调度运行周期- 周期枚举 DT_MODEL_DISPATCH")
 	@Column(name = "CYCLE_ENUM")
-	private Long cycleEnum;
+	private Long cycleEnum;//调度运行周期- 周期枚举 DT_MODEL_DISPATCH
 	
 	@ApiModelProperty("运行状态:未运行/运行中/运行出错/运行结束")
 	@Max(9L)
 	@Column(name = "RUN_STATE")
-	private Long runState;
+	private Long runState;//运行状态:未运行/运行中/运行出错/运行结束
 	
 	@ApiModelProperty("删除标记")
 	@Max(9L)
 	@Column(name = "IS_DELETED")
-	private Long isDeleted;
+	private Long isDeleted;//删除标记
 
 	@ApiModelProperty("成功个数")
 	@Column(name = "SUCCESS_NUN")
-	private Long successNum;
+	private Long successNum;//成功个数
 	@ApiModelProperty("更新总个数")
 	@Column(name = "UPDATE_NUN")
-	private Long updateNum;
+	private Long updateNum;//更新总个数
 
 	
 	@ApiModelProperty("是否新增")
 	@Transient
-    private Boolean isNew;
+    private Boolean isNew;//是否新增
 	
 	@Transient
     @JsonIgnore

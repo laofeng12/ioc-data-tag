@@ -15,6 +15,9 @@ import java.util.zip.ZipOutputStream;
 
 import static org.springframework.util.FileCopyUtils.BUFFER_SIZE;
 
+/**
+ *
+ */
 public class ExportUtil {
 //    private static final String EXPORT_FILE_DIR =ExportUtil.class.getResource("/").getPath()+"export_result/";
     private static final String EXPORT_FILE_DIR ="c:/export_result/";
@@ -31,22 +34,22 @@ public class ExportUtil {
      * @throws Exception
      */
     public static String export(String[][] data,String btype,String bid,int page)throws Exception {
-        String head []= data[0];
-        String value[][]= new String[data.length-1][];
-        System.arraycopy(data, 1, value, 0, data.length-1);
+        String head []= data[0];//
+        String value[][]= new String[data.length-1][];//
+        System.arraycopy(data, 1, value, 0, data.length-1);//
         if (data==null|| StringUtils.isBlank(btype)||StringUtils.isBlank(bid)){
             return null;
         }
-        File filePath = new File( URLDecoder.decode(EXPORT_FILE_DIR,"utf-8")+btype+"/"+bid+"/");
+        File filePath = new File( URLDecoder.decode(EXPORT_FILE_DIR,"utf-8")+btype+"/"+bid+"/");//
         String fileName = bid+"-"+page+".xlsx";
         if(!filePath.exists()){
             filePath.mkdirs();
         }
-        FileOutputStream outputStream = new FileOutputStream(filePath+"/"+fileName);
+        FileOutputStream outputStream = new FileOutputStream(filePath+"/"+fileName);//
         try {
-            POIExcelBuilder myBuilder = new POIExcelBuilder(outputStream);
+            POIExcelBuilder myBuilder = new POIExcelBuilder(outputStream);//
             for (int i = 0; i < head.length; i++) {
-                myBuilder.addProperty( head[i]);
+                myBuilder.addProperty( head[i]);//
             }
             myBuilder.buildSheet(bid+"-"+page, Arrays.asList(value));//放到第一个sheet
             //开始导出
@@ -118,15 +121,15 @@ public class ExportUtil {
         if (StringUtils.isBlank(btype)||StringUtils.isBlank(bid)){
             return false;
         }
-        File filePath = new File(URLDecoder.decode(EXPORT_FILE_DIR,"utf-8")+btype+"/"+bid+"/");
-        String[] filelist = filePath.list();
+        File filePath = new File(URLDecoder.decode(EXPORT_FILE_DIR,"utf-8")+btype+"/"+bid+"/");//
+        String[] filelist = filePath.list();//
         if (filelist==null){
             return true;
         }
         for (int i = 0; i < filelist.length; i++) {
             File delfile = new File(filePath.getPath()+"/" + filelist[i]);
             if (!delfile.isDirectory()) {
-                delfile.delete();
+                delfile.delete();//
             } else if (delfile.isDirectory()) {
                 deleFile(btype,bid);//递归删
             }
@@ -134,6 +137,13 @@ public class ExportUtil {
         return true;
     }
 
+    /**
+     *
+     * @param btype
+     * @param bid
+     * @return
+     * @throws Exception
+     */
     public static File getZipLocalFile(String btype,String bid) throws Exception{
         if (StringUtils.isBlank(btype)||StringUtils.isBlank(bid)){
             return null;
@@ -143,6 +153,13 @@ public class ExportUtil {
         return zipLocalFile;
     }
 
+    /**
+     *
+     * @param btype
+     * @param bid
+     * @return
+     * @throws Exception
+     */
     public static String uploadToFTP(String btype,String bid) throws Exception{
         if (StringUtils.isBlank(btype)||StringUtils.isBlank(bid)){
             return null;
@@ -152,6 +169,11 @@ public class ExportUtil {
         return null;
     }
 
+    /**
+     *
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception{
         String[][] data =new String[2][2];
         data[0][0] = "a";

@@ -42,8 +42,13 @@ import java.util.Date;
 public class DtTaggingErrorLogAction {
 	
 	@Resource
-	private DtTaggingErrorLogService dtTaggingErrorLogService;
+	private DtTaggingErrorLogService dtTaggingErrorLogService;//
 
+	/**
+	 *
+	 * @param taggingModelId
+	 * @return
+	 */
 	@ApiOperation(value = "获取报错日志", notes = "", nickname="getErrormessage")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "taggingModelId", value = "模型主键=", required = false, dataType = "Long", paramType = "path"),

@@ -5,6 +5,9 @@ import org.ljdp.core.spring.data.JpaMultiDynamicQueryDAO;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+/**
+ *
+ */
 public class DtSetColRepositoryImpl implements DtSetColRepositoryCustom {
 	private EntityManager em;
 	private JpaMultiDynamicQueryDAO dao;//动态参数多表关联查询

@@ -72,6 +72,14 @@ public class MyDtTagGroupAction {
 		}
 	}
 
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@ApiOperation(value = "列表分页查询(我的标签组)", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "keyword", value = "关键字-模糊查询标签组名和简介", required = false, dataType = "String", paramType = "query"),
@@ -97,6 +105,13 @@ public class MyDtTagGroupAction {
 
 	}
 
+	/**
+	 *
+	 * @param id
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@ApiOperation(value = "删除", nickname="delete")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),

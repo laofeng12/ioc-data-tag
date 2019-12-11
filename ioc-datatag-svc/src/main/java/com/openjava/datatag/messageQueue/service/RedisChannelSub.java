@@ -19,6 +19,11 @@ import java.io.IOException;
  */
 @Service
 public class RedisChannelSub implements RedisMsg {
+    /**
+     *
+     * @param message
+     * @throws Exception
+     */
     @Override
     public void receiveMessage(String message) throws Exception {
 //      注意通道调用的方法名要和RedisConfig2的listenerAdapter的MessageListenerAdapter参数2相同

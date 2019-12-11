@@ -14,12 +14,34 @@ import com.openjava.datatag.tagcol.query.DtCooTagcolLimitDBParam;
  *
  */
 public interface DtCooTagcolLimitService {
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	Page<DtCooTagcolLimit> query(DtCooTagcolLimitDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	List<DtCooTagcolLimit> queryDataOnly(DtCooTagcolLimitDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	DtCooTagcolLimit get(Long id);
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	DtCooTagcolLimit doSave(DtCooTagcolLimit m);
 	List<DtCooTagcolLimit> findByColId(Long colId);
 	int deleteBycoolId(Long colId);

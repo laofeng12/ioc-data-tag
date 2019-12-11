@@ -24,17 +24,34 @@ import com.openjava.datatag.log.repository.DtTaggChooseLogRepository;
 public class DtTaggChooseLogServiceImpl implements DtTaggChooseLogService {
 	
 	@Resource
-	private DtTaggChooseLogRepository dtTaggChooseLogRepository;
-	
+	private DtTaggChooseLogRepository dtTaggChooseLogRepository;//
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public Page<DtTaggChooseLog> query(DtTaggChooseLogDBParam params, Pageable pageable){
 		Page<DtTaggChooseLog> pageresult = dtTaggChooseLogRepository.query(params, pageable);
 		return pageresult;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public List<DtTaggChooseLog> queryDataOnly(DtTaggChooseLogDBParam params, Pageable pageable){
 		return dtTaggChooseLogRepository.queryDataOnly(params, pageable);
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	public DtTaggChooseLog get(Long id) {
 		Optional<DtTaggChooseLog> o = dtTaggChooseLogRepository.findById(id);
 		if(o.isPresent()) {
@@ -44,18 +61,44 @@ public class DtTaggChooseLogServiceImpl implements DtTaggChooseLogService {
 		System.out.println("找不到记录DtTaggChooseLog："+id);
 		return null;
 	}
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	public DtTaggChooseLog doSave(DtTaggChooseLog m) {
 		return dtTaggChooseLogRepository.save(m);
 	}
 
+	/**
+	 *
+	 * @param userId
+	 * @param copiedTaggId
+	 * @return
+	 */
 	public Long countChooseToday(Long userId,Long copiedTaggId){
 		return dtTaggChooseLogRepository.countChooseToday(userId,copiedTaggId);
 	}
+
+	/**
+	 *
+	 * @param userId
+	 * @param copiedTaggId
+	 * @return
+	 */
 	public Long countChoose(Long userId,Long copiedTaggId){
 		return dtTaggChooseLogRepository.countChoose(userId,copiedTaggId);
 	}
 
+	/**
+	 *
+	 * @param fromTaggId
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	public DtTaggChooseLog loggingChoose(Long fromTaggId, DtTagGroup db,Long userId,String ip){
 		//日志记录
 		DtTaggChooseLog log = new DtTaggChooseLog();

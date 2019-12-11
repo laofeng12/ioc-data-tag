@@ -38,35 +38,35 @@ public class DtWaitUpdateIndex implements Persistable<Long>,Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commonseq")
 	@SequenceGenerator(name = "commonseq", sequenceName = "SEQ_COMMON_ID", allocationSize = 1)
 	@Column(name = "WAIT_UPDATE_INDEX_ID")
-	private Long waitUpdateIndexId;
+	private Long waitUpdateIndexId;//模型运行结果表ID
 	
 	@ApiModelProperty("标签模型主键")
 	@Column(name = "TAGGING_MODEL_ID")
-	private Long taggingModelId;
+	private Long taggingModelId;//标签模型主键
 
 	@ApiModelProperty("标签模型主键名称")
 	@Column(name = "MODEL_KEY_COL_NAME")
-	private String modelKeyColName;
+	private String modelKeyColName;//标签模型主键名称
 
 	@ApiModelProperty("表名")
 	@Column(name = "TABLE_NAME")
-	private String tableName;
+	private String tableName;//表名
 	
 	@ApiModelProperty("索引更新运行状态（0未开始1已开始）")
 	@Column(name = "RUN_STATE")
-	private Long runState;
+	private Long runState;//索引更新运行状态（0未开始1已开始）
 	
 	@ApiModelProperty("创建时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATE_TIME")
-	private Date createTime;
+	private Date createTime;//创建时间
 	
 	
 	@ApiModelProperty("是否新增")
 	@Transient
-    private Boolean isNew;
+    private Boolean isNew;//是否新增
 	
 	@Transient
     @JsonIgnore

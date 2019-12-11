@@ -15,7 +15,19 @@ import java.util.List;
  *
  */
 public interface DownloadQueueRepository extends DynamicJpaRepository<DownloadQueue, Long>, DownloadQueueRepositoryCustom{
+    /**
+     *
+     * @param btype
+     * @param bid
+     * @return
+     */
     DownloadQueue findBybtypeAndBid(String btype,String bid);
+
+    /**
+     *
+     * @param state
+     * @return
+     */
     @Query(value = "from DownloadQueue t where t.state=:state order by t.createTime desc")
     List<DownloadQueue> findByState(Long state);
 }

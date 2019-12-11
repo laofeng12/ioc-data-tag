@@ -5,8 +5,11 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ *
+ */
 @Data
 public class DataSetRspDTO extends BaseResp {
-    private DataSetRspDataDTO data;
+    private DataSetRspDataDTO data;//
 
 }

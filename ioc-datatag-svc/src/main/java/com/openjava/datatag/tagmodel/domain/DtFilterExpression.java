@@ -38,41 +38,41 @@ public class DtFilterExpression implements Persistable<Long>,Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commonseq")
 	@SequenceGenerator(name = "commonseq", sequenceName = "SEQ_COMMON_ID", allocationSize = 1)
 	@Column(name = "FILTER_EXPRESSION_ID")
-	private Long filterExpressionID;
+	private Long filterExpressionID;//规制表达式表ID
 	
 	@ApiModelProperty("条件设置主键")
 	@Column(name = "TAG_CONDITION_ID")
-	private Long tagConditionId;
+	private Long tagConditionId;//条件设置主键
 	
 	@ApiModelProperty("符号")
 	@Length(min=0, max=32)
 	@Column(name = "SYMBOL")
-	private String symbol;
+	private String symbol;//符号
 	
 	@ApiModelProperty("条件值")
 	@Length(min=0, max=4000)
 	@Column(name = "THE_VALUES")
-	private String theValues;
+	private String theValues;//条件值
 	
 	@ApiModelProperty("值类型")
 	@Length(min=0, max=32)
 	@Column(name = "VALUES_TYPE")
-	private String valuesType;
+	private String valuesType;//值类型
 	
 	@ApiModelProperty("是否连接符")
 	@Max(1L)
 	@Column(name = "IS_CONNECT_SYMBOL")
-	private Long isConnectSymbol;
+	private Long isConnectSymbol;//是否连接符
 	
 	@ApiModelProperty("排序")
 	@Max(9999L)
 	@Column(name = "SORT")
-	private Integer sort;
+	private Integer sort;//排序
 	
 	
 	@ApiModelProperty("是否新增")
 	@Transient
-    private Boolean isNew;
+    private Boolean isNew;//是否新增
 	
 	@Transient
     @JsonIgnore

@@ -53,27 +53,27 @@ public class SysUser extends BasicApiResponse implements ApiResponse {
 	private String picture;//头像
 	@ApiModelProperty("来源类型")
 	private Short fromtype;//来源类型
-	private String fromtypeName;
+	private String fromtypeName;//来源类型中文翻译
 	@ApiModelProperty("短信验证码")
-	private String scode;
+	private String scode;//短信验证码
 	@ApiModelProperty("OA-单位组织机构代码")
-	private String orgcode;
+	private String orgcode;//OA-单位组织机构代码
 	@ApiModelProperty("OA-统一认证平台中机构编码")
-	private String deptcode;
+	private String deptcode;//OA-统一认证平台中机构编码
 	@ApiModelProperty("OA-用户uid")
-	private String oarelationid;
+	private String oarelationid;//OA-用户uid
 	@ApiModelProperty("OA-部门ID")
-	private String deptid;
+	private String deptid;//OA-部门ID
 	@ApiModelProperty("OA-机构名")
-	private String orgname;
+	private String orgname;//OA-机构名
 	@ApiModelProperty("OA-所在单位科室")
-	private String level0;
+	private String level0;//OA-所在单位科室
 	@ApiModelProperty("OA-所在单位")
-	private String level1;
+	private String level1;//OA-所在单位
 	@ApiModelProperty("OA-最后更新时间")
-	private Date updatetime;
+	private Date updatetime;//OA-最后更新时间
 	@ApiModelProperty("OA-组织机构ID")
-	private String orgid;
+	private String orgid;//OA-组织机构ID
 
 	@Id
 	@Column(name = "USERID")

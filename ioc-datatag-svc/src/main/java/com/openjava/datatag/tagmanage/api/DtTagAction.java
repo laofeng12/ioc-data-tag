@@ -73,7 +73,13 @@ public class DtTagAction {
         return dtTagService.doSaveOrEdit(body,ip);//修改标签
     }
 
-
+    /**
+     *
+     * @param id
+     * @param request
+     * @return
+     * @throws Exception
+     */
     @ApiOperation(value = "删除", nickname = "delete")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "主键编码", required = false, paramType = "delete"),

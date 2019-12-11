@@ -26,17 +26,34 @@ import com.openjava.datatag.log.repository.DtTaggUpdateLogRepository;
 public class DtTaggUpdateLogServiceImpl implements DtTaggUpdateLogService {
 	
 	@Resource
-	private DtTaggUpdateLogRepository dtTaggUpdateLogRepository;
-	
+	private DtTaggUpdateLogRepository dtTaggUpdateLogRepository;//
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public Page<DtTaggUpdateLog> query(DtTaggUpdateLogDBParam params, Pageable pageable){
 		Page<DtTaggUpdateLog> pageresult = dtTaggUpdateLogRepository.query(params, pageable);
 		return pageresult;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public List<DtTaggUpdateLog> queryDataOnly(DtTaggUpdateLogDBParam params, Pageable pageable){
 		return dtTaggUpdateLogRepository.queryDataOnly(params, pageable);
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	public DtTaggUpdateLog get(Long id) {
 		Optional<DtTaggUpdateLog> o = dtTaggUpdateLogRepository.findById(id);
 		if(o.isPresent()) {
@@ -46,11 +63,25 @@ public class DtTaggUpdateLogServiceImpl implements DtTaggUpdateLogService {
 		System.out.println("找不到记录DtTaggUpdateLog："+id);
 		return null;
 	}
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	public DtTaggUpdateLog doSave(DtTaggUpdateLog m) {
 		return dtTaggUpdateLogRepository.save(m);
 	}
 
+	/**
+	 *
+	 * @param modifyContent
+	 * @param oldContent
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	public DtTaggUpdateLog loggingUpdate(String modifyContent, String oldContent,
 										 DtTagGroup db, Long userId, String ip){
 		//日志记录
@@ -66,6 +97,14 @@ public class DtTaggUpdateLogServiceImpl implements DtTaggUpdateLogService {
 		return dtTaggUpdateLogRepository.save(log);
 	}
 
+	/**
+	 *
+	 * @param modifyContent
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	public DtTaggUpdateLog loggingNew(String modifyContent,DtTagGroup db,Long userId,String ip){
 		DtTaggUpdateLog log = new DtTaggUpdateLog();
 		log.setId(ConcurrentSequence.getInstance().getSequence());
@@ -79,6 +118,13 @@ public class DtTaggUpdateLogServiceImpl implements DtTaggUpdateLogService {
 		return dtTaggUpdateLogRepository.save(log);
 	}
 
+	/**
+	 *
+	 * @param db
+	 * @param userId
+	 * @param ip
+	 * @return
+	 */
 	public DtTaggUpdateLog loggingDelete(DtTagGroup db,Long userId,String ip){
 		DtTaggUpdateLog log = new DtTaggUpdateLog();
 		log.setId(ConcurrentSequence.getInstance().getSequence());

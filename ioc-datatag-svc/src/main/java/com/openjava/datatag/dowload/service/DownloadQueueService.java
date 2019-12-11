@@ -16,15 +16,47 @@ import javax.servlet.http.HttpServletResponse;
  *
  */
 public interface DownloadQueueService {
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 * @throws Exception
+	 */
 	Page<DownloadQueue> query(DownloadQueueDBParam params, Pageable pageable)throws Exception;
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	List<DownloadQueue> queryDataOnly(DownloadQueueDBParam params, Pageable pageable);
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	DownloadQueue get(Long id);
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	DownloadQueue doSave(DownloadQueue m);
-	
+
+	/**
+	 *
+	 * @param id
+	 */
 	void doDelete(Long id);
+
+	/**
+	 *
+	 * @param ids
+	 */
 	void doRemove(String ids);
 
 	/**
@@ -33,8 +65,25 @@ public interface DownloadQueueService {
 	 */
 	DownloadQueue doSaveNow(DownloadQueue m);
 
+	/**
+	 *
+	 * @param btype
+	 * @param bid
+	 * @return
+	 */
 	DownloadQueue findBybtypeAndBid(String btype,String bid);
 
+	/**
+	 *
+	 * @param state
+	 * @return
+	 */
 	List<DownloadQueue> findByState(Long state);
+
+	/**
+	 *
+	 * @param taggingModelId
+	 * @param response
+	 */
 	void doExport(Long taggingModelId, HttpServletResponse response);
 }

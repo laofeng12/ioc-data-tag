@@ -38,71 +38,71 @@ public class DtTagCondition implements Persistable<Long>,Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "commonseq")
 	@SequenceGenerator(name = "commonseq", sequenceName = "SEQ_COMMON_ID", allocationSize = 1)
 	@Column(name = "TAG_CONDITION_ID")
-	private Long tagConditionId;
+	private Long tagConditionId;//条件设置主键
 	
 	@ApiModelProperty("字段表主键")
 	@Max(9223372036854775806L)
 	@Column(name = "COL_ID")
-	private Long colId;
+	private Long colId;//字段表主键
 	
 	@ApiModelProperty("标签编号")
 	@Max(9223372036854775806L)
 	@Column(name = "TAG_ID")
-	private Long tagId;
+	private Long tagId;//标签编号
 
 	@ApiModelProperty("是否手动打标")
 	@Max(1L)
 	@Column(name = "IS_HANDLE")
-	private Long isHandle;
+	private Long isHandle;//是否手动打标
 
 	@ApiModelProperty("逻辑语句")
 	@Length(min=0, max=4000)
 	@Column(name = "FILTER_EXPRESSION")
-	private String filterExpression;
+	private String filterExpression;//逻辑语句
 	
 	@ApiModelProperty("源字段名")
 	@Length(min=0, max=32)
 	@Column(name = "SOURCE_COL")
-	private String sourceCol;
+	private String sourceCol;//源字段名
 	
 	@ApiModelProperty("显示字段名")
 	@Length(min=0, max=32)
 	@Column(name = "SHOW_COL")
-	private String showCol;
+	private String showCol;//显示字段名
 	
 	@ApiModelProperty("创建用户")
 	@Max(9223372036854775806L)
 	@Column(name = "CREATE_USER")
-	private Long createUser;
+	private Long createUser;//创建用户
 	
 	@ApiModelProperty("创建时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATE_TIME")
-	private Date createTime;
+	private Date createTime;//创建时间
 	
 	@ApiModelProperty("修改用户")
 	@Max(9223372036854775806L)
 	@Column(name = "MODIFY_USER")
-	private Long modifyUser;
+	private Long modifyUser;//修改用户
 	
 	@ApiModelProperty("修改时间")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "MODIFY_TIME")
-	private Date modifyTime;
+	private Date modifyTime;//修改时间
 	
 	@ApiModelProperty("删除标记")
 	@Max(9L)
 	@Column(name = "IS_DELETED")
-	private Long isDeleted;
+	private Long isDeleted;//删除标记
 	
 	
 	@ApiModelProperty("是否新增")
 	@Transient
-    private Boolean isNew;
+    private Boolean isNew;//是否新增
 	
 	@Transient
     @JsonIgnore

@@ -27,17 +27,34 @@ import com.openjava.datatag.log.repository.DtTagmUpdateLogRepository;
 public class DtTagmUpdateLogServiceImpl implements DtTagmUpdateLogService {
 	
 	@Resource
-	private DtTagmUpdateLogRepository dtTagmUpdateLogRepository;
-	
+	private DtTagmUpdateLogRepository dtTagmUpdateLogRepository;//
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public Page<DtTagmUpdateLog> query(DtTagmUpdateLogDBParam params, Pageable pageable){
 		Page<DtTagmUpdateLog> pageresult = dtTagmUpdateLogRepository.query(params, pageable);
 		return pageresult;
 	}
-	
+
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
 	public List<DtTagmUpdateLog> queryDataOnly(DtTagmUpdateLogDBParam params, Pageable pageable){
 		return dtTagmUpdateLogRepository.queryDataOnly(params, pageable);
 	}
-	
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
 	public DtTagmUpdateLog get(Long id) {
 		Optional<DtTagmUpdateLog> o = dtTagmUpdateLogRepository.findById(id);
 		if(o.isPresent()) {
@@ -47,12 +64,24 @@ public class DtTagmUpdateLogServiceImpl implements DtTagmUpdateLogService {
 		System.out.println("找不到记录DtTagmUpdateLog："+id);
 		return null;
 	}
-	
+
+	/**
+	 *
+	 * @param m
+	 * @return
+	 */
 	public DtTagmUpdateLog doSave(DtTagmUpdateLog m) {
 		return dtTagmUpdateLogRepository.save(m);
 	}
 
-
+	/**
+	 *
+	 * @param modifyContent
+	 * @param oldContent
+	 * @param db
+	 * @param ip
+	 * @return
+	 */
 	public DtTagmUpdateLog loggingUpdate(String modifyContent,String oldContent, DtTaggingModel db, String ip){
 		//日志记录
 		DtTagmUpdateLog log = new DtTagmUpdateLog();
@@ -67,6 +96,13 @@ public class DtTagmUpdateLogServiceImpl implements DtTagmUpdateLogService {
 		return dtTagmUpdateLogRepository.save(log);
 	}
 
+	/**
+	 *
+	 * @param modifyContent
+	 * @param db
+	 * @param ip
+	 * @return
+	 */
 	public DtTagmUpdateLog loggingNew(String modifyContent,DtTaggingModel db,String ip){
 		DtTagmUpdateLog log = new DtTagmUpdateLog();
 		log.setId(ConcurrentSequence.getInstance().getSequence());
@@ -80,6 +116,12 @@ public class DtTagmUpdateLogServiceImpl implements DtTagmUpdateLogService {
 		return dtTagmUpdateLogRepository.save(log);
 	}
 
+	/**
+	 *
+	 * @param db
+	 * @param ip
+	 * @return
+	 */
 	public DtTagmUpdateLog loggingDelete(DtTaggingModel db,String ip){
 		DtTagmUpdateLog log = new DtTagmUpdateLog();
 		log.setId(ConcurrentSequence.getInstance().getSequence());

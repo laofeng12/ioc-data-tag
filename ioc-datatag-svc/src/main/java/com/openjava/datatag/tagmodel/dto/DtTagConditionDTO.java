@@ -10,30 +10,33 @@ import javax.persistence.Column;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ */
 @Data
 public class DtTagConditionDTO {
     @ApiModelProperty("条件设置主键")
-    private Long tagConditionId;
+    private Long tagConditionId;//条件设置主键
     @ApiModelProperty("字段表主键")
-    private Long colId;
+    private Long colId;//字段表主键
     @ApiModelProperty("标签id")
-    private Long tagId;
+    private Long tagId;//标签id
     @ApiModelProperty("标签名")
-    private String tagName;
+    private String tagName;//标签名
     @ApiModelProperty("标签组id")
-    private Long tagsId;
+    private Long tagsId;//标签组id
     @ApiModelProperty("标签id路径")
-    private String idPath;
+    private String idPath;//标签id路径
     @ApiModelProperty("是否手动设置")
-    private Long isHandle;
+    private Long isHandle;//是否手动设置
     @ApiModelProperty("逻辑语句")
-    private String filterExpression;
+    private String filterExpression;//逻辑语句
     @ApiModelProperty("源字段名")
-    private String sourceCol;
+    private String sourceCol;//源字段名
     @ApiModelProperty("显示字段名")
-    private String showCol;
+    private String showCol;//显示字段名
     @ApiModelProperty("条件设置")
-    private List<SaveConditionDtFilterExpressionDTO> conditionSetting = new ArrayList<>();
+    private List<SaveConditionDtFilterExpressionDTO> conditionSetting = new ArrayList<>();//条件设置
     @Override
     public boolean equals(Object obj) {
         if (this == obj){

@@ -34,6 +34,12 @@ public class PortrayalAction {
     @Resource
     private DtTaggingModelService dtTaggingModelService;//标签模型业务层接口
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws Exception
+     */
     @ApiOperation(value = "根据画像id查询画像列表", notes = "结果对象数组")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "画像ID", required = false, dataType = "String", paramType = "path"),
@@ -49,6 +55,13 @@ public class PortrayalAction {
         return resp;
     }
 
+    /**
+     *
+     * @param tableName
+     * @param pKey
+     * @return
+     * @throws Exception
+     */
     @ApiOperation(value = "查询画像详情", notes = "查询画像详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "tableName", value = "表名", dataType ="String", paramType = "path"),

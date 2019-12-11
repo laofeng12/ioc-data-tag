@@ -12,16 +12,24 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+/**
+ *
+ */
 @Component
 public class TokenGenerator {
 
     @Resource
-    private SysUserService sysUserService;
+    private SysUserService sysUserService;//
     @Resource
-    private LmMemberTokenService lmMemberTokenService;
+    private LmMemberTokenService lmMemberTokenService;//
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;//
 
+    /**
+     *
+     * @param userId
+     * @return
+     */
     public String createToken(Long userId){
         String token = "";
         try {

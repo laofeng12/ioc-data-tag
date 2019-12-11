@@ -5,39 +5,43 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+
+/**
+ *
+ */
 @Data
 public class DtSetColDTO {
 
-    private Long colId;
+    private Long colId;//
 
-    private Long taggingModelId;
+    private Long taggingModelId;//
 
-    private String sourceCol;
-    private String sourceColId;
-    private String sourceDataType;
+    private String sourceCol;//
+    private String sourceColId;//
+    private String sourceDataType;//
 
-    private String showCol;
+    private String showCol;//
 
-    private Long createUser;
-
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
-    private Date createTime;
-
-    private Long modifyUser;
+    private Long createUser;//
 
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
-    private Date modifyTime;
+    private Date createTime;//
 
-    private Long isDeleted;
+    private Long modifyUser;//
 
-    private Long isPKey;
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
+    private Date modifyTime;//
 
-    private Long isHandle;
+    private Long isDeleted;//
 
-    private Long isMarking;
+    private Long isPKey;//
 
-    private Long isSource;
-    private Long colSort;
+    private Long isHandle;//
+
+    private Long isMarking;//
+
+    private Long isSource;//
+    private Long colSort;//
 }

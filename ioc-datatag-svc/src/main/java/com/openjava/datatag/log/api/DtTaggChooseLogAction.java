@@ -33,9 +33,15 @@ import com.openjava.datatag.log.query.DtTaggChooseLogDBParam;
 public class DtTaggChooseLogAction {
 	
 	@Resource
-	private DtTaggChooseLogService dtTaggChooseLogService;
+	private DtTaggChooseLogService dtTaggChooseLogService;//
 
-	
+	/**
+	 *
+	 * @param params
+	 * @param pageable
+	 * @return
+	 * @throws APIException
+	 */
 	@ApiOperation(value = "列表分页查询", notes = "{total：总数量，totalPage：总页数，rows：结果对象数组}", nickname="search")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "eq_copiedTagg", value = "被拷贝的标签组编号=", required = false, dataType = "Long", paramType = "query"),
