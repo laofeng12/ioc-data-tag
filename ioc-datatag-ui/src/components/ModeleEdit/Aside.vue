@@ -472,7 +472,7 @@
         //     }
         //   })
         // })
-        console.log('排序', this.tableData)
+        // console.log('排序', this.tableData)
         this.tableData.forEach((item, index) => {
           if (item.colSort === '') {
             item.colSort = index + 1
