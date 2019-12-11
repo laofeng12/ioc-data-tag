@@ -87,9 +87,9 @@ export function getDispatchdetail(params) {
  *查询模型打标结果列表
  * @param data
  */
-export function getlist({taggingModelId,page,size}) {
+export function getTabulation({taggingModelId,page,size}) {
   return fetch ({
-    url:`/datatag/tagmodel/dtTaggingModel/${taggingModelId}/${page}/${size}/`,
+    url:`/datatag/tagmodel/dtTaggingModel/${taggingModelId}/${page}/${size}`,
     method:'get'
   })
 }
