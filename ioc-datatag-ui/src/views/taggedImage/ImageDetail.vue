@@ -131,7 +131,7 @@
       },
       handleSizeChange(size) {
         this.size = size
-        if (size > this.totalnum) {
+        if (size * 10 > this.totalnum) {
           this.page = 0
           this.getList()
         }else {
