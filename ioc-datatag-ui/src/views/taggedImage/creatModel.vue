@@ -793,23 +793,30 @@
       // 另存模型
       async saveAsmodel() {
         this.saveasLoading = true
-        try {
-          const res = await saveAs({
-            taggingModelId: this.taggingModelId,
-            "modelDesc": this.ruleForm.textarea2,
-            "modelName": this.ruleForm.name
-          })
-          this.$message({
-            message: res.message,
-            type: 'success'
-          });
-          this.saveasLoading = false
-          this.editDialog = false
-          this.$router.push('/lableImage')
-        } catch (e) {
-          console.log(e);
-          this.saveasLoading = false
-        }
+        this.$refs.ruleForm.validate(async (valid) => {
+          if (valid) {
+            try {
+              const res = await saveAs({
+                taggingModelId: this.taggingModelId,
+                "modelDesc": this.ruleForm.textarea2,
+                "modelName": this.ruleForm.name
+              })
+              this.$message({
+                message: res.message,
+                type: 'success'
+              });
+              this.saveasLoading = false
+              this.editDialog = false
+              this.$router.push('/lableImage')
+            } catch (e) {
+              console.log(e);
+              this.saveasLoading = false
+            }
+          } else {
+            this.saveasLoading = false
+          }
+        });
+
       },
       // 确定调度
       async goDispatchto() {
