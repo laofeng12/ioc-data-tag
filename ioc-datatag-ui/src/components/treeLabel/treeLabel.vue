@@ -410,6 +410,10 @@
         this.lvl = node.level + 1
         this.preaTagId = data.id
         this.labelDialog2 = true
+        if(this.ruleForm.name !== '' || this.ruleForm.textarea !== ''){
+          this.ruleForm.name = ''
+          this.ruleForm.textarea = ''
+        }
       },
       closedialogOne() {
         this.labelDialog = false
