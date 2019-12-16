@@ -173,7 +173,7 @@
                 class="controlChoose"
                 size="small"
                 placeholder="请输入需要导出的数据条目数量"
-                v-model="exportNum">
+                v-model.trim="exportNum">
               </el-input>
             </el-form-item>
 
@@ -183,7 +183,7 @@
           <div>
             <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="handleExport">确定导出
             </el-button>
-            <el-button size="small" type="primary" class="queryBtn" @click="cancleExport">取消</el-button>
+            <el-button size="small" plain @click="cancleExport">取消</el-button>
           </div>
         </div>
       </el-dialog>
@@ -270,6 +270,7 @@
     name: "tagManage",
     data() {
       return {
+        numResult: '',
         errorContent: '',
         lockReconnect: false,
         webUserId: '',
@@ -439,6 +440,8 @@
         } else {
           this.downloadDialog = true
           this.downloadId = id
+          const numResult = num.split('/')
+          this.numResult = numResult[1]
         }
       },
       // 关闭下载模板
@@ -481,22 +484,40 @@
       // 导出数据操作
       async handleExport() {
         this.saveLoading = true
+        const reg = new RegExp("^[0-9]*$")
         if ((this.exportValue == 1 && this.exportNum != '') || this.exportValue == 0) {
-          const params = {
-            number: this.exportNum,
-            taggingModelId: this.downloadId
-          }
-          try {
-            const res = await startDown(params)
+          if (!reg.test(this.exportNum)) {
             this.$message({
-              message: res.message,
-              type: 'success'
+              message: '请输入正确的数字！',
+              type: 'warning'
             });
             this.saveLoading = false
-            this.downloadDialog = false
-            this.$router.push('download')
-          } catch (e) {
-            console.log(e);
+          } else {
+            if (this.exportNum > this.numResult) {
+              this.$message({
+                message: '导出条目数量应小于调度成功数量！',
+                type: 'warning'
+              });
+              this.saveLoading = false
+            } else {
+              const params = {
+                number: this.exportNum,
+                taggingModelId: this.downloadId
+              }
+              try {
+                const res = await startDown(params)
+                this.$message({
+                  message: res.message,
+                  type: 'success'
+                });
+                this.saveLoading = false
+                this.downloadDialog = false
+                this.$router.push('download')
+              } catch (e) {
+                this.saveLoading = false
+                console.log(e);
+              }
+            }
           }
         } else {
           this.$message.error('请输入需要导出的数据条目数量');
