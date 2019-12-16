@@ -15,7 +15,8 @@
         arr: [],
         onHeight: {
           height: '100'
-        }
+        },
+        dataNum:''
       }
     },
     mounted() {
@@ -61,9 +62,26 @@
           myChart.resize();
         }
       },
+      //产生随机数
+      randomWord (randomFlag,min,max) {
+        let num = '',
+          range = min,
+          arr = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
+        //随机产生
+        if (randomFlag) {
+          range = Math.round( Math.random() * (max-min)) + min;
+        }
+        for (var i=0;i<range;i++) {
+          let pos = Math.round(Math.random() * (arr.length-1));
+          num += arr[pos]
+        }
+        this.dataNum = num
+        return num;
+      },
       // 计算字符长度
       textLength(str) {
         let len = 0;
+        this.randomWord(false,32)
         for (let a of str) {
           if (/[\u4E00-\u9FA5]/.exec(a)) {
             len += 1;
@@ -73,6 +91,7 @@
         }
         if (len < 8) {
           const numOne = {
+            'id':this.dataNum,
             "name": str,
             "value": 582,
             "symbolSize": 80,
@@ -88,6 +107,7 @@
           this.arr.push(numOne)
         } else {
           const numTwo = {
+            'id':this.dataNum,
             "name": str,
             "value": 1484,
             "symbolSize": 100,

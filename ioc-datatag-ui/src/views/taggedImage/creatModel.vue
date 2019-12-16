@@ -11,7 +11,7 @@
             <div class="zedit" v-if="routerName==='editModel'">
               <!--<el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容"-->
               <!--@blur="getsaveName"></el-input>-->
-              <el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容" maxlength="25"
+              <el-input v-show="!showBtn" size="small" clearable v-model.trim="runModelname" placeholder="请输入模型名称" maxlength="25"
                         show-word-limit></el-input>
               <span v-show="showBtn">模型名称：{{runModelname}}</span>
               <div class="editTwo">
@@ -201,7 +201,7 @@
         <el-container class="">
           <el-aside width="250px" class="left">
             <h3>选择协作用户</h3>
-            <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText" size="small" suffix-icon="el-icon-search"
+            <el-input placeholder="输入关键词搜索列表" clearable v-model.trim="searchText" size="small" prefix-icon="el-icon-search"
             ></el-input>
             <div class="allPeople">
               <div class="userContent clearfix" v-for="(item,index) in list" :key="index">
@@ -212,8 +212,8 @@
           </el-aside>
           <el-aside width="250px" class="left">
             <h3>已选用户</h3>
-            <el-input placeholder="输入关键词搜索列表" v-model.trim="searchText2" size="small"
-                      suffix-icon="el-icon-search"></el-input>
+            <el-input placeholder="输入关键词搜索列表" clearable v-model.trim="searchText2" size="small"
+                      prefix-icon="el-icon-search"></el-input>
             <div class="allPeople">
               <div class="userContent clearfix" v-for="(item,index) in list2" :key="index"
                    :class="{zxhh:changeRed == index}">
@@ -768,15 +768,23 @@
       // 模型名称保存
       async getsaveName() {
         try {
-          const resName = await saveName({
-            taggingModelId: this.taggingModelId,
-            modelName: this.runModelname
-          })
-          this.$message({
-            message: resName.message,
-            type: 'success'
-          });
-          this.showBtn = true
+          if(this.runModelname){
+            const resName = await saveName({
+              taggingModelId: this.taggingModelId,
+              modelName: this.runModelname
+            })
+            this.$message({
+              message: resName.message,
+              type: 'success'
+            });
+            this.showBtn = true
+          }else{
+            this.$message({
+              message: '请输入模型名称',
+              type: 'warning'
+            });
+          }
+
         } catch (e) {
           console.log(e);
         }
@@ -785,23 +793,30 @@
       // 另存模型
       async saveAsmodel() {
         this.saveasLoading = true
-        try {
-          const res = await saveAs({
-            taggingModelId: this.taggingModelId,
-            "modelDesc": this.ruleForm.textarea2,
-            "modelName": this.ruleForm.name
-          })
-          this.$message({
-            message: res.message,
-            type: 'success'
-          });
-          this.saveasLoading = false
-          this.editDialog = false
-          this.$router.push('/lableImage')
-        } catch (e) {
-          console.log(e);
-          this.saveasLoading = false
-        }
+        this.$refs.ruleForm.validate(async (valid) => {
+          if (valid) {
+            try {
+              const res = await saveAs({
+                taggingModelId: this.taggingModelId,
+                "modelDesc": this.ruleForm.textarea2,
+                "modelName": this.ruleForm.name
+              })
+              this.$message({
+                message: res.message,
+                type: 'success'
+              });
+              this.saveasLoading = false
+              this.editDialog = false
+              this.$router.push('/lableImage')
+            } catch (e) {
+              console.log(e);
+              this.saveasLoading = false
+            }
+          } else {
+            this.saveasLoading = false
+          }
+        });
+
       },
       // 确定调度
       async goDispatchto() {
