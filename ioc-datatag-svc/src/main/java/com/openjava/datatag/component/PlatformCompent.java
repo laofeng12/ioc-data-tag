@@ -49,6 +49,7 @@ public class PlatformCompent {
             spUnifyWorkformDTO.setBusinessId(businessId);
             spUnifyWorkformDTO.setUserId(userId);
             spUnifyWorkformDTO.setUserAccount(userAccount);
+            System.out.println(JSONObject.toJSONString(spUnifyWorkformDTO));
             HttpResponse resp = client.postJSON(url, JSONObject.toJSONString(spUnifyWorkformDTO));
             String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
             System.out.println(jsontext);
