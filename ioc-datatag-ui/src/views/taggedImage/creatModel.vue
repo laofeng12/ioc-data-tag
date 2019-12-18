@@ -413,7 +413,7 @@
           this.runModelname = data.modelName
           this.headColList = data.colList
           this.$store.dispatch('getlistArr', data.colList)
-
+          this.getModelColsList(this.taggingModelId, 0, 100, 1)
         } catch (e) {
         }
       },
@@ -864,7 +864,7 @@
         //进入编辑模型或者打标界面
         //获取模型数据
         this.getModelList(this.taggingModelId)
-        this.getModelColsList(this.taggingModelId, 0, 100, 1)
+        // this.getModelColsList(this.taggingModelId, 0, 100, 1)
         this.getpeopleList()
       }
       this.groupList()
