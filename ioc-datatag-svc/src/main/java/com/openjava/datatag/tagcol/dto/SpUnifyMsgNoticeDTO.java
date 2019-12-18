@@ -22,4 +22,6 @@ public class SpUnifyMsgNoticeDTO {
     private String userAccount;//消息接收的用户账号
 
     private String userId;//消息接收的用户id
+
+    private Long jobStatus=1L;//1：待处理，2：已完成，3：已作废  默认待处理
 }
