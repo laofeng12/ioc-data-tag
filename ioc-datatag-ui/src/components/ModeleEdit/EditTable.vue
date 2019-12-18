@@ -2,7 +2,8 @@
   <div class="table-box">
     <div class="showCon" @click="hidePanel">
       <el-table border class="my-table" :data="tableData" style="width: 100%;" :height="tableHeight">
-        <el-table-column v-for="(item,index) in theadData" :prop="item.sourceCol" :key="index" min-width="300">
+        <!--<el-table-column v-for="(item,index) in theadData" :prop="item.sourceCol" :key="index" min-width="300">-->
+        <el-table-column v-for="(item,index) in theadData" :prop="item.showCol" :key="index" min-width="300">
           <template slot="header" slot-scope="scope">
             <el-dropdown @command="handleCommandTags($event,item)"
                          v-if="theadData[index].isMarking===true || theadData[index].isMarking==1">
@@ -269,14 +270,7 @@
           this.tagSetList = newValue
         },
         deep: true
-      },
-      'tableData': {
-        handler: function (newValue, oldValue) {
-          this.tableData = newValue
-          this.$set(this.tableData)
-        },
-        deep: true
-      },
+      }
     },
     created() {
       //获取标签组
