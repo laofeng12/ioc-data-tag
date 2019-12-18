@@ -6,6 +6,7 @@ import com.openjava.audit.auditManagement.component.AuditComponet;
 import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.component.PlatformCompent;
 import com.openjava.datatag.component.PostgreSqlConfig;
 import com.openjava.datatag.component.TokenGenerator;
 import com.openjava.datatag.demo.dto.BaseResp;
@@ -117,7 +118,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private AuditComponet auditComponet;//
 	@Resource
 	private DownloadQueueService downloadQueueService;//下载列表业务层接口
-
+	@Resource
+	private PlatformCompent platformCompent;//首页对接消息组件
 	/**
 	 *
 	 * @param copy
@@ -740,6 +742,8 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			}else {
 
 			}
+			//发送告警信息  todo
+			platformCompent.spUnifyMsgNotice();//发送告警信息
 		}
 		tagModel.setUpdateNum(totalCount);//
 		tagModel.setSuccessNum(successCount);//

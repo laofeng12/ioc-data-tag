@@ -111,8 +111,10 @@ pgconfig:
   pooled: true
 
 platform:
-  baseUrl: http://219.135.182.2:31012
-  spUnifyWorkform: /category/workform/spUnifyWorkform
-  finish: /category/workform/spUnifyWorkform/finish/%s/%s
-  spUnifyMsgNotice: /category/workform/spUnifyMsgNotice
+  baseUrl: http://19.104.40.36
+  jobPath: http://19.104.40.36/datatagweb/cooperationModel
+  spUnifyWorkform: ${platform.baseUrl}/category/workform/spUnifyWorkform #新增/编辑工单
+  finish: ${platform.baseUrl}/category/workform/spUnifyWorkform/finish/%s/%s #完成工单
+  cancel: ${platform.baseUrl}/category/workform/spUnifyWorkform/cancel/%s/%S-%s #作废工单/{formType}/{businessId}-{userId}
+  spUnifyMsgNotice: ${platform.baseUrl}/category/workform/spUnifyMsgNotice  #新增告警消息
 

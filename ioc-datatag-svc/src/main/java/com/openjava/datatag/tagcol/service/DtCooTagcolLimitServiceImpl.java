@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import javax.xml.crypto.Data;
 
 import com.openjava.datatag.common.Constants;
+import com.openjava.datatag.component.PlatformCompent;
 import com.openjava.datatag.tagcol.domain.DtCooperation;
 import com.openjava.datatag.tagcol.repository.DtCooperationRepository;
 import com.openjava.datatag.tagmodel.domain.DtTagCondition;
@@ -38,7 +39,8 @@ public class DtCooTagcolLimitServiceImpl implements DtCooTagcolLimitService {
 	private DtTagConditionService dtTagConditionService;//
 	@Resource
 	private DtCooperationService dtCooperationService;//
-
+	@Resource
+	private PlatformCompent platformCompent;//首页对接消息组件
 	/**
 	 *
 	 * @param params
@@ -140,6 +142,8 @@ public class DtCooTagcolLimitServiceImpl implements DtCooTagcolLimitService {
 			cooperation.setState(Constants.DT_COOPERATION_YES);
 			cooperation.setCompleteTime(new Date());
 			dtCooperationService.doSave(cooperation);
+			// @todo 完成工单
+			platformCompent.finish(cooperation.getId()+"",user.getUserId());
 		}
 		cooTagcolLimit.setState(Constants.DT_COOP_TAGCOL_LIMMIT_YES);
 		dtCooTagcolLimitRepository.save(cooTagcolLimit);
