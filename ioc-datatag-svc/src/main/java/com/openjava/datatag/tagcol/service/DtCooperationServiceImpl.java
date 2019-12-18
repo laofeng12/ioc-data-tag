@@ -1,47 +1,41 @@
 package com.openjava.datatag.tagcol.service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import com.alibaba.fastjson.JSONObject;
-import com.commons.utils.QueryParamsUtil;
 import com.commons.utils.VoUtils;
 import com.openjava.audit.auditManagement.component.AuditComponet;
 import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
 import com.openjava.datatag.common.MyErrorConstants;
+import com.openjava.datatag.component.PlatformCompent;
 import com.openjava.datatag.tagcol.domain.DtCooTagcolLimit;
 import com.openjava.datatag.tagcol.domain.DtTagmCooLog;
 import com.openjava.datatag.tagcol.dto.*;
 import com.openjava.datatag.tagcol.query.DtCooTagcolLimitDBParam;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
-import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.service.DtTagGroupService;
 import com.openjava.datatag.tagmodel.domain.DtSetCol;
 import com.openjava.datatag.tagmodel.domain.DtTaggingModel;
-import com.openjava.datatag.tagmodel.dto.DtTaggingModelDTO;
 import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.tagmodel.service.DtSetColService;
 import com.openjava.datatag.tagmodel.service.DtTaggingModelService;
 import com.openjava.datatag.user.domain.SysUser;
+import com.openjava.datatag.user.repository.SysUserRepository;
 import com.openjava.datatag.user.service.SysUserService;
 import com.openjava.datatag.utils.TimeUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.C;
-import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.user.BaseUserInfo;
-import org.ljdp.core.db.DBQueryParam;
 import org.ljdp.core.spring.data.JpaMultiDynamicQueryDAO;
 import org.ljdp.secure.sso.SsoContext;
 import org.ljdp.ui.bootstrap.TablePage;
 import org.ljdp.ui.bootstrap.TablePageImpl;
-import org.ljdp.util.DateFormater;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,6 +74,10 @@ public class DtCooperationServiceImpl implements DtCooperationService {
     private AuditComponet auditComponet;//
     @Resource
     private DtSetColService dtSetColService;//
+    @Resource
+    private PlatformCompent platformCompent;//
+    @Resource
+    private SysUserRepository sysUserRepository;
     @PersistenceContext
     public void setEntityManager(EntityManager em) {
         this.em = em;
@@ -345,11 +343,13 @@ public class DtCooperationServiceImpl implements DtCooperationService {
      * 描述：新增、修改协作用户
      */
     public void doCoolListSave(List<DtCooperationListDTO> list) throws Exception {
-        String reqParams = JSONObject.toJSONString(list);
+        String reqParams = JSONObject.toJSONString(list);//请求数据转化为json格式
         DtTagmCooLog log = new DtTagmCooLog();
-        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();
-        Long userId = Long.valueOf(userInfo.getUserId());
+        BaseUserInfo userInfo = (BaseUserInfo) SsoContext.getUser();//获取用户信息
+        Long userId = Long.valueOf(userInfo.getUserId());//用户id
         for (DtCooperationListDTO dtos : list) {
+            boolean submitWorkOrderFlag = false;//是否需要提交工单
+            boolean cancleType = false;//是否需要取消工单
             if (dtos.getTaggmId() == null) {
                 throw new APIException(MyErrorConstants.PUBLIC_ERROE, "taggmId参数不能为空");
             }
@@ -385,7 +385,6 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 //EntityClassUtil.dealModifyInfo(col,userInfo);
                 col = dtCooperationRepository.save(col);
             } else {
-
                 col.setTaggmId(taggmId);
                 col.setCooUser(dtos.getCooUser());
                 col.setCreateUser(userId);
@@ -414,8 +413,14 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 if (record.getId() != null) {
                     if (record.getIsDelete()!=null && record.getIsDelete()==1){
                         dtCooTagcolLimitService.doDelete(record.getId());
+                        cancleType = true;//取消字段的打标需要作废工单
                     }else {
                         newcolLimit = dtCooTagcolLimitService.get(record.getId());
+                        boolean ischange = ischangeTagcol(newcolLimit,record);//判断是否有改动
+                        if (ischange){
+                            submitWorkOrderFlag = true;
+                            cancleType = true;
+                        }
                         newcolLimit.setUseTagGroup(record.getUseTagGroup());
                         newcolLimit.setTagColName(record.getTagColName());
                         newcolLimit.setCooId(col.getId());
@@ -424,7 +429,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                         newcolLimit = dtCooTagcolLimitService.doSave(newcolLimit);
                     }
                 } else {
-
+                    submitWorkOrderFlag = true;
                     newcolLimit.setIsNew(true);
                     newcolLimit.setUseTagGroup(record.getUseTagGroup());
                     newcolLimit.setTagColName(record.getTagColName());
@@ -436,9 +441,17 @@ public class DtCooperationServiceImpl implements DtCooperationService {
                 }
 
             }
-
+            //取消工单
+            if (cancleType){
+                platformCompent.cancel(col.getId()+"",dtos.getCooUser()+"");//取消工单
+            }
+            //添加协作成员时添加工单
+            if (submitWorkOrderFlag){
+                SysUser user =  sysUserRepository.getOne(dtos.getCooUser());
+                platformCompent.spUnifyWorkform(col.getId()+"",dtos.getCooUser()+"",user.getAccount());
+            }
         }
-        AuditLogVO vo = new AuditLogVO();
+        AuditLogVO vo = new AuditLogVO();//
         vo.setType(1L);//管理操作
         vo.setOperationService("标签与画像");//必传
         vo.setOperationModule("模型部署");//必传
@@ -447,6 +460,23 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         vo.setRecordId(userId+"");
         auditComponet.saveAuditLog(vo);
 
+    }
+
+    /**
+     * 判断协作字段是有有改动
+     * @param db
+     * @param record
+     * @return
+     */
+    public boolean ischangeTagcol(DtCooTagcolLimit db,DtCooTagcolLimitDTO record){
+        boolean ischange = false;
+        if (!record.getUseTagGroup().equals(db.getUseTagGroup()) ) {
+            ischange = true;//标签组更换需要取消工单
+        }
+        if (!record.getTagColId().equals(db.getTagColId())){
+            ischange = true;//字段修改需要修改工单
+        }
+        return ischange;
     }
 
     /**
@@ -535,7 +565,7 @@ public class DtCooperationServiceImpl implements DtCooperationService {
     public void doRemove(String ids) {
         String[] items = ids.split(",");
         for (int i = 0; i < items.length; i++) {
-            dtCooperationRepository.deleteById(new Long(items[i]));
+            doDelete(new Long(items[i]));//
         }
     }
 
