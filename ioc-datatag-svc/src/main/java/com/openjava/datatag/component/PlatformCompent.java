@@ -1,6 +1,7 @@
 package com.openjava.datatag.component;
 
 import com.alibaba.fastjson.JSONObject;
+import com.openjava.datatag.tagcol.dto.SpUnifyMsgNoticeDTO;
 import com.openjava.datatag.tagcol.dto.SpUnifyWorkformDTO;
 import lombok.Data;
 import org.apache.http.HttpResponse;
@@ -27,6 +28,7 @@ public class PlatformCompent {
     private String cancel;
     private String spUnifyMsgNotice;
     private String jobPath;
+    private String tagModelPath;
 
     @Resource
     private TokenGenerator tokenGenerator;//
@@ -95,12 +97,17 @@ public class PlatformCompent {
     /**
      * 告警
      */
-    public void spUnifyMsgNotice(){
+    public void spUnifyMsgNotice(String businessId,String userId,String userAccount){
         String url = spUnifyMsgNotice;//告警url
         try {
             LjdpHttpClient client = new LjdpHttpClient();
-//            client = initcClient(client,Long.valueOf(userId));
-            HttpResponse resp = client.postJSON(url, JSONObject.toJSONString(""));
+            client = initcClient(client,Long.valueOf(userId));
+            SpUnifyMsgNoticeDTO spUnifyMsgNoticeDTO = new SpUnifyMsgNoticeDTO();
+            spUnifyMsgNoticeDTO.setBusinessId(businessId);//业务id
+            spUnifyMsgNoticeDTO.setUserId(userId);
+            spUnifyMsgNoticeDTO.setUserAccount(userAccount);
+            spUnifyMsgNoticeDTO.setPath(tagModelPath);
+            HttpResponse resp = client.postJSON(url, JSONObject.toJSONString(spUnifyMsgNoticeDTO));
             String jsontext = HttpClientUtils.getContentString(resp.getEntity(), "utf-8");
             System.out.println(jsontext);
         } catch (IOException e) {

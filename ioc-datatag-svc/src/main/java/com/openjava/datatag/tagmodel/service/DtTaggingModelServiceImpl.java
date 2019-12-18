@@ -26,6 +26,8 @@ import com.openjava.datatag.tagmodel.query.DtTaggingModelDBParam;
 import com.openjava.datatag.tagmodel.repository.DtSetColRepository;
 import com.openjava.datatag.tagmodel.repository.DtTagConditionRepository;
 import com.openjava.datatag.tagmodel.repository.DtTaggingModelRepository;
+import com.openjava.datatag.user.domain.SysUser;
+import com.openjava.datatag.user.repository.SysUserRepository;
 import com.openjava.datatag.userprofile.service.PortrayalService;
 import com.openjava.datatag.utils.EntityClassUtil;
 import com.openjava.datatag.utils.MyTimeUtil;
@@ -120,6 +122,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	private DownloadQueueService downloadQueueService;//下载列表业务层接口
 	@Resource
 	private PlatformCompent platformCompent;//首页对接消息组件
+	@Resource
+	private SysUserRepository sysUserRepository;//
+
 	/**
 	 *
 	 * @param copy
@@ -739,11 +744,16 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				errorLog.setErrorTime(new Date());//
 				errorLog.setTaggingModelId(taggingModelId);//
 				dtTaggingErrorLogService.doSave(errorLog);//
-			}else {
-
 			}
 			//发送告警信息  todo
-			platformCompent.spUnifyMsgNotice();//发送告警信息
+			try {
+				SysUser sysUser = sysUserRepository.getOne(tagModel.getCreateUser());
+				platformCompent.spUnifyMsgNotice(tagModel.getTaggingModelId()+"",tagModel.getCreateUser()+"",sysUser.getAccount());//发送告警信息
+			}catch (Exception e){
+				System.out.println("告警失败");
+				e.printStackTrace();
+			}
+
 		}
 		tagModel.setUpdateNum(totalCount);//
 		tagModel.setSuccessNum(successCount);//

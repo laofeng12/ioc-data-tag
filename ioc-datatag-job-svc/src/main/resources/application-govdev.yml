@@ -119,3 +119,11 @@ searchjob: #更新模型中间表定时任务
   jobName: search_job
   queue: 0 0/5 * * * ? * #更新频率
 
+platform:
+  baseUrl: http://19.104.40.36
+  jobPath: http://19.104.40.36/datatagweb/cooperationModel
+  tagModelPath: http://19.104.40.36/datatagweb/lableImage
+  spUnifyWorkform: ${platform.baseUrl}/category/workform/spUnifyWorkform #新增/编辑工单
+  finish: ${platform.baseUrl}/category/workform/spUnifyWorkform/finish/%s/%s #完成工单
+  cancel: ${platform.baseUrl}/category/workform/spUnifyWorkform/cancel/%s/%S-%s #作废工单/{formType}/{businessId}-{userId}
+  spUnifyMsgNotice: ${platform.baseUrl}/category/workform/spUnifyMsgNotice  #新增告警消息
