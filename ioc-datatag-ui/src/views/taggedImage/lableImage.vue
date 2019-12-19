@@ -493,7 +493,7 @@
             });
             this.saveLoading = false
           } else {
-            if (this.exportNum > this.numResult) {
+            if (Number(this.exportNum) > Number(this.numResult)) {
               this.$message({
                 message: '导出条目数量应小于调度成功数量！',
                 type: 'warning'
