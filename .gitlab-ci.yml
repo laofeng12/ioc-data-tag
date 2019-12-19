@@ -15,8 +15,7 @@ build-web:
   stage: build-web
   before_script: 
     - echo "192.168.6.102 master.alltosea.com" > /etc/hosts
-    - oc login "$OPENSHIFT_SERVER" -u "$OPENSHIFT_USER" -p  "$OPENSHIFT_PWD" --insecure-skip-tls-verify
-    - oc project ioc-platform
+    - oc project ioc-platform login "$OPENSHIFT_SERVER" -u "$OPENSHIFT_USER" -p  "$OPENSHIFT_PWD" --insecure-skip-tls-verify
   script:
     - "oc start-build $CI_WEB_NAME --from-dir=. --follow"
   tags:
@@ -30,8 +29,7 @@ build-java:
   stage: build-java
   before_script: 
     - echo "192.168.6.102 master.alltosea.com" > /etc/hosts
-    - oc login "$OPENSHIFT_SERVER" -u "$OPENSHIFT_USER" -p  "$OPENSHIFT_PWD" --insecure-skip-tls-verify
-    - oc project ioc-platform
+    - oc project ioc-platform login "$OPENSHIFT_SERVER" -u "$OPENSHIFT_USER" -p  "$OPENSHIFT_PWD" --insecure-skip-tls-verify
   script:
     - "oc start-build $CI_SVC_NAME --from-dir=. --follow"
   tags:
@@ -45,8 +43,7 @@ build-job:
   stage: build-job
   before_script: 
     - echo "192.168.6.102 master.alltosea.com" > /etc/hosts
-    - oc login "$OPENSHIFT_SERVER" -u "$OPENSHIFT_USER" -p  "$OPENSHIFT_PWD" --insecure-skip-tls-verify
-    - oc project ioc-platform
+    - oc project ioc-platform login "$OPENSHIFT_SERVER" -u "$OPENSHIFT_USER" -p  "$OPENSHIFT_PWD" --insecure-skip-tls-verify
   script:
     - "oc start-build $CI_JOB_NAME --from-dir=. --follow"
   tags:
