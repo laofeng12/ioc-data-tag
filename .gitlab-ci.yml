@@ -16,6 +16,7 @@ build-web:
   before_script: 
     - echo "192.168.6.102 master.alltosea.com" > /etc/hosts
     - oc login "$OPENSHIFT_SERVER" -u "$OPENSHIFT_USER" -p  "$OPENSHIFT_PWD" --insecure-skip-tls-verify
+    - oc project ioc-platform
   script:
     - "oc start-build $CI_WEB_NAME --from-dir=. --follow"
   tags:
