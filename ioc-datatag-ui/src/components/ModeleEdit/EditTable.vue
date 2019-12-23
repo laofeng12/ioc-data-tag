@@ -1,7 +1,8 @@
 <template>
   <div class="table-box">
-    <div class="showCon" @click="hidePanel">
-      <el-table border class="my-table" :data="tableData" style="width: 100%;" :height="tableHeight">
+    <div class="showCon getTable" @click="hidePanel">
+      <!--<el-table border class="my-table" :data="tableData" style="width: 100%;" :height="tableHeight">-->
+      <el-table border class="my-table" :data="tableData" style="width: 100%;">
         <!--<el-table-column v-for="(item,index) in theadData" :prop="item.sourceCol" :key="index" min-width="300">-->
         <el-table-column v-for="(item,index) in theadData" :prop="item.showCol" :key="index" min-width="300">
           <template slot="header" slot-scope="scope">
@@ -278,7 +279,7 @@
       // this.getMyTagGroupList()
       this.getConnectList('dt.tag.conditions.connect')
       this.getCountList('dt.tag.conditions.noconnect')
-      this.tableHeight = document.body.clientHeight - 190
+      // this.tableHeight = document.body.clientHeight - 190
     },
     mounted() {
     },
@@ -962,5 +963,11 @@
   .autoBtn .el-button {
     height: 26px !important;
     line-height: 26px !important;
+  }
+  .getTable{
+    /*height: calc(100vh - 190px);*/
+    /*width: 100%;*/
+    /*overflow: scroll;*/
+    /*border: 1px solid red;*/
   }
 </style>
