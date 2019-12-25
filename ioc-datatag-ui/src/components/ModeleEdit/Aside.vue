@@ -115,10 +115,10 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="排序" width="60">
-                  <template slot-scope="scope">
-                    <div v-model="scope.row.colSort">{{scope.row.colSort}}</div>
-                  </template>
+                  type="index"
+                  label="序号"
+                  width="60"
+                >
                 </el-table-column>
                 <el-table-column label="字段" prop="definition"></el-table-column>
                 <el-table-column prop="type" label="类型">
@@ -234,10 +234,10 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="序号" width="50">
-                  <template slot-scope="scope">
-                    <div v-model="scope.row.colSort">{{scope.row.colSort}}</div>
-                  </template>
+                  type="index"
+                  label="序号"
+                  width="50"
+                >
                 </el-table-column>
                 <el-table-column label="字段" prop="definition"></el-table-column>
                 <el-table-column width="80" prop="type" label="类型">
@@ -749,7 +749,8 @@
                 sourceDataType: item.type,
                 isMarking: item.isMarking ? 1 : 0,
                 colId: item.colId,
-                colSort: item.colSort,
+                // colSort: item.colSort,
+                colSort: index + 1,
                 taggingModelId: this.modelData.taggingModelId,
                 sourceColId: item.id
               })
