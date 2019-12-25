@@ -5,12 +5,22 @@
         <el-input placeholder="输入关键词搜索" v-model="filterText" class="search" size="small"
                   prefix-icon="el-icon-search" clearable></el-input>
         <div class="tree-box treeCode">
-          <el-tree class="tree" :props="props" :highlight-current="true"
+          <!--<el-tree class="tree" :props="props" :highlight-current="true"-->
+                   <!--:filter-node-method="filterNode"-->
+                   <!--ref="tree"-->
+                   <!--node-key="id"-->
+                   <!--@node-click="handleNodeClick"-->
+                   <!--:load="loadNode" lazy>-->
+            <!--<div class="custom-tree-node" slot-scope="{ node, data }">-->
+              <!--<i v-if="data.isTable===true" class="el-icon-coin iconImg"></i>-->
+              <!--<div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>-->
+            <!--</div>-->
+          <!--</el-tree>-->
+          <el-tree :data="dataSetDirectoryTree" class="tree" :props="props" :highlight-current="true"
                    :filter-node-method="filterNode"
                    ref="tree"
                    node-key="id"
-                   @node-click="handleNodeClick"
-                   :load="loadNode" lazy>
+                   @node-click="handleNodeClick">
             <div class="custom-tree-node" slot-scope="{ node, data }">
               <i v-if="data.isTable===true" class="el-icon-coin iconImg"></i>
               <div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>
@@ -105,10 +115,10 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="排序" width="60">
-                  <template slot-scope="scope">
-                    <div v-model="scope.row.colSort">{{scope.row.colSort}}</div>
-                  </template>
+                  type="index"
+                  label="序号"
+                  width="60"
+                >
                 </el-table-column>
                 <el-table-column label="字段" prop="definition"></el-table-column>
                 <el-table-column prop="type" label="类型">
@@ -224,10 +234,10 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="序号" width="50">
-                  <template slot-scope="scope">
-                    <div v-model="scope.row.colSort">{{scope.row.colSort}}</div>
-                  </template>
+                  type="index"
+                  label="序号"
+                  width="50"
+                >
                 </el-table-column>
                 <el-table-column label="字段" prop="definition"></el-table-column>
                 <el-table-column width="80" prop="type" label="类型">
@@ -298,7 +308,7 @@
         filterText: '',
         props: {
           label: 'orgName',
-          children: 'children',
+          children: 'resList',
           isLeaf: 'leaf',
         },
         searchText: '',
@@ -629,13 +639,19 @@
       async getOneZtreeData(resolve) {
         try {
           const {data} = await getOneZtreeData()
+          data.dataSetDirectoryTree.map(item =>{
+            item.resList.forEach(_item =>{
+              _item.orgName = _item.resourceName
+            })
+          })
           this.dataLakeDirectoryName = data.dataLakeDirectoryName
           this.dataSetDirectoryName = data.dataSetDirectoryName
           this.dataLakeDirectoryTree = data.dataLakeDirectoryTree
           this.dataSetDirectoryTree = data.dataSetDirectoryTree
           // resolve([{ orgName: this.dataSetDirectoryName, id: 1 }])
           // resolve([{orgName:this.dataSetDirectoryTree}])
-          resolve(this.dataSetDirectoryTree)
+          // resolve(this.dataSetDirectoryTree)
+
         } catch (e) {
           console.log('error', e)
         }
@@ -733,7 +749,8 @@
                 sourceDataType: item.type,
                 isMarking: item.isMarking ? 1 : 0,
                 colId: item.colId,
-                colSort: item.colSort,
+                // colSort: item.colSort,
+                colSort: index + 1,
                 taggingModelId: this.modelData.taggingModelId,
                 sourceColId: item.id
               })
@@ -846,7 +863,7 @@
     created() {
       window.addEventListener('resize', this.getHeight);
       this.getHeight()
-      // this.getOneZtreeData()
+      this.getOneZtreeData()
       if (this.$route.name == 'editModel') {
         this.modelId = this.$route.params.id
       }
