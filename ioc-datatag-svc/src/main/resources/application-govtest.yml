@@ -101,7 +101,7 @@ pgconfig:
   pooled: true
 
 platform:
-  baseUrl: http://19.104.40.36
+  baseUrl: http://ioc-paas-svc:8080
   jobPath: http://19.104.40.36/datatagweb/cooperationModel
   tagModelPath: http://19.104.40.36/datatagweb/lableImage
   spUnifyWorkform: ${platform.baseUrl}/category/workform/spUnifyWorkform #新增/编辑工单
