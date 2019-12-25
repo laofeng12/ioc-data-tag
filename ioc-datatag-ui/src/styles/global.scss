@@ -3,6 +3,7 @@
 #app {
   height: 100%;
 }
+
 .app-container {
   padding: 20px;
   background: #ffffff;
@@ -30,13 +31,15 @@
   padding-left: 10px;
   margin-bottom: 20px;
 }
-.w-info-default .el-form-item{
-  border-bottom:1px dotted #ccc;
+
+.w-info-default .el-form-item {
+  border-bottom: 1px dotted #ccc;
 }
 
 .text-right {
   text-align: right;
 }
+
 .bottom-button {
   margin-top: 25px;
 }
@@ -48,6 +51,7 @@ ul li {
 p {
   margin: 0;
 }
+
 .p-t-18 {
   padding-top: 18px;
 }
@@ -55,6 +59,7 @@ p {
 .w-link-color {
   color: #409EFF;
 }
+
 /**滚动条样式**/
 ::-webkit-scrollbar {
   width: 14px;
@@ -68,23 +73,23 @@ p {
 }
 
 ::-webkit-scrollbar-track {
-  box-shadow: 1px 1px 5px rgba(0,0,0,.2) inset;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, .2) inset;
 }
 
 ::-webkit-scrollbar-thumb {
   min-height: 20px;
   background-clip: content-box;
-  box-shadow: 0 0 0 5px rgba(0,0,0,.2) inset;
+  box-shadow: 0 0 0 5px rgba(0, 0, 0, .2) inset;
 }
 
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
 // 树结构横向滚动条
 //.treeCode .el-tree-node>.el-tree-node__children{
 //  overflow: inherit !important;
 //}
-
 
 // 叶子节点去掉图标
 //.aside .el-tree-node__expand-icon.is-leaf::before
@@ -93,52 +98,63 @@ p {
 //}
 
 // 标签管理
-.treeBel .el-tree-node__expand-icon.is-leaf{
+.treeBel .el-tree-node__expand-icon.is-leaf {
   //display: none;
   color: transparent !important;
 }
 
-.treeBel .el-tree .el-tree-node__expand-icon.expanded{
+.treeBel .el-tree .el-tree-node__expand-icon.expanded {
   transform: rotate(90deg) !important;
 }
 
 // 创建模型
-.treeCode .el-tree .el-tree-node__expand-icon.expanded{
+.treeCode .el-tree .el-tree-node__expand-icon.expanded {
   transform: rotate(90deg) !important;
 }
-.treeCode .el-tree-node__expand-icon.is-leaf{
+
+.treeCode .el-tree-node__expand-icon.is-leaf {
   color: transparent !important;
 }
 
-.sel .el-input__inner{
+.sel .el-input__inner {
   cursor: pointer;
 }
 
 // 暂时为了菜单组件问题使用
 // 开始
-.el-table{
+.el-table {
   padding: 0px !important;
   margin-top: 20px !important;
   padding-bottom: 16px !important;
 }
+
 // 暂时为了标签树的样式
-.temporary .el-button{
+.temporary .el-button {
   padding: 0px !important;
- }
+}
 
 // 暂时
-.peopleName{
+.peopleName {
   width: 165px !important;
 }
-.components .el-button{
-  padding: 0px !important;
-}
-// 暂时字段设置
-.formClass .el-form{
+
+.components .el-button {
   padding: 0px !important;
 }
 
-.creat .el-form{
+// 暂时字段设置
+.formClass .el-form {
   padding: 0px !important;
 }
+
+.creat .el-form {
+  padding: 0px !important;
+}
+
 // 结束
+
+// 修改表格的高度
+.getTable .el-table--scrollable-x .el-table__body-wrapper {
+  height: calc(100vh - 280px) !important;
+  overflow-y: auto;
+}

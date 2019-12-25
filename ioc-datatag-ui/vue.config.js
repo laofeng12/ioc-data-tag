@@ -11,6 +11,13 @@ module.exports = {
   },
   devServer: {
     proxy: {
+      '/platformweb/admin/': {
+        target: 'http://219.135.182.2:31075', // 登录
+        changeOrigin: true,
+        pathRewrite:{
+          '^/platformweb/admin/': '/admin/'
+        }
+      },
       '/admin': {
         target: 'http://219.135.182.2:31075', // 公司测试环境
         changeOrigin: true
