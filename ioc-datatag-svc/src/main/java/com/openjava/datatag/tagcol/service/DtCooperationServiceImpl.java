@@ -120,6 +120,14 @@ public class DtCooperationServiceImpl implements DtCooperationService {
         Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                 Sort.by(Sort.Order.desc("o.modifyTime")));
         Page<?> dbresult = dao.query(multiHql, mypage, prodPrams, itemParams);
+
+        AuditLogVO vo = new AuditLogVO();//审计日志
+        vo.setType(2L);//数据查询
+        vo.setOperationService("标签与画像");//必传
+        vo.setOperationModule("模型部署");//必传
+        vo.setFunctionLev1("协作模型");//必传
+        vo.setFunctionLev2("查询");//必传
+        auditComponet.saveAuditLog(vo);//保存审计日志
         return dbresult;
     }
 

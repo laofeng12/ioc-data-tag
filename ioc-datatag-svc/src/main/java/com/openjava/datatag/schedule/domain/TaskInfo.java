@@ -60,7 +60,7 @@ public class TaskInfo implements Serializable {
 			if (taskInfo != null){
 				return false;
 			}
-		} else if (!this.getJobGroup().equals(taskInfo.getJobGroup()) && this.getJobName().equals(taskInfo.getJobName())){
+		} else if (!(this.getJobGroup().equals(taskInfo.getJobGroup()) && this.getJobName().equals(taskInfo.getJobName()))){
 			return false;
 		}
 		return true;
@@ -70,10 +70,10 @@ public class TaskInfo implements Serializable {
 		List<TaskInfo> saveconditions = new ArrayList<>();
 		TaskInfo d = new TaskInfo();
 		TaskInfo d2 = new TaskInfo();
-		d.setJobGroup("333");
+		d.setJobGroup("3331");
 		d.setJobName("111");
-		d2.setJobGroup("2333");
-		d2.setJobName("111");
+		d2.setJobGroup("333");
+		d2.setJobName("1111");
 		saveconditions.add(d);
 		System.out.println(saveconditions.contains(d2));
 	}
