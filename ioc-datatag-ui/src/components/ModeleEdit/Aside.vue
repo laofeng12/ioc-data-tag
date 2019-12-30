@@ -445,7 +445,8 @@
                 newItem.isMarking = true
               }
               if (item.sourceColId == newItem.id) {
-                Object.assign(newItem, {colId: item.colId})
+                // Object.assign(newItem, {colId: item.colId})
+                Object.assign(newItem, {colId: ''})
               }
             })
           })
@@ -512,7 +513,8 @@
                 newItem.isMarking = true
               }
               if (item.sourceColId == newItem.id) {
-                Object.assign(newItem, {colId: item.colId})
+                // Object.assign(newItem, {colId: item.colId})
+                Object.assign(newItem, {colId: ''})
               }
               if (newItem.definition == item.showCol) {
                 newItem.definition = item.showCol
