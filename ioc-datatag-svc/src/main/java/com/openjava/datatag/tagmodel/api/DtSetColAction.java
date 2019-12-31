@@ -78,6 +78,7 @@ public class DtSetColAction {
 			throw new APIException(MyErrorConstants.PUBLIC_ERROE,"数据源主键不能指定为空");
 			//这里应该添加验证主键唯一性约束
 		}
+
 		DtTaggingModelDTO dtTaggingModelDTO =  dtSetColService.selectCol(body,ip);//字段设置-确认选择
 		Long id = dtTaggingModelDTO.getTaggingModelId();//模型id
 		SelectColSuccessDTO success = new SelectColSuccessDTO();//创建返回参数
