@@ -143,7 +143,7 @@ public class DtCooTagcolLimitServiceImpl implements DtCooTagcolLimitService {
 			cooperation.setCompleteTime(new Date());
 			dtCooperationService.doSave(cooperation);
 			// @todo 完成工单
-			platformCompent.finish(cooperation.getId()+"",user.getUserId());
+			platformCompent.finish(cooperation.getId()+"",cooperation.getCreateUser()+"");
 		}
 		cooTagcolLimit.setState(Constants.DT_COOP_TAGCOL_LIMMIT_YES);
 		dtCooTagcolLimitRepository.save(cooTagcolLimit);
