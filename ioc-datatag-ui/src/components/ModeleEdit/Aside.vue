@@ -6,15 +6,15 @@
                   prefix-icon="el-icon-search" clearable></el-input>
         <div class="tree-box treeCode">
           <!--<el-tree class="tree" :props="props" :highlight-current="true"-->
-                   <!--:filter-node-method="filterNode"-->
-                   <!--ref="tree"-->
-                   <!--node-key="id"-->
-                   <!--@node-click="handleNodeClick"-->
-                   <!--:load="loadNode" lazy>-->
-            <!--<div class="custom-tree-node" slot-scope="{ node, data }">-->
-              <!--<i v-if="data.isTable===true" class="el-icon-coin iconImg"></i>-->
-              <!--<div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>-->
-            <!--</div>-->
+          <!--:filter-node-method="filterNode"-->
+          <!--ref="tree"-->
+          <!--node-key="id"-->
+          <!--@node-click="handleNodeClick"-->
+          <!--:load="loadNode" lazy>-->
+          <!--<div class="custom-tree-node" slot-scope="{ node, data }">-->
+          <!--<i v-if="data.isTable===true" class="el-icon-coin iconImg"></i>-->
+          <!--<div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>-->
+          <!--</div>-->
           <!--</el-tree>-->
           <el-tree :data="dataSetDirectoryTree" class="tree" :props="props" :highlight-current="true"
                    :filter-node-method="filterNode"
@@ -641,8 +641,8 @@
       async getOneZtreeData(resolve) {
         try {
           const {data} = await getOneZtreeData()
-          data.dataSetDirectoryTree.map(item =>{
-            item.resList.forEach(_item =>{
+          data.dataSetDirectoryTree.map(item => {
+            item.resList.forEach(_item => {
               _item.orgName = _item.resourceName
             })
           })
