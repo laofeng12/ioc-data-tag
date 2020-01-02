@@ -235,7 +235,9 @@ public class PostgreSqlDataProvider extends JdbcDataProvider {
                     int columType = metaData.getColumnType(j + 1);
                     switch (columType) {
                         case Types.DATE:
-                            row[j] = rs.getDate(j + 1).toString();
+                            if(rs.getDate(j + 1)!=null){
+                                row[j] = rs.getDate(j + 1).toString();
+                            }
                             break;
                         default:
                             row[j] = rs.getString(j + 1);
