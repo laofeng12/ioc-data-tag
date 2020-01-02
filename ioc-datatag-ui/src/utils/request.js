@@ -230,19 +230,22 @@ function errorHttpCode (error) {
   return Promise.reject(error.response)
 }
 function authFailure (data) {
-  MessageBox.alert(
-    '权限认证失败',
-    '警告',
-    {
-      confirmButtonText: '重新登录',
-      type: 'warning',
-      showClose: false
-    }
-  ).then(() => {
-    store.dispatch('resetToken').then(() => {
-      location.reload() // 为了重新实例化vue-router对象 避免bug
-    })
+  store.dispatch('resetToken').then(() => {
+    location.reload() // 为了重新实例化vue-router对象 避免bug
   })
+  // MessageBox.alert(
+  //   '权限认证失败',
+  //   '警告',
+  //   {
+  //     confirmButtonText: '重新登录',
+  //     type: 'warning',
+  //     showClose: false
+  //   }
+  // ).then(() => {
+  //   store.dispatch('resetToken').then(() => {
+  //     location.reload() // 为了重新实例化vue-router对象 避免bug
+  //   })
+  // })
 }
 // export default service
 export {
