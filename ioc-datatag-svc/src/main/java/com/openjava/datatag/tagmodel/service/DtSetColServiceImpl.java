@@ -185,7 +185,7 @@ public class DtSetColServiceImpl implements DtSetColService {
      */
     public DtTaggingModelDTO selectCol(DtTaggingModelDTO body, String ip) throws Exception {
         //模型主键字段不能是也不允许存在克隆体
-        checkPkeySetting(body.getColList(),body.getPkey());
+//        checkPkeySetting(body.getColList(),body.getPkey());
 
         String reqParams = JSONObject.toJSONString(body);//用来保存前端请求参数，保存在日志里，方便排查
         List<DtSetCol> removeCols = new ArrayList<>(); //保存软删除的显示列
