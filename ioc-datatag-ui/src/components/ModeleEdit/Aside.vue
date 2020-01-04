@@ -6,15 +6,15 @@
                   prefix-icon="el-icon-search" clearable></el-input>
         <div class="tree-box treeCode">
           <!--<el-tree class="tree" :props="props" :highlight-current="true"-->
-                   <!--:filter-node-method="filterNode"-->
-                   <!--ref="tree"-->
-                   <!--node-key="id"-->
-                   <!--@node-click="handleNodeClick"-->
-                   <!--:load="loadNode" lazy>-->
-            <!--<div class="custom-tree-node" slot-scope="{ node, data }">-->
-              <!--<i v-if="data.isTable===true" class="el-icon-coin iconImg"></i>-->
-              <!--<div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>-->
-            <!--</div>-->
+          <!--:filter-node-method="filterNode"-->
+          <!--ref="tree"-->
+          <!--node-key="id"-->
+          <!--@node-click="handleNodeClick"-->
+          <!--:load="loadNode" lazy>-->
+          <!--<div class="custom-tree-node" slot-scope="{ node, data }">-->
+          <!--<i v-if="data.isTable===true" class="el-icon-coin iconImg"></i>-->
+          <!--<div class="cus-node-title" :title="data.orgName">{{ data.orgName }}</div>-->
+          <!--</div>-->
           <!--</el-tree>-->
           <el-tree :data="dataSetDirectoryTree" class="tree" :props="props" :highlight-current="true"
                    :filter-node-method="filterNode"
@@ -258,7 +258,8 @@
       </div>
       <div slot="footer" class="dialog-footer device">
         <div>
-          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" @click="setCols">确认选择
+          <el-button size="small" type="primary" class="queryBtn" :loading="saveLoading" :disabled="readyButton"
+                     @click="setCols">确认选择
           </el-button>
         </div>
       </div>
@@ -267,6 +268,7 @@
 </template>
 
 <script>
+  import {Message, MessageBox} from 'element-ui'
   import {
     getOneZtreeData,
     getChildZtreeData,
@@ -288,6 +290,7 @@
     },
     data() {
       return {
+        readyButton: false,
         contentStyleObj: {
           width: ''
         },
@@ -430,7 +433,12 @@
               }
             })
           } else {
-            this.myData = this.editData
+            // this.myData = this.editData
+            this.myData = this.editData.filter(({definition}) => {
+              return this.checkedCols.some(citem => {
+                return citem === definition && !citem.match(/^copy_/)
+              })
+            })
           }
         } else {
           this.myData = []
@@ -497,7 +505,11 @@
             }
           })
         } else {
-          this.myData = this.tableData
+          this.myData = this.tableData.filter(({definition}) => {
+            return this.checkedCols.some(citem => {
+              return citem === definition && !citem.match(/^copy_/)
+            })
+          })
         }
         // 清空
         if (value == '') {
@@ -641,8 +653,8 @@
       async getOneZtreeData(resolve) {
         try {
           const {data} = await getOneZtreeData()
-          data.dataSetDirectoryTree.map(item =>{
-            item.resList.forEach(_item =>{
+          data.dataSetDirectoryTree.map(item => {
+            item.resList.forEach(_item => {
               _item.orgName = _item.resourceName
             })
           })
@@ -836,6 +848,18 @@
             item.isMarking = false
           }
         })
+        let flag = false
+        this.tableData.filter(_item => _item.sourceColtion === this.ruleForm.pkey).map(keyItem => {
+          if (keyItem.definition !== keyItem.sourceColtion) {
+            flag = true
+            this.readyButton = true
+            return
+          } else {
+            this.readyButton = false
+          }
+        })
+        flag && this.$message.error('不能选择有克隆字段的字段作为主键！');
+
       },
       handleClick(tab, event) {
         // console.log(tab, event);
