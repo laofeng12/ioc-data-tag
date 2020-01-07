@@ -100,7 +100,7 @@ searchjob: #更新模型中间表定时任务
   queue: 0 0/5 * * * ? * #更新频率
 
 dataSet: #数据集相关
-  resourceDataUrl: http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/
+  resourceDataUrl: http://19.104.40.36/dsweb/pds/datalake/dataLake/resourceData/
 
 pgconfig:
   ip: 19.106.85.70
@@ -119,5 +119,4 @@ platform:
   finish: ${platform.baseUrl}/category/workform/spUnifyWorkform/finish/%s/%s #完成工单
   cancel: ${platform.baseUrl}/category/workform/spUnifyWorkform/cancel/%s/%S-%s #作废工单/{formType}/{businessId}-{userId}
   spUnifyMsgNotice: ${platform.baseUrl}/category/workform/spUnifyMsgNotice  #新增告警消息
-
 
