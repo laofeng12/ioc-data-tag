@@ -114,19 +114,22 @@ service.interceptors.response.use(
 )
 
 function authFailure (data) {
-  MessageBox.alert(
-    data.message,
-    '警告',
-    {
-      confirmButtonText: '重新登录',
-      type: 'warning',
-      showClose: false
-    }
-  ).then(() => {
-    store.dispatch('resetToken').then(() => {
-      location.reload() // 为了重新实例化vue-router对象 避免bug
-    })
+  store.dispatch('resetToken').then(() => {
+    location.reload() // 为了重新实例化vue-router对象 避免bug
   })
+  // MessageBox.alert(
+  //   data.message,
+  //   '警告',
+  //   {
+  //     confirmButtonText: '重新登录',
+  //     type: 'warning',
+  //     showClose: false
+  //   }
+  // ).then(() => {
+  //   store.dispatch('resetToken').then(() => {
+  //     location.reload() // 为了重新实例化vue-router对象 避免bug
+  //   })
+  // })
 }
 
 const fetch = function (url) {

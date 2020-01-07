@@ -11,7 +11,8 @@
             <div class="zedit" v-if="routerName==='editModel'">
               <!--<el-input v-show="!showBtn" size="small" v-model="runModelname" placeholder="请输入内容"-->
               <!--@blur="getsaveName"></el-input>-->
-              <el-input v-show="!showBtn" size="small" clearable v-model.trim="runModelname" placeholder="请输入模型名称" maxlength="25"
+              <el-input v-show="!showBtn" size="small" clearable v-model.trim="runModelname" placeholder="请输入模型名称"
+                        maxlength="25"
                         show-word-limit></el-input>
               <span v-show="showBtn">模型名称：{{runModelname}}</span>
               <div class="editTwo">
@@ -201,7 +202,8 @@
         <el-container class="">
           <el-aside width="250px" class="left">
             <h3>选择协作用户</h3>
-            <el-input placeholder="输入关键词搜索列表" clearable v-model.trim="searchText" size="small" prefix-icon="el-icon-search"
+            <el-input placeholder="输入关键词搜索列表" clearable v-model.trim="searchText" size="small"
+                      prefix-icon="el-icon-search"
             ></el-input>
             <div class="allPeople">
               <div class="userContent clearfix" v-for="(item,index) in list" :key="index">
@@ -237,7 +239,18 @@
                   label="选择标签组">
                   <template slot-scope="scope">
                     <el-checkbox v-show="false"></el-checkbox>
-                    <el-select class="controlChoose2" size="small" v-model="scope.row.useTagGroup" placeholder="请选择"
+                    <el-select v-if="scope.row.useTagGroup == '123947334341780'" class="controlChoose2" size="small"
+                               v-model="scope.row.useTagGroup" placeholder="请选择"
+                               @change="chooseSelect(scope.row)">
+                      <el-option
+                        v-for="item in options3"
+                        :key="item.id"
+                        :label="item.tagsName"
+                        :value="item.id">
+                      </el-option>
+                    </el-select>
+                    <el-select v-else class="controlChoose2" size="small" v-model="scope.row.useTagGroup"
+                               placeholder="请选择"
                                @change="chooseSelect(scope.row)"
                                :disabled="(!helpId || (scope.row.cooUser && scope.row.cooUser !== helpId))">
                       <el-option
@@ -635,7 +648,7 @@
               code: "",
               createTime: "",
               createUser: "",
-              id: "123456",
+              id: 123947334341780,
               isDeleted: 1,
               isNew: "",
               isShare: 0,
@@ -672,7 +685,7 @@
         row.tagColId = row.colId
         let arrRow = []
         arrRow.push(row)
-        if (row.useTagGroup == '123456') {
+        if (row.useTagGroup == '123947334341780') {
           row.isDeleted = 1
           const tmp = arrRow.filter(item => item.useTagGroup).map(({id, cooFieldId, showCol, useTagGroup, isCooField, cooUser, tagColId, isDeleted}) => {
             return {
@@ -724,51 +737,66 @@
             isDelete: isDeleted
           }
         })
-        tmp.forEach(item => {
-          if (item.useTagGroup) {
-            item.isCooField = true
+        if (tmp.length == this.tableData.length) {
+          for (let data of tmp) {
+            if (data.useTagGroup && data.useTagGroup == '123947334341780') {
+              this.$message.error('请选择标签组！');
+              this.saveLoading = false
+              return
+            } else {
+
+            }
           }
-        })
-        const arrList = [...this.showPeoplelist]
-        const arr = []
-        let obj = []
-        tmp.map(item_a => {
-          arr.push(item_a.cooUser)
-        })
-        let uniqueArr = [...new Set(arr)]
-        // 根据用户的id刷选用户
-        arrList.forEach(item_b => {
-          uniqueArr.map(item_c => {
-            if (item_b.cooUser == item_c) {
-              item_b.cooTagcolLimitList = []
-              obj.push(item_b)
+          tmp.forEach(item => {
+            if (item.useTagGroup && item.useTagGroup != '123947334341780') {
+              item.isCooField = true
             }
           })
-        })
-        tmp.forEach((item, index) => {
-          arrList.map((citem, cindex) => {
-            if (item.cooUser == citem.cooUser) {
-              citem.cooTagcolLimitList.push(item)
-            }
+          const arrList = [...this.showPeoplelist]
+          const arr = []
+          let obj = []
+          tmp.map(item_a => {
+            arr.push(item_a.cooUser)
           })
-        })
-        try {
-          const saveRes = await dosave(obj)
-          this.$message({
-            message: saveRes.message,
-            type: 'success'
-          });
-          this.saveLoading = false
-          this.addSetDialog = false
-          this.sureIt = 1
-        } catch (e) {
+          let uniqueArr = [...new Set(arr)]
+          // 根据用户的id刷选用户
+          arrList.forEach(item_b => {
+            uniqueArr.map(item_c => {
+              if (item_b.cooUser == item_c) {
+                item_b.cooTagcolLimitList = []
+                obj.push(item_b)
+              }
+            })
+          })
+          tmp.forEach((item, index) => {
+            arrList.map((citem, cindex) => {
+              if (item.cooUser == citem.cooUser) {
+                citem.cooTagcolLimitList.push(item)
+              }
+            })
+          })
+          try {
+            const saveRes = await dosave(obj)
+            this.$message({
+              message: saveRes.message,
+              type: 'success'
+            });
+            this.saveLoading = false
+            this.addSetDialog = false
+            this.sureIt = 1
+          } catch (e) {
+            this.saveLoading = false
+          }
+        } else {
+          this.$message.error('请选择用户和标签组！');
           this.saveLoading = false
         }
+
       },
       // 模型名称保存
       async getsaveName() {
         try {
-          if(this.runModelname){
+          if (this.runModelname) {
             const resName = await saveName({
               taggingModelId: this.taggingModelId,
               modelName: this.runModelname
@@ -778,7 +806,7 @@
               type: 'success'
             });
             this.showBtn = true
-          }else{
+          } else {
             this.$message({
               message: '请输入模型名称',
               type: 'warning'
