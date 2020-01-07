@@ -18,4 +18,5 @@ public class PostgreSqlConfig {
     private String port;
     private String dataBaseName;
     private String pooled;
+    private String schema;
 }

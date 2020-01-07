@@ -103,12 +103,13 @@ dataSet: #数据集相关
   resourceDataUrl: http://19.104.40.36/dsweb/pds/datalake/dataLake/resourceData/
 
 pgconfig:
-  password: nanjian#2019
-  username: nanjian
-  ip: 19.104.59.17
+  ip: 19.106.85.70
   port: 25308
-  dataBaseName: postgres
+  username: datatag
+  password: nanjian#2019
+  dataBaseName: datalake_application
   pooled: true
+  schema: nj_datatag
 
 platform:
   baseUrl: http://ioc-paas-svc:8080
