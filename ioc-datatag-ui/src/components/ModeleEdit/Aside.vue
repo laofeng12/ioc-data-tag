@@ -316,10 +316,11 @@
         },
         searchText: '',
         checkAll: false,
-        checkedCols: [],
-        checkIt: [],
-        cols: colsOptions,
+        checkedCols: [],  // 选中的元素
+        cols: colsOptions, // 所有的元素
+        copyChecked:[], // 带copy
         isIndeterminate: true,
+        checkIt: [],
         tableData: [],
         totableData: [],
         resData: [],
@@ -402,13 +403,18 @@
         this.tableData = []
         this.myData = []
         this.editData = []
+        this.checkedCols = []
+        // 全选操作
         this.checkedCols = val ? colsOptions : [];
         this.isIndeterminate = false;
         if (this.checkAll === true) {
+          this.checkedCols = []
           this.columnData.map(item => {
             item.colSort = ''
+            this.checkedCols.push(item.definition)
           })
-          this.tableData = this.columnData
+          let newTable = JSON.parse(JSON.stringify(this.columnData))
+          this.tableData = newTable
           this.tableData.forEach((item, index) => {
             item.isMarking = false
             if (item.colSort === '') {
@@ -452,9 +458,21 @@
               if (item.isMarking == true && newItem.definition == item.showCol) {
                 newItem.isMarking = true
               }
-              if (item.sourceColId == newItem.id) {
-                // Object.assign(newItem, {colId: item.colId})
-                Object.assign(newItem, {colId: ''})
+              if (item.sourceColId == newItem.id && newItem.definition == item.showCol) {
+                Object.assign(newItem, {colId: item.colId})  // 克隆的原字段
+                // Object.assign(newItem, {colId: ''})
+              }
+              if (newItem.definition == item.showCol) {
+                newItem.definition = item.showCol
+              }
+            })
+          })
+          this.tableData.filter((item)=>{
+            return !this.modelData.colList.some((col)=>{
+              const coltion = item.definition
+              return col.showCol === coltion
+              if(item.sourceColId != newItem.id){
+                return Object.assign(newItem, {colId: ''})
               }
             })
           })
@@ -462,14 +480,15 @@
       },
       // 标签单选操作
       handleCheckedColsChange(value) {
-        let checkedCount = value.length;
+        let checkedCount = value.length
         this.checkAll = checkedCount === this.cols.length;
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
         // this.tableData = []
         this.myData = []
         // 左边勾选的项 this.checkedCols
         // 左边全部字段项 this.columnData
-        this.tableData = this.tableData.filter(({definition}) => this.checkedCols.some(citem => citem === definition)) // 删除
+        // 删除
+        this.tableData = this.tableData.filter(({definition}) => this.checkedCols.some(citem => citem === definition))
         // 本宝宝
         this.checkedCols.forEach((citem) => {
           if ((this.tableData.length === 0 || this.tableData.every(({definition}) => definition !== citem))) {
@@ -481,17 +500,7 @@
             }
           }
         })
-        // this.checkedCols.forEach((citem) => {
-        //   this.columnData.map((item) => {
-        //     if (item.definition == citem && (this.tableData.length === 0 || this.tableData.every(({definition}) => definition !== citem))) {
-        //       console.log('===============', this.tableData.some(({definition}) => definition !== citem), this.tableData, citem)
-        //       item.isMarking = false
-        //       item.colSort = ''
-        //       this.tableData.push(item)
-        //     }
-        //   })
-        // })
-        // console.log('排序', this.tableData)
+        // 排序
         this.tableData.forEach((item, index) => {
           if (item.colSort === '') {
             item.colSort = index + 1
@@ -524,12 +533,21 @@
               if (item.isMarking == true && newItem.definition == item.showCol) {
                 newItem.isMarking = true
               }
-              if (item.sourceColId == newItem.id) {
-                // Object.assign(newItem, {colId: item.colId})
-                Object.assign(newItem, {colId: ''})
+              if (item.sourceColId == newItem.id && newItem.definition == item.showCol) {
+                Object.assign(newItem, {colId: item.colId})  // 克隆的原字段
+                // Object.assign(newItem, {colId: ''})
               }
               if (newItem.definition == item.showCol) {
                 newItem.definition = item.showCol
+              }
+            })
+          })
+          this.tableData.filter((item)=>{
+            return !this.modelData.colList.some((col)=>{
+              const coltion = item.definition
+              return col.showCol === coltion
+              if(item.sourceColId != newItem.id){
+                return Object.assign(newItem, {colId: ''})
               }
             })
           })
@@ -548,7 +566,6 @@
         this.editData = []
         colsOptions = []
         this.checkAll = false
-        // this.colSetDialog = true
         let colsData = {}
         let allcolsData = {}
         if (this.routerName === 'creatModel' && data.isTable === true) {
@@ -564,10 +581,10 @@
           this.resourceId = colsData.data.resourceId
           this.resourceType = colsData.data.type   // 0数据湖 1自建目录
           this.tableData = []
-          this.columnData.forEach((item, index) => {
-            colsOptions.push(item.definition)
-          })
-          this.cols = colsOptions
+          // this.columnData.forEach((item, index) => {
+          //   colsOptions.push(item.definition)
+          // })
+          // this.cols = colsOptions
           // 全部的字段权限显示
           this.allcolumnData.forEach((item, index) => {
             if (item.viewable == false) {
@@ -599,10 +616,10 @@
           this.resourceId = colsData.data.resourceId
           this.resourceType = colsData.data.type   // 0数据湖 1自建目录
           // this.tableData = []
-          this.columnData.forEach((item, index) => {
-            colsOptions.push(item.definition)
-          })
-          this.cols = colsOptions
+          // this.columnData.forEach((item, index) => {
+          //   colsOptions.push(item.definition)
+          // })
+          // this.cols = colsOptions
           // 全部的字段权限显示
           this.allcolumnData.forEach((item, index) => {
             if (item.viewable == false) {
@@ -638,6 +655,12 @@
               }
             })
           })
+          // 全选
+          if(this.editData.length == this.columnData.length){
+            this.checkAll = true
+          }else{
+            this.checkAll = false
+          }
           if (this.resourceType == 0) {
             this.editData.forEach((item, index) => {
               if (item.isPrimaryKey == 1) {
@@ -748,16 +771,18 @@
           if (valid) {
             this.saveLoading = true
             const colList = []
+            let tableData = JSON.parse(JSON.stringify(this.tableData))
             if (this.routerName === 'editModel') {
-              this.tableData.map((item, index) => {
-                this.modelData.colList.forEach(modelitem => {
+              let resList = JSON.parse(JSON.stringify(this.modelData.colList))
+              tableData.forEach((item) => {
+                resList.forEach(modelitem => {
                   if (item.definition == modelitem.showCol) {
                     item.definition = modelitem.sourceCol
                   }
                 })
               })
             }
-            this.tableData.map((item, index) => {
+            tableData.forEach((item, index) => {
               colList.push({
                 sourceCol: item.definition,
                 sourceDataType: item.type,
@@ -836,6 +861,9 @@
           }
         })
         this.tableData.splice(index, 1)
+        let checkedCount = this.checkedCols.length
+        this.checkAll = checkedCount === this.cols.length;
+        this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
       },
       // 打标主键的选择
       changeSel() {
