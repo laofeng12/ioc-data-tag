@@ -106,7 +106,7 @@ pgconfig:
   ip: 19.106.85.70
   port: 25308
   username: datatag
-  password: nanjian#2019
+  password: datatag12#$
   dataBaseName: datalake_application
   pooled: true
   schema: nj_datatag

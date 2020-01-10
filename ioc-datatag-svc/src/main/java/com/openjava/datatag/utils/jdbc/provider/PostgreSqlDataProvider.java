@@ -74,14 +74,15 @@ public class PostgreSqlDataProvider extends JdbcDataProvider {
         String ip = dataSource.get("ip");
         String port = dataSource.get("port");
         String dataBaseName = dataSource.get("dataBaseName");
-
+        String myschema = dataSource.get("schema");
         sb.append("jdbc:postgresql://");
         sb.append(ip);
         sb.append(":");
         sb.append(port);
         sb.append("/");
         sb.append(dataBaseName);
-
+        sb.append("?currentSchema=");
+        sb.append(myschema);
         return sb.toString();
     }
 
