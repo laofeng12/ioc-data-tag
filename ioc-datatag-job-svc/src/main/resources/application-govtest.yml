@@ -122,7 +122,7 @@ pgconfig:
   port: 25308
   dataBaseName: postgres
   pooled: true
-
+  schema: public
 
 platform:
   baseUrl: http://ioc-paas-svc:8080
