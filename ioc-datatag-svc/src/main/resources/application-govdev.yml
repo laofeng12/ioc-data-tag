@@ -109,6 +109,7 @@ pgconfig:
   port: 25308
   dataBaseName: postgres
   pooled: true
+  schema: public
 
 platform:
   baseUrl: http://19.104.40.36
