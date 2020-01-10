@@ -17,7 +17,7 @@ spring:
 #    username: alitest
 #    password: Ch#123456
     driver-class-name: oracle.jdbc.OracleDriver
-    url: ENC(EGVln/0bmIejAwvTzDNw828GGHKo00I0UgwHofRMkGHJOxoHwOIleL+sJa1U6p2ynqQnvUxEqvE=)
+    url: ENC(pdkETFhba/RP7Z7DyJnE8U8yiDqrDMbytnzSfvge7uDYDrEDKDJQAtaQCl8oJW+/q7XpUk0iq5c=)
     username: ENC(bj5AMYvG8zZ956TDzg/6FMaZo0YK2BXt)
     password: ENC(F4SHg+Y7jo2GC2BnKvx8Rs8b5biSGt60)
     druid:
