@@ -242,7 +242,6 @@ public interface TagDashboardRepository extends DynamicJpaRepository<DtTaggingMo
             " order by numbers desc\n")
     public  List<Object> getLastYearHotTags();
 
-
     /**
      * 上个月标签使用个数
      * @author zmk

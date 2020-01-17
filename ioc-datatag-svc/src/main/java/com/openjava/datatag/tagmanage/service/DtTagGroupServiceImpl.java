@@ -11,6 +11,7 @@ import com.openjava.datatag.tagmanage.dto.ShareTopListDTO;
 import com.openjava.datatag.tagmanage.query.DtTagGroupDBParam;
 import com.openjava.datatag.tagmanage.repository.DtTagGroupRepository;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ljdp.common.bean.MyBeanUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
 import org.ljdp.component.sequence.SequenceService;
@@ -180,6 +181,9 @@ public class DtTagGroupServiceImpl implements DtTagGroupService {
 		body.setCreateTime(db.getCreateTime());//创建用户
 		body.setModifyTime(new Date());//修改时间
 		MyBeanUtils.copyPropertiesNotBlank(db, body);//对象拷贝
+		if(StringUtils.isBlank(body.getSynopsis())){
+			db.setSynopsis(null);
+		}//允许标签组简介为空
 		db.setIsNew(false);
 		DtTagGroup newdb = doSave(db);//保存
 

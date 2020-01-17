@@ -163,6 +163,7 @@ public class MyDtTagGroupAction {
 
 		DtTagGroup body = new DtTagGroup();
 		MyBeanUtils.copyPropertiesNotBlank(body,bodyDTO);//对象拷贝
+
 		//EntityClassUtil.getHtmlOfEntity(body);
 		if (body.getIsNew() == null || body.getIsNew()) {
 			DtTagGroup db = dtTagGroupService.doNew(body,userId,ip);//创建标签组
