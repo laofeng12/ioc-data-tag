@@ -80,7 +80,7 @@
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
           <el-form-item label="标签名称:" prop="name" class="nameOne">
-            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入标签名称"></el-input>
+            <el-input v-model.trim="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入标签名称"></el-input>
           </el-form-item>
           <el-form-item label="标签简介:" prop="textarea" class="nameOne">
             <el-input
@@ -90,7 +90,7 @@
               placeholder="请输入标签简介"
               maxlength="100"
               show-word-limit
-              v-model="ruleForm.textarea">
+              v-model.trim="ruleForm.textarea">
             </el-input>
           </el-form-item>
         </el-form>
@@ -110,7 +110,7 @@
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
           <el-form-item label="标签名称:" prop="name" class="nameOne">
-            <el-input v-model="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入标签名称"></el-input>
+            <el-input v-model.trim="ruleForm.name" maxlength="25" show-word-limit placeholder="请输入标签名称"></el-input>
           </el-form-item>
           <el-form-item label="标签简介:" prop="textarea" class="nameOne">
             <el-input
@@ -120,7 +120,7 @@
               placeholder="请输入标签简介"
               maxlength="100"
               show-word-limit
-              v-model="ruleForm.textarea">
+              v-model.trim="ruleForm.textarea">
             </el-input>
           </el-form-item>
         </el-form>

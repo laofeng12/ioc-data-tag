@@ -100,7 +100,8 @@ searchjob: #更新模型中间表定时任务
   queue: 0 0/5 * * * ? * #更新频率
 
 dataSet: #数据集相关
-  resourceDataUrl: http://19.104.40.36/dsweb/pds/datalake/dataLake/resourceData/
+  baseUrl: http://ioc-dataset-svc.ioc-platform.svc:8080
+  resourceDataUrl: ${dataSet.baseUrl}/pds/datalake/dataLake/resourceData/
 
 pgconfig:
   ip: 19.106.85.70

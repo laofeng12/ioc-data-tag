@@ -9,7 +9,7 @@
           placeholder="请输入内容"
           prefix-icon="el-icon-search"
           @keyup.enter.native="getQuireData"
-          v-model="input2">
+          v-model.trim="input2">
         </el-input>
         <el-select class="tagSelect" size="small" v-model="value" placeholder="请选择">
           <el-option
@@ -111,7 +111,7 @@
                 class="zxinp moduleOne"
                 size="small"
                 placeholder="请输入内容"
-                v-model="ruleForm.labelName" style="width: 360px">
+                v-model.trim="ruleForm.labelName" style="width: 360px">
               </el-input>
             </el-form-item>
             <el-form-item label="标签组简介:" prop="textarea" class="nameOne">
@@ -122,7 +122,7 @@
                 placeholder="请输入内容"
                 maxlength="100"
                 show-word-limit
-                v-model="ruleForm.textarea">
+                v-model.trim="ruleForm.textarea">
               </el-input>
             </el-form-item>
             <!--<el-form-item label="是否共享:" prop="introduction" class="nameOne">-->
@@ -154,7 +154,7 @@
                 class="zxinp moduleOne"
                 size="small"
                 placeholder="请输入标签组名称"
-                v-model="ruleForm.tagsName" style="width: 360px">
+                v-model.trim="ruleForm.tagsName" style="width: 360px">
               </el-input>
             </el-form-item>
             <el-form-item label="标签组简介:" prop="synopsis" class="nameOne">
@@ -165,7 +165,7 @@
                 placeholder="请输入标签组简介"
                 maxlength="100"
                 show-word-limit
-                v-model="ruleForm.synopsis">
+                v-model.trim="ruleForm.synopsis">
               </el-input>
             </el-form-item>
           </el-form>
