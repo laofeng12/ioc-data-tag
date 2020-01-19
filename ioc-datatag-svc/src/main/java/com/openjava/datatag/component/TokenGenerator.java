@@ -1,12 +1,17 @@
 package com.openjava.datatag.component;
 
+import com.openjava.admin.component.IocAuthorizationToken;
 import com.openjava.admin.user.vo.OaUserVO;
 import com.openjava.datatag.user.domain.SysUser;
 import com.openjava.datatag.user.service.SysUserService;
 import com.openjava.framework.sys.service.LmMemberTokenService;
 import org.ljdp.common.json.JacksonTools;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -24,6 +29,8 @@ public class TokenGenerator {
     private LmMemberTokenService lmMemberTokenService;//
     @Resource
     private RedisTemplate<String, Object> redisTemplate;//
+    @Resource
+    private IocAuthorizationToken iocAuthorizationToken;
 
     /**
      *
@@ -72,11 +79,69 @@ public class TokenGenerator {
 
             //集群版,默认用redis
             redisTemplate.boundValueOps(token).set(vo, loginTimeout, TimeUnit.MINUTES);
+
             redisTemplate.boundValueOps(token+"-JSON").set(userJson, loginTimeout, TimeUnit.MINUTES);
         }catch (Exception e){
             e.printStackTrace();
         }
         return token;
     }
+
+    public String createToken2(Long userId){
+        String token = "";
+        try {
+            if(userId==null){
+                return "";
+            }
+            SysUser u = sysUserService.get(userId);
+            if(u==null){
+                return "";
+            }
+
+            OaUserVO vo = new OaUserVO();
+            vo.setUserId(u.getUserid().toString());
+            vo.setUserAccount(u.getAccount());
+            vo.setUserName(u.getFullname());
+            vo.setUserMobileno(u.getMobile());
+            vo.setHeadImg(u.getPicture());
+            vo.setUserType(u.getAccounttype());
+            vo.setLoginTime(new Date());
+            vo.setRefreshTime(new Date());
+            vo.setUserAgent("platform-schedule-job");
+
+            //OA返回用户信息
+            vo.setOrgcode(u.getOrgcode());
+            vo.setDeptcode(u.getDeptcode());
+            vo.setDeptid(u.getDeptid());
+            vo.setOarelationid(u.getOarelationid());
+            vo.setOrgname(u.getOrgname());
+            vo.setLevel0(u.getLevel0());
+            vo.setLevel1(u.getLevel1());
+
+            //会话保持时间
+            int loginTimeout = 5;//5分钟
+            vo.setExpireInMin(loginTimeout);
+
+            String userJson = JacksonTools.getObjectMapper().writeValueAsString(vo);
+            token = iocAuthorizationToken.generateAesToken(vo);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return token;
+    }
+
+    public static void main(String[] args) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization","");
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(new LinkedMultiValueMap<>(), headers);
+        ResponseEntity<String> response = restTemplate.exchange("", HttpMethod.GET,request,String.class);
+        String result = response.getBody();
+        System.out.println(result);
+
+    }
+
 
 }
