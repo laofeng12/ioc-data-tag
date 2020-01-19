@@ -17,6 +17,7 @@ import com.openjava.datatag.utils.tree.TagDTOTreeNodeShow;
 import com.openjava.datatag.utils.tree.TagDTOTreeNodeShow2;
 import io.swagger.annotations.*;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.component.result.SuccessMessage;
 import org.ljdp.component.user.BaseUserInfo;
@@ -31,7 +32,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -67,6 +67,9 @@ public class DtTagAction {
     @RequestMapping(method = RequestMethod.POST)
     public SuccessMessage doSaveOrEdit(@RequestBody DtTag body,
                                  HttpServletRequest request) throws Exception {
+        if(StringUtils.isBlank(body.getTagName())||StringUtils.isBlank(body.getSynopsis())){
+            throw new APIException(MyErrorConstants.PUBLIC_ERROE, "标签名或标签简介不能为空");
+        }
         String ip = IpUtil.getRealIP(request);//获取ip
         return dtTagService.doSaveOrEdit(body,ip);//修改标签
     }
