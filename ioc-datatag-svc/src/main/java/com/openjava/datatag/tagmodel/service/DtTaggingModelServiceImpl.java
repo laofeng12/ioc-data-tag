@@ -776,9 +776,12 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 //			}
 		}
 		LjdpHttpClient client = new LjdpHttpClient();
-		String  token= tokenGenerator.createToken(taggingModel.getCreateUser());//模型创建者才有权限调用数据集接口
-		client.setHeader("authority-token",token);//
+        String  token= tokenGenerator.createToken(taggingModel.getCreateUser());//模型创建者才有权限调用数据集接口
+        String  Authorization= tokenGenerator.createToken2(taggingModel.getCreateUser());//模型创建者才有权限调用数据集接口
+
+        client.setHeader("authority-token",token);//
 		client.setHeader("User-Agent","platform-schedule-job");//
+        client.setHeader("Authorization",Authorization);
 		DataSetReqDTO req = new DataSetReqDTO();//
 		req.setColumnList(sourceMap.values().stream().toArray());//
 		req.setColumnIdList(sourceMap.keySet().stream().toArray());//
@@ -790,7 +793,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 //        System.out.println(jsontext);
 		DataSetRspDTO data = JSONObject.parseObject(jsontext, DataSetRspDTO.class);//
 		if (resp.getStatusLine().getStatusCode()==200 && data.getCode()==200) {
-			//重组数据
+			//
 			List<List<Object>> dataList =data.getData().getData();//原始数据
 			Object[] columnList =  sourceMap.values().stream().toArray();//表头
             List result= rebuiltData(cols,dataList,columnList,type);//处理数据

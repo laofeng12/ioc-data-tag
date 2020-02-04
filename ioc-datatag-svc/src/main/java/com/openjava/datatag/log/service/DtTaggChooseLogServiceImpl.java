@@ -4,9 +4,14 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
 
+import com.openjava.admin.user.vo.OaUserVO;
 import com.openjava.datatag.log.domain.DtTaggChooseLog;
 import com.openjava.datatag.tagmanage.domain.DtTagGroup;
+import org.apache.commons.collections.CollectionUtils;
 import org.ljdp.component.sequence.ConcurrentSequence;
+import org.ljdp.plugin.sys.vo.OrgVO;
+import org.ljdp.plugin.sys.vo.UserVO;
+import org.ljdp.secure.sso.SsoContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -101,6 +106,7 @@ public class DtTaggChooseLogServiceImpl implements DtTaggChooseLogService {
 	 */
 	public DtTaggChooseLog loggingChoose(Long fromTaggId, DtTagGroup db,Long userId,String ip){
 		//日志记录
+		OaUserVO userVO = (OaUserVO) SsoContext.getUser();
 		DtTaggChooseLog log = new DtTaggChooseLog();
 		log.setId(ConcurrentSequence.getInstance().getSequence());
 		log.setChooserIp(ip);
@@ -108,6 +114,10 @@ public class DtTaggChooseLogServiceImpl implements DtTaggChooseLogService {
 		log.setChooseUser(userId);
 		log.setCopiedTagg(fromTaggId);
 		log.setCopyTagg(db.getId());
+		log.setChooseUserName(userVO.getUserName());//选用人姓名
+		log.setChooseOrgid(userVO.getOrgid());//选用者所在部门
+		log.setChooseOrgNmae(userVO.getOrgname());//选用者所在部门名称
+
 		log.setIsNew(true);
 		return dtTaggChooseLogRepository.save(log);
 	}

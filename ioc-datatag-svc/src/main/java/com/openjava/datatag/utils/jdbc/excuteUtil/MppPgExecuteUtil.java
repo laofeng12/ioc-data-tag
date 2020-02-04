@@ -134,7 +134,7 @@ public class MppPgExecuteUtil extends ExecuteUtil {
     @Override
     public List<String> getCreateTableSqlList() {
         List<String> sqlList = new LinkedList<>();
-        String schema = "public";
+        String schema = postgreSqlConfig.getSchema();
 
         //建表语句
         StringBuilder createTableSql = new StringBuilder();
