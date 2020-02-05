@@ -98,7 +98,7 @@ schedule:
   example:
     example: 0/5 * * * * ?
   dowload: 0/1 * * * * ?
-
+  datatagImmediatelyRunJob: 0/3 * * * * ?
 
 schedulejob: #定时任务组件
   jobMethod: com.openjava.datatag.schedule.job.Schedulejob
@@ -122,7 +122,7 @@ pgconfig:
   port: 5432
   dataBaseName: postgres
   pooled: true
-  schema: nj_datatag
+  schema: public
 
 platform:
   baseUrl: http://219.135.182.2:31012
