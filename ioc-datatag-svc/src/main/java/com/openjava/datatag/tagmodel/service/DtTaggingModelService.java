@@ -168,4 +168,11 @@ public interface DtTaggingModelService {
 	 * @throws Exception
 	 */
 	SuccessMessage beginDowload(Long number,Long taggingModelId)throws Exception;
+
+	/**
+	 *
+	 * @param dtDispatchNow
+	 * @return
+	 */
+    List<DtTaggingModel> findByCycleEnum(Long dtDispatchNow);
 }
