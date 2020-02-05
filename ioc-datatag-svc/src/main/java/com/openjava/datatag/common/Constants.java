@@ -110,6 +110,7 @@ public class Constants {
     public static final Long DT_DISPATCH_EACH_WEEK= 3L;
     public static final Long DT_DISPATCH_EACH_MONTH = 4L;
     public static final Long DT_DISPATCH_EACH_YEAR= 5L;
+    public static final Long DT_DISPATCH_NOW = 6L;
 
     //==========定时任务调度组件============
     public static final String DT_SCHEDULE_CORE_JOB_CLASS = "com.openjava.datatag.schedule.job.DtTaggingModelCalculationJob";//模型调度核心job

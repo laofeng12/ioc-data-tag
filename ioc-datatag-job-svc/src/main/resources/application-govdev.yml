@@ -108,6 +108,7 @@ schedule:
   example:
     example: 0/5 * * * * ?
   dowload: 0/10 * * * * ?
+  datatagImmediatelyRunJob: 0/3 * * * * ?
 
 schedulejob: #定时任务组件
   jobMethod: com.openjava.datatag.schedule.job.Schedulejob

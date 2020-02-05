@@ -381,6 +381,12 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 //				db.setCycle(null);
 //				db.setCycleEnum(null);
 				stopModel(db.getTaggingModelId(),null);//
+			}else if(body.getCycleEnum().equals(Constants.DT_DISPATCH_NOW)){
+				//立即执行
+				db.setRunState(Constants.DT_MODEL_NO_BEGIN);
+				db.setStartTime(null);
+				db.setCycle(null);
+				db.setCycleEnum(body.getCycleEnum());//
 			}else{
 				if (body.getStartTime() == null){
 					throw new APIException(MyErrorConstants.TAGM_DISPATCH_NONE_START_TIME,"未设置开始时间");//
@@ -415,7 +421,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 	 * @return
 	 */
 	private boolean checkCycle(Long cycle){
-		return cycle >= Constants.DT_DISPATCH_STOP && cycle <= Constants.DT_DISPATCH_EACH_YEAR;
+		return cycle >= Constants.DT_DISPATCH_STOP && cycle <= Constants.DT_DISPATCH_NOW;
 	}
 
 	/**
@@ -1043,7 +1049,14 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		auditComponet.saveAuditLog(vo);
 		return new SuccessMessage("已开始导出");//
 	}
-
+	/**
+	 *
+	 * @param dtDispatchNow
+	 * @return
+	 */
+	public List<DtTaggingModel> findByCycleEnum(Long dtDispatchNow){
+		return  dtTaggingModelRepository.findByCycleEnumAndIsDeletedAndRunState(dtDispatchNow,Constants.PUBLIC_NO,Constants.DT_MODEL_NO_BEGIN);
+	}
 	public static void main(String[] args) {
 		/*String colJson = "[{\"index\":0,\"aggType\":null,\"name\":\"tb_0_MODIFY_ID\"},{\"index\":1,\"aggType\":null,\"name\":\"tb_0_CREATE_NAME\"},{\"index\":2,\"aggType\":null,\"name\":\"tb_0_SOURCE_NAME\"}]";
 		List<Map<String,String>> colList = new LinkedList<>();
