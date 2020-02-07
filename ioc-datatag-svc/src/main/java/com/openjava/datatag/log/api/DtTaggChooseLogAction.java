@@ -3,12 +3,15 @@ package com.openjava.datatag.log.api;
 import javax.annotation.Resource;
 
 import com.openjava.datatag.log.domain.DtTaggChooseLog;
+import org.apache.commons.lang3.StringUtils;
 import org.ljdp.component.exception.APIException;
 import org.ljdp.secure.annotation.Security;
 import org.ljdp.ui.bootstrap.TablePage;
 import org.ljdp.ui.bootstrap.TablePageImpl;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,15 +52,20 @@ public class DtTaggChooseLogAction {
 		@ApiImplicitParam(name = "eq_chooseUser", value = "选用者=", required = false, dataType = "Long", paramType = "query"),
 		@ApiImplicitParam(name = "le_chooseTime", value = "选用时间<=", required = false, dataType = "Date", paramType = "query"),
 		@ApiImplicitParam(name = "ge_chooseTime", value = "选用时间>=", required = false, dataType = "Date", paramType = "query"),
+		@ApiImplicitParam(name = "keyword", value = "关键词", required = false, dataType = "String", paramType = "query"),
 		@ApiImplicitParam(name = "size", value = "每页显示数量", required = false, dataType = "int", paramType = "query"),
 		@ApiImplicitParam(name = "page", value = "页码", required = false, dataType = "int", paramType = "query"),
 	})
 	@Security(session=true)
 	@RequestMapping(value="/search",method=RequestMethod.GET)
 	public TablePage<DtTaggChooseLog> doSearch(@ApiIgnore() DtTaggChooseLogDBParam params, @ApiIgnore() Pageable pageable) throws APIException {
-		Page<DtTaggChooseLog> result =  dtTaggChooseLogService.query(params, pageable);
-		throw new APIException(500,"暂时不提供");
-		//return new TablePageImpl<>(result);
+		if (StringUtils.isNotBlank(params.getKeyword())){
+			params.setSql_key("chooseOrgNmae like '%"+params.getKeyword()+"%' or  chooseUserName like '%"+params.getKeyword()+"%'");
+		}
+		Pageable mypage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+				Sort.by(Sort.Order.desc("chooseTime")));//按照修改时间和创建时间倒叙排序
+		Page<DtTaggChooseLog> result =  dtTaggChooseLogService.query(params, mypage);
+		return new TablePageImpl<>(result);
 	}
 
 
