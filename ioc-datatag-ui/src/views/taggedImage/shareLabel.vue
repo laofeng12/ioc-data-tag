@@ -66,6 +66,12 @@
                 <i class="el-icon-position iconLogo" @click="Selection(props.row.tagsId,props.row.tagsName)"></i>
               </span>
               </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="选用记录" placement="top">
+              <span class="operationIcona">
+                <i class="el-icon-time iconLogo"
+                   @click="selecteRecord(props.row.tagsId,props.row.tagsName)"></i>
+              </span>
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
@@ -199,6 +205,16 @@
         this.labelDialog = true
         this.selectionId = id
         this.selectiontagsName = name
+      },
+      // 选用记录
+      selecteRecord(id, name) {
+        this.$router.push({
+          path: '/record',
+          query: {
+            id: id,
+            name: name
+          }
+        })
       },
       closelabelDialog() {
         this.labelDialog = false
