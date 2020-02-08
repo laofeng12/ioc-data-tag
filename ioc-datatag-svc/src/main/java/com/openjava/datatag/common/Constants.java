@@ -81,6 +81,7 @@ public class Constants {
     public static final String DT_TABLE_PREFIX="DT_";//临时表前缀
     public static final String DT_COL_PREFIX="TAG_";//打标字段前缀
     public static final String DT_COL_COPY="copy_";//字段克隆前缀
+    public static final String DT_COL_COPY_COMMENT="复制_";//字段克隆前缀
     public static final String DT_SEARCH_TABLE_NAME ="DT_SEARCH";//画像结果中间表名称
     public static final String DT_SEARCH_MODEL_TABLE_NAME ="model_table_name";//模型表名称
     public static final String DT_SEARCH_MODEL_PKEY ="model_p_key";//模型的主键
