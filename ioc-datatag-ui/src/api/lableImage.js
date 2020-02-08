@@ -19,7 +19,7 @@ export function getmodelList(params) {
  */
 export function getDispatch(data) {
   return fetch({
-    url:'/datatag/tagmodel/dtTaggingModel/Dispatch',
+    url:'/datatag/tagmodel/dtTaggingModel/dispatch',
     method:'post',
     data
   })
@@ -76,7 +76,7 @@ export function getImagelist({tableName,pKey}) {
  */
 export function getDispatchdetail(params) {
   return fetch ({
-    url:'/datatag/tagmodel/dtTaggingModel/Dispatch',
+    url:'/datatag/tagmodel/dtTaggingModel/dispatch',
     method:'get',
     params
   })

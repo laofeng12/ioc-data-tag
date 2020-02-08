@@ -76,6 +76,12 @@ export default new Router({
           component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/shareLabel.vue')
         },
         {
+          path: '/record',
+          name: 'record',
+          meta: {title: '标签组选用记录'},
+          component: () => import(/* webpackChunkName: "mysql" */ '@/views/taggedImage/record.vue')
+        },
+        {
           path: '/lookTree/:tagsId/:tagsName',
           name: 'lookTree',
           meta: {title: '查看标签'},

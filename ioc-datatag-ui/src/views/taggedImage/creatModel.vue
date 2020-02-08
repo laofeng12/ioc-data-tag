@@ -161,7 +161,7 @@
       <div class="del-dialog-cnt">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px">
           <el-form-item label="模型名称:" prop="zmodelName" class="nameOne">{{runModelname}}</el-form-item>
-          <el-form-item label="运行开始时间:" prop="date" class="nameOne">
+          <el-form-item label="运行开始时间:" prop="date" class="nameOne" v-if="this.ruleForm.region != 6">
             <el-date-picker
               size="small"
               class="dateInp"
@@ -351,6 +351,9 @@
           value: '0',
           label: '停止运行'
         }, {
+          value: '6',
+          label: '立即执行'
+        },{
           value: '1',
           label: '运行一次'
         }, {
@@ -849,39 +852,61 @@
       // 确定调度
       async goDispatchto() {
         this.savedispatchLoading = true
-        this.$refs.ruleForm.validate(async (valid) => {
-          if (valid) {
-            try {
-              const param = {
-                "cycleEnum": this.ruleForm.region,
-                "id": this.taggingModelId,
-                "startTime": this.ruleForm.date
-              }
-              const remindTime = this.ruleForm.date
-              const str = remindTime.toString()
-              const str2 = str.replace('/-/g', '/')
-              const oldTime = new Date(str2).getTime()
-              if (oldTime <= new Date().getTime()) {
-                this.$message.error('运行开始时间不能小于当前时间!')
-                this.savedispatchLoading = false
-                return
-              }
-              const resto = await goDispatch(param)
-              this.$message({
-                message: resto.message,
-                type: 'success'
-              });
-              this.savedispatchLoading = false
-              this.runDialog = false
-              this.$router.push('/lableImage')
-            } catch (e) {
-              console.log(e);
-              this.savedispatchLoading = false
+        if (this.ruleForm.region === '6') {
+          this.$refs['ruleForm'].clearValidate()
+          try {
+            const param = {
+              "cycleEnum": this.ruleForm.region,
+              "id": this.taggingModelId,
+              "startTime": this.ruleForm.date
             }
-          } else {
+            const resto = await goDispatch(param)
+            this.$message({
+              message: resto.message,
+              type: 'success'
+            });
+            this.savedispatchLoading = false
+            this.runDialog = false
+            this.$router.push('/lableImage')
+          } catch (e) {
+            console.log(e);
             this.savedispatchLoading = false
           }
-        });
+        }else {
+          this.$refs.ruleForm.validate(async (valid) => {
+            if (valid) {
+              try {
+                const param = {
+                  "cycleEnum": this.ruleForm.region,
+                  "id": this.taggingModelId,
+                  "startTime": this.ruleForm.date
+                }
+                const remindTime = this.ruleForm.date
+                const str = remindTime.toString()
+                const str2 = str.replace('/-/g', '/')
+                const oldTime = new Date(str2).getTime()
+                if (oldTime <= new Date().getTime()) {
+                  this.$message.error('运行开始时间不能小于当前时间!')
+                  this.savedispatchLoading = false
+                  return
+                }
+                const resto = await goDispatch(param)
+                this.$message({
+                  message: resto.message,
+                  type: 'success'
+                });
+                this.savedispatchLoading = false
+                this.runDialog = false
+                this.$router.push('/lableImage')
+              } catch (e) {
+                console.log(e);
+                this.savedispatchLoading = false
+              }
+            } else {
+              this.savedispatchLoading = false
+            }
+          });
+        }
       }
     },
     created() {
