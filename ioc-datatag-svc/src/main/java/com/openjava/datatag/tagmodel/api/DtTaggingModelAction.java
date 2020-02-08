@@ -186,7 +186,7 @@ public class DtTaggingModelAction {
 	 */
 	@ApiOperation(value = "设置调度", nickname="save", notes = "报文格式：content-type=application/json")
 	@Security(session=true,allowResources = {"lableImage"})
-	@RequestMapping(value="/Dispatch",method=RequestMethod.POST)
+	@RequestMapping(value="/dispatch",method=RequestMethod.POST)
 	@ApiResponses({
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.TAG_MODEL_NO_FIND, message="找不到该模型或模型已经被删除"),
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="没有权限修改本模型"),
@@ -225,7 +225,7 @@ public class DtTaggingModelAction {
 			@io.swagger.annotations.ApiResponse(code=MyErrorConstants.PUBLIC_NO_AUTHORITY, message="无此标签模型权限"),
 	})
 	@Security(session=true,allowResources = {"lableImage"})
-	@RequestMapping(value="/Dispatch",method=RequestMethod.GET)
+	@RequestMapping(value="/dispatch",method=RequestMethod.GET)
 	public DtTaggingDispatchDTO getDispatch(
 			@RequestParam(value="taggingModelId",required=true)Long taggingModelId) throws Exception{
 		DtTaggingModel m = dtTaggingModelService.get(taggingModelId);//获取模型

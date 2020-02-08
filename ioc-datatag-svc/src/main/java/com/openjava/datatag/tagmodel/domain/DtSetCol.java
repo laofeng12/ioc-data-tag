@@ -65,6 +65,12 @@ public class DtSetCol implements Persistable<Long>,Serializable {
 	@Length(min=0, max=32)
 	@Column(name = "SHOW_COL")
 	private String showCol;//显示字段名
+
+	@ApiModelProperty("字段中文翻译")
+	@Length(min=0, max=32)
+	@Column(name = "COL_COMMENT")
+	private String comment;//字段中文翻译
+
 	
 	@ApiModelProperty("创建用户")
 	@Max(9223372036854775806L)
