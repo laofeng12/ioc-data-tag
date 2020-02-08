@@ -120,7 +120,7 @@
         <div class="del-dialog-cnt">
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px">
             <el-form-item label="模型名称:" prop="name" class="nameOne">{{dispatchName}}</el-form-item>
-            <el-form-item label="调度开始时间:" prop="date" class="nameOne">
+            <el-form-item label="调度开始时间:" prop="date" class="nameOne" v-if="this.ruleForm.region != 6">
               <el-date-picker
                 size="small"
                 class="dateInp"
@@ -325,6 +325,9 @@
         options2: [{
           value: '0',
           label: '停止运行'
+        }, {
+          value: '6',
+          label: '立即执行'
         }, {
           value: '1',
           label: '运行一次'
@@ -594,44 +597,60 @@
       /**
        * 确定调度操作
        */
-      sureDispatch() {
+      async sureDispatch() {
         const param = {
           "cycleEnum": this.ruleForm.region,
           "id": this.dispatchId,
           "startTime": this.ruleForm.date
         }
         this.dispatchLoading = true
-        this.$refs.ruleForm.validate(async (valid) => {
-          if (valid) {
-            try {
-              // 限制现在运行的时间不能少于当前时间
-              const remindTime = this.ruleForm.date
-              const str = remindTime.toString()
-              const str2 = str.replace('/-/g', '/')
-              const oldTime = new Date(str2).getTime()
-              if (oldTime <= new Date().getTime()) {
-                this.$message.error('运行开始时间不能小于当前时间!')
-                this.dispatchLoading = false
-                return
-              }
-              const res = await getDispatch(param)
-              this.$message({
-                message: res.message,
-                type: 'success'
-              });
-              this.dispatchLoading = false
-              this.controlDialog = false
-              this.datamodelList()
-
-            } catch (e) {
-              console.log(e);
-              this.dispatchLoading = false
-            }
-          } else {
+        if (this.ruleForm.region === '6') {
+          this.$refs['ruleForm'].clearValidate()
+          try {
+            const res = await getDispatch(param)
+            this.$message({
+              message: res.message,
+              type: 'success'
+            });
+            this.dispatchLoading = false
+            this.controlDialog = false
+            this.datamodelList()
+          } catch (e) {
+            console.log(e);
             this.dispatchLoading = false
           }
-        });
+        } else {
+          this.$refs.ruleForm.validate(async (valid) => {
+            if (valid) {
+              try {
+                // 限制现在运行的时间不能少于当前时间
+                const remindTime = this.ruleForm.date
+                const str = remindTime.toString()
+                const str2 = str.replace('/-/g', '/')
+                const oldTime = new Date(str2).getTime()
+                if (oldTime <= new Date().getTime()) {
+                  this.$message.error('运行开始时间不能小于当前时间!')
+                  this.dispatchLoading = false
+                  return
+                }
+                const res = await getDispatch(param)
+                this.$message({
+                  message: res.message,
+                  type: 'success'
+                });
+                this.dispatchLoading = false
+                this.controlDialog = false
+                this.datamodelList()
 
+              } catch (e) {
+                console.log(e);
+                this.dispatchLoading = false
+              }
+            } else {
+              this.dispatchLoading = false
+            }
+          });
+        }
       },
       // 确定删除操作
       async sureDelete() {

@@ -47,3 +47,12 @@ export function looktreeTable(id) {
   })
 }
 
+
+// 选用记录
+export function recordSearch(params) {
+  return fetch({
+    url:'/datatag/tagmanage/dtTaggChooseLog/search',
+    method:'get',
+    params
+  })
+}

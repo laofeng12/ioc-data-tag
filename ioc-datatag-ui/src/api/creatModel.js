@@ -207,7 +207,7 @@ export function saveAs(data) {
 // 设置调度
 export function goDispatch(data) {
   return fetch({
-    url:'/datatag/tagmodel/dtTaggingModel/Dispatch',
+    url:'/datatag/tagmodel/dtTaggingModel/dispatch',
     method:'post',
     data
   })
@@ -218,7 +218,7 @@ export function goDispatch(data) {
  */
 export function getmodelDispatchdetail(params) {
   return fetch ({
-    url:'/datatag/tagmodel/dtTaggingModel/Dispatch',
+    url:'/datatag/tagmodel/dtTaggingModel/dispatch',
     method:'get',
     params
   })
