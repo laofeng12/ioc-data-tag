@@ -38,7 +38,10 @@ public class DtCooperationSetCol {
 
 	@ApiModelProperty("显示字段名")
 	private String showCol;
-	
+
+	@ApiModelProperty("字段中文注释")
+	private String comment;
+
 	@ApiModelProperty("创建用户")
 	private Long createUser;
 	

@@ -431,6 +431,9 @@ public class DtSetColServiceImpl implements DtSetColService {
         clone.setIsNew(true);//
         clone.setIsSource(Constants.PUBLIC_NO);//非源字段
         clone.setShowCol(Constants.DT_COL_COPY + col.getSourceCol() + "_" + String.valueOf(cloneCount));//
+        if (StringUtils.isNotBlank(col.getComment())){
+            clone.setComment(Constants.DT_COL_COPY_COMMENT+col.getComment() + "_"+ String.valueOf(cloneCount));//克隆中文翻译，加前缀
+        }
         clone = doSave(clone);//
 
         AuditLogVO vo = new AuditLogVO();//
