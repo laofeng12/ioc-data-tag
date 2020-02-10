@@ -248,7 +248,7 @@
                   width="50"
                 >
                 </el-table-column>
-                <el-table-column label="字段234" prop="definition">
+                <el-table-column label="字段" prop="definition">
                   <template slot-scope="scope">
                     <span>{{scope.row.definition}}</span>
                     <span v-if="scope.row.comment != null && scope.row.comment != ''">({{scope.row.comment}})</span>
