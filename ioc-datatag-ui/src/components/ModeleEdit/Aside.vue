@@ -248,7 +248,7 @@
                   width="50"
                 >
                 </el-table-column>
-                <el-table-column label="字段22" prop="definition">
+                <el-table-column label="字段" prop="definition">
                   <template slot-scope="scope">
                     <span>{{scope.row.definition}}</span>
                     <span v-if="scope.row.comment != null && scope.row.comment != ''">({{scope.row.comment}})</span>
@@ -658,7 +658,8 @@
             this.checkedCols.push(item.showCol)
             this.tableData.push({
               definition: item.showCol, isMarking: item.isMarking,
-              colId: item.colId, type: item.sourceDataType, colSort: item.colSort, sourceColtion: item.sourceCol
+              colId: item.colId, type: item.sourceDataType, colSort: item.colSort, sourceColtion: item.sourceCol,
+              comment:item.comment
             })
           })
           // 编辑下拉
