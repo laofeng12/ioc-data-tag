@@ -51,7 +51,9 @@
                           <span v-if="item.type==='string'" class="blue">Str.</span>
                           <span v-else-if="item.type==='number'" class="green">No.</span>
                           <span v-else="item.type==='date'" class="orange">Date.</span>
-                          <span class="col-name" :title="item.definition">{{item.definition}}</span>
+                          <span class="col-name">{{item.definition}}
+                            <span v-if="item.comment != null && item.comment != ''">({{item.comment}})</span>
+                          </span>
                         </span>
                       </el-checkbox>
                     </el-checkbox-group>
@@ -120,7 +122,12 @@
                   width="60"
                 >
                 </el-table-column>
-                <el-table-column label="字段" prop="definition"></el-table-column>
+                <el-table-column label="字段" prop="definition">
+                  <template slot-scope="scope">
+                    <span>{{scope.row.definition}}</span>
+                    <span v-if="scope.row.comment != null && scope.row.comment != ''">({{scope.row.comment}})</span>
+                  </template>
+                </el-table-column>
                 <el-table-column prop="type" label="类型">
                 </el-table-column>
                 <el-table-column
@@ -169,7 +176,9 @@
                           <span v-if="item.type==='string'" class="blue">Str.</span>
                           <span v-else-if="item.type==='number'" class="green">No.</span>
                           <span v-else="item.type==='date'" class="orange">Date.</span>
-                          <span class="col-name" :title="item.definition">{{item.definition}}</span>
+                          <span class="col-name" >{{item.definition}}
+                          <span v-if="item.comment != null && item.comment != ''">({{item.comment}})</span>
+                          </span>
                         </span>
                     </el-checkbox>
                   </el-checkbox-group>
@@ -239,7 +248,12 @@
                   width="50"
                 >
                 </el-table-column>
-                <el-table-column label="字段" prop="definition"></el-table-column>
+                <el-table-column label="字段22" prop="definition">
+                  <template slot-scope="scope">
+                    <span>{{scope.row.definition}}</span>
+                    <span v-if="scope.row.comment != null && scope.row.comment != ''">({{scope.row.comment}})</span>
+                  </template>
+                </el-table-column>
                 <el-table-column width="80" prop="type" label="类型">
                 </el-table-column>
                 <el-table-column
@@ -318,7 +332,7 @@
         checkAll: false,
         checkedCols: [],  // 选中的元素
         cols: colsOptions, // 所有的元素
-        copyChecked:[], // 带copy
+        copyChecked: [], // 带copy
         isIndeterminate: true,
         checkIt: [],
         tableData: [],
@@ -467,11 +481,11 @@
               }
             })
           })
-          this.tableData.filter((item)=>{
-            return !this.modelData.colList.some((col)=>{
+          this.tableData.filter((item) => {
+            return !this.modelData.colList.some((col) => {
               const coltion = item.definition
               return col.showCol === coltion
-              if(item.sourceColId != newItem.id){
+              if (item.sourceColId != newItem.id) {
                 return Object.assign(newItem, {colId: ''})
               }
             })
@@ -542,11 +556,11 @@
               }
             })
           })
-          this.tableData.filter((item)=>{
-            return !this.modelData.colList.some((col)=>{
+          this.tableData.filter((item) => {
+            return !this.modelData.colList.some((col) => {
               const coltion = item.definition
               return col.showCol === coltion
-              if(item.sourceColId != newItem.id){
+              if (item.sourceColId != newItem.id) {
                 return Object.assign(newItem, {colId: ''})
               }
             })
@@ -656,9 +670,9 @@
             })
           })
           // 全选
-          if(this.editData.length == this.columnData.length){
+          if (this.editData.length == this.columnData.length) {
             this.checkAll = true
-          }else{
+          } else {
             this.checkAll = false
           }
           if (this.resourceType == 0) {
@@ -786,6 +800,7 @@
               colList.push({
                 sourceCol: item.definition,
                 sourceDataType: item.type,
+                comment:item.comment, // 中文
                 isMarking: item.isMarking ? 1 : 0,
                 colId: item.colId,
                 // colSort: item.colSort,
@@ -948,6 +963,7 @@
         })
         return arr
       },
+
     }
   }
 </script>
@@ -955,6 +971,7 @@
 <style scoped lang="scss">
   .col-name-box {
     display: flex;
+
     .col-name {
       width: 100px;
       overflow: hidden;
@@ -977,13 +994,16 @@
     margin-left: 16px;
     box-sizing: border-box;
     z-index: 2;
+
     .tree {
       height: calc(75vh - 116px);
       overflow: auto;
     }
+
     .search {
       margin-bottom: 20px;
     }
+
     .cus-node-title {
       display: inline-block;
       max-width: 120px;
@@ -992,6 +1012,7 @@
       color: #606266;
       font-size: 14px;
     }
+
     .custom-tree-node {
       display: flex;
       align-items: baseline;
@@ -1008,14 +1029,17 @@
     margin-left: 16px;
     box-sizing: border-box;
     z-index: 2;
+
     .tree {
       /*height: calc(75vh - 80px);*/
       height: calc(75vh - 116px);
       overflow: auto;
     }
+
     .search {
       margin-bottom: 20px;
     }
+
     .cus-node-title {
       display: inline-block;
       max-width: 120px;
@@ -1024,6 +1048,7 @@
       color: #606266;
       font-size: 14px;
     }
+
     .custom-tree-node {
       display: flex;
       align-items: baseline;
@@ -1036,22 +1061,26 @@
       padding: 0 10px;
       color: #000000;
     }
+
     .leftNew {
       padding: 0 10px;
       color: #000000;
     }
+
     h3 {
       font-weight: normal;
       font-size: 14px;
       line-height: 32px;
       border-bottom: 1px solid #eee;
     }
+
     .h4 {
       margin-top: 10px;
       padding: 5px 10px;
       background-color: #f4f9fb;
       border: 1px solid #eee;
       font-weight: bold;
+
       .allNametitle {
         padding-left: 10px;
         font-size: 14px;
@@ -1059,20 +1088,25 @@
         font-weight: 500;
       }
     }
+
     ul {
       margin: 0;
       padding: 0;
+
       li {
         margin: 0;
         padding: 5px 10px;
         border: 1px solid #eee;
         border-top: none;
+
         .blue {
           color: #0486fe;
         }
+
         .green {
           color: green;
         }
+
         .orange {
           color: orange;
         }
@@ -1161,6 +1195,7 @@
   thead
     color: #222222;
     font-size 14px
+
     th
       background-color: #f4f9fb
       padding: 5px 0

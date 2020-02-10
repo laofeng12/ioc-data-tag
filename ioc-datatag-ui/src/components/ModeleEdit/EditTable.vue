@@ -9,7 +9,7 @@
             <el-dropdown @command="handleCommandTags($event,item)"
                          v-if="theadData[index].isMarking===true || theadData[index].isMarking==1">
               <span class="el-dropdown-link">
-                {{item.showCol}} <i class="el-icon-setting btnMargin"></i>
+                {{item.showCol}} <span v-if="item.comment != null && item.comment != ''">({{item.comment}})</span><i class="el-icon-setting btnMargin"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="0" icon="el-icon-document-copy">克隆字段</el-dropdown-item>
@@ -19,6 +19,7 @@
             </el-dropdown>
             <span v-else>
             {{item.showCol}}
+              <span v-if="item.comment != null && item.comment != ''">({{item.comment}})</span>
           </span>
           </template>
         </el-table-column>

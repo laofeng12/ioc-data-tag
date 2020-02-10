@@ -30,6 +30,7 @@
             <el-table-column v-for="(item,index) in headData" :key="index" :prop="item.sourceCol" min-width="300">
               <template slot="header" slot-scope="scope">
                 <span>{{item.showCol}}</span>
+                <span v-if="item.comment != null && item.comment != ''">({{item.comment}})</span>
                 <el-tooltip class="item" effect="dark" content="打标" placement="top">
                   <i v-if="item.isMarking==1&&item.isCooField==1" class="el-icon-price-tag  iconLogo"
                      @click="dataMaking(item)"></i>
