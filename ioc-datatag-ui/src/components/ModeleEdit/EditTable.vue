@@ -901,7 +901,9 @@
     border: 1px solid #ee0320;
   }
 
-
+.el-dropdown-link{
+  white-space: normal !important;
+}
 </style>
 <style>
   .newData .el-dialog__title {
@@ -964,11 +966,5 @@
   .autoBtn .el-button {
     height: 26px !important;
     line-height: 26px !important;
-  }
-  .getTable{
-    /*height: calc(100vh - 190px);*/
-    /*width: 100%;*/
-    /*overflow: scroll;*/
-    /*border: 1px solid red;*/
   }
 </style>
