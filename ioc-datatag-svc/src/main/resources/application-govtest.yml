@@ -92,6 +92,10 @@ ljdp:
 dataSet: #数据集相关
   resourceDataUrl: http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/
 
+#模型立即执行
+messageChannel:
+  runNow: false
+
 pgconfig:
   password: nanjian#2019
   username: nanjian
