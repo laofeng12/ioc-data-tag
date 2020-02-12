@@ -104,6 +104,10 @@ searchjob: #更新模型中间表定时任务
 dataSet: #数据集相关
   resourceDataUrl: http://219.135.182.2:31013/pds/datalake/dataLake/resourceData/
 
+#模型立即执行
+messageChannel:
+  runNow: false
+
 pgconfig:
   username: mppuser
   password: ioc123456

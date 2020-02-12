@@ -115,6 +115,10 @@ searchjob: #更新模型中间表定时任务
 dataSet: #数据集相关
   resourceDataUrl: http://ioc-dataset-svc.ioc-platform.svc:8080/pds/datalake/dataLake/resourceData/
 
+#模型立即执行
+messageChannel:
+  runNow: true
+
 pgconfig:
   password: ioc123456
   username: mppuser
