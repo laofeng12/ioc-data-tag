@@ -97,8 +97,8 @@ schedule:
     waitqueue: 0/5 * * * * ?
   example:
     example: 0/5 * * * * ?
-  dowload: 0/1 * * * * ?
-  datatagImmediatelyRunJob: 0/3 * * * * ?
+  dowload: 0 0/5 * * * ?
+  datatagImmediatelyRunJob: 0 0/5 * * * ?
 
 schedulejob: #定时任务组件
   jobMethod: com.openjava.datatag.schedule.job.Schedulejob
@@ -114,6 +114,10 @@ searchjob: #更新模型中间表定时任务
 
 dataSet: #数据集相关
   resourceDataUrl: http://219.135.182.2:31013/pds/datalake/dataLake/resourceData/
+
+#模型立即执行
+messageChannel:
+  runNow: true
 
 pgconfig:
   username: mppuser
@@ -132,5 +136,4 @@ platform:
   finish: ${platform.baseUrl}/category/workform/spUnifyWorkform/finish/%s/%s-%s #完成工单
   cancel: ${platform.baseUrl}/category/workform/spUnifyWorkform/cancel/%s/%S-%s #作废工单/{formType}/{businessId}-{userId}
   spUnifyMsgNotice: ${platform.baseUrl}/category/workform/spUnifyMsgNotice  #新增告警消息
-
 

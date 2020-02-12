@@ -381,12 +381,15 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 //				db.setCycle(null);
 //				db.setCycleEnum(null);
 				stopModel(db.getTaggingModelId(),null);//
+				db = dtTaggingModelRepository.save(db);//
 			}else if(body.getCycleEnum().equals(Constants.DT_DISPATCH_NOW)){
 				//立即执行
 				db.setRunState(Constants.DT_MODEL_NO_BEGIN);
 				db.setStartTime(null);
 				db.setCycle(null);
 				db.setCycleEnum(body.getCycleEnum());//
+				db = dtTaggingModelRepository.save(db);
+				stringRedisTemplate.convertAndSend(Constants.DT_REDIS_MESSAGE_QUEUE_CHANL,JSONObject.toJSONString(db));
 			}else{
 				if (body.getStartTime() == null){
 					throw new APIException(MyErrorConstants.TAGM_DISPATCH_NONE_START_TIME,"未设置开始时间");//
@@ -395,12 +398,11 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				db.setStartTime(body.getStartTime());//
 				db.setCycle(toCron(body.getCycleEnum(),body.getStartTime()));//
 				db.setCycleEnum(body.getCycleEnum());//
+				db = dtTaggingModelRepository.save(db);//
 			}
 		}else{
 			throw new APIException(MyErrorConstants.TAGM_DISPATCH_CYCLE_ERROR,"Cycle不合法");//
 		}
-
-		db = dtTaggingModelRepository.save(db);//
 		AuditLogVO vo = new AuditLogVO();//
 		vo.setType(1L);//管理操作
 		vo.setOperationService("标签与画像");//必传

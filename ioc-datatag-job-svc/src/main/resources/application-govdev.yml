@@ -92,6 +92,10 @@ ljdp:
 dataSet: #数据集相关
   resourceDataUrl: http://19.104.40.36/dsweb/pds/datalake/dataLake/resourceData/
 
+#模型立即执行
+messageChannel:
+  runNow: true
+
 pgconfig:
   password: nanjian#2019
   username: nanjian
