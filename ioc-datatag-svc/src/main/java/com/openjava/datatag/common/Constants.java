@@ -123,6 +123,7 @@ public class Constants {
 
     //=======  Redis消息订阅通道 ===============
     public static final String DT_REDIS_MESSAGE_QUEUE_CHANL = "channel";
+    public static final String DT_REDIS_MESSAGE_QUEUE_CHANL2 = "channel2";
 
     //=======  画像结果  ==============
     public static final int DT_RESULT_DOWLOAD_LIMIT = 20000;//画像结果最高下载数量

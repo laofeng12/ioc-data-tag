@@ -25,7 +25,7 @@ public interface DtTaggingModelRepository extends DynamicJpaRepository<DtTagging
      * @param runStates
      * @return
      */
-    @Query(value="from DtTaggingModel t where t.isDeleted=0 and t.runState in(:runStates)")
+    @Query(value="from DtTaggingModel t where t.isDeleted=0 and t.runState in(:runStates) and t.cycle is not null")
     List<DtTaggingModel> getModelByRunStates(@Param("runStates")List<Long> runStates);
 
     /**

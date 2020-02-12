@@ -51,9 +51,7 @@
                           <span v-if="item.type==='string'" class="blue">Str.</span>
                           <span v-else-if="item.type==='number'" class="green">No.</span>
                           <span v-else="item.type==='date'" class="orange">Date.</span>
-                          <span class="col-name">{{item.definition}}
-                            <span v-if="item.comment != null && item.comment != ''">({{item.comment}})</span>
-                          </span>
+                          <span class="col-name" :title="item.showText">{{item.showText}}</span>
                         </span>
                       </el-checkbox>
                     </el-checkbox-group>
@@ -176,9 +174,7 @@
                           <span v-if="item.type==='string'" class="blue">Str.</span>
                           <span v-else-if="item.type==='number'" class="green">No.</span>
                           <span v-else="item.type==='date'" class="orange">Date.</span>
-                          <span class="col-name" >{{item.definition}}
-                          <span v-if="item.comment != null && item.comment != ''">({{item.comment}})</span>
-                          </span>
+                          <span class="col-name" :title="item.showText">{{item.showText}}</span>
                         </span>
                     </el-checkbox>
                   </el-checkbox-group>
@@ -943,15 +939,17 @@
     },
     computed: {
       list() {
-        const arr = []
+        const arr = [];
         this.columnData.map(item => {
-          if (item.definition &&
-            (item.definition.toLowerCase().includes(this.searchText) ||
-              item.definition.toUpperCase().includes(this.searchText))) {
-            arr.push(item)
+          if (
+            item.definition &&
+            item.definition.toLowerCase().includes(this.searchText.toLowerCase())
+          ) {
+            item.showText = item.comment ? `${item.definition}(${item.comment})` :  `${item.definition}`
+            arr.push(item);
           }
-        })
-        return arr
+        });
+        return arr;
       },
       allList() {
         const arr = []
