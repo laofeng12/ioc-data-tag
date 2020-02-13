@@ -103,6 +103,10 @@ dataSet: #数据集相关
   baseUrl: http://ioc-dataset-svc.ioc-platform.svc:8080
   resourceDataUrl: ${dataSet.baseUrl}/pds/datalake/dataLake/resourceData/
 
+#模型立即执行
+messageChannel:
+  runNow: false
+
 pgconfig:
   ip: 19.106.85.70
   port: 25308

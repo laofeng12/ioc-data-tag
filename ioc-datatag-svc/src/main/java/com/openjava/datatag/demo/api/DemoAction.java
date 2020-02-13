@@ -69,7 +69,8 @@ public class DemoAction {
 	@RequestMapping(value="/redisMessageQueue", method=RequestMethod.GET)
 	public void sendMessage(){
 //		stringRedisTemplate.convertAndSend("pmp",String.valueOf(Math.random()));
-		stringRedisTemplate.convertAndSend(Constants.DT_REDIS_MESSAGE_QUEUE_CHANL,String.valueOf(Math.random()));
+//		stringRedisTemplate.convertAndSend(Constants.DT_REDIS_MESSAGE_QUEUE_CHANL,"channel"+String.valueOf(Math.random()));
+		stringRedisTemplate.convertAndSend(Constants.DT_REDIS_MESSAGE_QUEUE_CHANL2,"channel2"+String.valueOf(Math.random()));
 	}
 
 	@ApiOperation(value = "testAudit", nickname="testAudit", notes = "testAudit")

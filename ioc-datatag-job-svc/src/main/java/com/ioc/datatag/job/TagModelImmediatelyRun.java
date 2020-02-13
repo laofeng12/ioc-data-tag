@@ -18,14 +18,14 @@ public class TagModelImmediatelyRun  extends Thread  {
     private DtTaggingModelService dtTaggingModelService;
 
 
-    @Scheduled(cron = "${schedule.datatagImmediatelyRunJob}")
-    public void cronJob() throws Exception{
-        List<DtTaggingModel> list  = dtTaggingModelService.findByCycleEnum(Constants.DT_DISPATCH_NOW);
-        for (DtTaggingModel model:list
-             ) {
-            model.setRunState(Constants.DT_MODEL_RUNNING);
-            dtTaggingModelService.calculation(model);
-        }
-    }
+//    @Scheduled(cron = "${schedule.datatagImmediatelyRunJob}")
+//    public void cronJob() throws Exception{
+//        List<DtTaggingModel> list  = dtTaggingModelService.findByCycleEnum(Constants.DT_DISPATCH_NOW);
+//        for (DtTaggingModel model:list
+//             ) {
+//            model.setRunState(Constants.DT_MODEL_RUNNING);
+//            dtTaggingModelService.calculation(model);
+//        }
+//    }
 
 }

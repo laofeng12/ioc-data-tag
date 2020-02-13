@@ -77,7 +77,29 @@ public class PortrayalAction {
             @PathVariable(value = "pKey") String pKey
     ) throws Exception{
         DataApiResponse<PortrayalDetailDTO> resp = new DataApiResponse<>();//新建画像详情结果集
-        resp.setData(portrayalService.portrayal(tableName,1,pKey,true));//设画像详情结果集
+        PortrayalDetailDTO detail = portrayalService.portrayal(tableName,1,pKey,true);
+        //过滤掉空字符串
+        List<String> property = detail.getProperty();
+        Map<String,String> mapProperty = detail.getMapProperty();
+        if (!CollectionUtils.isEmpty(property)){
+            for (int i = property.size()-1; i >=0 ; i--) {
+                if (StringUtils.isBlank(property.get(i))){
+                    property.remove(i);
+                }
+            }
+        }
+        detail.setProperty(property);
+        if (mapProperty!=null){
+            Iterator<Map.Entry<String, String>> it = mapProperty.entrySet().iterator();
+            while(it.hasNext()){
+                Map.Entry<String, String> entry = it.next();
+                String value = entry.getValue();
+                if(StringUtils.isBlank(value)){
+                    it.remove();
+                }
+            }
+        }
+        resp.setData(detail);//设画像详情结果集
         return resp;
     }
 
