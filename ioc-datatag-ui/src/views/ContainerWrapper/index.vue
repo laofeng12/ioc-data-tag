@@ -12,6 +12,7 @@
       :dropdownItemList="dropdownItemList"
       :portalInfo="portalInfo"
       :svgArr="svgArr"
+      v-if="!singleSpaNavigate"
     >
       <div class="container-wrapper">
         <transition name="fade-transform" mode="out-in">
@@ -19,6 +20,9 @@
         </transition>
       </div>
     </ch-layout>
+    <div v-else class="container-wrapper">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
@@ -42,7 +46,10 @@
         'device', // 设备类型，mobile或者desktop
         'menuList', // 后台请求回来的菜单
         'userInfo' // 用户信息
-      ])
+      ]),
+      singleSpaNavigate() {
+        return window.singleSpaNavigate
+      }
     },
     mounted () {
     },

@@ -1,4 +1,5 @@
 const baseUrl = process.env.NODE_ENV === 'production' ? '/datatagweb/' : '/datatagweb/'
+const StatsPlugin = require('stats-webpack-plugin')
 module.exports = {
   lintOnSave: false,
   publicPath: baseUrl,
@@ -14,7 +15,7 @@ module.exports = {
       '/platformweb/admin/': {
         target: 'http://219.135.182.2:31075', // 登录
         changeOrigin: true,
-        pathRewrite:{
+        pathRewrite: {
           '^/platformweb/admin/': '/admin/'
         }
       },
@@ -35,7 +36,7 @@ module.exports = {
       '/datatagweb/framework': {
         target: 'http://219.135.182.2:30003', // test
         changeOrigin: true,
-        pathRewrite: { '^/datatagweb/framework': '/datatagweb/framework' },
+        pathRewrite: { '^/datatagweb/framework': '/datatagweb/framework' }
       }
     }
   },
@@ -55,5 +56,21 @@ module.exports = {
       .options({
         symbolId: 'icon-[name]'
       })
+
+    config.output.library('datatagweb').libraryTarget('window').end()
+
+    config.plugin('stats').use(StatsPlugin, [
+      'manifest.json',
+      {
+        chunkModules: false,
+        entrypoints: true,
+        source: false,
+        chunks: false,
+        modules: false,
+        assets: false,
+        children: false,
+        exclude: [/node_modules/]
+      }
+    ])
   }
 }
