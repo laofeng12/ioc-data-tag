@@ -98,10 +98,10 @@ public class ShareDtTagGroupAction {
             throw new APIException(MyErrorConstants.CAN_NOT_CHOOSE, "不能选用自己的标签组");
         }
 
-        Long count = dtTaggChooseLogService.countChoose(Long.valueOf(userInfo.getUserId()),id);//查询当前用户标签组选用次数
-        if (count!=null && count>0){
-            throw new APIException(MyErrorConstants.CAN_NOT_CHOOSE, "该标签组已选用，不能重复选用");
-        }
+//        Long count = dtTaggChooseLogService.countChoose(Long.valueOf(userInfo.getUserId()),id);//查询当前用户标签组选用次数
+//        if (count!=null && count>0){
+//            throw new APIException(MyErrorConstants.CAN_NOT_CHOOSE, "该标签组已选用，不能重复选用");
+//        }
         dtShareTagGroupService.choose(id,Long.parseLong(userInfo.getUserId()),ip);
         return new SuccessMessage("选用成功");
     }
