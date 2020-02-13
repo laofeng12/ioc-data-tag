@@ -558,6 +558,7 @@
               }
               if (item.runState == 2) {
                 item.runState = '运行中'
+                this.getsocket()
               }
               if (item.runState == 3) {
                 item.runState = '运行成功'
