@@ -3,6 +3,7 @@ const StatsPlugin = require('stats-webpack-plugin')
 module.exports = {
   lintOnSave: false,
   publicPath: baseUrl,
+  productionSourceMap: false,
   css: {
     loaderOptions: {
       sass: {
