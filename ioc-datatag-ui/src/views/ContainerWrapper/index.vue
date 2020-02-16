@@ -113,4 +113,12 @@
     background: #f2f2f2;
     /*min-height: calc(100vh - 50px);*/
   }
+  .app-container {
+    padding: 20px;
+    background: #ffffff;
+    ////border-radius: 10px;
+    //min-height: calc(100vh - 150px);
+    box-sizing: border-box;
+    min-height: calc(100vh - 130px);
+  }
 </style>

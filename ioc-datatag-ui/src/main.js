@@ -15,6 +15,7 @@ import api from '@/api'
 import * as filters from '@/filters'
 import Router from 'vue-router'
 import singleSpaVue from 'single-spa-vue'
+import '@/permission' // permission control
 
 const originalPush = Router.prototype.push
 Router.prototype.push = function push (location) {
@@ -52,7 +53,6 @@ const vueOptions = {
 
 // 判断当前页面使用singleSpa应用,不是就渲染
 if (!window.singleSpaNavigate) {
-  require('./permission') // permission control
   delete vueOptions.el
   new Vue(vueOptions).$mount('#app')
 }
