@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="datatagweb">
     <router-view></router-view>
   </div>
 </template>
