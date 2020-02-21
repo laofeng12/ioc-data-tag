@@ -28,9 +28,8 @@ if (window.singleSpaNavigate) {
         return
       }
     }
-    console.log('datatagweb to', JSON.stringify(to))
     // 把路由挂在 window，让外围拿到数据
-    window.router = { to: JSON.parse(JSON.stringify(to)), baseUrl: '/datatagweb' }
+    window.router = { to, baseUrl: '/datatagweb' }
     const userInfo = getUserInfo()
     store.commit('SET_USERINFO', userInfo)
     next()
