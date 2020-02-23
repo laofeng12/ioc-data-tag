@@ -949,10 +949,13 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			cols.add(col);//
 		}
 		List<DtSetCol> dbCols = dtSetColService.getByTaggingModelId(taggingModelId);
-		Map<String,String> colComMap = new HashedMap();
+		List<ColCommentDTO> colCommentDTOS = new ArrayList<>();
 		if (CollectionUtils.isNotEmpty(dbCols)){
 			for (DtSetCol c:dbCols) {
-				colComMap.put(c.getShowCol(),c.getComment());
+				ColCommentDTO colCommentDTO = new ColCommentDTO();
+				colCommentDTO.setDefinition(c.getShowCol());
+				colCommentDTO.setComment(c.getComment());
+				colCommentDTOS.add(colCommentDTO);
 			}
 		}
 		List<Object> result = rebuiltData(cols,dataList,data[0],type);//重组数据
@@ -960,7 +963,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		map.put("pKey",taggingModel.getPkey());//
 		map.put("tableName",Constants.DT_TABLE_PREFIX+taggingModel.getTaggingModelId());//
 		map.put("cols",data[0]);//
-		map.put("comments",colComMap);//中文注释
+		map.put("columnData",colCommentDTOS);//中文注释
 		if (data!=null) {
 			map.put("result",new PageImpl<>(result, pageable, totalCount));//
 		}else{
