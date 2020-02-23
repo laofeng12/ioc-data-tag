@@ -39,6 +39,7 @@ import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.bag.SynchronizedSortedBag;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -947,11 +948,19 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			col.setShowCol(data[0][i]);//
 			cols.add(col);//
 		}
+		List<DtSetCol> dbCols = dtSetColService.getByTaggingModelId(taggingModelId);
+		Map<String,String> colComMap = new HashedMap();
+		if (CollectionUtils.isNotEmpty(dbCols)){
+			for (DtSetCol c:dbCols) {
+				colComMap.put(c.getShowCol(),c.getComment());
+			}
+		}
 		List<Object> result = rebuiltData(cols,dataList,data[0],type);//重组数据
 		Map<String,Object> map = new HashMap<>();//
 		map.put("pKey",taggingModel.getPkey());//
 		map.put("tableName",Constants.DT_TABLE_PREFIX+taggingModel.getTaggingModelId());//
 		map.put("cols",data[0]);//
+		map.put("comments",colComMap);//中文注释
 		if (data!=null) {
 			map.put("result",new PageImpl<>(result, pageable, totalCount));//
 		}else{
