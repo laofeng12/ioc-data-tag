@@ -16,7 +16,7 @@
         <div class="newTable  daList  imageTable" v-if="showTable">
           <el-table ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
                     style="width: 100%;text-align: center"
-                    :header-cell-style="{background:'#f0f2f5'}">
+                    :header-cell-style="{background:'#f0f2f5'}" :height="clientHeight2">
             <template slot="empty">
               <div v-if="Loading">
                 <div v-loading="saveLoading2"></div>
@@ -65,6 +65,8 @@
     name: 'modelEdit',
     data() {
       return {
+        clientHeight2:window.innerHeight - 180,
+        clientHeight:'',
         showTable: true,
         showPicture: false,
         page: 0,
@@ -84,10 +86,14 @@
         tagName: '',
         updateAsideForce: true,
         pKey: '',
-        tableName: ''
+        tableName: '',
+        colData:[]
       }
     },
-    watch: {},
+    mounted(){
+    },
+    watch: {
+    },
     created() {
       // this.tagId = this.$route.params.id
       // this.tagName = this.$route.params.name
@@ -109,8 +115,7 @@
           const resList = await getTabulation(params)
           if ((resList.data.result.content && resList.data.result.content.length > 0) && (resList.data.cols && resList.data.cols.length > 0)) {
             this.ztableShowList = resList.data.result.content
-            // this.theadData = resList.data.cols
-            this.theadData = resList.data.columnData
+            this.theadData = resList.data.cols
             this.doFalse = true
             this.pKey = resList.data.pKey
             this.tableName = resList.data.tableName
