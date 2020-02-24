@@ -161,4 +161,8 @@ p {
 
 .imageTable .el-table .cell {
   white-space: nowrap !important;
+  //display: -webkit-box;
+  //-webkit-box-orient: vertical;
+  //-webkit-line-clamp: 2;
+  //overflow: hidden;
 }

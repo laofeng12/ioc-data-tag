@@ -28,14 +28,15 @@
             <!--<span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>-->
             <!--</template>-->
             <!--</el-table-column>-->
-            <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
-                             :prop="item" min-width="300" v-if="index <1" show-overflow-tooltip>
+            <el-table-column :label="item.showText" v-for="(item,index) in list" :key="index"
+                             :prop="item.definition" min-width="300" v-if="index <1" show-overflow-tooltip>
               <template slot-scope="props" class="caozuo">
-                <span class="operationIcona  look" @click="lookImage(props.row)">{{props.row[item]}}</span>
+                <span class="operationIcona  look" @click="lookImage(props.row)">{{props.row[item.definition]}}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
-                             :prop="item" min-width="300" v-if="index > 0" show-overflow-tooltip></el-table-column>
+            <el-table-column :label="item.showText" v-for="(item,index) in list" :key="index"
+                             :prop="item.definition" min-width="350" v-if="index > 0" show-overflow-tooltip>
+            </el-table-column>
           </el-table>
           <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
           <!--@sureClick="goPage"></element-pagination>-->
@@ -108,7 +109,8 @@
           const resList = await getTabulation(params)
           if ((resList.data.result.content && resList.data.result.content.length > 0) && (resList.data.cols && resList.data.cols.length > 0)) {
             this.ztableShowList = resList.data.result.content
-            this.theadData = resList.data.cols
+            // this.theadData = resList.data.cols
+            this.theadData = resList.data.columnData
             this.doFalse = true
             this.pKey = resList.data.pKey
             this.tableName = resList.data.tableName
@@ -152,7 +154,17 @@
           }
         })
       }
-    }
+    },
+    computed:{
+      list() {
+        const arr = [];
+        this.theadData.map(item => {
+            item.showText = item.comment ? `${item.definition}(${item.comment})` :  `${item.definition}`
+            arr.push(item);
+        });
+        return arr;
+      }
+    },
   }
 </script>
 
