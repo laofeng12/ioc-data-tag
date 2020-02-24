@@ -941,29 +941,30 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 			}
 			dataList.add(list);//
 		}
+		List<DtSetCol> dbCols = dtSetColService.getByTaggingModelId(taggingModelId);
+		List<ColCommentDTO> colCommentDTOS = new ArrayList<>();
+		Map<String,String> colMap = new HashedMap();
+		if (CollectionUtils.isNotEmpty(dbCols)){
+			for (DtSetCol c:dbCols) {
+				colMap.put(c.getShowCol(),c.getComment());
+			}
+		}
 		List<DtSetCol> cols = new LinkedList<>();
 		for (int i = 0; i < data[0].length; i++) {
 			DtSetCol col = new DtSetCol();//
 			col.setSourceCol(data[0][i]);//
 			col.setShowCol(data[0][i]);//
 			cols.add(col);//
-		}
-		List<DtSetCol> dbCols = dtSetColService.getByTaggingModelId(taggingModelId);
-		List<ColCommentDTO> colCommentDTOS = new ArrayList<>();
-		if (CollectionUtils.isNotEmpty(dbCols)){
-			for (DtSetCol c:dbCols) {
-				ColCommentDTO colCommentDTO = new ColCommentDTO();
-				colCommentDTO.setDefinition(c.getShowCol());
-				colCommentDTO.setComment(c.getComment());
-				colCommentDTOS.add(colCommentDTO);
-			}
+			ColCommentDTO colCommentDTO = new ColCommentDTO();
+			colCommentDTO.setDefinition(data[0][i]);
+			colCommentDTO.setComment(colMap.get(data[0][i]));
+			colCommentDTOS.add(colCommentDTO);
 		}
 		List<Object> result = rebuiltData(cols,dataList,data[0],type);//重组数据
 		Map<String,Object> map = new HashMap<>();//
 		map.put("pKey",taggingModel.getPkey());//
 		map.put("tableName",Constants.DT_TABLE_PREFIX+taggingModel.getTaggingModelId());//
-		map.put("cols",data[0]);//
-		map.put("columnData",colCommentDTOS);//中文注释
+		map.put("cols",colCommentDTOS);//
 		if (data!=null) {
 			map.put("result",new PageImpl<>(result, pageable, totalCount));//
 		}else{
