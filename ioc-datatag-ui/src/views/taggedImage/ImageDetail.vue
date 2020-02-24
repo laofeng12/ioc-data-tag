@@ -28,14 +28,16 @@
             <!--<span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>-->
             <!--</template>-->
             <!--</el-table-column>-->
-            <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
-                             :prop="item" min-width="300" v-if="index <1">
+            <el-table-column :title="item.showText" :label="item.showText" v-for="(item,index) in list" :key="index"
+                             :prop="item.showText" min-width="330" v-if="index <1" show-overflow-tooltip>
               <template slot-scope="props" class="caozuo">
-                <span class="operationIcona  look" @click="lookImage(props.row)">{{props.row[item]}}</span>
+                <span class="operationIcona  look" @click="lookImage(props.row)">{{props.row[item.definition]}}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="item" v-for="(item,index) in theadData" :key="index"
-                             :prop="item" min-width="300" v-if="index > 0"></el-table-column>
+            <el-table-column :title="item.showText" :label="item.showText" v-for="(item,index) in list" :key="index"
+                              min-width="330" v-if="index > 0" show-overflow-tooltip>
+              <span>{{item.definition}}</span>
+            </el-table-column>
           </el-table>
           <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
           <!--@sureClick="goPage"></element-pagination>-->
@@ -67,7 +69,7 @@
         showTable: true,
         showPicture: false,
         page: 0,
-        size: 20,
+        size: 10,
         totalnum: 0,
         doFalse: false,
         Loading: true,
@@ -108,7 +110,8 @@
           const resList = await getTabulation(params)
           if ((resList.data.result.content && resList.data.result.content.length > 0) && (resList.data.cols && resList.data.cols.length > 0)) {
             this.ztableShowList = resList.data.result.content
-            this.theadData = resList.data.cols
+            // this.theadData = resList.data.cols
+            this.theadData = resList.data.columnData
             this.doFalse = true
             this.pKey = resList.data.pKey
             this.tableName = resList.data.tableName
@@ -134,7 +137,7 @@
         if (size * 10 > this.totalnum) {
           this.page = 0
           this.getList()
-        }else {
+        } else {
           this.getList()
         }
       },
@@ -152,7 +155,17 @@
           }
         })
       }
-    }
+    },
+    computed:{
+      list() {
+        const arr = [];
+        this.theadData.map(item => {
+            item.showText = item.comment ? `${item.definition}(${item.comment})` :  `${item.definition}`
+            arr.push(item);
+        });
+        return arr;
+      }
+    },
   }
 </script>
 
@@ -164,9 +177,11 @@
     height: 60px;
     color: #ffffff;
     background: rgba(22, 38, 59, 1);
+
     .left {
       display: flex;
       align-items: center;
+
       .return {
         width: 60px;
         border-right: 1px solid #999;
@@ -174,9 +189,11 @@
         font-size: 30px;
         margin-right: 20px;
       }
+
       .name {
         display: flex;
         text-align: center;
+
         .img {
           width: 25px;
           height: 25px;
@@ -185,6 +202,7 @@
           background-repeat: no-repeat;
           background-size: 100% 100%;
         }
+
         .text {
           line-height: 25px;
         }
@@ -194,6 +212,7 @@
 
   .content {
     display: flex;
+
     .components {
       width: 100%;
       position: absolute;
@@ -201,17 +220,21 @@
       bottom: 0;
       box-sizing: border-box;
       overflow-x: hidden;
+
       .top {
         display: flex;
         justify-content: space-between;
+
         .left {
           display: flex;
           justify-content: space-around;
           align-items: center;
           font-size: 14px;
+
           .box {
             width: 50%;
             cursor: pointer;
+
             .icon {
               width: 25px;
               height: 25px;
@@ -220,6 +243,7 @@
               background-repeat: no-repeat;
             }
           }
+
           .right-line {
             border-right: 1px #ddd solid;
           }

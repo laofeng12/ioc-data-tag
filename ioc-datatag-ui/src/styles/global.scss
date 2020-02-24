@@ -154,4 +154,14 @@ p {
 .getTable .el-table--scrollable-x .el-table__body-wrapper {
     height: calc(100vh - 280px) !important;
     overflow-y: auto;
+    height: calc(100vh - 280px) !important;
+    overflow-y: auto;
+}
+
+.imageTable .el-table .cell {
+  //white-space: nowrap !important;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
