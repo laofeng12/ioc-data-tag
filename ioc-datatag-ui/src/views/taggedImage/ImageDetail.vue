@@ -28,15 +28,14 @@
             <!--<span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>-->
             <!--</template>-->
             <!--</el-table-column>-->
-            <el-table-column :title="item.showText" :label="item.showText" v-for="(item,index) in list" :key="index"
-                             :prop="item.showText" min-width="330" v-if="index <1" show-overflow-tooltip>
+            <el-table-column :label="item.showText" v-for="(item,index) in list" :key="index"
+                             :prop="item.definition" min-width="300" v-if="index <1" show-overflow-tooltip>
               <template slot-scope="props" class="caozuo">
                 <span class="operationIcona  look" @click="lookImage(props.row)">{{props.row[item.definition]}}</span>
               </template>
             </el-table-column>
-            <el-table-column :title="item.showText" :label="item.showText" v-for="(item,index) in list" :key="index"
-                              min-width="330" v-if="index > 0" show-overflow-tooltip>
-              <span>{{item.definition}}</span>
+            <el-table-column :label="item.showText" v-for="(item,index) in list" :key="index"
+                             :prop="item.definition" min-width="350" v-if="index > 0" show-overflow-tooltip>
             </el-table-column>
           </el-table>
           <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
