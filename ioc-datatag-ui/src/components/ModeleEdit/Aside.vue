@@ -923,7 +923,7 @@
         }
       },
       getHeight() {
-        this.contentStyleObj.width = window.innerWidth - 614 + 'px';
+        this.contentStyleObj.width = window.innerWidth - 662 + 'px';
       }
     },
     created() {
