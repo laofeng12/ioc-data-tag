@@ -1575,7 +1575,7 @@
   }
 
   .allContent {
-    width: calc(100vw - 48px);
+    // width: calc(100vw - 48px);
     height: calc(100vh - 108px);
     background-color: #fff;
     margin: 24px;
