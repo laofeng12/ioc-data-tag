@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/home/index'
 import ContainerWrapper from '@/views/ContainerWrapper'
+import EmptyWrapper from '@/views/EmptyWrapper'
 import Login from '@/views/login/index'
 Vue.use(Router)
 export default new Router({
@@ -126,40 +127,48 @@ export default new Router({
       ]
     },
     {
-      path: '/modelEdit/:id',
-      name: 'modelEdit',
-      meta: { title: '编辑模型' },
-      component: () => import('@/views/taggedImage/modelEdit.vue')
-    },
-    {
-      path: '/ImageDetail',
-      name: 'ImageDetail',
-      meta: { title: '画像模型' },
-      component: () => import('@/views/taggedImage/ImageDetail.vue')
-    },
-    {
-      path: '/creatModel',
-      name: 'creatModel',
-      meta: { title: '创建模型' },
-      component: () => import('@/views/taggedImage/creatModel.vue')
-    },
-    {
-      path: '/editModel/:id',
-      name: 'editModel',
-      meta: { title: '编辑模型' },
-      component: () => import('@/views/taggedImage/creatModel.vue')
-    },
-    {
-      path: '/marking',
-      name: 'marking',
-      meta: { title: '协作打标' },
-      component: () => import('@/views/taggedImage/marking.vue')
-    },
-    {
-      path: '/lookImagedetail',
-      name: 'lookImagedetail',
-      meta: { title: '查看画像' },
-      component: () => import('@/components/image/lookImagedetail.vue')
+      path: '/',
+      name: 'EmptyWrapper',
+      component: EmptyWrapper,
+      meta: { title: '标签与画像' },
+      children: [
+        {
+          path: '/modelEdit/:id',
+          name: 'modelEdit',
+          meta: { title: '编辑模型' },
+          component: () => import('@/views/taggedImage/modelEdit.vue')
+        },
+        {
+          path: '/ImageDetail',
+          name: 'ImageDetail',
+          meta: { title: '画像模型' },
+          component: () => import('@/views/taggedImage/ImageDetail.vue')
+        },
+        {
+          path: '/creatModel',
+          name: 'creatModel',
+          meta: { title: '创建模型' },
+          component: () => import('@/views/taggedImage/creatModel.vue')
+        },
+        {
+          path: '/editModel/:id',
+          name: 'editModel',
+          meta: { title: '编辑模型' },
+          component: () => import('@/views/taggedImage/creatModel.vue')
+        },
+        {
+          path: '/marking',
+          name: 'marking',
+          meta: { title: '协作打标' },
+          component: () => import('@/views/taggedImage/marking.vue')
+        },
+        {
+          path: '/lookImagedetail',
+          name: 'lookImagedetail',
+          meta: { title: '查看画像' },
+          component: () => import('@/components/image/lookImagedetail.vue')
+        }
+      ]
     }
   ]
 })
