@@ -37,13 +37,6 @@
         <div class="components" v-if="routerName==='creatModel'">
           <div class="top">
             <div class="headLeft">字段设置</div>
-            <div class="left">
-              {{modelData.resourceName}}
-              <el-button v-if="routerName==='editModel'" class="set-btn btnMargin" type="text" size="mini"
-                         @click.stop="editSetTags(1)">
-                <i class="el-icon-setting"></i>
-              </el-button>
-            </div>
             <div class="right rightNew2">
               <span class="cooperation">协作人员:</span>
               <img class="imgPeople" src="../../assets/img/icon_default.png" height="18" width="18"/>
