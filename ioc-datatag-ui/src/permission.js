@@ -15,6 +15,7 @@ if (window.singleSpaNavigate) {
     const objectList = [
       '/dataminingweb',
       '/datacollisionweb',
+      '/datatransferweb',
       '/datatagweb',
       '/platformweb',
       '/datalakeweb',
