@@ -20,7 +20,6 @@
     "postcss-selector-namespace": "^3.0.1",
     "qs": "^6.7.0",
     "qs.js": "^0.1.12",
-    "single-spa-vue": "^1.8.0",
     "stats-webpack-plugin": "^0.7.0",
     "vue": "^2.6.6",
     "vue-router": "^3.1.3",

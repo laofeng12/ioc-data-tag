@@ -1,5 +1,5 @@
 <template>
   <div id="app" class="datatagweb-postcss">
-    <router-view></router-view>
+    <keep-alive><router-view></router-view></keep-alive>
   </div>
 </template>

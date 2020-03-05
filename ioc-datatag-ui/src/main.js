@@ -14,7 +14,7 @@ import '@/styles/index.scss'
 import api from '@/api'
 import * as filters from '@/filters'
 import Router from 'vue-router'
-import singleSpaVue from 'single-spa-vue'
+import singleSpaVue from './single-spa-vue'
 import '@/permission' // permission control
 
 const originalPush = Router.prototype.push
