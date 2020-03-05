@@ -733,7 +733,7 @@
             isDelete: isDeleted
           }
         })
-        if (tmp.length == this.tableData.length) {
+        if (this.changeRed > -1 && tmp!="" && tmp.useTagGroup != '123947334341780') {
           for (let data of tmp) {
             if (data.useTagGroup && data.useTagGroup == '123947334341780') {
               this.$message.error('请选择标签组！');

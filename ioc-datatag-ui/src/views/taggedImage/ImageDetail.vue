@@ -16,7 +16,7 @@
         <div class="newTable  daList  imageTable" v-if="showTable">
           <el-table ref="multipleTable" :data="ztableShowList" border stripe tooltip-effect="dark"
                     style="width: 100%;text-align: center"
-                    :header-cell-style="{background:'#f0f2f5'}">
+                    :header-cell-style="{background:'#f0f2f5'}" :height="clientHeight2">
             <template slot="empty">
               <div v-if="Loading">
                 <div v-loading="saveLoading2"></div>
@@ -28,15 +28,14 @@
             <!--<span class="operationIcona  look" @click="lookImage(props.row)">查看画像</span>-->
             <!--</template>-->
             <!--</el-table-column>-->
-            <el-table-column :title="item.showText" :label="item.showText" v-for="(item,index) in list" :key="index"
-                             :prop="item.showText" min-width="330" v-if="index <1" show-overflow-tooltip>
+            <el-table-column :label="item.showText" v-for="(item,index) in list" :key="index"
+                             :prop="item.definition" min-width="300" v-if="index <1" show-overflow-tooltip>
               <template slot-scope="props" class="caozuo">
                 <span class="operationIcona  look" @click="lookImage(props.row)">{{props.row[item.definition]}}</span>
               </template>
             </el-table-column>
-            <el-table-column :title="item.showText" :label="item.showText" v-for="(item,index) in list" :key="index"
-                              min-width="330" v-if="index > 0" show-overflow-tooltip>
-              <span>{{item.definition}}</span>
+            <el-table-column :label="item.showText" v-for="(item,index) in list" :key="index"
+                             :prop="item.definition" min-width="350" v-if="index > 0" show-overflow-tooltip>
             </el-table-column>
           </el-table>
           <!--<element-pagination :pageSize="size" :total="totalnum" @handleCurrentChange="handleCurrentChange"-->
@@ -66,6 +65,8 @@
     name: 'modelEdit',
     data() {
       return {
+        clientHeight2:window.innerHeight - 180,
+        clientHeight:'',
         showTable: true,
         showPicture: false,
         page: 0,
@@ -85,10 +86,14 @@
         tagName: '',
         updateAsideForce: true,
         pKey: '',
-        tableName: ''
+        tableName: '',
+        colData:[]
       }
     },
-    watch: {},
+    mounted(){
+    },
+    watch: {
+    },
     created() {
       // this.tagId = this.$route.params.id
       // this.tagName = this.$route.params.name
@@ -110,8 +115,7 @@
           const resList = await getTabulation(params)
           if ((resList.data.result.content && resList.data.result.content.length > 0) && (resList.data.cols && resList.data.cols.length > 0)) {
             this.ztableShowList = resList.data.result.content
-            // this.theadData = resList.data.cols
-            this.theadData = resList.data.columnData
+            this.theadData = resList.data.cols
             this.doFalse = true
             this.pKey = resList.data.pKey
             this.tableName = resList.data.tableName
