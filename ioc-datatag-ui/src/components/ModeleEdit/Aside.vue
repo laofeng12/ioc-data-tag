@@ -209,7 +209,7 @@
             <div class="formClass">
               <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
                 <el-form-item label="选择主键" prop="pkey">
-                  <el-select v-model="ruleForm.pkey" filterable placeholder="请选择主键" size="small" @change="changeSel">
+                  <el-select v-model="ruleForm.pkey" name="quantity" filterable placeholder="请选择主键" size="small" @change="changeSel">
                     <el-option
                       v-for="(item,index) in myData"
                       :key="item.sourceColId"
@@ -300,6 +300,10 @@
     },
     data() {
       return {
+        treeId:'',
+        teMap: new Map(),
+        myDataMap:new Map(),
+        inputMap:new Map(),
         readyButton: false,
         contentStyleObj: {
           width: ''
@@ -345,7 +349,7 @@
         editData: [],
         checkTags: false,
         ruleForm: {
-          pkey: '',
+          pkey: ''
         },
         rules: {
           pkey: [
@@ -499,6 +503,7 @@
         // 左边全部字段项 this.columnData
         // 删除
         this.tableData = this.tableData.filter(({definition}) => this.checkedCols.some(citem => citem === definition))
+        this.teMap.set(this.treeId,this.tableData)
         // 本宝宝
         this.checkedCols.forEach((citem) => {
           if ((this.tableData.length === 0 || this.tableData.every(({definition}) => definition !== citem))) {
@@ -516,6 +521,10 @@
             item.colSort = index + 1
           }
         })
+        // 如果主键去掉勾选，把下拉框清空
+        if(!value.includes(this.ruleForm.pkey)){
+          this.ruleForm.pkey = ''
+        }
         // 下拉框填写内容
         if (this.resourceType == 0) {
           this.tableData.forEach((item, index) => {
@@ -523,12 +532,14 @@
               this.myData.push(item)
             }
           })
+          this.myDataMap.set(this.treeId,this.myData)
         } else {
           this.myData = this.tableData.filter(({definition}) => {
             return this.checkedCols.some(citem => {
               return citem === definition && !citem.match(/^copy_/)
             })
           })
+          this.myDataMap.set(this.treeId,this.myData)
         }
         // 清空
         if (value == '') {
@@ -571,9 +582,25 @@
         return data.orgName.indexOf(value) !== -1
       },
       // 对字段进行选择确认,type=0,新建模型，type=1编辑模型
-      async handleNodeClick(data) {
-        this.myData = []
+      async handleNodeClick(data,node) {
+        this.treeId = node.id
         this.editData = []
+        if(this.teMap.get(this.treeId) === undefined){
+          this.tableData = []
+        }else{
+          this.tableData = this.teMap.get(this.treeId)
+        }
+        if(this.myDataMap.get(this.treeId) === undefined){
+          this.myData = []
+        }else{
+          this.myData = this.myDataMap.get(this.treeId)
+        }
+        if(this.inputMap.get(this.treeId) === undefined){
+          //移除校验结果并重置字段值
+          this.$refs['ruleForm'].resetFields()
+        }else{
+          this.ruleForm.pkey = this.inputMap.get(this.treeId)
+        }
         colsOptions = []
         this.checkAll = false
         let colsData = {}
@@ -590,7 +617,6 @@
           this.resourceName = colsData.data.resourceName
           this.resourceId = colsData.data.resourceId
           this.resourceType = colsData.data.type   // 0数据湖 1自建目录
-          this.tableData = []
           // this.columnData.forEach((item, index) => {
           //   colsOptions.push(item.definition)
           // })
@@ -878,7 +904,7 @@
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
       },
       // 打标主键的选择
-      changeSel() {
+      changeSel(val) {
         let index = this.tableData.findIndex(item => item.definition === this.ruleForm.pkey)
         let data = this.tableData.splice(index, 1)
         this.tableData.unshift(data[0])
@@ -899,7 +925,7 @@
           }
         })
         flag && this.$message.error('不能选择有克隆字段的字段作为主键！');
-
+        this.inputMap.set(this.treeId,val)
       },
       handleClick(tab, event) {
         // console.log(tab, event);
