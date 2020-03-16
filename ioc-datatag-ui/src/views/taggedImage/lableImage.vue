@@ -129,6 +129,7 @@
                 format="yyyy-MM-dd HH:mm:ss"
                 type="datetime"
                 :picker-options="pickerOptions"
+                :disabled="dateInput"
                 placeholder="选择日期时间">
               </el-date-picker>
             </el-form-item>
@@ -270,6 +271,7 @@
     name: "tagManage",
     data() {
       return {
+        dateInput:false,
         numResult: '',
         errorContent: '',
         lockReconnect: false,
@@ -553,6 +555,17 @@
                 item.runState = '未开始'
               }
               if (item.runState == 1) {
+                // 判断时间是否比当前时间晚
+                // const str = item.startTime.toString()
+                // const str2 = str.replace('/-/g', '/')
+                // const startTime = new Date(str2).getTime()
+                // if (startTime > new Date()){
+                //   item.runState = '等待运行'
+                //   this.getsocket()
+                // } else {
+                //   item.runState = '运行中'
+                //   this.getsocket()
+                // }
                 item.runState = '等待运行'
                 this.getsocket()
               }
@@ -751,7 +764,20 @@
       this.datamodelList()
     },
     computed: {},
-    watch: {},
+    watch: {
+      'ruleForm.region':{
+        handler: function (newValue, oldValue) {
+          newValue === '0' ? this.dateInput = true : this.dateInput = false
+        },
+        deep: true,
+        immediate: true
+      },
+      // 'ruleForm.state':{
+      //   handler: function (newValue, oldValue) {
+      //     console.log(newValue)
+      //   }
+      // }
+    },
     mounted() {
     }
   }
