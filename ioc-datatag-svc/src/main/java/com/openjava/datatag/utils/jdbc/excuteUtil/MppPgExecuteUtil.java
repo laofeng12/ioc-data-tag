@@ -209,8 +209,12 @@ public class MppPgExecuteUtil extends ExecuteUtil {
 
     @Override
     public String getDropTableSql() {
+        String schema = postgreSqlConfig.getSchema();
         StringBuilder dropTableSqlSb = new StringBuilder();
         dropTableSqlSb.append("DROP TABLE if exists \"");
+        dropTableSqlSb.append(schema);
+        dropTableSqlSb.append("\".");
+        dropTableSqlSb.append("\"");
         dropTableSqlSb.append(tableName);
         dropTableSqlSb.append("\"");
 
