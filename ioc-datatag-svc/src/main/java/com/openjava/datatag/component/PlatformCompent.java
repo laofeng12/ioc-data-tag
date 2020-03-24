@@ -61,7 +61,7 @@ public class PlatformCompent {
     /**
      * 完成工单
      * @param businessId
-     * @param userId
+     * @param userId 协作用户
      *  @param createUser  工单发起人
      */
     public void finish(String businessId,String userId,String createUser){
