@@ -270,6 +270,12 @@
     components: {ElementPagination},
     name: "tagManage",
     data() {
+      let checkDate = (rule,value,callback) =>{
+        if(!value && !this.dateInput){
+          return callback(new Error('请选择时间'))
+        }
+        callback()
+      }
       return {
         dateInput:false,
         numResult: '',
@@ -366,7 +372,7 @@
         },
         rules: {
           date: [
-            {required: true, message: '请选择时间', trigger: 'blur'}
+            {validator:checkDate,trigger: 'blur'}
           ],
           region: [
             {required: true, message: '请选择周期', trigger: 'change'}
@@ -555,17 +561,6 @@
                 item.runState = '未开始'
               }
               if (item.runState == 1) {
-                // 判断时间是否比当前时间晚
-                // const str = item.startTime.toString()
-                // const str2 = str.replace('/-/g', '/')
-                // const startTime = new Date(str2).getTime()
-                // if (startTime > new Date()){
-                //   item.runState = '等待运行'
-                //   this.getsocket()
-                // } else {
-                //   item.runState = '运行中'
-                //   this.getsocket()
-                // }
                 item.runState = '等待运行'
                 this.getsocket()
               }
@@ -767,16 +762,16 @@
     watch: {
       'ruleForm.region':{
         handler: function (newValue, oldValue) {
-          newValue === '0' ? this.dateInput = true : this.dateInput = false
+          if(newValue === '0'){
+            this.dateInput = true
+            this.ruleForm.date = ''
+          }else{
+            this.dateInput = false
+          }
         },
         deep: true,
         immediate: true
-      },
-      // 'ruleForm.state':{
-      //   handler: function (newValue, oldValue) {
-      //     console.log(newValue)
-      //   }
-      // }
+      }
     },
     mounted() {
     }

@@ -1,7 +1,7 @@
 package com.openjava.datatag.tagmodel.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.support.odps.udf.CodecCheck;
+//import com.alibaba.fastjson.support.odps.udf.CodecCheck;
 import com.openjava.audit.auditManagement.component.AuditComponet;
 import com.openjava.audit.auditManagement.vo.AuditLogVO;
 import com.openjava.datatag.common.Constants;
