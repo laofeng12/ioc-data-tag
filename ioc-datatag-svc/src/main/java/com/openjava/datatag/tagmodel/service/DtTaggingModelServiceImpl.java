@@ -754,7 +754,9 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 				errorLog.setTaggingModelId(taggingModelId);//
 				dtTaggingErrorLogService.doSave(errorLog);//
 			}
-			//发送告警信息  todo
+			//websocket通知前端
+			stringRedisTemplate.convertAndSend(Constants.DT_REDIS_MESSAGE_QUEUE_CHANL,JSONObject.toJSONString(tagModel));//缓存消息队列
+			//发送告警信息
 			try {
 				SysUser sysUser = sysUserRepository.getOne(tagModel.getCreateUser());
 				platformCompent.spUnifyMsgNotice(tagModel.getTaggingModelId()+"",tagModel.getCreateUser()+"",sysUser.getAccount());//发送告警信息
@@ -767,7 +769,7 @@ public class DtTaggingModelServiceImpl implements DtTaggingModelService {
 		tagModel.setUpdateNum(totalCount);//
 		tagModel.setSuccessNum(successCount);//
 		tagModel = doSave(tagModel);//
-		stringRedisTemplate.convertAndSend(Constants.DT_REDIS_MESSAGE_QUEUE_CHANL,JSONObject.toJSONString(tagModel));//
+		stringRedisTemplate.convertAndSend(Constants.DT_REDIS_MESSAGE_QUEUE_CHANL,JSONObject.toJSONString(tagModel));//缓存消息队列
 		logger.info(String.format("模型：{%s}打标成功,总记录数数:{%s},成功数{%s},总耗时:{%s}毫秒",taggingModelId,totalCount,successCount,end.getTime()-begin.getTime()));
 	}
 
