@@ -599,6 +599,7 @@
         } catch (e) {
           console.log(e);
         }
+        this.helpId = ''
       },
       // 点击用户操作
       async markingPeople(zuserid, id, index) {
