@@ -452,12 +452,14 @@ public class DtCooperationServiceImpl implements DtCooperationService {
             }
             //取消工单
             if (cancleType){
-                platformCompent.cancel(col.getId()+"",dtos.getCooUser()+"");//取消工单
+                platformCompent.cancel(col.getId()+"",dtos.getCooUser()+"",userInfo.getUserId()+"");//取消工单
             }
             //添加协作成员时添加工单
             if (submitWorkOrderFlag){
                 SysUser user =  sysUserRepository.getOne(dtos.getCooUser());
-                platformCompent.spUnifyWorkform(col.getId()+"",dtos.getCooUser()+"",user.getAccount());
+                //platformCompent.spUnifyWorkform(col.getId()+"",dtos.getCooUser()+"",user.getAccount());
+                platformCompent.spUnifyWorkform(col.getId()+"",userInfo.getUserId(),dtos.getCooUser()+"",user.getAccount());
+
             }
         }
         AuditLogVO vo = new AuditLogVO();//
@@ -561,6 +563,9 @@ public class DtCooperationServiceImpl implements DtCooperationService {
      * @param id
      */
     public void doDelete(Long id){
+        //取消协助工单
+        DtCooperation dtCooperation = dtCooperationRepository.getOne(id);
+        platformCompent.cancel(dtCooperation.getId()+"",dtCooperation.getCooUser()+"",dtCooperation.getCreateUser()+"");
         //根据Id删除协作成员表记录
         dtCooperationRepository.deleteById(id);
         //根据协作成员Id删除协作字段表记录
