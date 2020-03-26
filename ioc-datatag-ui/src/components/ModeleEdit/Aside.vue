@@ -304,6 +304,8 @@
         teMap: new Map(),
         myDataMap:new Map(),
         inputMap:new Map(),
+        checkedColsMap:new Map(),
+        allCheckMap:new Map(),
         readyButton: false,
         contentStyleObj: {
           width: ''
@@ -422,11 +424,13 @@
         this.checkedCols = val ? colsOptions : [];
         this.isIndeterminate = false;
         if (this.checkAll === true) {
+          this.allCheck = true
           this.checkedCols = []
           this.columnData.map(item => {
             item.colSort = ''
             this.checkedCols.push(item.definition)
           })
+          this.checkedColsMap.set(this.treeId,this.checkedCols)
           let newTable = JSON.parse(JSON.stringify(this.columnData))
           this.tableData = newTable
           this.tableData.forEach((item, index) => {
@@ -435,6 +439,8 @@
               item.colSort = index + 1
             }
           })
+          this.teMap.set(this.treeId,this.tableData)
+          this.allCheckMap.set(this.treeId,this.checkAll)
         } else {
           this.tableData = []
         }
@@ -460,6 +466,7 @@
               })
             })
           }
+          this.myDataMap.set(this.treeId,this.myData)
         } else {
           this.myData = []
           this.ruleForm.pkey = ''
@@ -515,6 +522,7 @@
             }
           }
         })
+        this.checkedColsMap.set(this.treeId,this.checkedCols)
         // 排序
         this.tableData.forEach((item, index) => {
           if (item.colSort === '') {
@@ -586,6 +594,7 @@
         this.myData = []
         this.editData = []
         colsOptions = []
+        this.$refs['ruleForm'].resetFields()
         this.checkAll = false
         let colsData = {}
         let allcolsData = {}
@@ -598,6 +607,11 @@
           if(this.teMap.get(this.treeId) === undefined){
             this.tableData = []
           }else{
+            if(this.allCheckMap.get(this.treeId) === undefined){
+              this.checkAll = false
+            }else{
+              this.checkAll = true
+            }
             this.tableData = this.teMap.get(this.treeId)
           }
           if(this.myDataMap.get(this.treeId) === undefined){
@@ -610,6 +624,12 @@
             this.$refs['ruleForm'].resetFields()
           }else{
             this.ruleForm.pkey = this.inputMap.get(this.treeId)
+          }
+          if(this.checkedColsMap.get(this.treeId) === undefined){
+            //移除校验结果并重置字段值
+            this.checkedCols = []
+          }else{
+            this.checkedCols = this.checkedColsMap.get(this.treeId)
           }
           // 全部字段
           this.allcolumnData = allcolsData.data.column
