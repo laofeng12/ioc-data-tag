@@ -300,10 +300,12 @@
     },
     data() {
       return {
-        // treeId:'',
-        // teMap: new Map(),
-        // myDataMap:new Map(),
-        // inputMap:new Map(),
+        treeId:'',
+        teMap: new Map(),
+        myDataMap:new Map(),
+        inputMap:new Map(),
+        checkedColsMap:new Map(),
+        allCheckMap:new Map(),
         readyButton: false,
         contentStyleObj: {
           width: ''
@@ -422,11 +424,13 @@
         this.checkedCols = val ? colsOptions : [];
         this.isIndeterminate = false;
         if (this.checkAll === true) {
+          this.allCheck = true
           this.checkedCols = []
           this.columnData.map(item => {
             item.colSort = ''
             this.checkedCols.push(item.definition)
           })
+          this.checkedColsMap.set(this.treeId,this.checkedCols)
           let newTable = JSON.parse(JSON.stringify(this.columnData))
           this.tableData = newTable
           this.tableData.forEach((item, index) => {
@@ -435,6 +439,8 @@
               item.colSort = index + 1
             }
           })
+          this.teMap.set(this.treeId,this.tableData)
+          this.allCheckMap.set(this.treeId,this.checkAll)
         } else {
           this.tableData = []
         }
@@ -460,6 +466,7 @@
               })
             })
           }
+          this.myDataMap.set(this.treeId,this.myData)
         } else {
           this.myData = []
           this.ruleForm.pkey = ''
@@ -503,7 +510,7 @@
         // 左边全部字段项 this.columnData
         // 删除
         this.tableData = this.tableData.filter(({definition}) => this.checkedCols.some(citem => citem === definition))
-        // this.teMap.set(this.treeId,this.tableData)
+        this.teMap.set(this.treeId,this.tableData)
         // 本宝宝
         this.checkedCols.forEach((citem) => {
           if ((this.tableData.length === 0 || this.tableData.every(({definition}) => definition !== citem))) {
@@ -515,6 +522,7 @@
             }
           }
         })
+        this.checkedColsMap.set(this.treeId,this.checkedCols)
         // 排序
         this.tableData.forEach((item, index) => {
           if (item.colSort === '') {
@@ -532,14 +540,14 @@
               this.myData.push(item)
             }
           })
-          // this.myDataMap.set(this.treeId,this.myData)
+          this.myDataMap.set(this.treeId,this.myData)
         } else {
           this.myData = this.tableData.filter(({definition}) => {
             return this.checkedCols.some(citem => {
               return citem === definition && !citem.match(/^copy_/)
             })
           })
-          // this.myDataMap.set(this.treeId,this.myData)
+          this.myDataMap.set(this.treeId,this.myData)
         }
         // 清空
         if (value == '') {
@@ -585,23 +593,8 @@
       async handleNodeClick(data) {
         this.myData = []
         this.editData = []
-        // if(this.teMap.get(this.treeId) === undefined){
-        //   this.tableData = []
-        // }else{
-        //   this.tableData = this.teMap.get(this.treeId)
-        // }
-        // if(this.myDataMap.get(this.treeId) === undefined){
-        //   this.myData = []
-        // }else{
-        //   this.myData = this.myDataMap.get(this.treeId)
-        // }
-        // if(this.inputMap.get(this.treeId) === undefined){
-        //   //移除校验结果并重置字段值
-        //   this.$refs['ruleForm'].resetFields()
-        // }else{
-        //   this.ruleForm.pkey = this.inputMap.get(this.treeId)
-        // }
         colsOptions = []
+        this.$refs['ruleForm'].resetFields()
         this.checkAll = false
         let colsData = {}
         let allcolsData = {}
@@ -610,6 +603,34 @@
           // 新建模型字段确认获取数据
           colsData = await getResourceInfoData(data.resourceId, data.type, 1)  // 有权限的字段
           allcolsData = await getResourceInfoData(data.resourceId, data.type, 0)  // 全部的字段
+          this.treeId = data.resourceId
+          if(this.teMap.get(this.treeId) === undefined){
+            this.tableData = []
+          }else{
+            if(this.allCheckMap.get(this.treeId) === undefined){
+              this.checkAll = false
+            }else{
+              this.checkAll = true
+            }
+            this.tableData = this.teMap.get(this.treeId)
+          }
+          if(this.myDataMap.get(this.treeId) === undefined){
+            this.myData = []
+          }else{
+            this.myData = this.myDataMap.get(this.treeId)
+          }
+          if(this.inputMap.get(this.treeId) === undefined){
+            //移除校验结果并重置字段值
+            this.$refs['ruleForm'].resetFields()
+          }else{
+            this.ruleForm.pkey = this.inputMap.get(this.treeId)
+          }
+          if(this.checkedColsMap.get(this.treeId) === undefined){
+            //移除校验结果并重置字段值
+            this.checkedCols = []
+          }else{
+            this.checkedCols = this.checkedColsMap.get(this.treeId)
+          }
           // 全部字段
           this.allcolumnData = allcolsData.data.column
           // 有权限字段
@@ -617,7 +638,7 @@
           this.resourceName = colsData.data.resourceName
           this.resourceId = colsData.data.resourceId
           this.resourceType = colsData.data.type   // 0数据湖 1自建目录
-          this.tableData = []
+          // this.tableData = []
           // this.columnData.forEach((item, index) => {
           //   colsOptions.push(item.definition)
           // })
@@ -905,7 +926,7 @@
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cols.length;
       },
       // 打标主键的选择
-      changeSel() {
+      changeSel(val) {
         let index = this.tableData.findIndex(item => item.definition === this.ruleForm.pkey)
         let data = this.tableData.splice(index, 1)
         this.tableData.unshift(data[0])
@@ -926,7 +947,7 @@
           }
         })
         flag && this.$message.error('不能选择有克隆字段的字段作为主键！');
-        // this.inputMap.set(this.treeId,val)
+        this.inputMap.set(this.treeId,val)
       },
       handleClick(tab, event) {
         // console.log(tab, event);
