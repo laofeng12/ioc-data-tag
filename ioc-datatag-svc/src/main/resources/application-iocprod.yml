@@ -24,7 +24,7 @@ spring:
     password: ENC(F4SHg+Y7jo2GC2BnKvx8Rs8b5biSGt60)
     druid:
       initial-size: 1
-      max-active: 100
+      max-active: 10
       min-idle: 1
       max-wait: 20000 # 配置获取连接等待超时的时间
       pool-prepared-statements: false
