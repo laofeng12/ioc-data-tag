@@ -129,6 +129,7 @@
                 format="yyyy-MM-dd HH:mm:ss"
                 type="datetime"
                 :picker-options="pickerOptions"
+                :disabled="dateInput"
                 placeholder="选择日期时间">
               </el-date-picker>
             </el-form-item>
@@ -269,7 +270,14 @@
     components: {ElementPagination},
     name: "tagManage",
     data() {
+      let checkDate = (rule,value,callback) =>{
+        if(!value && !this.dateInput){
+          return callback(new Error('请选择时间'))
+        }
+        callback()
+      }
       return {
+        dateInput:false,
         numResult: '',
         errorContent: '',
         lockReconnect: false,
@@ -364,7 +372,7 @@
         },
         rules: {
           date: [
-            {required: true, message: '请选择时间', trigger: 'blur'}
+            {validator:checkDate,trigger: 'blur'}
           ],
           region: [
             {required: true, message: '请选择周期', trigger: 'change'}
@@ -751,7 +759,20 @@
       this.datamodelList()
     },
     computed: {},
-    watch: {},
+    watch: {
+      'ruleForm.region':{
+        handler: function (newValue, oldValue) {
+          if(newValue === '0'){
+            this.dateInput = true
+            this.ruleForm.date = ''
+          }else{
+            this.dateInput = false
+          }
+        },
+        deep: true,
+        immediate: true
+      }
+    },
     mounted() {
     }
   }
