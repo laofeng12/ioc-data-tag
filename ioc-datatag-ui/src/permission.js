@@ -12,25 +12,14 @@ const whiteList = ['/login', '/home']
 // single-spa 模式下，路由拦截只设置用户信息，路由判断由外围统一处理
 if (window.singleSpaNavigate) {
   router.beforeEach((to, from, next) => {
-    const objectList = [
-      '/dataminingweb',
-      '/datacollisionweb',
-      '/datatransferweb',
-      '/datatagweb',
-      '/platformweb',
-      '/datalakeweb',
-      '/visualweb',
-      '/olapweb',
-      '/biweb',
-      '/dsweb'
-    ]
+    const objectList = Object.keys(window.singleSpaConfig.spaProjects)
     for (let obj of objectList) {
       if (to.path.match(new RegExp('^' + obj))) {
         return
       }
     }
     // 把路由挂在 window，让外围拿到数据
-    window.router = { to, baseUrl: '/datatagweb' }
+    window.singleSpaConfig.router = { to, baseUrl: '/datatagweb' }
     const userInfo = getUserInfo()
     store.commit('SET_USERINFO', userInfo)
     next()

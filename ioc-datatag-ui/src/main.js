@@ -16,6 +16,9 @@ import * as filters from '@/filters'
 import Router from 'vue-router'
 import singleSpaVue from './single-spa-vue'
 import '@/permission' // permission control
+import UrlKeepAlive from '@/components/UrlKeepAlive'
+
+Vue.component('url-keep-alive', UrlKeepAlive)
 
 const originalPush = Router.prototype.push
 Router.prototype.push = function push (location) {
