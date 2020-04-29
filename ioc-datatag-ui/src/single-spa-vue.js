@@ -57,9 +57,10 @@ function bootstrap (opts) {
 
 function mount (opts, mountedInstances, props) {
   return Promise.resolve().then(() => {
-    if (mountedInstances.instance) {
-      mountedInstances.instance.$el.style.display = 'block'
-      return mountedInstances.instance
+    if (window.singleSpaConfig.spaProjects[props.name].instance) {
+      const app = document.getElementById('app')
+      app.appendChild(window.singleSpaConfig.spaProjects[props.name].instance.$el)
+      return window.singleSpaConfig.spaProjects[props.name].instance
     }
 
     const appOptions = { ...opts.appOptions }
@@ -120,6 +121,7 @@ function mount (opts, mountedInstances, props) {
         mountedInstances.instance
       )
     }
+    window.singleSpaConfig.spaProjects[props.name].instance = mountedInstances.instance
     return mountedInstances.instance
   })
 }
@@ -138,8 +140,10 @@ function update (opts, mountedInstances, props) {
 
 function unmount (opts, mountedInstances) {
   return Promise.resolve().then(() => {
+    const app = document.getElementById('app')
+    app.innerHTML = ''
     // 隐藏起来~
-    mountedInstances.instance.$el.style.display = 'none'
+    // mountedInstances.instance.$el.style.display = 'none'
 
     // mountedInstances.instance.$destroy()
     // mountedInstances.instance.$el.innerHTML = ''

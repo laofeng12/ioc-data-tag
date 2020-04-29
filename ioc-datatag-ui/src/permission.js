@@ -14,7 +14,7 @@ if (window.singleSpaNavigate) {
   router.beforeEach((to, from, next) => {
     const objectList = Object.keys(window.singleSpaConfig.spaProjects)
     for (let obj of objectList) {
-      if (to.path.match(new RegExp('^' + obj))) {
+      if (to.path.match(new RegExp('^' + '/' +  obj))) {
         return
       }
     }
