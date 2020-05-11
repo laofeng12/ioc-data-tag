@@ -14,7 +14,7 @@
     "echarts-wordcloud": "^1.1.3",
     "element-ui": "^2.8.2",
     "js-cookie": "^2.2.0",
-    "nhc-portal": "^0.7.8",
+    "nhc-portal": "^0.10.17",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "postcss-selector-namespace": "^3.0.1",
