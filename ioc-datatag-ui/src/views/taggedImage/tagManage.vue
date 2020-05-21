@@ -516,6 +516,9 @@ export default {
   created () {
     this.getTagsData()
   },
+  activated () {
+    this.getTagsData()
+  },
   computed: {},
   watch: {},
   mounted () {
