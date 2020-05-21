@@ -260,522 +260,524 @@
 </template>
 
 <script>
-  import {getmodelList, getDispatch, getDelete, getDispatchdetail, startDown, getError} from '@/api/lableImage.js'
-  import {getDtTagGroupData} from '@/api/tagManage'
-  import ElementPagination from '@/components/ElementPagination'
-  import DMSocket from '@/utils/DMSocket'
-  import createSocket from '@/utils/web'
+import { getmodelList, getDispatch, getDelete, getDispatchdetail, startDown, getError } from '@/api/lableImage.js'
+import { getDtTagGroupData } from '@/api/tagManage'
+import ElementPagination from '@/components/ElementPagination'
+import DMSocket from '@/utils/DMSocket'
+import createSocket from '@/utils/web'
 
-  export default {
-    components: {ElementPagination},
-    name: "tagManage",
-    data() {
-      let checkDate = (rule,value,callback) =>{
-        if(!value && !this.dateInput){
-          return callback(new Error('请选择时间'))
-        }
-        callback()
+export default {
+  components: { ElementPagination },
+  name: 'tagManage',
+  data () {
+    let checkDate = (rule, value, callback) => {
+      if (!value && !this.dateInput) {
+        return callback(new Error('请选择时间'))
       }
-      return {
-        dateInput:false,
-        numResult: '',
-        errorContent: '',
-        lockReconnect: false,
-        webUserId: '',
-        downloadId: '',
-        page: 0,
-        size: 10,
-        totalnum: 0,
-        like_modelName: '',
-        eq_runState: '',
-        dispatchName: '',
-        dispatchId: '',
-        deleteName: '',
-        deleteId: '',
-        input2: '',
-        errorDialog: false,
-        Loading: true,
-        saveLoading2: true,
-        controlDialog: false,
-        downloadDialog: false,
-        deleteDialog: false,
-        dispatchLoading: false,
-        deleteLoading: false,
-        saveLoading: false,
-        labelcreatDialog: false,
-        creatsaveLoading: false,
-        percentage: 30,
-        value1: '',
-        textarea: '',
-        WebSocket: null,
-        options: [{
-          value: '',
-          label: '全部'
-        }, {
-          value: '0',
-          label: '未开始'
-        }, {
-          value: '1',
-          label: '等待运行'
-        }, {
-          value: '2',
-          label: '运行中'
-        }, {
-          value: '3',
-          label: '运行成功'
-        }, {
-          value: '4',
-          label: '运行错误'
-        }, {
-          value: '-1',
-          label: '运行结束'
-        }],
-        options2: [{
-          value: '0',
-          label: '停止运行'
-        }, {
-          value: '6',
-          label: '立即执行'
-        }, {
-          value: '1',
-          label: '运行一次'
-        }, {
-          value: '2',
-          label: '每天一次'
-        }, {
-          value: '3',
-          label: '每周一次'
-        }, {
-          value: '4',
-          label: '每月一次'
-        }, {
-          value: '5',
-          label: '每年一次'
-        }],
-        options3: [{
-          value: '0',
-          label: '导出全部数据'
-        }, {
-          value: '1',
-          label: '导出部分数据'
-        }],
-        exportValue: '0',
-        exportNum: '',
+      callback()
+    }
+    return {
+      dateInput: false,
+      numResult: '',
+      errorContent: '',
+      lockReconnect: false,
+      webUserId: '',
+      downloadId: '',
+      page: 0,
+      size: 10,
+      totalnum: 0,
+      like_modelName: '',
+      eq_runState: '',
+      dispatchName: '',
+      dispatchId: '',
+      deleteName: '',
+      deleteId: '',
+      input2: '',
+      errorDialog: false,
+      Loading: true,
+      saveLoading2: true,
+      controlDialog: false,
+      downloadDialog: false,
+      deleteDialog: false,
+      dispatchLoading: false,
+      deleteLoading: false,
+      saveLoading: false,
+      labelcreatDialog: false,
+      creatsaveLoading: false,
+      percentage: 30,
+      value1: '',
+      textarea: '',
+      WebSocket: null,
+      options: [{
         value: '',
-        ztableShowList: [],
-        timer: '',
-        ruleForm: {
-          region: null,
-          date: null,
-          tagsName: '',
-          synopsis: ''
-        },
-        rules: {
-          date: [
-            {validator:checkDate,trigger: 'blur'}
-          ],
-          region: [
-            {required: true, message: '请选择周期', trigger: 'change'}
-          ],
-          labelName: [
-            {required: true, message: '请填写名称', trigger: 'blur'}
-          ],
-          tagsName: [
-            {required: true, message: '请填写名称', trigger: 'blur'}
-          ]
-        },
-        pickerOptions: {
-          disabledDate(time) {
-            return time.getTime() <= Date.now() - 8.64e7
-          }
-        },
+        label: '全部'
+      }, {
+        value: '0',
+        label: '未开始'
+      }, {
+        value: '1',
+        label: '等待运行'
+      }, {
+        value: '2',
+        label: '运行中'
+      }, {
+        value: '3',
+        label: '运行成功'
+      }, {
+        value: '4',
+        label: '运行错误'
+      }, {
+        value: '-1',
+        label: '运行结束'
+      }],
+      options2: [{
+        value: '0',
+        label: '停止运行'
+      }, {
+        value: '6',
+        label: '立即执行'
+      }, {
+        value: '1',
+        label: '运行一次'
+      }, {
+        value: '2',
+        label: '每天一次'
+      }, {
+        value: '3',
+        label: '每周一次'
+      }, {
+        value: '4',
+        label: '每月一次'
+      }, {
+        value: '5',
+        label: '每年一次'
+      }],
+      options3: [{
+        value: '0',
+        label: '导出全部数据'
+      }, {
+        value: '1',
+        label: '导出部分数据'
+      }],
+      exportValue: '0',
+      exportNum: '',
+      value: '',
+      ztableShowList: [],
+      timer: '',
+      ruleForm: {
+        region: null,
+        date: null,
+        tagsName: '',
+        synopsis: ''
+      },
+      rules: {
+        date: [
+          { validator: checkDate, trigger: 'blur' }
+        ],
+        region: [
+          { required: true, message: '请选择周期', trigger: 'change' }
+        ],
+        labelName: [
+          { required: true, message: '请填写名称', trigger: 'blur' }
+        ],
+        tagsName: [
+          { required: true, message: '请填写名称', trigger: 'blur' }
+        ]
+      },
+      pickerOptions: {
+        disabledDate (time) {
+          return time.getTime() <= Date.now() - 8.64e7
+        }
+      }
+    }
+  },
+  methods: {
+    stateColor (runState) {
+      if (runState == '未开始' || runState == '等待运行' || runState == '运行结束') {
+        return 'color:#909399;'
+      } else if (runState == '运行中' || runState == '运行成功') {
+        return 'color:#67c23a'
+      } else {
+        return 'color:#ee0320'
       }
     },
-    methods: {
-      stateColor(runState) {
-        if (runState == '未开始' || runState == '等待运行' || runState == '运行结束') {
-          return "color:#909399;";
-        } else if (runState == '运行中' || runState == '运行成功') {
-          return "color:#67c23a";
-        } else {
-          return "color:#ee0320";
-        }
-      },
-      spotColor(runState) {
-        if (runState == '未开始' || runState == '等待运行' || runState == '运行结束') {
-          return "backgroundColor:#909399";
-        } else if (runState == '运行中' || runState == '运行成功') {
-          return "backgroundColor:#67c23a";
-        } else {
-          return "backgroundColor:#ee0320";
-        }
-      },
-      /**
+    spotColor (runState) {
+      if (runState == '未开始' || runState == '等待运行' || runState == '运行结束') {
+        return 'backgroundColor:#909399'
+      } else if (runState == '运行中' || runState == '运行成功') {
+        return 'backgroundColor:#67c23a'
+      } else {
+        return 'backgroundColor:#ee0320'
+      }
+    },
+    /**
        * 标签组调度
        * @param name
        * @param id
        * @returns {Promise<void>}
        */
-      async handleControl(name, id) {
-        this.controlDialog = true
-        this.dispatchName = name
-        this.dispatchId = id
-        try {
-          const resOk = await getDispatchdetail({
-            taggingModelId: id
-          })
-          this.options2.forEach(item => {
-            if (resOk.cycleEnum == item.value) {
-              resOk.cycleEnum = item.value
-            }
-          })
-          this.ruleForm.date = resOk.startTime
-          this.ruleForm.region = resOk.cycleEnum
-        } catch (e) {
-          console.log(e);
-        }
-      },
-      closeControl() {
-        this.controlDialog = false
-        this.$refs.ruleForm.resetFields()
-      },
-      /**
+    async handleControl (name, id) {
+      this.controlDialog = true
+      this.dispatchName = name
+      this.dispatchId = id
+      try {
+        const resOk = await getDispatchdetail({
+          taggingModelId: id
+        })
+        this.options2.forEach(item => {
+          if (resOk.cycleEnum == item.value) {
+            resOk.cycleEnum = item.value
+          }
+        })
+        this.ruleForm.date = resOk.startTime
+        this.ruleForm.region = resOk.cycleEnum
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    closeControl () {
+      this.controlDialog = false
+      this.$refs.ruleForm.resetFields()
+    },
+    /**
        * 导出数据
        * @param id
        * @param num
        */
-      download(id, num) {
-        if (num === '0/0') {
-          this.$message.error('调度成功数量为0，无法导出！');
-          return
+    download (id, num) {
+      if (num === '0/0') {
+        this.$message.error('调度成功数量为0，无法导出！')
+      } else {
+        this.downloadDialog = true
+        this.downloadId = id
+        const numResult = num.split('/')
+        this.numResult = numResult[1]
+      }
+    },
+    // 关闭下载模板
+    closeDownload () {
+      this.downloadDialog = false
+      this.exportNum = ''
+    },
+    // 取消下载模板操作
+    cancleExport () {
+      this.downloadDialog = false
+      this.exportNum = ''
+    },
+    // 获取删除信息
+    handleDelete (name, id) {
+      this.deleteDialog = true
+      this.deleteName = name
+      this.deleteId = id
+    },
+    // 关闭删除
+    closedelete () {
+      this.deleteDialog = false
+    },
+    // 删除取消按钮操作
+    cancelDelete () {
+      this.deleteDialog = false
+    },
+    createLabel () {
+      this.labelcreatDialog = true
+    },
+    createModel () {
+      this.$router.push('creatModel')
+    },
+    cooperationModel () {
+      this.$router.push('cooperationModel')
+    },
+    // 下载跳转操作
+    down () {
+      this.$router.push('download')
+    },
+    // 导出数据操作
+    async handleExport () {
+      this.saveLoading = true
+      const reg = new RegExp('^[0-9]*$')
+      if ((this.exportValue == 1 && this.exportNum != '') || this.exportValue == 0) {
+        if (!reg.test(this.exportNum)) {
+          this.$message({
+            message: '请输入正确的数字！',
+            type: 'warning'
+          })
+          this.saveLoading = false
         } else {
-          this.downloadDialog = true
-          this.downloadId = id
-          const numResult = num.split('/')
-          this.numResult = numResult[1]
-        }
-      },
-      // 关闭下载模板
-      closeDownload() {
-        this.downloadDialog = false
-        this.exportNum = ''
-      },
-      // 取消下载模板操作
-      cancleExport() {
-        this.downloadDialog = false
-        this.exportNum = ''
-      },
-      // 获取删除信息
-      handleDelete(name, id) {
-        this.deleteDialog = true
-        this.deleteName = name
-        this.deleteId = id
-      },
-      // 关闭删除
-      closedelete() {
-        this.deleteDialog = false
-      },
-      // 删除取消按钮操作
-      cancelDelete() {
-        this.deleteDialog = false
-      },
-      createLabel() {
-        this.labelcreatDialog = true
-      },
-      createModel() {
-        this.$router.push('creatModel')
-      },
-      cooperationModel() {
-        this.$router.push('cooperationModel')
-      },
-      // 下载跳转操作
-      down() {
-        this.$router.push('download')
-      },
-      // 导出数据操作
-      async handleExport() {
-        this.saveLoading = true
-        const reg = new RegExp("^[0-9]*$")
-        if ((this.exportValue == 1 && this.exportNum != '') || this.exportValue == 0) {
-          if (!reg.test(this.exportNum)) {
+          if (Number(this.exportNum) > Number(this.numResult)) {
             this.$message({
-              message: '请输入正确的数字！',
+              message: '导出条目数量应小于调度成功数量！',
               type: 'warning'
-            });
+            })
             this.saveLoading = false
           } else {
-            if (Number(this.exportNum) > Number(this.numResult)) {
+            const params = {
+              number: this.exportNum,
+              taggingModelId: this.downloadId
+            }
+            try {
+              const res = await startDown(params)
               this.$message({
-                message: '导出条目数量应小于调度成功数量！',
-                type: 'warning'
-              });
+                message: res.message,
+                type: 'success'
+              })
               this.saveLoading = false
-            } else {
-              const params = {
-                number: this.exportNum,
-                taggingModelId: this.downloadId
-              }
-              try {
-                const res = await startDown(params)
-                this.$message({
-                  message: res.message,
-                  type: 'success'
-                });
-                this.saveLoading = false
-                this.downloadDialog = false
-                this.$router.push('download')
-              } catch (e) {
-                this.saveLoading = false
-                console.log(e);
-              }
+              this.downloadDialog = false
+              this.$router.push('download')
+            } catch (e) {
+              this.saveLoading = false
+              console.log(e)
             }
           }
-        } else {
-          this.$message.error('请输入需要导出的数据条目数量');
-          this.saveLoading = false
         }
-      },
-      // 定时器
-      setTimer() {
-        setInterval(() => {
-          this.datamodelList()
-        }, 5000)
-      },
-      // 获取数据列表操作
-      async datamodelList() {
-        const params = {
-          eq_runState: this.value,
-          ge_startTime: '',
-          le_startTime: '',
-          like_modelName: this.input2,
-          page: this.page,
-          size: this.size
-        }
-        try {
-          const modelList = await getmodelList(params)
-          if (modelList.rows && modelList.rows.length > 0) {
-            this.ztableShowList = modelList.rows
-            this.totalnum = modelList.total
-            modelList.rows.map(item => {
-              if (item.runState == 0) {
-                item.runState = '未开始'
-              }
-              if (item.runState == 1) {
-                item.runState = '等待运行'
-                this.getsocket()
-              }
-              if (item.runState == 2) {
-                item.runState = '运行中'
-                this.getsocket()
-              }
-              if (item.runState == 3) {
-                item.runState = '运行成功'
-              }
-              if (item.runState == 4) {
-                item.runState = '运行错误'
-              }
-              if (item.runState == -1) {
-                item.runState = '运行结束'
-              }
-            })
-            // this.getsocket()
-          } else {
-            this.ztableShowList = []
-            this.Loading = false
-            this.totalnum = 0
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      },
-      handleCurrentChange(page) {
-        this.page = page - 1
+      } else {
+        this.$message.error('请输入需要导出的数据条目数量')
+        this.saveLoading = false
+      }
+    },
+    // 定时器
+    setTimer () {
+      setInterval(() => {
         this.datamodelList()
-      },
-      handleSizeChange(size) {
-        this.size = size
-        this.datamodelList()
-      },
-      goPage() {
-      },
-      // 查询操作
-      modelQuery() {
-        this.page = 0
-        this.datamodelList()
-      },
-      /**
-       * 确定调度操作
-       */
-      async sureDispatch() {
-        const param = {
-          "cycleEnum": this.ruleForm.region,
-          "id": this.dispatchId,
-          "startTime": this.ruleForm.date
-        }
-        this.dispatchLoading = true
-        if (this.ruleForm.region === '6') {
-          this.$refs['ruleForm'].clearValidate()
-          try {
-            const res = await getDispatch(param)
-            this.$message({
-              message: res.message,
-              type: 'success'
-            });
-            this.dispatchLoading = false
-            this.controlDialog = false
-            this.datamodelList()
-          } catch (e) {
-            console.log(e);
-            this.dispatchLoading = false
-          }
-        } else {
-          this.$refs.ruleForm.validate(async (valid) => {
-            if (valid) {
-              try {
-                // 限制现在运行的时间不能少于当前时间
-                const remindTime = this.ruleForm.date
-                const str = remindTime.toString()
-                const str2 = str.replace('/-/g', '/')
-                const oldTime = new Date(str2).getTime()
-                if (oldTime <= new Date().getTime()) {
-                  this.$message.error('运行开始时间不能小于当前时间!')
-                  this.dispatchLoading = false
-                  return
-                }
-                const res = await getDispatch(param)
-                this.$message({
-                  message: res.message,
-                  type: 'success'
-                });
-                this.dispatchLoading = false
-                this.controlDialog = false
-                this.datamodelList()
-
-              } catch (e) {
-                console.log(e);
-                this.dispatchLoading = false
-              }
-            } else {
-              this.dispatchLoading = false
+      }, 5000)
+    },
+    // 获取数据列表操作
+    async datamodelList () {
+      const params = {
+        eq_runState: this.value,
+        ge_startTime: '',
+        le_startTime: '',
+        like_modelName: this.input2,
+        page: this.page,
+        size: this.size
+      }
+      try {
+        const modelList = await getmodelList(params)
+        if (modelList.rows && modelList.rows.length > 0) {
+          this.ztableShowList = modelList.rows
+          this.totalnum = modelList.total
+          modelList.rows.map(item => {
+            if (item.runState == 0) {
+              item.runState = '未开始'
             }
-          });
-        }
-      },
-      // 确定删除操作
-      async sureDelete() {
-        const res = await getDelete({
-          id: this.deleteId
-        })
-        this.$message({
-          message: res.message,
-          type: 'success'
-        });
-        this.deleteDialog = false
-        this.datamodelList()
-      },
-      closeCreat() {
-        this.$refs.ruleForm.resetFields();
-        this.labelcreatDialog = false
-      },
-      cancleCreat() {
-        this.$refs.ruleForm.resetFields();
-        this.labelcreatDialog = false
-      },
-      // 标签组确定编辑操作
-      sureCreat() {
-        try {
-          this.creatsaveLoading = true
-          this.$refs.ruleForm.validate(async (valid) => {
-            if (valid) {
-              try {
-                const data = await getDtTagGroupData({
-                  id: '',
-                  isNew: true,
-                  isShare: '',
-                  synopsis: this.ruleForm.synopsis,
-                  tagsName: this.ruleForm.tagsName
-                })
-                this.creatsaveLoading = false
-                this.$router.push('/tree/' + data.id + '/' + data.tagsName)
-              } catch (e) {
-                this.creatsaveLoading = false
-                console.log(e);
-              }
-            } else {
-              this.creatsaveLoading = false
+            if (item.runState == 1) {
+              item.runState = '等待运行'
+              this.getsocket()
             }
-          });
-        } catch (e) {
-          this.creatsaveLoading = false
-          console.log(e);
-        }
-      },
-      // 查看画像详情
-      lookImage(row, id, name) {
-        if (row.runState != '运行成功') {
-          this.$message.error('请先进行数据调度成功之后再查看画像！');
-        } else {
-          this.$router.push({
-            path: '/ImageDetail',
-            query: {
-              detailId: id,
-              imageName: name
+            if (item.runState == 2) {
+              item.runState = '运行中'
+              this.getsocket()
+            }
+            if (item.runState == 3) {
+              item.runState = '运行成功'
+            }
+            if (item.runState == 4) {
+              item.runState = '运行错误'
+            }
+            if (item.runState == -1) {
+              item.runState = '运行结束'
             }
           })
+          // this.getsocket()
+        } else {
+          this.ztableShowList = []
+          this.Loading = false
+          this.totalnum = 0
         }
-      },
-      // zhujianxiong
-      getsocket() {
-        const url = '/datatag/websocket/server/' + this.webUserId
-        try {
-          //方法调用
-          const handler = (evt, ws) => {
-            //evt 是 websockett数据
-            var obj = JSON.parse(evt.data)
-            if (obj.datas != "-1") {
-              this.datamodelList()
-              wssCenter.close();  //断开连接
-            }
-          }
-          const wssCenter = createSocket(url, handler, this.webUserId)
-        } catch (e) {
-          console.log(e)
-          this.reconnect(url);
-        }
-      },
-      // 查看错误日记
-      async handleError(taggingModelId) {
-        this.errorDialog = true
-        const res = await getError(taggingModelId)
-        this.errorContent = res
-      },
-      // 关闭查看错误日记
-      cancelError() {
-        this.errorDialog = false
+      } catch (e) {
+        console.log(e)
       }
     },
-    created() {
-      this.webUserId = this.$store.state.user.userInfo.userId
+    handleCurrentChange (page) {
+      this.page = page - 1
       this.datamodelList()
     },
-    computed: {},
-    watch: {
-      'ruleForm.region':{
-        handler: function (newValue, oldValue) {
-          if(newValue === '0'){
-            this.dateInput = true
-            this.ruleForm.date = ''
-          }else{
-            this.dateInput = false
+    handleSizeChange (size) {
+      this.size = size
+      this.datamodelList()
+    },
+    goPage () {
+    },
+    // 查询操作
+    modelQuery () {
+      this.page = 0
+      this.datamodelList()
+    },
+    /**
+       * 确定调度操作
+       */
+    async sureDispatch () {
+      const param = {
+        'cycleEnum': this.ruleForm.region,
+        'id': this.dispatchId,
+        'startTime': this.ruleForm.date
+      }
+      this.dispatchLoading = true
+      if (this.ruleForm.region === '6') {
+        this.$refs['ruleForm'].clearValidate()
+        try {
+          const res = await getDispatch(param)
+          this.$message({
+            message: res.message,
+            type: 'success'
+          })
+          this.dispatchLoading = false
+          this.controlDialog = false
+          this.datamodelList()
+        } catch (e) {
+          console.log(e)
+          this.dispatchLoading = false
+        }
+      } else {
+        this.$refs.ruleForm.validate(async (valid) => {
+          if (valid) {
+            try {
+              // 限制现在运行的时间不能少于当前时间
+              const remindTime = this.ruleForm.date
+              const str = remindTime.toString()
+              const str2 = str.replace('/-/g', '/')
+              const oldTime = new Date(str2).getTime()
+              if (oldTime <= new Date().getTime()) {
+                this.$message.error('运行开始时间不能小于当前时间!')
+                this.dispatchLoading = false
+                return
+              }
+              const res = await getDispatch(param)
+              this.$message({
+                message: res.message,
+                type: 'success'
+              })
+              this.dispatchLoading = false
+              this.controlDialog = false
+              this.datamodelList()
+            } catch (e) {
+              console.log(e)
+              this.dispatchLoading = false
+            }
+          } else {
+            this.dispatchLoading = false
           }
-        },
-        deep: true,
-        immediate: true
+        })
       }
     },
-    mounted() {
+    // 确定删除操作
+    async sureDelete () {
+      const res = await getDelete({
+        id: this.deleteId
+      })
+      this.$message({
+        message: res.message,
+        type: 'success'
+      })
+      this.deleteDialog = false
+      this.datamodelList()
+    },
+    closeCreat () {
+      this.$refs.ruleForm.resetFields()
+      this.labelcreatDialog = false
+    },
+    cancleCreat () {
+      this.$refs.ruleForm.resetFields()
+      this.labelcreatDialog = false
+    },
+    // 标签组确定编辑操作
+    sureCreat () {
+      try {
+        this.creatsaveLoading = true
+        this.$refs.ruleForm.validate(async (valid) => {
+          if (valid) {
+            try {
+              const data = await getDtTagGroupData({
+                id: '',
+                isNew: true,
+                isShare: '',
+                synopsis: this.ruleForm.synopsis,
+                tagsName: this.ruleForm.tagsName
+              })
+              this.creatsaveLoading = false
+              this.closeCreat()
+              this.$router.push('/tree/' + data.id + '/' + data.tagsName)
+            } catch (e) {
+              this.creatsaveLoading = false
+              console.log(e)
+            }
+          } else {
+            this.creatsaveLoading = false
+          }
+        })
+      } catch (e) {
+        this.creatsaveLoading = false
+        console.log(e)
+      }
+    },
+    // 查看画像详情
+    lookImage (row, id, name) {
+      if (row.runState != '运行成功') {
+        this.$message.error('请先进行数据调度成功之后再查看画像！')
+      } else {
+        this.$router.push({
+          path: '/ImageDetail',
+          query: {
+            detailId: id,
+            imageName: name
+          }
+        })
+      }
+    },
+    // zhujianxiong
+    getsocket () {
+      const url = '/datatag/websocket/server/' + this.webUserId
+      try {
+        // 方法调用
+        const handler = (evt, ws) => {
+          // evt 是 websockett数据
+          var obj = JSON.parse(evt.data)
+          if (obj.datas != '-1') {
+            this.datamodelList()
+            wssCenter.close() // 断开连接
+          }
+        }
+        const wssCenter = createSocket(url, handler, this.webUserId)
+      } catch (e) {
+        console.log(e)
+        this.reconnect(url)
+      }
+    },
+    // 查看错误日记
+    async handleError (taggingModelId) {
+      this.errorDialog = true
+      const res = await getError(taggingModelId)
+      this.errorContent = res
+    },
+    // 关闭查看错误日记
+    cancelError () {
+      this.errorDialog = false
     }
+  },
+  created () {
+    this.webUserId = this.$store.state.user.userInfo.userId
+    this.datamodelList()
+  },
+  activated () {
+    this.datamodelList()
+  },
+  computed: {},
+  watch: {
+    'ruleForm.region': {
+      handler: function (newValue, oldValue) {
+        if (newValue === '0') {
+          this.dateInput = true
+          this.ruleForm.date = ''
+        } else {
+          this.dateInput = false
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
+  mounted () {
   }
+}
 </script>
 
 <style scoped>

@@ -202,329 +202,325 @@
 </template>
 
 <script>
-  import {mapActions, mapState, mapGetters} from 'vuex'
-  import ElementPagination from '@/components/ElementPagination'
-  import {getTagsData, getDtTagGroupData, delTagGroup} from '@/api/tagManage'
+import { mapActions, mapState, mapGetters } from 'vuex'
+import ElementPagination from '@/components/ElementPagination'
+import { getTagsData, getDtTagGroupData, delTagGroup } from '@/api/tagManage'
 
-  export default {
-    components: {ElementPagination},
-    name: "tagManage",
-    data() {
-      return {
-        labelId: '',
-        isShare: false,
-        labelName: '',
-        totalnum: 0,
-        eq_isShare: '',
-        keyword: '',
-        page: 0,
-        size: 10,
-        input2: '',
-        tagName: '',
-        delTreeId: '',
-        Loading: true,
-        deleteDialog: false,
-        deleteLoading: false,
-        saveLoading2: true,
-        shareDialog: false,
-        saveLoading: false,
-        labelcreatDialog: false,
-        creatsaveLoading: false,
-        percentage: '',
-        value1: '',
-        textarea: '',
-        options: [{
-          value: '',
-          label: '全部'
-        }, {
-          value: '0',
-          label: '未共享'
-        }, {
-          value: '1',
-          label: '已共享'
-        }],
+export default {
+  components: { ElementPagination },
+  name: 'tagManage',
+  data () {
+    return {
+      labelId: '',
+      isShare: false,
+      labelName: '',
+      totalnum: 0,
+      eq_isShare: '',
+      keyword: '',
+      page: 0,
+      size: 10,
+      input2: '',
+      tagName: '',
+      delTreeId: '',
+      Loading: true,
+      deleteDialog: false,
+      deleteLoading: false,
+      saveLoading2: true,
+      shareDialog: false,
+      saveLoading: false,
+      labelcreatDialog: false,
+      creatsaveLoading: false,
+      percentage: '',
+      value1: '',
+      textarea: '',
+      options: [{
         value: '',
-        ztableShowList: [],
-        ruleForm: {
-          labelName: '',
-          textarea: '',
-          tagsName: '',
-          synopsis: ''
-        },
-        rules: {
-          labelName: [
-            {required: true, message: '请填写名称', trigger: 'blur'}
-          ],
-          tagsName: [
-            {required: true, message: '请填写名称', trigger: 'blur'}
-          ],
-        },
+        label: '全部'
+      }, {
+        value: '0',
+        label: '未共享'
+      }, {
+        value: '1',
+        label: '已共享'
+      }],
+      value: '',
+      ztableShowList: [],
+      ruleForm: {
+        labelName: '',
+        textarea: '',
+        tagsName: '',
+        synopsis: ''
+      },
+      rules: {
+        labelName: [
+          { required: true, message: '请填写名称', trigger: 'blur' }
+        ],
+        tagsName: [
+          { required: true, message: '请填写名称', trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  methods: {
+    customColorMethod (percentage) {
+      if (percentage < 25) {
+        return '#909399'
+      } else if (percentage < 75) {
+        return '#e6a23c'
+      } else {
+        return '#67c23a'
       }
     },
-    methods: {
-      customColorMethod(percentage) {
-        if (percentage < 25) {
-          return '#909399';
-        } else if (percentage < 75) {
-          return '#e6a23c';
-        } else {
-          return '#67c23a';
-        }
-      },
-      handleShare(row) {
-        this.shareDialog = true
-        this.ruleForm.labelName = row.tagsName
-        this.ruleForm.textarea = row.synopsis
-        // if (row.isShare === 0) {
-        //   this.isShare = false
-        // } else {
-        //   this.isShare = true
-        // }
-        this.labelId = row.id
-        // console.log(this.isShare)
-
-      },
-      closeShare() {
-        this.shareDialog = false
-        this.$refs.ruleForm.resetFields()
-      },
-      closeShare2() {
-        this.shareDialog = false
-        this.$refs.ruleForm.resetFields()
-      },
-      /**
+    handleShare (row) {
+      this.shareDialog = true
+      this.ruleForm.labelName = row.tagsName
+      this.ruleForm.textarea = row.synopsis
+      // if (row.isShare === 0) {
+      //   this.isShare = false
+      // } else {
+      //   this.isShare = true
+      // }
+      this.labelId = row.id
+      // console.log(this.isShare)
+    },
+    closeShare () {
+      this.shareDialog = false
+      this.$refs.ruleForm.resetFields()
+    },
+    closeShare2 () {
+      this.shareDialog = false
+      this.$refs.ruleForm.resetFields()
+    },
+    /**
        * 共享
        * @param status
        * @param item
        * @returns {Promise<void>}
        */
-      async shareStatus(status, item) {
-        this.ruleForm.labelName = item.tagsName
-        this.ruleForm.textarea = item.synopsis
-        if (item.isShare === 0) {
-          this.isShare = false
+    async shareStatus (status, item) {
+      this.ruleForm.labelName = item.tagsName
+      this.ruleForm.textarea = item.synopsis
+      if (item.isShare === 0) {
+        this.isShare = false
+      } else {
+        this.isShare = true
+      }
+      this.labelId = item.id
+      try {
+        await this.$confirm(`是否${item.isShare ? '取消' : ''}共享${item.tagsName}`)
+        this.getDtTagGroupData('status')
+      } catch (err) {
+        console.warn(err)
+      }
+    },
+    // 设置确认
+    sureShare () {
+      this.saveLoading = true
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          try {
+            this.getDtTagGroupData('edit')
+            this.shareDialog = false
+            this.saveLoading = false
+          } catch (e) {
+            this.saveLoading = false
+            console.log(e)
+          }
         } else {
-          this.isShare = true
+          this.saveLoading = false
         }
-        this.labelId = item.id
-        try {
-          await this.$confirm(`是否${item.isShare ? '取消' : ''}共享${item.tagsName}`)
-          this.getDtTagGroupData('status')
-        } catch (err) {
-          console.warn(err)
-        }
-      },
-      // 设置确认
-      sureShare() {
-        this.saveLoading = true
-        this.$refs.ruleForm.validate((valid) => {
+      })
+    },
+    createLabel () {
+      this.labelcreatDialog = true
+    },
+    sureCreat () {
+      try {
+        this.creatsaveLoading = true
+        this.$refs.ruleForm.validate(async (valid) => {
           if (valid) {
             try {
-              this.getDtTagGroupData('edit')
-              this.shareDialog = false
-              this.saveLoading = false
-            } catch (e) {
-              this.saveLoading = false
-              console.log(e);
-            }
-          } else {
-            this.saveLoading = false
-          }
-        });
-
-      },
-      createLabel() {
-        this.labelcreatDialog = true
-      },
-      sureCreat() {
-        try {
-          this.creatsaveLoading = true
-          this.$refs.ruleForm.validate(async (valid) => {
-            if (valid) {
-              try {
-                const data = await getDtTagGroupData({
-                  id: '',
-                  isNew: true,
-                  isShare: '',
-                  synopsis: this.ruleForm.synopsis, // 简介
-                  tagsName: this.ruleForm.tagsName  // 名称
-                })
-                this.creatsaveLoading = false
-                this.$router.push('/labelcreatTree/' + data.id + '/' + data.tagsName)
-              } catch (e) {
-                this.creatsaveLoading = false
-                console.log(e);
-              }
-            } else {
+              const data = await getDtTagGroupData({
+                id: '',
+                isNew: true,
+                isShare: '',
+                synopsis: this.ruleForm.synopsis, // 简介
+                tagsName: this.ruleForm.tagsName // 名称
+              })
               this.creatsaveLoading = false
+              this.closeCreat()
+              this.$router.push('/labelcreatTree/' + data.id + '/' + data.tagsName)
+            } catch (e) {
+              this.creatsaveLoading = false
+              console.log(e)
             }
-          });
-        } catch (e) {
-          this.creatsaveLoading = false
-          console.log(e);
-        }
-      },
-      closeCreat() {
-        this.$refs.ruleForm.resetFields();
-        this.labelcreatDialog = false
-      },
-      cancleCreat() {
-        this.$refs.ruleForm.resetFields();
-        this.labelcreatDialog = false
-      },
-      shareLabel() {
-        this.$router.push('/shareLabel')
-      },
-      // 我的标签列表数据
-      async getTagsData() {
-        const params = {
-          eq_isShare: this.eq_isShare,
-          keyword: this.keyword,
-          page: this.page,
-          size: this.size
-        }
-        try {
-          const data = await getTagsData(params)
-          if (data.rows && data.rows.length > 0) {
-            this.ztableShowList = data.rows
-            this.totalnum = data.total
-            data.rows.map(item => {
-              if (item.popularityLevel == 0) {
-                item.popularityLevel = 0
-              }
-              if (item.popularityLevel == 1) {
-                item.popularityLevel = 25
-              }
-              if (item.popularityLevel == 2) {
-                item.popularityLevel = 50
-              }
-              if (item.popularityLevel == 3) {
-                item.popularityLevel = 75
-              }
-              if (item.popularityLevel == 4) {
-                item.popularityLevel = 100
-              }
-            })
           } else {
-            this.ztableShowList = []
-            this.Loading = false
-            this.totalnum = 0
+            this.creatsaveLoading = false
           }
-
-        } catch (e) {
-
-        }
-      },
-
-      // 共享和设置确认
-      async getDtTagGroupData(type) {
-        if (type === 'status') {
-          let isShare = 0
-          if (this.isShare === false) {
-            isShare = 1
-          } else {
-            isShare = 0
-          }
-          let params = {
-            id: this.labelId,
-            isNew: false,
-            isShare: isShare,
-            synopsis: this.ruleForm.textarea,
-            tagsName: this.ruleForm.labelName
-          }
-          try {
-            const data = await getDtTagGroupData(params)
-            this.getQuireData()
-            this.$message({
-              message: '修改状态成功！',
-              type: 'success'
-            });
-          } catch (e) {
-            this.$message.error('修改状态失败，请重试！');
-          }
+        })
+      } catch (e) {
+        this.creatsaveLoading = false
+        console.log(e)
+      }
+    },
+    closeCreat () {
+      this.$refs.ruleForm.resetFields()
+      this.labelcreatDialog = false
+    },
+    cancleCreat () {
+      this.$refs.ruleForm.resetFields()
+      this.labelcreatDialog = false
+    },
+    shareLabel () {
+      this.$router.push('/shareLabel')
+    },
+    // 我的标签列表数据
+    async getTagsData () {
+      const params = {
+        eq_isShare: this.eq_isShare,
+        keyword: this.keyword,
+        page: this.page,
+        size: this.size
+      }
+      try {
+        const data = await getTagsData(params)
+        if (data.rows && data.rows.length > 0) {
+          this.ztableShowList = data.rows
+          this.totalnum = data.total
+          data.rows.map(item => {
+            if (item.popularityLevel == 0) {
+              item.popularityLevel = 0
+            }
+            if (item.popularityLevel == 1) {
+              item.popularityLevel = 25
+            }
+            if (item.popularityLevel == 2) {
+              item.popularityLevel = 50
+            }
+            if (item.popularityLevel == 3) {
+              item.popularityLevel = 75
+            }
+            if (item.popularityLevel == 4) {
+              item.popularityLevel = 100
+            }
+          })
         } else {
-          let params = {
-            id: this.labelId,
-            isNew: false,
-            isShare: '',
-            synopsis: this.ruleForm.textarea,
-            tagsName: this.ruleForm.labelName
-          }
-          try {
-            const data = await getDtTagGroupData(params)
-            this.getQuireData()
-            this.$message({
-              message: '修改信息成功！',
-              type: 'success'
-            });
-          } catch (e) {
-            this.$message.error('修改信息失败，请重试！');
-          }
+          this.ztableShowList = []
+          this.Loading = false
+          this.totalnum = 0
         }
+      } catch (e) {
 
-      },
-      //查询
-      getQuireData() {
-        this.page = 0
-        this.eq_isShare = this.value
-        this.keyword = this.input2
-        this.getTagsData()
-      },
-      //点击分页跳转
-      handleCurrentChange(page) {
-        this.page = page - 1
-        this.getTagsData()
-      },
-      handleSizeChange(size) {
-        this.size = size
-        this.getTagsData()
-      },
-      //点击分页确认
-      goPage() {
+      }
+    },
 
-      },
-      delTaglabel(row) {
-        this.deleteDialog = true
-        this.tagName = row.tagsName
-        this.delTreeId = row.id
-      },
-      closedelete() {
-        this.deleteDialog = false
-      },
-      cancelDelete() {
-        this.deleteDialog = false
-      },
-      //删除
-      async delTag(id) {
+    // 共享和设置确认
+    async getDtTagGroupData (type) {
+      if (type === 'status') {
+        let isShare = 0
+        if (this.isShare === false) {
+          isShare = 1
+        } else {
+          isShare = 0
+        }
+        let params = {
+          id: this.labelId,
+          isNew: false,
+          isShare: isShare,
+          synopsis: this.ruleForm.textarea,
+          tagsName: this.ruleForm.labelName
+        }
         try {
-          const data = await delTagGroup(id)
-          //console.log(data)
-          if (data.message == '删除成功') {
-            this.$message({
-              message: '删除成功',
-              duration: 1000,
-              type: 'success'
-            });
-            this.getTagsData()
-            this.deleteDialog = false
-          } else {
-            this.$message.error(data.message)
-            this.deleteDialog = false
-          }
-
+          const data = await getDtTagGroupData(params)
+          this.getQuireData()
+          this.$message({
+            message: '修改状态成功！',
+            type: 'success'
+          })
         } catch (e) {
-          this.deleteDialog = false
+          this.$message.error('修改状态失败，请重试！')
+        }
+      } else {
+        let params = {
+          id: this.labelId,
+          isNew: false,
+          isShare: '',
+          synopsis: this.ruleForm.textarea,
+          tagsName: this.ruleForm.labelName
+        }
+        try {
+          const data = await getDtTagGroupData(params)
+          this.getQuireData()
+          this.$message({
+            message: '修改信息成功！',
+            type: 'success'
+          })
+        } catch (e) {
+          this.$message.error('修改信息失败，请重试！')
         }
       }
     },
-    created() {
+    // 查询
+    getQuireData () {
+      this.page = 0
+      this.eq_isShare = this.value
+      this.keyword = this.input2
       this.getTagsData()
     },
-    computed: {},
-    watch: {},
-    mounted() {
+    // 点击分页跳转
+    handleCurrentChange (page) {
+      this.page = page - 1
+      this.getTagsData()
+    },
+    handleSizeChange (size) {
+      this.size = size
+      this.getTagsData()
+    },
+    // 点击分页确认
+    goPage () {
+
+    },
+    delTaglabel (row) {
+      this.deleteDialog = true
+      this.tagName = row.tagsName
+      this.delTreeId = row.id
+    },
+    closedelete () {
+      this.deleteDialog = false
+    },
+    cancelDelete () {
+      this.deleteDialog = false
+    },
+    // 删除
+    async delTag (id) {
+      try {
+        const data = await delTagGroup(id)
+        // console.log(data)
+        if (data.message == '删除成功') {
+          this.$message({
+            message: '删除成功',
+            duration: 1000,
+            type: 'success'
+          })
+          this.getTagsData()
+          this.deleteDialog = false
+        } else {
+          this.$message.error(data.message)
+          this.deleteDialog = false
+        }
+      } catch (e) {
+        this.deleteDialog = false
+      }
     }
+  },
+  created () {
+    this.getTagsData()
+  },
+  computed: {},
+  watch: {},
+  mounted () {
   }
+}
 </script>
 
 <style scoped>

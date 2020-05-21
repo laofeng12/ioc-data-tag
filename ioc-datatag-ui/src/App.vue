@@ -13,7 +13,7 @@ export default {
       return window.singleSpaNavigate
     },
     key () {
-      return this.$route.path
+      return this.$route.fullPath
     }
   }
 }
