@@ -127,161 +127,159 @@
 </template>
 
 <script>
-  import {getcooperationList, cooperationQuery} from '@/api/cooperation.js'
-  import {getDtTagGroupData} from '@/api/tagManage'
-  import ElementPagination from '@/components/ElementPagination'
+import { getcooperationList, cooperationQuery } from '@/api/cooperation.js'
+import { getDtTagGroupData } from '@/api/tagManage'
+import ElementPagination from '@/components/ElementPagination'
 
-  export default {
-    components: {ElementPagination},
-    name: "cooperationModel",
-    data() {
-      return {
-        page: 0,
-        size: 10,
-        totalnum: 0,
-        input2: '',
-        Loading: true,
-        saveLoading2: true,
-        saveLoading: false,
-        labelcreatDialog: false,
-        creatsaveLoading: false,
-        value: '',
-        options: [
-          {
-            value: '',
-            label: '全部'
-          }, {
-            value: '0',
-            label: '进行中'
-          }, {
-            value: '1',
-            label: '已完成'
-          }
+export default {
+  components: { ElementPagination },
+  name: 'cooperationModel',
+  data () {
+    return {
+      page: 0,
+      size: 10,
+      totalnum: 0,
+      input2: '',
+      Loading: true,
+      saveLoading2: true,
+      saveLoading: false,
+      labelcreatDialog: false,
+      creatsaveLoading: false,
+      value: '',
+      options: [
+        {
+          value: '',
+          label: '全部'
+        }, {
+          value: '0',
+          label: '进行中'
+        }, {
+          value: '1',
+          label: '已完成'
+        }
+      ],
+      ztableShowList: [],
+      ruleForm: {
+        tagsName: '',
+        synopsis: ''
+      },
+      rules: {
+        labelName: [
+          { required: true, message: '请填写名称', trigger: 'blur' }
         ],
-        ztableShowList: [],
-        ruleForm: {
-          tagsName: '',
-          synopsis: ''
-        },
-        rules: {
-          labelName: [
-            {required: true, message: '请填写名称', trigger: 'blur'}
-          ],
-          tagsName: [
-            {required: true, message: '请填写名称', trigger: 'blur'}
-          ],
-        },
+        tagsName: [
+          { required: true, message: '请填写名称', trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  methods: {
+    stateColor (name) {
+      if (name == '已完成') {
+        return 'color:#999999'
+      } else if (name == '进行中') {
+        return 'color:#00CC33'
+      } else {
+        return 'color:#FF3333'
       }
     },
-    methods: {
-      stateColor(name) {
-        if (name == '已完成') {
-          return "color:#999999";
-        } else if (name == '进行中') {
-          return "color:#00CC33";
-        } else {
-          return "color:#FF3333";
+    marking (id, name) {
+      this.$router.push({
+        path: '/marking',
+        query: {
+          id: id,
+          modelName: name
         }
-      },
-      marking(id, name) {
-        this.$router.push({
-          path: '/marking',
-          query: {
-            id: id,
-            modelName: name
+      })
+    },
+    createLabel () {
+      this.labelcreatDialog = true
+    },
+    closeCreat () {
+      this.$refs.ruleForm.resetFields()
+      this.labelcreatDialog = false
+    },
+    cancleCreat () {
+      this.$refs.ruleForm.resetFields()
+      this.labelcreatDialog = false
+    },
+    async modelQuery () {
+      const params = {
+        eq_cooUser: '',
+        eq_taggmId: '',
+        keyWord: this.input2,
+        runState: this.value,
+        page: this.page,
+        size: this.size
+      }
+      try {
+        const resQuery = await cooperationQuery(params)
+        if (resQuery.rows && resQuery.rows.length > 0) {
+          resQuery.rows.forEach(item => {
+            if (item.runState == 0) {
+              item.runState = '进行中'
+            } else {
+              item.runState = '已完成'
+            }
+          })
+          this.ztableShowList = resQuery.rows
+          this.totalnum = resQuery.total
+        } else {
+          this.ztableShowList = []
+          this.Loading = false
+        }
+      } catch (e) {
+
+      }
+    },
+    sureCreat () {
+      try {
+        this.creatsaveLoading = true
+        this.$refs.ruleForm.validate(async (valid) => {
+          if (valid) {
+            try {
+              const data = await getDtTagGroupData({
+                id: '',
+                isNew: true,
+                isShare: '',
+                synopsis: this.ruleForm.synopsis,
+                tagsName: this.ruleForm.tagsName
+              })
+              this.creatsaveLoading = false
+              this.$router.push('/labelcreatTree/' + data.id + '/' + data.tagsName)
+            } catch (e) {
+              this.creatsaveLoading = false
+              console.log(e)
+            }
+          } else {
+            this.creatsaveLoading = false
           }
         })
-      },
-      createLabel() {
-        this.labelcreatDialog = true
-      },
-      closeCreat() {
-        this.$refs.ruleForm.resetFields();
-        this.labelcreatDialog = false
-      },
-      cancleCreat() {
-        this.$refs.ruleForm.resetFields();
-        this.labelcreatDialog = false
-      },
-      async modelQuery() {
-        const params = {
-          eq_cooUser: '',
-          eq_taggmId: '',
-          keyWord: this.input2,
-          runState: this.value,
-          page: this.page,
-          size: this.size
-        }
-        try {
-          const resQuery = await cooperationQuery(params)
-          if (resQuery.rows && resQuery.rows.length > 0) {
-            resQuery.rows.forEach(item => {
-              if (item.runState == 0) {
-                item.runState = '进行中'
-              } else {
-                item.runState = '已完成'
-              }
-            })
-            this.ztableShowList = resQuery.rows
-            this.totalnum = resQuery.total
-          } else {
-            this.ztableShowList = []
-            this.Loading = false
-          }
-
-        } catch (e) {
-
-        }
-
-      },
-      sureCreat() {
-        try {
-          this.creatsaveLoading = true
-          this.$refs.ruleForm.validate(async (valid) => {
-            if (valid) {
-              try {
-                const data = await getDtTagGroupData({
-                  id: '',
-                  isNew: true,
-                  isShare: '',
-                  synopsis: this.ruleForm.synopsis,
-                  tagsName: this.ruleForm.tagsName
-                })
-                this.creatsaveLoading = false
-                this.$router.push('/labelcreatTree/' + data.id + '/' + data.tagsName)
-              } catch (e) {
-                this.creatsaveLoading = false
-                console.log(e);
-              }
-            } else {
-              this.creatsaveLoading = false
-            }
-          });
-        } catch (e) {
-          this.creatsaveLoading = false
-          console.log(e);
-        }
-      },
-      handleCurrentChange(page) {
-        this.page = page - 1
-        this.modelQuery()
-      },
-      handleSizeChange(size) {
-        this.size = size
-        this.modelQuery()
-      },
-      goPage() {
-      },
+      } catch (e) {
+        this.creatsaveLoading = false
+        console.log(e)
+      }
     },
-    created() {
-      // this.getList()
+    handleCurrentChange (page) {
+      this.page = page - 1
       this.modelQuery()
     },
-    computed: {},
-    watch: {},
-    mounted() {
+    handleSizeChange (size) {
+      this.size = size
+      this.modelQuery()
+    },
+    goPage () {
     }
+  },
+  created () {
+    // this.getList()
+    this.modelQuery()
+  },
+  computed: {},
+  watch: {},
+  mounted () {
   }
+}
 </script>
 
 <style scoped>
