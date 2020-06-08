@@ -129,3 +129,7 @@ platform:
   cancel: ${platform.baseUrl}/category/workform/spUnifyWorkform/cancel/%s/%S-%s #作废工单/{formType}/{businessId}-{userId}
   spUnifyMsgNotice: ${platform.baseUrl}/category/workform/spUnifyMsgNotice  #新增告警消息
 
+iocplatform:
+  url:
+    ioc-admin: http://ioc-admin-svc.ioc-platform:8080
+
