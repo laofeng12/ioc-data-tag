@@ -91,6 +91,11 @@ ljdp:
   security:
     api:
       skey: ENC(U9gx2By8DaCRK/VM7SgZfFluZy8G7InNSmJvTnI8LEDxL8GSns8dVWZJ0cHm6mY2)
+  minio:
+    endpoint: http://19.104.50.77:9004
+    access-key: minio
+    secret-key: IoC#datalake2019
+    download-proxy: /admin/dfs/objectcatalog/download?objectkey=
 
 #计划任务配置 cron表达式
 schedule:
