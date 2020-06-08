@@ -4,9 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.openjava.datatag.demo.dto.BaseResp;
 import com.openjava.datatag.demo.dto.TopDepartmentReqReqDTO;
 import com.openjava.datatag.demo.dto.TopDepartmentRespDTO;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.logging.log4j.core.util.JsonUtils;
 import org.ljdp.common.http.HttpClientUtils;
 import org.ljdp.common.http.LjdpHttpClient;
 
