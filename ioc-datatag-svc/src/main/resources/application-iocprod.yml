@@ -19,7 +19,7 @@ spring:
     #    password: Ch#123456
     # 用Oracle
     driver-class-name: oracle.jdbc.OracleDriver
-    url: ENC(pdkETFhba/RP7Z7DyJnE8U8yiDqrDMbytnzSfvge7uDYDrEDKDJQAtaQCl8oJW+/q7XpUk0iq5c=)
+    url: ENC(fkVR/xFeG2bSQogKTrwJRa7ADJhTunuroXTwxoLM5ajaI3TTxS0nT8O6A59FbafW85N45y5tRxE=)
     username: ENC(bj5AMYvG8zZ956TDzg/6FMaZo0YK2BXt)
     password: ENC(F4SHg+Y7jo2GC2BnKvx8Rs8b5biSGt60)
     druid:
@@ -85,7 +85,11 @@ ljdp:
   security:
     api:
       skey: ENC(U9gx2By8DaCRK/VM7SgZfFluZy8G7InNSmJvTnI8LEDxL8GSns8dVWZJ0cHm6mY2)
-
+  minio:
+    endpoint: http://19.104.50.77:9004
+    access-key: minio
+    secret-key: IoC#datalake2019
+    download-proxy: /admin/dfs/objectcatalog/download?objectkey=
 
 schedulejob: #定时任务组件
   jobMethod: com.openjava.datatag.schedule.job.Schedulejob
@@ -124,4 +128,8 @@ platform:
   finish: ${platform.baseUrl}/category/workform/spUnifyWorkform/finish/%s/%S-%s #完成工单
   cancel: ${platform.baseUrl}/category/workform/spUnifyWorkform/cancel/%s/%S-%s #作废工单/{formType}/{businessId}-{userId}
   spUnifyMsgNotice: ${platform.baseUrl}/category/workform/spUnifyMsgNotice  #新增告警消息
+
+iocplatform:
+  url:
+    ioc-admin: http://ioc-admin-svc.ioc-platform:8080
 
